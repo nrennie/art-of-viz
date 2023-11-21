@@ -62,6 +62,10 @@ download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv",
   destfile = "data/PFW_count_site_data_public_2021.csv")
 
+# Freedom in the world
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-02-22/freedom.csv",
+  destfile = "data/freedom.csv")
 
 
 

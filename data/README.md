@@ -42,6 +42,20 @@ Source: []()
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10)
 
+## Freedom in the world
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-02-22](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-02-22)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
