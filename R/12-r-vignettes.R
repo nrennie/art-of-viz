@@ -1,6 +1,5 @@
 library(tidyverse)
 library(showtext)
-library(usefunc)
 library(lubridate)
 library(jcolors)
 library(gtable)

@@ -1,10 +1,7 @@
 library(tidyverse)
-library(lubridate)
 library(showtext)
-library(camcorder)
 library(ggtext)
 library(glue)
-library(nrBrand)
 
 # load fonts
 font_add_google("VT323", "vt")
@@ -13,16 +10,6 @@ showtext_auto()
 
 # load data
 languages <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-21/languages.csv')
-
-# start recording
-gg_record(
-  dir = file.path("2023", "2023-03-21", "recording"), # where to save the recording
-  device = "png", # device to use to save images
-  width = 6, # width of saved image
-  height = 4, # height of saved image
-  units = "in", # units for width and height
-  dpi = 300 # dpi to use when saving image
-)
 
 # data wrangling
 plot_data <- languages |> 
@@ -109,11 +96,3 @@ ggplot(plot_data) +
         axis.ticks = element_blank(),
         plot.margin = margin(10, 15, 5, 0))
 
-# save gif
-gg_playback(
-  name = file.path("2023", "2023-03-21", "20230321.gif"),
-  first_image_duration = 4,
-  last_image_duration = 20,
-  frame_duration = .25,
-  background = "grey5"
-)
