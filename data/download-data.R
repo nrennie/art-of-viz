@@ -48,6 +48,33 @@ download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-31/cats_uk_reference.csv",
   destfile = "data/cats_uk_reference.csv")
 
+# Doctors in an ageing population
+library(owidR)
+doctors <- owid("physicians-per-1000-people")
+write.csv(doctors, "data/doctors.csv", row.names = FALSE)
+# still need population breakdown
+
+# Bird sightings
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv",
+  destfile = "data/PFW_2021_public.csv")
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv",
+  destfile = "data/PFW_count_site_data_public_2021.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

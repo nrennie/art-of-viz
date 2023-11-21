@@ -32,9 +32,15 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/20
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31)
 
+## Doctors in an ageing population
 
+Source: [https://ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people)
 
+Source: []()
 
+## Bird sightings
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10)
 
 
 
