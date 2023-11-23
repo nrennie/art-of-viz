@@ -1,2 +1,347 @@
-# Bee Colony Losses
+---
+fig-width: 6
+fig-height: 4
+fig-align: center
+fig-dpi: 300
+filters:
+  - line-highlight
+---
 
+# Technology adoption: making donut charts and gauge charts with {ggforce} {#technology}
+
+## Data
+
+```{r}
+#| label: load-technology-data
+#| message: false
+# add tidytuesdayr version
+technology <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-19/technology.csv")
+```
+
+```{r}
+#| label: explore-technology
+head(technology)
+```
+
+what might be interesting
+
+some initial base R exploratory plots
+
+Let's look at something more specific
+
+
+We can get a list of all ISO3 codes with `unique(technology$iso3c)`
+
+```{r}
+#| label: filter-technology
+# subset of countries to look at further
+countries <- c("GBR", "USA", "SWE", "BRA", "NZL", "VEN")
+
+# subset data for specific topic, years, and countries
+measles_data <- technology |>
+  dplyr::filter(
+    label == "% children who received a measles immunization",
+    year %in% c(1980, 2010),
+    iso3c %in% countries
+  )
+head(measles_data)
+```
+
+photos of sketches
+
+```{r}
+#| label: wrangle-technology
+plot_data <- measles_data |>
+  dplyr::select(-c(group, category, variable, label)) |>
+  dplyr::mutate(no_value = 100 - value) |>
+  tidyr::pivot_longer(
+    cols = c(value, no_value),
+    names_to = "YN",
+    values_to = "perc"
+  ) |>
+  tidyr::pivot_wider(names_from = "year", values_from = "perc") |>
+  dplyr::mutate(YN = factor(YN)) |>
+  dplyr::mutate(
+    perc_1980 = `1980` / 100,
+    perc_2010 = `2010` / 100
+  ) |>
+  dplyr::select(-c(`1980`, `2010`)) |>
+  dplyr::group_by(iso3c) |>
+  dplyr::mutate(
+    ymax_1980 = cumsum(perc_1980),
+    ymax_2010 = cumsum(perc_2010)
+  )
+head(plot_data)
+```
+
+what is ggforce
+
+gauge data
+
+this changed from original mutate_at
+
+```{r}
+#| label: technology-gauge-data
+gauge_data <- plot_data |>
+  dplyr::ungroup() |>
+  dplyr::mutate(
+    ymin_1980 = c(rbind(
+      rep(0, length(countries)),
+      (dplyr::slice_head(plot_data, n = -1) |> dplyr::pull(ymax_1980))
+      ))
+  ) |>
+  dplyr::mutate(
+    ymin_2010 = c(rbind(
+      rep(0, length(countries)),
+      (dplyr::slice_head(plot_data, n = -1) |> dplyr::pull(ymax_2010))
+      ))
+  ) |>
+  dplyr::group_by(iso3c) |>
+  dplyr::mutate(
+    dplyr::across(dplyr::starts_with("y", ignore.case = FALSE),
+                  ~ scales::rescale(., to = pi * c(-0.5, 0.5), from = 0:1))
+  )
+```
+
+
+basic plot
+
+```{r}
+#| label: technology-basic-plot
+#| warning: false
+library(ggplot2)
+basic_plot <- ggplot(data = gauge_data) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.7, r = 1,
+      start = ymin_2010, end = ymax_2010,
+      fill = YN
+    )
+  ) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.2, r = 0.5,
+      start = ymin_1980, end = ymax_1980,
+      fill = YN
+    )
+  ) +
+  facet_wrap(~iso3c, nrow = 2)
+basic_plot
+```
+
+
+### Colours
+
+```{r}
+#| label: technology-colours
+highlight_col <- "#990c58"
+second_col <- "#949398"
+bg_col <- "#dedede"
+```
+
+add new colours to basic plot
+
+```{r}
+#| label: technology-basic-plot2
+#| source-line-numbers: "9,18"
+basic_plot <- ggplot(data = gauge_data) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.7, r = 1,
+      start = ymin_2010, end = ymax_2010,
+      fill = YN
+    ),
+    colour = second_col
+  ) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.2, r = 0.5,
+      start = ymin_1980, end = ymax_1980,
+      fill = YN
+    ),
+    colour = second_col
+  ) +
+  facet_wrap(~iso3c, nrow = 2)
+```
+
+add scale fill
+
+
+```{r}
+#| label: technology-colour-plot
+colour_plot <- basic_plot +
+  scale_fill_manual(
+    breaks = c("value", "no_value"),
+    labels = c("Immunised", "Not Immunised"),
+    values = c(highlight_col, second_col)
+  )
+colour_plot
+```
+
+
+## Text and fonts
+
+load font
+
+```{r}
+#| label: technology-fonts
+sysfonts::font_add_google(name = "Ubuntu", family = "ubuntu")
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "ubuntu"
+```
+
+
+write text
+social to add
+
+```{r}
+#| label: technology-text-vars
+title <- "Measles Vaccinations"
+subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
+```
+
+text labels
+
+```{r}
+#| label: technology-text-df
+text_df <- data.frame(
+  x = c(0.35, 0.85),
+  y = c(-0.1, -0.1),
+  label = c(1980, 2010)
+)
+```
+
+
+```{r}
+#| label: technology-text
+text_plot <- colour_plot +
+  geom_text(
+    data = text_df,
+    mapping = aes(x = x, y = y, label = label),
+    family = body_font,
+    size = 6
+  ) +
+  labs(
+    title = title,
+    subtitle = subtitle
+  )
+text_plot
+```
+
+## Theme
+
+tidy up
+
+```{r}
+#| label: technology-theme1
+theme_plot1 <- text_plot +
+  coord_fixed() +
+  theme_void(base_family = body_font)
+theme_plot1
+```
+
+further theming
+
+```{r}
+#| label: technology-theme2
+main_plot <- theme_plot1 +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = bg_col, colour = bg_col),
+    panel.background = element_rect(fill = bg_col, colour = bg_col),
+    plot.title = element_text(
+      margin = margin(t = 10, b = 10),
+      face = "bold",
+      size = rel(1.5)
+    ),
+    plot.subtitle = ggtext::element_textbox_simple(
+      lineheight = 0.5
+    ),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+main_plot
+```
+
+
+## Adding a better legend
+
+As we already saw in chapter ..., 
+
+```{r}
+#| label: technology-legend
+#| fig-width: 3
+#| fig-height: 3
+legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.7, r = 1,
+      start = ymin_2010, end = ymax_2010,
+      fill = YN
+    ),
+    colour = second_col
+  ) +
+  ggforce::geom_arc_bar(
+    mapping = aes(
+      x0 = 0, y0 = 0,
+      r0 = 0.2, r = 0.5,
+      start = ymin_1980, end = ymax_1980,
+      fill = YN
+    ),
+    colour = second_col
+  ) +
+  geom_text(
+    data = text_df,
+    mapping = aes(x = x, y = y, label = label),
+    family = body_font, size = 6
+  ) +
+  facet_wrap(~iso3c) +
+  scale_fill_manual(
+    breaks = c("value", "no_value"),
+    labels = c("Immunised", "Not Immunised"),
+    values = c(highlight_col, second_col)
+  ) +
+  labs(title = "How do I read this plot?") +
+  coord_fixed() +
+  theme_void(base_family = body_font) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    plot.background = element_rect(
+      fill = "transparent", colour = "transparent"
+    ),
+    panel.background = element_rect(
+      fill = "transparent", colour = "transparent"
+    ),
+    plot.title = element_text(
+      hjust = 0.5,
+      face = "italic",
+      margin = margin(t = 10, b = 10)
+    ),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+legend_plot
+```
+
+Join with {patchwork}
+
+```{r}
+#| label: technology-patchwork
+#| warning: false
+library(patchwork)
+final_plot <- main_plot + inset_element(legend_plot, 0.5, 1.0, 1.1, 1.6) &
+  theme(
+    plot.background = element_rect(fill = bg_col, colour = bg_col),
+    panel.background = element_rect(fill = bg_col, colour = bg_col)
+  )
+final_plot
+```
+
+As with previous examples, don't be fooled into thinking ... 
+
+some last thoughts

@@ -2,7 +2,7 @@
 
 The .csv files in this folder are downloaded from the [#TidyTuesday repository](https://github.com/rfordatascience/tidytuesday/tree/master), and are intended as backups only. 
 
-Details of the original data source and accrediations can be found in the original repository, and will be added to the text of this book as each chapter is written.
+Details of the original data source and accreditation can be found in the original repository, and will be added to the text of this book as each chapter is written.
 
 ## Programming languages
 
@@ -61,7 +61,6 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/20
 ## Lemurs
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24)
-
 
 ## R vignettes
 
