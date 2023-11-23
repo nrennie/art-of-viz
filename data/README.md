@@ -48,8 +48,6 @@ All data produced by Our World in Data is completely open access under the Creat
 
 The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our documentation, so you should always check the license of any such third-party data before use and redistribution.
 
-Medical doctors include generalist physicians and specialist medical practitioners.
-
 Source: []()
 
 ## Bird sightings
