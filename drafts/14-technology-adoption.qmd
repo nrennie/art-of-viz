@@ -5,6 +5,8 @@ fig-align: center
 fig-dpi: 300
 filters:
   - line-highlight
+execute: 
+  freeze: auto
 ---
 
 # Technology adoption: making donut charts and gauge charts with {ggforce} {#technology}
@@ -14,8 +16,10 @@ filters:
 ```{r}
 #| label: load-technology-data
 #| message: false
-# add tidytuesdayr version
-technology <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-19/technology.csv")
+#| warning: false
+#| include: false
+tuesdata <- tidytuesdayR::tt_load("2022-07-19")
+technology <- tuesdata$technology
 ```
 
 ```{r}
@@ -24,6 +28,8 @@ head(technology)
 ```
 
 what might be interesting
+
+## Initial exloration
 
 some initial base R exploratory plots
 
@@ -48,6 +54,8 @@ head(measles_data)
 ```
 
 photos of sketches
+
+## Data wrangling
 
 ```{r}
 #| label: wrangle-technology
@@ -74,7 +82,15 @@ plot_data <- measles_data |>
 head(plot_data)
 ```
 
+## The {ggforce} extension package
+
 what is ggforce
+
+### Gauge charts
+
+### `geom_arc_bar()`
+
+### Reformatting data
 
 gauge data
 
@@ -103,11 +119,13 @@ gauge_data <- plot_data |>
   )
 ```
 
+## Initial plots
 
 basic plot
 
 ```{r}
-#| label: technology-basic-plot
+#| label: fig-technology-basic-plot
+#| fig-cap: "Initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries."
 #| warning: false
 library(ggplot2)
 basic_plot <- ggplot(data = gauge_data) +
@@ -132,19 +150,20 @@ basic_plot
 ```
 
 
-### Colours
+### Colors
 
 ```{r}
-#| label: technology-colours
+#| label: technology-colors
 highlight_col <- "#990c58"
 second_col <- "#949398"
 bg_col <- "#dedede"
 ```
 
-add new colours to basic plot
+add new colors to basic plot
 
 ```{r}
-#| label: technology-basic-plot2
+#| label: fig-technology-basic-plot2
+#| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color changed to a medium grey."
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
   ggforce::geom_arc_bar(
@@ -154,7 +173,7 @@ basic_plot <- ggplot(data = gauge_data) +
       start = ymin_2010, end = ymax_2010,
       fill = YN
     ),
-    colour = second_col
+    color = second_col
   ) +
   ggforce::geom_arc_bar(
     mapping = aes(
@@ -163,7 +182,7 @@ basic_plot <- ggplot(data = gauge_data) +
       start = ymin_1980, end = ymax_1980,
       fill = YN
     ),
-    colour = second_col
+    color = second_col
   ) +
   facet_wrap(~iso3c, nrow = 2)
 ```
@@ -172,14 +191,15 @@ add scale fill
 
 
 ```{r}
-#| label: technology-colour-plot
-colour_plot <- basic_plot +
+#| label: fig-technology-color-plot
+#| fig-cap: "Edited version of the previous plot with colors changed from defaults to grey and dark pink."
+color_plot <- basic_plot +
   scale_fill_manual(
     breaks = c("value", "no_value"),
     labels = c("Immunised", "Not Immunised"),
     values = c(highlight_col, second_col)
   )
-colour_plot
+color_plot
 ```
 
 
@@ -201,6 +221,7 @@ social to add
 
 ```{r}
 #| label: technology-text-vars
+#| code-overflow: wrap
 title <- "Measles Vaccinations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
 ```
@@ -218,8 +239,9 @@ text_df <- data.frame(
 
 
 ```{r}
-#| label: technology-text
-text_plot <- colour_plot +
+#| label: fig-technology-text
+#| fig-cap: "Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle."
+text_plot <- color_plot +
   geom_text(
     data = text_df,
     mapping = aes(x = x, y = y, label = label),
@@ -233,12 +255,13 @@ text_plot <- colour_plot +
 text_plot
 ```
 
-## Theme
+## Further styling
 
 tidy up
 
 ```{r}
-#| label: technology-theme1
+#| label: fig-technology-theme1
+#| fig-cap: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed."
 theme_plot1 <- text_plot +
   coord_fixed() +
   theme_void(base_family = body_font)
@@ -248,19 +271,23 @@ theme_plot1
 further theming
 
 ```{r}
-#| label: technology-theme2
+#| label: fig-technology-theme2
+#| fig-cap: "Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title."
 main_plot <- theme_plot1 +
   theme(
     legend.position = "none",
-    plot.background = element_rect(fill = bg_col, colour = bg_col),
-    panel.background = element_rect(fill = bg_col, colour = bg_col),
+    plot.background = element_rect(fill = bg_col, color = bg_col),
+    panel.background = element_rect(fill = bg_col, color = bg_col),
+    strip.text = element_text(face = "bold", size = rel(1.2)),
     plot.title = element_text(
       margin = margin(t = 10, b = 10),
       face = "bold",
       size = rel(1.5)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
-      lineheight = 0.5
+      maxwidth = 0.8,
+      lineheight = 0.5,
+      hjust = 0.5,
     ),
     plot.margin = margin(5, 5, 5, 5)
   )
@@ -273,7 +300,8 @@ main_plot
 As we already saw in chapter ..., 
 
 ```{r}
-#| label: technology-legend
+#| label: fig-technology-legend
+#| fig-cap: "Version of the gauge chart shown only for USA which will act as a legend."
 #| fig-width: 3
 #| fig-height: 3
 legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
@@ -284,7 +312,7 @@ legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
       start = ymin_2010, end = ymax_2010,
       fill = YN
     ),
-    colour = second_col
+    color = second_col
   ) +
   ggforce::geom_arc_bar(
     mapping = aes(
@@ -293,7 +321,7 @@ legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
       start = ymin_1980, end = ymax_1980,
       fill = YN
     ),
-    colour = second_col
+    color = second_col
   ) +
   geom_text(
     data = text_df,
@@ -313,10 +341,10 @@ legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
     legend.position = "bottom",
     legend.title = element_blank(),
     plot.background = element_rect(
-      fill = "transparent", colour = "transparent"
+      fill = "transparent", color = "transparent"
     ),
     panel.background = element_rect(
-      fill = "transparent", colour = "transparent"
+      fill = "transparent", color = "transparent"
     ),
     plot.title = element_text(
       hjust = 0.5,
@@ -328,16 +356,19 @@ legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
 legend_plot
 ```
 
+## Combining legend with {patchwork}
+
 Join with {patchwork}
 
 ```{r}
-#| label: technology-patchwork
+#| label: fig-technology-patchwork
+#| fig-cap: "Final gauge chart with overlaid legend in top right corner."
 #| warning: false
 library(patchwork)
-final_plot <- main_plot + inset_element(legend_plot, 0.5, 1.0, 1.1, 1.6) &
+final_plot <- main_plot + inset_element(legend_plot, 0.5, 0.9, 1.1, 1.4) &
   theme(
-    plot.background = element_rect(fill = bg_col, colour = bg_col),
-    panel.background = element_rect(fill = bg_col, colour = bg_col)
+    plot.background = element_rect(fill = bg_col, color = bg_col),
+    panel.background = element_rect(fill = bg_col, color = bg_col)
   )
 final_plot
 ```
@@ -345,3 +376,12 @@ final_plot
 As with previous examples, don't be fooled into thinking ... 
 
 some last thoughts
+
+## Reflection
+
+Are gauge charts useful?
+
+What would I change?
+
+
+
