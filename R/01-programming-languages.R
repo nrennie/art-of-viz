@@ -1,12 +1,6 @@
 # Load packages -----------------------------------------------------------
 
-library(dplyr)
 library(ggplot2)
-library(ggtext)
-library(readr)
-library(showtext)
-library(sysfonts)
-library(tidyr)
 
 
 # Load data ---------------------------------------------------------------
@@ -17,17 +11,17 @@ languages <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/
 # Data wrangling ----------------------------------------------------------
 
 plot_data <- languages |>
-  filter(type == "pl") |>
-  filter(line_comment_token %in% c("//", "#", ";")) |>
-  select(title, appeared, line_comment_token, last_activity, language_rank) |>
-  drop_na() |>
-  mutate(label = paste("Comment token:", line_comment_token)) |>
-  group_by(label) |>
-  slice_head(n = 10) |>
-  mutate(n = factor(row_number(), levels = 1:10)) |>
-  ungroup() |>
-  select(label, n, title, appeared, last_activity, language_rank) |>
-  pivot_longer(
+  dplyr::filter(type == "pl") |>
+  dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
+  dplyr::select(title, appeared, line_comment_token, last_activity, language_rank) |>
+  tidyr::drop_na() |>
+  dplyr::mutate(label = paste("Comment token:", line_comment_token)) |>
+  dplyr::group_by(label) |>
+  dplyr::slice_head(n = 10) |>
+  dplyr::mutate(n = factor(dplyr::row_number(), levels = 1:10)) |>
+  dplyr::ungroup() |>
+  dplyr::select(label, n, title, appeared, last_activity, language_rank) |>
+  tidyr::pivot_longer(
     cols = c(appeared, last_activity),
     names_to = "type",
     values_to = "year"
@@ -106,6 +100,7 @@ text_plot
 sysfonts::font_add_google("VT323", "vt")
 sysfonts::font_add_google("Share Tech Mono", "share")
 showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
 
 # Font variables
 body_font <- "share"
@@ -195,10 +190,11 @@ theme_plot2 <- theme_plot1 +
     plot.title = element_text(
       colour = main_col,
       family = title_font,
-      size = 40
+      size = 24
     ),
-    plot.subtitle = element_textbox_simple(
+    plot.subtitle = ggtext::element_textbox_simple(
       colour = main_col,
+      lineheight = 2,
       margin = margin(b = 5)
     ),
     plot.caption = element_text(
@@ -216,8 +212,6 @@ theme_plot2 +
   geom_text(
     mapping = aes(x = 1930, y = n, label = title),
     family = body_font,
-    fill = "transparent",
-    label.colour = "transparent",
     vjust = 0.5,
     hjust = 0,
     colour = main_col
@@ -239,17 +233,25 @@ theme_plot2 +
 
 # make an HTML label
 plot_data <- plot_data |>
-  mutate(rank_label = paste0("<p>", title, "</p><p style='font-size:8pt;'>(Rank: ", language_rank, ")</p>"))
+  dplyr::mutate(rank_label = glue::glue("<p>{title}</p><p style='font-size:8pt;'>(Rank: {language_rank})</p>"))
 
 # plot with geom_richtext
 theme_plot2 +
-  geom_richtext(
+  ggtext::geom_richtext(
     data = plot_data,
     mapping = aes(x = 1930, y = n, label = rank_label),
     family = body_font,
     fill = "transparent",
     label.colour = "transparent",
+    lineheight = 0.1,
     vjust = 0.5,
     hjust = 0,
     colour = main_col
   )
+
+# save
+ggsave("plots/programming_languages.png",
+  width = 6,
+  height = 4,
+  units = "in"
+)

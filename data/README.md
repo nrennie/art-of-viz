@@ -16,6 +16,12 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/20
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22)
 
+Copyright info: [https://museweb.dcs.bbk.ac.uk/copyright](https://museweb.dcs.bbk.ac.uk/copyright)
+
+The data and other research material published on this website are open access and free to use under the terms of the Creative Commons (BY) license. This allows users to copy, distribute, remix and build upon the research, so long the Mapping Museums team is credited with its original creation.
+
+Data downloaded from the Mapping Museums website at [www.mappingmuseums.org](www.mappingmuseums.org). Accessed on 2022-11-22.
+
 ## Board games
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25)
@@ -35,6 +41,14 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/20
 ## Doctors in an ageing population
 
 Source: [https://ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people)
+
+Copyright info: [https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data](https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data)
+
+All data produced by Our World in Data is completely open access under the Creative Commons BY license. You have the permission to use, reproduce, and distribute it in any medium, provided the source and authors are credited.
+
+The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our documentation, so you should always check the license of any such third-party data before use and redistribution.
+
+Medical doctors include generalist physicians and specialist medical practitioners.
 
 Source: []()
 
@@ -62,6 +76,10 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/20
 ## Technology adoption
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19)
+
+Copyright info: [https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset](https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset)
+
+The authors have made this dataset available for anyone to use and users should cite the following article: Comin, D. and Hohijn B., "Cross-Country Technological Adoption: Making the Theories Face the Facts". Journal of Monetary Economics, January 2004, pp. 39-83.
 
 ## Premier league
 
