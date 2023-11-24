@@ -9,35 +9,49 @@ execute:
   freeze: auto
 ---
 
-# Technology adoption: making donut charts and gauge charts with {ggforce} {#technology}
+# Technology adoption: making gauge charts with {ggforce} {#technology}
+
+In this chapter we'll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.
 
 ## Data
 
-[@technology_data]
+The *technology adoption* [@technology_data] data comes from 
 
 ```{r}
 #| label: load-technology-data
-#| include: false
-#| echo: true
+#| output: false
 tuesdata <- tidytuesdayR::tt_load("2022-07-19")
 technology <- tuesdata$technology
 ```
 
+The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns. The data is in long format, and 
+
+What might be an interesting aspect of this data to visualize?
+
+## Initial exploration
+
+As in other chapters n this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot` function\index{barplot}:
+
 ```{r}
-#| label: explore-technology
-head(technology)
+#| label: technology-barplot
+barplot(
+  table(technology$category),
+  las = 2,
+  cex.axis = 0.5,
+  cex.names = 0.5
+)
 ```
-
-what might be interesting
-
-## Initial exloration
 
 some initial base R exploratory plots
 
 Let's look at something more specific
 
 
-We can get a list of all ISO3 codes with `unique(technology$iso3c)`
+A list of all ISO3 country codes can be obtained by running `unique(technology$iso3c)`, and from there we can choose a subset of countries we want to look at in more detail. Let's look at Great Britain, USA, Sweden, Brazil, New Zealand, and Venezuela, and store these choices in a vector called `countries`. We also need to narrow down the data we want to consider - there are `r length(unique(technology$label))` different questions contained in the data. You can check by running `length(unique(technology$label))`. One variable we will consider further is the percentage of children who received a measles immunization - indicated by the `"pctimmunizmeas"` level in the `variable` column.
+
+Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter`\index{dplyr!filter} function from {dplyr}\index{dplyr} to filter our `technology` data set to consider only the rows showing data about percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
+
+We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from {dplyr}.
 
 ```{r}
 #| label: filter-technology
@@ -50,18 +64,26 @@ measles_data <- technology |>
     label == "% children who received a measles immunization",
     year %in% c(1980, 2010),
     iso3c %in% countries
-  )
+  ) |>
+  dplyr::select(-c(group, category, variable, label))
 head(measles_data)
 ```
 
+Our tidier data now shows just the percentage (`value`) of children who received a measles immunization in each country (`iso3c`), in each of 1980 and 2010 (`year`), How might we visualize this data?
+
+There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 1980 to 2010? Do we want to compare countries to each other? Do we just want to show the range of values in the data? In this data, the most interesting example is a comparison between 1980 and 2010. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
+
+At the time of writing, there isn't a built-in function in {ggplot2} to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, this initial sketch might give you an idea of what we're aiming for.
+
 photos of sketches
+
+Before ... 
 
 ## Data wrangling
 
 ```{r}
 #| label: wrangle-technology
 plot_data <- measles_data |>
-  dplyr::select(-c(group, category, variable, label)) |>
   dplyr::mutate(no_value = 100 - value) |>
   tidyr::pivot_longer(
     cols = c(value, no_value),
@@ -85,13 +107,13 @@ head(plot_data)
 
 ## The {ggforce} extension package
 
-what is ggforce\index{ggforce}
+The {ggforce}\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of {ggplot2}, many of them aimed at exploratory data visualisation. We won't cover many of it's function in this chapter, and instead we'll focus on how to use it to create gauge charts.
 
-[@ggforce]
+{ggforce} is available on CRAN and can be installed with the usual `install.packages("ggforce")` command.
 
-### Gauge charts 
+### Gauge charts  with {ggforce}
 
-### `geom_arc_bar()`
+`geom_arc_bar()`\index{ggforce!geom\_arc\_bar}
 
 ### Reformatting data
 
@@ -106,19 +128,26 @@ gauge_data <- plot_data |>
   dplyr::mutate(
     ymin_1980 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |> dplyr::pull(ymax_1980))
-      ))
+      (dplyr::slice_head(plot_data, n = -1) |>
+        dplyr::pull(ymax_1980))
+    ))
   ) |>
   dplyr::mutate(
     ymin_2010 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |> dplyr::pull(ymax_2010))
-      ))
+      (dplyr::slice_head(plot_data, n = -1) |>
+        dplyr::pull(ymax_2010))
+    ))
   ) |>
   dplyr::group_by(iso3c) |>
   dplyr::mutate(
-    dplyr::across(dplyr::starts_with("y", ignore.case = FALSE),
-                  ~ scales::rescale(., to = pi * c(-0.5, 0.5), from = 0:1))
+    dplyr::across(
+      dplyr::starts_with("y", ignore.case = FALSE),
+      ~ scales::rescale(.,
+        to = pi * c(-0.5, 0.5),
+        from = 0:1
+      )
+    )
   )
 ```
 
@@ -153,7 +182,7 @@ basic_plot
 ```
 
 
-### Colors
+## Colors
 
 ```{r}
 #| label: technology-colors
@@ -208,7 +237,7 @@ color_plot
 
 ## Text and fonts
 
-load font
+As we've seen in previous chapters, we can load in Google fonts using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` font for both the title and the body font. 
 
 ```{r}
 #| label: technology-fonts
@@ -229,7 +258,7 @@ title <- "Measles Vaccinations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
 ```
 
-text labels
+Since axis labels tend not to make too much sense for `geom-arc_bar()` plots, we'll remove them later when using the `theme`\index{theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
 
 ```{r}
 #| label: technology-text-df
@@ -240,6 +269,7 @@ text_df <- data.frame(
 )
 ```
 
+We can then add this to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text dataframe we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
 
 ```{r}
 #| label: fig-technology-text
@@ -249,7 +279,7 @@ text_plot <- color_plot +
     data = text_df,
     mapping = aes(x = x, y = y, label = label),
     family = body_font,
-    size = 6
+    size = 3
   ) +
   labs(
     title = title,
@@ -258,9 +288,13 @@ text_plot <- color_plot +
 text_plot
 ```
 
-## Further styling
+You'll notice that the subtitle text runs off the page here. Let's fix that using {ggplot2} themes\index{ggplot2!theme} and {ggtext}\index{ggtext} functions.
 
-tidy up
+## Themes and styling
+
+We'll start by removing all of the theme element such as the grey background, grid lines, axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
+
+You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()`\index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
 ```{r}
 #| label: fig-technology-theme1
@@ -271,7 +305,12 @@ theme_plot1 <- text_plot +
 theme_plot1
 ```
 
-further theming
+This looks better but it's still not great. What do we still need to improve with styling? The title text doesn't stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help? The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from {ggtext} \index{ggtext!element\_textbox\_simple}. 
+
+bg col
+remove legend
+
+Let's fix the first three of these issues.
 
 ```{r}
 #| label: fig-technology-theme2
@@ -279,9 +318,15 @@ further theming
 main_plot <- theme_plot1 +
   theme(
     legend.position = "none",
-    plot.background = element_rect(fill = bg_col, color = bg_col),
-    panel.background = element_rect(fill = bg_col, color = bg_col),
-    strip.text = element_text(face = "bold", size = rel(1.2)),
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    strip.text = element_text(
+      face = "bold", size = rel(1.2)
+    ),
     plot.title = element_text(
       margin = margin(t = 10, b = 10),
       face = "bold",
@@ -307,7 +352,9 @@ As we already saw in chapter ...,
 #| fig-cap: "Version of the gauge chart shown only for USA which will act as a legend."
 #| fig-width: 3
 #| fig-height: 3
-legend_plot <- ggplot(data = dplyr::filter(gauge_data, iso3c == "USA")) +
+legend_plot <- ggplot(
+  data = dplyr::filter(gauge_data, iso3c == "USA")
+) +
   ggforce::geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
@@ -368,23 +415,23 @@ Join with {patchwork}
 #| fig-cap: "Final gauge chart with overlaid legend in top right corner."
 #| warning: false
 library(patchwork)
-final_plot <- main_plot + inset_element(legend_plot, 0.5, 0.9, 1.1, 1.4) &
+final_plot <- main_plot +
+  inset_element(legend_plot, 0.5, 0.9, 1.1, 1.4) &
   theme(
-    plot.background = element_rect(fill = bg_col, color = bg_col),
-    panel.background = element_rect(fill = bg_col, color = bg_col)
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, color = bg_col
+    )
   )
 final_plot
 ```
 
-As with previous examples, don't be fooled into thinking ... 
-
-some last thoughts
+As with previous examples, don't be fooled into thinking that the size of the legend and it's positioning within the main plot is something that happened perfectly this first. The values are often picked through a series of trial and error, and with practice you'll get better at choosing starting values.
 
 ## Reflection
 
-Are gauge charts useful?
+Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area . If you measure the change on arc length between 1980 and 2010, you'll get different answers to if you measured the proportional change in area for the two. 
 
 What would I change?
-
-
-
