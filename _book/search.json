@@ -46,7 +46,7 @@
     "href": "chapters/14-technology-adoption.html#data",
     "title": "1  Technology adoption: making donut charts and gauge charts with {ggforce}",
     "section": "\n1.1 Data",
-    "text": "1.1 Data\n\nhead(technology)\n\n# A tibble: 6 × 7\n  variable label                                iso3c  year group category value\n  &lt;chr&gt;    &lt;chr&gt;                                &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;\n1 BCG      % children who received a BCG immun… AFG    1982 Cons… Vaccines    10\n2 BCG      % children who received a BCG immun… AFG    1983 Cons… Vaccines    10\n3 BCG      % children who received a BCG immun… AFG    1984 Cons… Vaccines    11\n4 BCG      % children who received a BCG immun… AFG    1985 Cons… Vaccines    17\n5 BCG      % children who received a BCG immun… AFG    1986 Cons… Vaccines    18\n6 BCG      % children who received a BCG immun… AFG    1987 Cons… Vaccines    27\n\n\nwhat might be interesting"
+    "text": "1.1 Data\n(Comin and B. 2004)\n\nhead(technology)\n\n# A tibble: 6 × 7\n  variable label                                iso3c  year group category value\n  &lt;chr&gt;    &lt;chr&gt;                                &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;\n1 BCG      % children who received a BCG immun… AFG    1982 Cons… Vaccines    10\n2 BCG      % children who received a BCG immun… AFG    1983 Cons… Vaccines    10\n3 BCG      % children who received a BCG immun… AFG    1984 Cons… Vaccines    11\n4 BCG      % children who received a BCG immun… AFG    1985 Cons… Vaccines    17\n5 BCG      % children who received a BCG immun… AFG    1986 Cons… Vaccines    18\n6 BCG      % children who received a BCG immun… AFG    1987 Cons… Vaccines    27\n\n\nwhat might be interesting"
   },
   {
     "objectID": "chapters/14-technology-adoption.html#initial-exloration",
@@ -67,7 +67,7 @@
     "href": "chapters/14-technology-adoption.html#the-ggforce-extension-package",
     "title": "1  Technology adoption: making donut charts and gauge charts with {ggforce}",
     "section": "\n1.4 The {ggforce} extension package",
-    "text": "1.4 The {ggforce} extension package\nwhat is ggforce\n\n1.4.1 Gauge charts\n\n1.4.2 geom_arc_bar()\n\n\n1.4.3 Reformatting data\ngauge data\nthis changed from original mutate_at\n\ngauge_data &lt;- plot_data |&gt;\n  dplyr::ungroup() |&gt;\n  dplyr::mutate(\n    ymin_1980 = c(rbind(\n      rep(0, length(countries)),\n      (dplyr::slice_head(plot_data, n = -1) |&gt; dplyr::pull(ymax_1980))\n      ))\n  ) |&gt;\n  dplyr::mutate(\n    ymin_2010 = c(rbind(\n      rep(0, length(countries)),\n      (dplyr::slice_head(plot_data, n = -1) |&gt; dplyr::pull(ymax_2010))\n      ))\n  ) |&gt;\n  dplyr::group_by(iso3c) |&gt;\n  dplyr::mutate(\n    dplyr::across(dplyr::starts_with(\"y\", ignore.case = FALSE),\n                  ~ scales::rescale(., to = pi * c(-0.5, 0.5), from = 0:1))\n  )"
+    "text": "1.4 The {ggforce} extension package\nwhat is ggforce\n(Pedersen 2022)\n\n1.4.1 Gauge charts\n\n1.4.2 geom_arc_bar()\n\n\n1.4.3 Reformatting data\ngauge data\nthis changed from original mutate_at\n\ngauge_data &lt;- plot_data |&gt;\n  dplyr::ungroup() |&gt;\n  dplyr::mutate(\n    ymin_1980 = c(rbind(\n      rep(0, length(countries)),\n      (dplyr::slice_head(plot_data, n = -1) |&gt; dplyr::pull(ymax_1980))\n      ))\n  ) |&gt;\n  dplyr::mutate(\n    ymin_2010 = c(rbind(\n      rep(0, length(countries)),\n      (dplyr::slice_head(plot_data, n = -1) |&gt; dplyr::pull(ymax_2010))\n      ))\n  ) |&gt;\n  dplyr::group_by(iso3c) |&gt;\n  dplyr::mutate(\n    dplyr::across(dplyr::starts_with(\"y\", ignore.case = FALSE),\n                  ~ scales::rescale(., to = pi * c(-0.5, 0.5), from = 0:1))\n  )"
   },
   {
     "objectID": "chapters/14-technology-adoption.html#initial-plots",
@@ -109,13 +109,13 @@
     "href": "chapters/14-technology-adoption.html#reflection",
     "title": "1  Technology adoption: making donut charts and gauge charts with {ggforce}",
     "section": "\n1.10 Reflection",
-    "text": "1.10 Reflection\nAre gauge charts useful?\nWhat would I change?"
+    "text": "1.10 Reflection\nAre gauge charts useful?\nWhat would I change?\n\n\n\n\nComin, D., and Hohijn B. 2004. “Cross-Country Technological Adoption: Making the Theories Face the Facts.” Journal of Monetary Economics January 2004: 39–83.\n\n\nPedersen, Thomas Lin. 2022. Ggforce: Accelerating ’Ggplot2’. https://CRAN.R-project.org/package=ggforce."
   },
   {
     "objectID": "references.html",
     "href": "references.html",
     "title": "References",
     "section": "",
-    "text": "Community, R4DS Online Learning. 2023. “Tidy Tuesday: A Weekly\nSocial Data Project.” https://github.com/rfordatascience/tidytuesday.\n\n\nWickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023.\nR for Data Science. O-Reilly. https://r4ds.hadley.nz."
+    "text": "Comin, D., and Hohijn B. 2004. “Cross-Country Technological\nAdoption: Making the Theories Face the Facts.” Journal of\nMonetary Economics January 2004: 39–83.\n\n\nCommunity, R4DS Online Learning. 2023. “Tidy Tuesday: A Weekly\nSocial Data Project.” https://github.com/rfordatascience/tidytuesday.\n\n\nPedersen, Thomas Lin. 2022. Ggforce: Accelerating ’Ggplot2’. https://CRAN.R-project.org/package=ggforce.\n\n\nWickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023.\nR for Data Science. O-Reilly. https://r4ds.hadley.nz."
   }
 ]
