@@ -20,8 +20,10 @@ The *technology adoption* [@technology_data] data comes from
 ```{r}
 #| label: load-technology-data
 #| output: false
-tuesdata <- tidytuesdayR::tt_load("2022-07-19")
-technology <- tuesdata$technology
+#tuesdata <- tidytuesdayR::tt_load("2022-07-19")
+#technology <- tuesdata$technology
+technology <- readr::read_csv("data/technology.csv")
+
 ```
 
 The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns. The data is in long format, and 
@@ -258,7 +260,7 @@ title <- "Measles Vaccinations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
 ```
 
-Since axis labels tend not to make too much sense for `geom-arc_bar()` plots, we'll remove them later when using the `theme`\index{theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
+Since axis labels tend not to make too much sense for `geom-arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
 
 ```{r}
 #| label: technology-text-df
@@ -433,5 +435,3 @@ As with previous examples, don't be fooled into thinking that the size of the le
 ## Reflection
 
 Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area . If you measure the change on arc length between 1980 and 2010, you'll get different answers to if you measured the proportional change in area for the two. 
-
-What would I change?
