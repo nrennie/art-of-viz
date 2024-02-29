@@ -572,9 +572,9 @@
 \newcounter {subsubsection}[subsection]
 \newcounter {paragraph}[subsubsection]
 \newcounter {subparagraph}[paragraph]
-\renewcommand \thepart {\@Roman\c@part}
-\renewcommand \thechapter {\@arabic\c@chapter}
-\renewcommand \thesection {\thechapter.\@arabic\c@section}
+\renewcommand\thepart {\@Roman\c@part}
+\renewcommand\thechapter {\@arabic\c@chapter}
+\renewcommand\thesection {\thechapter.\@arabic\c@section}
 \renewcommand\thesubsection   {\thesection.\@arabic\c@subsection}
 \renewcommand\thesubsubsection{\thesubsection.\@arabic\c@subsubsection}
 \renewcommand\theparagraph    {\thesubsubsection.\@arabic\c@paragraph}
@@ -797,14 +797,25 @@
     \vskip 19.3\p@}
     \def\theequation{\thechapter.\arabic{equation}}
     }
-\def\@schapter#1{\if@twocolumn
+% \def\@schapter#1{\if@twocolumn
+%                    \@topnewpage[\@makeschapterhead{#1}]%
+%                  \else
+%                    \@makeschapterhead{#1}%
+%                                       \addcontentsline{toc}{fm}{#1}
+%                    \markboth{#1}{#1}
+%                    \@afterheading
+%                  \fi}
+ \def\@schapter#1{\if@twocolumn
                    \@topnewpage[\@makeschapterhead{#1}]%
                  \else
                    \@makeschapterhead{#1}%
-                                      \addcontentsline{toc}{fm}{#1}
+                   %\addcontentsline{toc}{chapter}{#1}
+                   %\addcontentsline{toc}{fm}{#1}
                    \markboth{#1}{#1}
                    \@afterheading
-                 \fi}
+                 \fi}%             
+                 
+                 
 \def\@makeschapterhead#1{%
 %%  \vspace*{50\p@}%
 %%  {\parindent \z@ \raggedright
@@ -1023,7 +1034,7 @@
 \renewcommand\theequation
   {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@equation}
 \newcounter{figure}[chapter]
-\renewcommand \thefigure
+\renewcommand\thefigure
      {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@figure}
 \def\fps@figure{tbp}
 \def\ftype@figure{1}
