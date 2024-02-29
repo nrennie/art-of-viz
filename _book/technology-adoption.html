@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.130">
+<meta name="generator" content="quarto-1.4.549">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="description" content="Learn how to create data visualisations in R.">
 <title>The #TidyTuesday Cookbook - 3&nbsp; Technology adoption: making gauge charts with {ggforce}</title>
@@ -20,7 +20,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -56,6 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -97,12 +98,13 @@ div.csl-indent {
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
   "keyboard-shortcut": [
     "f",
     "/",
     "s"
   ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -111,6 +113,7 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -121,19 +124,19 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./weird-wonderful.html">Weird and wonderful: completely custom charts</a></li><li class="breadcrumb-item"><a href="./technology-adoption.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./weird-wonderful.html">Weird and wonderful: completely custom charts</a></li><li class="breadcrumb-item"><a href="./technology-adoption.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">The #TidyTuesday Cookbook</a> 
     </div>
@@ -148,24 +151,53 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+ <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./introduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Common charts don't need to be boring!</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Making use of icons, fonts, and text</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualising spatial data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Doctors in an ageing population: making maps with {ggplot2}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Working with images</span></span>
+  </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./weird-wonderful.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weird and wonderful: completely custom charts</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link active">
@@ -177,12 +209,12 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
 </div>
-</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
@@ -208,7 +240,7 @@ div.csl-indent {
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./weird-wonderful.html">Weird and wonderful: completely custom charts</a></li><li class="breadcrumb-item"><a href="./technology-adoption.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></a></li></ol></nav><div class="quarto-title">
 <h1 class="title"><span id="technology" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></span></h1>
 </div>
 
@@ -222,13 +254,15 @@ div.csl-indent {
   </div>
   
 
+
 </header><p>In this chapter we’ll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.</p>
 <section id="data" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">3.1</span> Data</h2>
 <p>The <em>technology adoption</em> <span class="citation" data-cites="technology_data">(<a href="references.html#ref-technology_data" role="doc-biblioref">Comin and B. 2004</a>)</span> data comes from</p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-07-19"</span><span class="op">)</span></span>
-<span><span class="va">technology</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">technology</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#tuesdata &lt;- tidytuesdayR::tt_load("2022-07-19")</span></span>
+<span><span class="co">#technology &lt;- tuesdata$technology</span></span>
+<span><span class="va">technology</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/technology.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>technology</code> data is reasonably large with 491636 rows and 7 columns. The data is in long format, and</p>
 <p>What might be an interesting aspect of this data to visualize?</p>
@@ -243,7 +277,10 @@ div.csl-indent {
 <span>  cex.names <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="technology-adoption_files/figure-html/technology-barplot-1.png" class="img-fluid" width="1800"></p>
+<div>
+<figure class="figure"><p><img src="technology-adoption_files/figure-html/technology-barplot-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>some initial base R exploratory plots</p>
@@ -381,9 +418,13 @@ div.csl-indent {
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">iso3c</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-basic-plot" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-basic-plot-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.1: Initial plot created using <code>geom_arc_bar()</code> from {ggforce}, facetted by different countries.</figcaption></figure>
+<div id="fig-technology-basic-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-basic-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-basic-plot-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-basic-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Initial plot created using <code>geom_arc_bar()</code> from {ggforce}, facetted by different countries.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -427,9 +468,13 @@ div.csl-indent {
 <span>  <span class="op">)</span></span>
 <span><span class="va">color_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-color-plot" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-color-plot-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.2: Edited version of the previous plot with colors changed from defaults to grey and dark pink.</figcaption></figure>
+<div id="fig-technology-color-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-color-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-color-plot-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-color-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Edited version of the previous plot with colors changed from defaults to grey and dark pink.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -470,9 +515,13 @@ div.csl-indent {
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-text" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-text-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.3: Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle.</figcaption></figure>
+<div id="fig-technology-text" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-text-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -487,9 +536,13 @@ div.csl-indent {
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span></span>
 <span><span class="va">theme_plot1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-theme1" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-theme1-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.4: Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed.</figcaption></figure>
+<div id="fig-technology-theme1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-theme1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-theme1-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-theme1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -523,9 +576,13 @@ div.csl-indent {
 <span>  <span class="op">)</span></span>
 <span><span class="va">main_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-theme2" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-theme2-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.5: Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title.</figcaption></figure>
+<div id="fig-technology-theme2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-theme2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-theme2-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-theme2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.5: Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -586,9 +643,13 @@ div.csl-indent {
 <span>  <span class="op">)</span></span>
 <span><span class="va">legend_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-legend" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-legend-1.png" class="img-fluid figure-img" width="900"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.6: Version of the gauge chart shown only for USA which will act as a legend.</figcaption></figure>
+<div id="fig-technology-legend" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-legend-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-legend-1.png" class="img-fluid figure-img" width="900">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-legend-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.6: Version of the gauge chart shown only for USA which will act as a legend.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -609,9 +670,13 @@ div.csl-indent {
 <span>  <span class="op">)</span></span>
 <span><span class="va">final_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-patchwork" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure"><p><img src="technology-adoption_files/figure-html/fig-technology-patchwork-1.png" class="img-fluid figure-img" width="1800"></p>
-<figcaption class="figure-caption">Figure&nbsp;3.7: Final gauge chart with overlaid legend in top right corner.</figcaption></figure>
+<div id="fig-technology-patchwork" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-patchwork-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-patchwork-1.png" class="img-fluid figure-img" width="1800">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-patchwork-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.7: Final gauge chart with overlaid legend in top right corner.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -619,10 +684,9 @@ div.csl-indent {
 </section><section id="reflection" class="level2" data-number="3.11"><h2 data-number="3.11" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">3.11</span> Reflection</h2>
 <p>Are gauge charts the most effective method of visualising this data? No.&nbsp;Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area . If you measure the change on arc length between 1980 and 2010, you’ll get different answers to if you measured the proportional change in area for the two.</p>
-<p>What would I change?</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-technology_data" class="csl-entry" role="listitem">
 Comin, D., and Hohijn B. 2004. <span>“Cross-Country Technological Adoption: Making the Theories Face the Facts.”</span> <em>Journal of Monetary Economics</em> January 2004: 39–83.
 </div>
@@ -748,19 +812,55 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
   const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
       if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
         }
         return container.innerHTML
       } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
         return note.innerHTML;
       }
     } else {
-      return note.innerHTML;
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
     }
   }
   for (var i=0; i<xrefs.length; i++) {
@@ -769,28 +869,56 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       instance.disable();
       let url = xref.getAttribute('href');
       let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
         }
       } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
         .then(res => res.text())
         .then(html => {
           const parser = new DOMParser();
           const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
-          console.log(htmlDoc.body.innerHTML);
+          const note = htmlDoc.querySelector('main.content');
           if (note !== null) {
-            const html = processXRef(id, note);
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
             instance.setContent(html);
           } 
         }).finally(() => {
@@ -868,6 +996,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -927,13 +1081,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./weird-wonderful.html" class="pagination-link">
+      <a href="./weird-wonderful.html" class="pagination-link  aria-label=" weird="" and="" wonderful:="" completely="" custom="" charts="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Weird and wonderful: completely custom charts</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">References</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

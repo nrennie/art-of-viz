@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.4.549">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="author" content="Nicola Rennie">
 <meta name="description" content="Learn how to create data visualisations in R.">
-
-<title>The #TidyTuesday Cookbook</title>
+<title>The #TidyTuesday Cookbook - 2&nbsp; UK Museums: highlighting line charts with {gghighlight}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,8 +18,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
-
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
@@ -32,7 +61,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./introduction.html" rel="next">
+<link href="./text-fonts.html" rel="next">
+<link href="./common-charts.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -42,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -69,33 +99,24 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-
-
 </head>
-
 <body class="nav-sidebar floating">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./common-charts.html">Common charts don’t need to be boring!</a></li><li class="breadcrumb-item"><a href="./uk-museums.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">The #TidyTuesday Cookbook</a> 
     </div>
@@ -107,9 +128,9 @@ ul.task-list li input[type="checkbox"] {
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
@@ -120,9 +141,22 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
-      <span class="sidebar-item-text sidebar-link text-start">
- <span class="menu-text">Common charts don't need to be boring!</span></span>
-  </li>
+      <div class="sidebar-item-container"> 
+            <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common charts don't need to be boring!</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./uk-museums.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Making use of icons, fonts, and text</span></span>
@@ -135,15 +169,15 @@ ul.task-list li input[type="checkbox"] {
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Bee Colony Losses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Doctors in an ageing population: making maps with {ggplot2}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <span class="sidebar-item-text sidebar-link text-start">
  <span class="menu-text">Working with images</span></span>
@@ -156,15 +190,15 @@ ul.task-list li input[type="checkbox"] {
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with {ggforce}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
@@ -172,46 +206,29 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </li>
     </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Contents</h2>
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a>
-  <ul class="collapse">
-  <li><a href="#about-the-author" id="toc-about-the-author" class="nav-link" data-scroll-target="#about-the-author">About the author</a></li>
-  </ul></li>
-  </ul>
-</nav>
+<li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">2.1</span> Data</a></li>
+  <li><a href="#initial-exploration" id="toc-initial-exploration" class="nav-link" data-scroll-target="#initial-exploration"><span class="header-section-number">2.2</span> Initial exploration</a></li>
+  <li><a href="#basic-plot" id="toc-basic-plot" class="nav-link" data-scroll-target="#basic-plot"><span class="header-section-number">2.3</span> Basic plot</a></li>
+  <li><a href="#adding-styling" id="toc-adding-styling" class="nav-link" data-scroll-target="#adding-styling"><span class="header-section-number">2.4</span> Adding styling</a></li>
+  <li><a href="#the-making-of" id="toc-the-making-of" class="nav-link" data-scroll-target="#the-making-of"><span class="header-section-number">2.5</span> The making of…</a></li>
+  </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">The #TidyTuesday Cookbook</h1>
-<p class="subtitle lead">A case study approach to learning data visualisation with {ggplot2}</p>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./common-charts.html">Common charts don’t need to be boring!</a></li><li class="breadcrumb-item"><a href="./uk-museums.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="museums" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span></h1>
 </div>
 
-<div>
-  <div class="description">
-    <p>Learn how to create data visualisations in R.</p>
-  </div>
-</div>
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Nicola Rennie </p>
-          </div>
-  </div>
     
   
     
@@ -219,23 +236,27 @@ ul.task-list li input[type="checkbox"] {
   
 
 
-</header>
+</header><p>In this chapter different time series, and … spaghetti charts gghighlight</p>
+<section id="data" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">2.1</span> Data</h2>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">museums</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/museums.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>add ref to data</li>
+</ul></section><section id="initial-exploration" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="initial-exploration">
+<span class="header-section-number">2.2</span> Initial exploration</h2>
+</section><section id="basic-plot" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="basic-plot">
+<span class="header-section-number">2.3</span> Basic plot</h2>
+</section><section id="adding-styling" class="level2" data-number="2.4"><h2 data-number="2.4" class="anchored" data-anchor-id="adding-styling">
+<span class="header-section-number">2.4</span> Adding styling</h2>
+</section><section id="the-making-of" class="level2" data-number="2.5"><h2 data-number="2.5" class="anchored" data-anchor-id="the-making-of">
+<span class="header-section-number">2.5</span> The making of…</h2>
+<p>see the making of . If you’d like to read more about {camcorder} - see chapter … .</p>
+<p><img src="images/uk-museums.gif" class="img-fluid"></p>
 
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
-<p>Welcome to the online version of <strong>The #TidyTuesday Cookbook</strong> by <a href="https://nrennie.rbind.io/">Nicola Rennie</a>.</p>
-<p>This book is currently a work-in-progress.</p>
-<section id="about-the-author" class="level2">
-<h2 class="anchored" data-anchor-id="about-the-author">About the author</h2>
-<p><a href="https://nrennie.rbind.io/">Nicola Rennie</a> is a Lecturer in Health Data Science within the <a href="https://chicas.lancaster-university.uk/index.html">Centre for Health Informatics, Computing, and Statistics</a> at Lancaster University. She holds a PhD in Statistics and Operational Research, focusing on analysing and visualising transport demand. Her current research is focused on applications of statistics and machine learning to health-related data, communicating statistics, and the effective teaching of data science. She has experience of teaching at both undergraduate and postgraduate level, in courses covering fundamentals of data science, population health, and statistical programming. Nicola has also previously worked in data science consultancy, and delivered training courses covering topics including advanced data visualisation with R, statistical modelling, and reproducible reporting. She is the author and maintainer of several R packages, including multiple {ggplot2} extension packages. Nicola is a regular speaker at R and data science meetups, and is the current chapter organiser of R-Ladies Lancaster. She is co-author of the Royal Statistical Society’s <a href="https://royal-statistical-society.github.io/datavisguide/">Best Practices for Data Visualisation Guide</a>, and an active member of the Royal Statistical Society. Several of her data visualisations have been long-listed at the Information is Beautiful Awards.</p>
-
-
-</section>
-</section>
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -621,13 +642,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./common-charts.html" class="pagination-link  aria-label=" common="" charts="" don="" need="" to="" be="" boring="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Common charts don’t need to be boring!</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./introduction.html" class="pagination-link" aria-label="<span class='chapter-number'>1</span>&nbsp; <span class='chapter-title'>Introduction</span>">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./text-fonts.html" class="pagination-link" aria-label="Making use of icons, fonts, and text">
+        <span class="nav-page-text">Making use of icons, fonts, and text</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -635,5 +657,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-
+<script src="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.js" defer="true"></script>
 </body></html>
