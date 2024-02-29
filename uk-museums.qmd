@@ -1,6 +1,6 @@
 ---
-fig-width: 6
-fig-height: 4
+fig-width: 5.1
+fig-asp: 0.67
 fig-align: center
 fig-dpi: 300
 filters:
@@ -11,7 +11,8 @@ execute:
 
 # UK Museums: highlighting line charts with {gghighlight} {#museums}
 
-In this chapter different time series, and ... spaghetti charts gghighlight
+In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, with the help of the {gghighlight} extension package\index{gghighlight}
+.
 
 ## Data
 
@@ -19,23 +20,253 @@ In this chapter different time series, and ... spaghetti charts gghighlight
 
 \index{readr!read\_csv}
 
-
-\index{gghighlight}
-
 ```{r}
 #| label: load-museums-data
 #| output: false
 museums <- readr::read_csv("data/museums.csv")
 ```
 
+## Exploratory work
 
-## Initial exploration
+Let's start exploring the data!
 
-## Basic plot
+### Data exploration
 
-## Adding styling
+```{r}
+#| label: museums-barplot
+barplot(
+  table(museums$Area_Deprivation_index),
+  cex.axis = 0.5,
+  cex.names = 0.5
+)
+```
 
-### Text and font
+### Exploratory sketches
+
+> TO DO!!!
+
+## Preparing a plot
+
+### Data wrangling
+
+This is one of those very *real* datasets - the data wrangling is ...
+
+\index{dplyr!select}
+\index{dplyr!mutate}
+\index{dplyr!rename}
+\index{dplyr!arrange}
+\index{tidyr!drop\_na}
+\index{tidyr!separate}
+You could alternatively use `separate_wider_delim()` \index{tidyr!separate\_wider\_delim}
+
+```{r}
+#| label: museums-wrangle
+museum_data <- museums |>
+  dplyr::select(
+    Year_opened, Year_closed, Area_Deprivation_index
+  ) |>
+  tidyr::drop_na() |>
+  tidyr::separate(
+    Year_opened,
+    into = c("opened1", "opened2"),
+    sep = ":"
+  ) |>
+  tidyr::separate(
+    Year_closed,
+    into = c("closed1", "closed2"),
+    sep = ":"
+  ) |>
+  dplyr::mutate(
+    dplyr::across(
+      c(opened1, opened2, closed1, closed2), as.numeric
+    ),
+    Area_Deprivation_index = factor(Area_Deprivation_index, levels = 1:10)
+  ) |>
+  dplyr::mutate(dplyr::across(
+    c(closed1, closed2),
+    ~ dplyr::if_else(.x == 9999, NA_real_, .x)
+  )) |>
+  dplyr::mutate(closed = dplyr::case_when(
+    closed1 == closed2 ~ closed1,
+    closed1 != closed2 ~ round((closed2 + closed1) / 2)
+  )) |>
+  dplyr::mutate(opened = dplyr::case_when(
+    opened1 == opened2 ~ opened1,
+    opened1 != opened2 ~ round((opened2 + opened1) / 2)
+  )) |>
+  dplyr::select(Area_Deprivation_index, opened, closed) |>
+  dplyr::rename(deprivation = Area_Deprivation_index) |>
+  dplyr::arrange(deprivation)
+```
+
+```{r}
+#| label: museums-count-function
+num_year <- function(year, dep, data = museum_data) {
+  df <- dplyr::filter(data, deprivation == dep)
+  num_open <- df |>
+    dplyr::filter(opened <= year) |>
+    nrow()
+  num_closed <- df |>
+    dplyr::filter(closed <= year) |>
+    nrow()
+  diff <- num_open - num_closed
+  return(diff)
+}
+```
+
+\index{purrr!pmap} [@purrr]
+\index{tibble!as\_tibble} 
+\index{dplyr!mutate}
+\index{tidyr!pivot\_longer}
+
+[@tibble]
+
+```{r}
+all_years <- 1960:2021
+deps <- 1:10
+output <- purrr::pmap_vec(
+  expand.grid(all_years, deps),
+  ~ num_year(year = .x, dep = .y)
+)
+results <- matrix(output,
+  nrow = length(all_years),
+  byrow = FALSE
+)
+colnames(results) <- 1:10
+plot_data <- results |>
+  tibble::as_tibble() |>
+  dplyr::mutate(year = all_years) |>
+  tidyr::pivot_longer(
+    -year,
+    names_to = "deprivation",
+    values_to = "museums"
+  ) |>
+  dplyr::mutate(
+    deprivation = factor(deprivation, levels = 1:10)
+  )
+```
+
+### Packages and functions
+
+{gghighlight}
+
+### The first plot
+
+one of most common approaches
+
+\index{ggplot2!geom\_line}
+
+```{r}
+#| label: museums-basic-plot-1
+#| message: false
+library(ggplot2)
+ggplot(
+  data = plot_data,
+  mapping = aes(x = year, y = museums, colour = deprivation)
+) +
+  geom_line()
+```
+
+speghetti plots
+10 is a fairly large number of colours
+the colours in the legend are in different order
+
+let's try separating out into different facets - see Chapter 1 (cross-ref needed)
+colour to fill
+geom_area \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
+
+```{r}
+#| label: museums-basic-plot-2
+ggplot(
+  data = plot_data,
+  mapping = aes(x = year, y = museums, fill = deprivation)
+) +
+  geom_area() +
+  facet_wrap(~deprivation, nrow = 2)
+```
+
+this was the initial design i started with, but hard to compare
+let's go back to geom_line \index{gghighlight!gghighlight}
+
+```{r}
+#| label: museums-basic-plot-3
+#| message: false
+ggplot(
+  data = plot_data,
+  mapping = aes(x = year, y = museums, colour = deprivation)
+) +
+  geom_line() +
+  facet_wrap(~deprivation, nrow = 2) +
+  gghighlight::gghighlight(use_direct_label = FALSE)
+```
+
+some of them started higher lower levels, let's look at perc change instead
+
+```{r}
+#| label: museums-wrangle-perc
+lookup <- plot_data |>
+  dplyr::filter(year == 1960) |>
+  dplyr::select(deprivation, museums)
+
+new_plot_data <- plot_data |>
+  dplyr::left_join(lookup, by = "deprivation") |>
+  dplyr::rename(
+    museums = museums.x,
+    museums_1960 = museums.y
+  ) |>
+  dplyr::mutate(
+    change = (100 * (museums - museums_1960) / museums_1960)
+  ) |>
+  dplyr::select(year, deprivation, change)
+```
+
+let's plot instead
+
+```{r}
+#| label: museums-basic-plot-4
+#| message: false
+base_plot <- ggplot(
+  data = new_plot_data,
+  mapping = aes(x = year, y = change, colour = deprivation)
+) +
+  geom_line() +
+  facet_wrap(~deprivation, nrow = 2) +
+  gghighlight::gghighlight(use_direct_label = FALSE)
+base_plot
+```
+
+## Advanced styling
+
+get rid of legend
+colours aren't great
+
+### Colours
+
+{viridis} [@viridis] \index{viridis!scale\_color\_viridis}
+
+
+```{r}
+#| label: museums-colours
+bg_col <- "#fafafa"
+text_col <- "black"
+```
+
+```{r}
+#| label: museums-style-plot-1
+col_plot <- base_plot +
+  viridis::scale_color_viridis(discrete = TRUE, direction = -1)
+col_plot
+```
+
+### Text and fonts
+
+```{r}
+#| label: museums-fonts
+sysfonts::font_add_google("Raleway", "raleway")
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "raleway"
+```
 
 {sysfonts}\index{sysfonts}
 {showtext}\index{showtext}
@@ -44,7 +275,77 @@ museums <- readr::read_csv("data/museums.csv")
 \index{showtext!showtext\_auto}
 \index{showtext!showtext\_opts}
 
+Text 
+
+make sure text is correct one
+
+```{r}
+#| label: museums-text
+title <- "Are there fewer museums opening in more deprived areas?"
+st <- "The change in the estimated number of open museums since 1960 is significantly lower in areas with higher levels of deprivation. *Since around 2000, the number of open museums has stagnated across all areas, regardless of deprivation index. However, the rate of growth prior to this stagnation is lower in more deprived areas."
+cap <- "*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).<br><br>**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.<br><br>N. Rennie | Data: museweb.dcs.bbk.ac.uk"
+```
+
+\index{ggtext!element\_textbox\_simple}
+
+```{r}
+#| label: museums-style-plot-2
+text_plot <- col_plot +
+  labs(
+    title = title, subtitle = st, caption = cap,
+    x = "",
+    y = "% change in estimated number of\nopen museums since 1960**"
+  )
+```
+
+### Adjusting themes
+
+```{r}
+#| label: museums-style-plot-3
+#| fig-dpi: 300
+library(ggtext)
+text_plot +
+  scale_y_continuous(limits = c(0, 300)) +
+  coord_cartesian(expand = FALSE) +
+  theme_minimal(base_size = 8, base_family = body_font) +
+  theme(
+    legend.position = "none",
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    panel.spacing = unit(1, "lines"),
+    plot.margin = margin(10, 15, 10, 10),
+    plot.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    plot.title = element_textbox_simple(
+      colour = text_col,
+      lineheight = 0.5,
+      size = rel(1.2),
+      face = "bold",
+      margin = margin(b = 5)
+    ),
+    plot.subtitle = element_textbox_simple(
+      colour = text_col,
+      lineheight = 0.5
+    ),
+    plot.caption = element_textbox_simple(
+      hjust = 0,
+      colour = text_col,
+      lineheight = 0.5
+    ),
+    axis.text = element_text(
+      colour = text_col,
+      lineheight = 0.5
+    )
+  )
+```
+
 ## Reflection
+
+What would I want to change about this plot? colour probably not needed
 
 ::: {.content-visible when-format="html"}
 
@@ -52,6 +353,6 @@ museums <- readr::read_csv("data/museums.csv")
 
 see the making of . If you'd like to read more about {camcorder} - see chapter ... .
 
-![](images/uk-museums.gif)
+![](images/uk-museums.gif){fig-align="center"}
 
 :::
