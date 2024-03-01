@@ -181,7 +181,7 @@ body_font <- "roboto"
 ```{r}
 #| label: doctors-text
 title <- "Doctors in an ageing population"
-st <- "This map show the number of doctors per thousand people, rescaled by the percentage of the population aged over 70, revealing which countries* may be more likely to struggle in providing care for an elderly population.<br> using most recent available data for each country."
+st <- "This map show the number of doctors per thousand people, rescaled by the percentage of the population aged over 70, revealing which countries* may be more likely to struggle in providing care for an elderly population.<br><br>*using the most recent available data for each country."
 cap <- "**Data**: Our World in Data | **Graphic**: N. Rennie"
 ```
 
@@ -202,6 +202,7 @@ library(ggtext)
 text_plot +
   theme_void(base_size = 8, base_family = body_font) +
   theme(
+    plot.margin = margin(10, 10, 10, 10),
     plot.background = element_rect(
       fill = bg_col, color = bg_col),
     panel.background = element_rect(
@@ -241,17 +242,17 @@ styled_plot <- ggplot(
   geom_map(
     map = map_data,
     color = bg_col,
-    linewidth = 0.5) +
+    linewidth = 0.3) +
   scale_fill_gradientn(
     colors = col_palette,
     limits = c(0, 10),
     breaks = c(0.5, 9.5),
     labels = c("Fewer doctors", "More doctors")) +
-  guides(fill = guide_colorbar(ticks = FALSE)) +
   labs(title = title, subtitle = st, caption = cap) +
   facet_wrap(~label) +
-  theme_void(base_size = 8, base_family = body_font) +
+  theme_void(base_size = 7, base_family = body_font) +
   theme(
+    plot.margin = margin(10, 10, 10, 10),
     plot.background = element_rect(
       fill = bg_col, color = bg_col),
     panel.background = element_rect(
@@ -276,7 +277,9 @@ move subtitle text
 
 ::: {.callout-note icon=false appearance="simple"}
 
-Note `legend.position.inside` used to be `legend.position` before ggplot2 3.5.0
+Prior to Note `legend.position.inside` used to be `legend.position` before ggplot2 3.5.0
+
+legend ticks
 
 :::
 
@@ -285,33 +288,50 @@ Note `legend.position.inside` used to be `legend.position` before ggplot2 3.5.0
 #| fig-cap: "caption"
 styled_plot +
   labs(
-    subtitle = NULL, tag = st
+    title = NULL, subtitle = NULL, tag = st
   ) +
+  # add space for the tag (subtitle) text
+  coord_sf(ylim = c(-60, 140)) +
   theme(
     # move and format the tag (subtitle) text
-    plot.tag.position = c(0.03, 0.78),
+    plot.margin = margin(0, 0, 5, 0),
+    plot.tag.position = c(0.015, 0.8),
     plot.tag = element_textbox_simple(
       color = text_col,
       lineheight = 0.5,
-      hjust = 0
+      hjust = 0,
+      maxwidth = 0.98
     ),
+    # add margin for caption
+    plot.caption = element_textbox_simple(
+      hjust = 0,
+      color = text_col,
+      margin = margin(l = 5),
+      lineheight = 0.5),
     # change title text color
-    plot.title = element_textbox_simple(
+    strip.text = element_textbox_simple(
       color = bg_col,
-      lineheight = 0.5
+      lineheight = 0.5,
+      size = rel(1.4),
+      face = "bold",
+      margin = margin(6, 5, 6, 5)
     ),
-    # style the legend
+    # legend text
+    legend.title = element_blank(),
     legend.text = element_text(
       color = text_col,
       lineheight = 0.5,
       hjust = 0.5
     ),
-    legend.key.width = unit(2, "cm"),
-    legend.key.height = unit(0.3, "cm"),
-    legend.position.inside = c(0.645, -0.005),
-    legend.title = element_blank(),
+    # legend size
+    legend.key.width = unit(1, "cm"),
+    legend.key.height = unit(0.2, "cm"),
+    # legend position
+    legend.position = "bottom",
+    legend.justification.bottom = "right",
+    legend.margin = margin(0, 20, -4, 0), 
     legend.direction = "horizontal",
-    plot.margin = margin(0, 0, 10, 0)
+    legend.ticks = element_blank()
   )
 ```
 
@@ -319,10 +339,8 @@ styled_plot +
 ## Reflection
 
 > Note: ℹ The package "mapproj" is required for `coord_map()`.
-✖ Would you like to install it?
-
-1: Yes
-2: No
+✖ Would you like to install it? 1: Yes 2: No
+didn't use in original version
 
 When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colours were based on the log of this value. The raw values on the colour scale were hard to interpret, so the choice was made to use *Fewer doctors* and *More doctors* labels instead. For this version, where the underlying data is simpler and easier to ... 
 
