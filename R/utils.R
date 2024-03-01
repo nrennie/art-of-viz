@@ -20,3 +20,9 @@ gg_record(
   units = "in",
   dpi = 300
 )
+
+
+# Packages required for book ----------------------------------------------
+
+library(xml2)
+library(downlit)
