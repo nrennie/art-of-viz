@@ -11,13 +11,20 @@ execute:
 
 # Doctors in an ageing population: making maps with {ggplot2} {#doctors}
 
-In this chapter... we'll learn how to idenifty open data sources, make maps with ggplot2 using maps package, and create .... with a ... to facets.
+In this chapter we'll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.
 
 ## Data 
 
 * Bring your own data
+
+\#TidyTuesday\index{TidyTuesday} [@tidytuesday]
+
+
 * Common data sources
+
 * Doctors data
+
+
 
 The ... comes from Our World in Data [@doctors_data]
 
@@ -41,35 +48,46 @@ what does data look like
 
 ### Data wrangling
 
+Since this data is already fairly tidy, there isn't too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don't need, and renaming a couple of columns to make them easier to work with. We can use the `rename()` function from {dplyr} to rename the `entity` column to `region` (for reasons that will become clear in the next paragraph!). We also rename the `Physicians (per 1,000 people)` column to `doctors` to make it easier to work with. The data has multiple entries for each country, spanning different years. We *could* make an animated map to show how the number of doctors is changing over time, but for now we'll keep it simple with a static map showing a snapshot at one point in time. However, there's a bit of a problem. If you inspect the data, you'll see that not every country has an entry for each year - let's use the most recent data available for each country. For each `region`, we keep the row with only the most recent year using a combination of `group_by()`\index{dplyr!group\_by} and `slice_max()`\index{dplyr!slice\_max} from {dplyr}.
+
 ```{r}
 #| label: doctors-wrangle
 #| message: false
 doctors <- doctors |>
-  dplyr::rename(region = entity, doctors = `Physicians (per 1,000 people)`) |>
+  dplyr::rename(
+    region = entity,
+    doctors = `Physicians (per 1,000 people)`) |>
   dplyr::select(region, year, doctors) |>
   dplyr::group_by(region) |>
   dplyr::slice_max(year) |>
   dplyr::ungroup()
 ```
 
-Retrieving map data with {ggplot2}
+To plot this data on a world map, we also need data for the country borders. Luckily, the `map_data()` function built into {ggplot2}\index{ggplot2!map\_data} can help us with that! This function takes data from the {maps} package\index{maps} and turns it into an object you can plot directly with {ggplot2}.
 
 ```{r}
 #| label: map-doctors
 #| message: false
 library(ggplot2)
 world <- map_data("world")
+```
+
+Of course, it's never quite that straightforward. We need to join the `world` map data to our `doctors` data, and to do that we need a column in each data sets to join by - we'll use the `region` column. If you try to join these two data sets using the `region` column, you'll notice that you end up with some unexpected `NA` values. So what's going on?
+
+> You don't need to rename columns in your data to be able to join them, but for this example, I found it a little bit easier to work with the data after renaming `entity` to `region`.
+
+There are two issues here. Firstly, there are more regions in the `world` data than there are in the `doctors` data:
+
+```{r}
+#| label: map-doctors-length
 length(unique(world$region))
 length(unique(doctors$region))
 ```
 
-Note that `recode` has the rather unusual syntax of old_name = new_name
-
-\index{dplyr!recode}
-\index{dplyr!left\_join}
+If you go ahead and inspect the country names, you'll see that for some countries, they are encoded differently. For example, in the `world` data, the United States is listed as `"USA"` whilst in the `doctors` data, it's listed as `"United States"`. Here, the easiest thing to do is manually rename the values that differ in one of the datasets. We can use the `recode()` function from {dplyr} to do that.\index{dplyr!recode} Note that `recode()` has the rather unusual (for the {tidyverse}) syntax of `old_name = new_name`:
 
 ```{r}
-#| label: map-doctors-wrangle
+#| label: map-doctors-wrangle-1
 plot_data <- doctors |>
   dplyr::mutate(
     region =
@@ -78,9 +96,15 @@ plot_data <- doctors |>
         "United States" = "USA",
         "Congo, Dem. Rep." = "Democratic Republic of the Congo",
         "Cote d'Ivoire" = "Ivory Coast",
-        "Congo, Rep." = "Republic of Congo"
-      )
+        "Congo, Rep." = "Republic of Congo")
   )
+```
+
+\index{dplyr!left\_join} and filter out Antarctica \index{dplyr!filter}
+
+
+```{r}
+#| label: map-doctors-wrangle-2
 map_data <- dplyr::left_join(world, plot_data, by = "region") |>
   dplyr::filter(region != "Antarctica")
 ```
@@ -101,12 +125,8 @@ base_plot <- ggplot(
     long,
     lat,
     map_id = region,
-    fill = doctors
-  )
-) +
-  geom_map(
-    map = map_data
-  )
+    fill = doctors)) +
+  geom_map(map = map_data)
 base_plot
 ```
 
@@ -135,8 +155,7 @@ col_plot <- base_plot +
     colors = col_palette,
     limits = c(0, 10),
     breaks = c(0.5, 9.5),
-    labels = c("Fewer doctors", "More doctors")
-  ) +
+    labels = c("Fewer doctors", "More doctors")) +
   guides(fill = guide_colorbar(ticks = FALSE))
 col_plot
 ```
@@ -169,9 +188,7 @@ cap <- "**Data**: Our World in Data | **Graphic**: N. Rennie"
 ```{r}
 #| label: doctors-style-plot-2
 text_plot <- col_plot +
-  labs(
-    title = title, subtitle = st, caption = cap
-  )
+  labs(title = title, subtitle = st, caption = cap)
 ```
 
 ### Adjusting themes
@@ -185,18 +202,18 @@ library(ggtext)
 text_plot +
   theme_void(base_size = 8, base_family = body_font) +
   theme(
-    plot.background = element_rect(fill = bg_col, color = bg_col),
-    panel.background = element_rect(fill = bg_col, color = bg_col),
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col),
+    panel.background = element_rect(
+      fill = bg_col, color = bg_col),
     plot.title = element_textbox_simple(
-      color = text_col
-    ),
+      color = text_col),
     plot.subtitle = element_textbox_simple(
-      color = text_col
-    ),
+      color = text_col),
     plot.caption = element_textbox_simple(
       hjust = 0,
-      color = text_col
-    ))
+      color = text_col)
+  )
 ```
 
 
@@ -220,24 +237,18 @@ styled_plot <- ggplot(
     long,
     lat,
     map_id = region,
-    fill = doctors
-  )
-) +
+    fill = doctors)) +
   geom_map(
     map = map_data,
     color = bg_col,
-    linewidth = 0.5
-  ) +
+    linewidth = 0.5) +
   scale_fill_gradientn(
     colors = col_palette,
     limits = c(0, 10),
     breaks = c(0.5, 9.5),
-    labels = c("Fewer doctors", "More doctors")
-  ) +
+    labels = c("Fewer doctors", "More doctors")) +
   guides(fill = guide_colorbar(ticks = FALSE)) +
-  labs(
-    title = title, subtitle = st, caption = cap
-  ) +
+  labs(title = title, subtitle = st, caption = cap) +
   facet_wrap(~label) +
   theme_void(base_size = 8, base_family = body_font) +
   theme(
@@ -247,24 +258,27 @@ styled_plot <- ggplot(
       fill = bg_col, color = bg_col),
     plot.title = element_textbox_simple(
       color = text_col,
-      lineheight = 0.5
-    ),
+      lineheight = 0.5),
     plot.subtitle = element_textbox_simple(
       color = text_col,
-      lineheight = 0.5
-    ),
+      lineheight = 0.5),
     plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col,
-      lineheight = 0.5
-    ),
+      lineheight = 0.5),
     strip.background = element_rect(
-      fill = highlight_col, color = highlight_col))
+      fill = highlight_col, color = highlight_col)
+  )
 styled_plot
 ```
 
 move subtitle text 
+
+::: {.callout-note icon=false appearance="simple"}
+
 Note `legend.position.inside` used to be `legend.position` before ggplot2 3.5.0
+
+:::
 
 ```{r}
 #| label: fig-doctors-style-plot-5
@@ -310,13 +324,14 @@ styled_plot +
 1: Yes
 2: No
 
-fewer/more labels
+When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colours were based on the log of this value. The raw values on the colour scale were hard to interpret, so the choice was made to use *Fewer doctors* and *More doctors* labels instead. For this version, where the underlying data is simpler and easier to ... 
+
+When we were processing the data, we made the choice to plot a map showing the values for the most recently available data. That means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Showing uncertainty on maps is tricky, ... perhaps setting the colours ... above or below average, with the intensity ... . Or at least a more detailed 
 
 ::: {.content-visible when-format="html"}
 
-see the making of . If you'd like to read more about {camcorder} - see chapter ... .
+Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, have a read at @camcorder.
 
-![](images/doctors.gif)
+![](images/doctors.gif){fig-align="center"}
 
 :::
-
