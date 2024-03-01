@@ -1,5 +1,5 @@
 ---
-fig-width: 5.2
+fig-width: 5
 fig-asp: 0.67
 fig-align: center
 fig-dpi: 300
@@ -158,27 +158,34 @@ one of most common approaches
 
 \index{ggplot2!geom\_line}
 
+\index{line chart}
+
 ```{r}
-#| label: museums-basic-plot-1
+#| label: fig-museums-basic-plot-1
+#| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the overlapping lines resembling spaghetti!"
 #| message: false
 library(ggplot2)
 ggplot(
   data = plot_data,
-  mapping = aes(x = year, y = museums, colour = deprivation)
+  mapping = aes(x = year, y = museums, color = deprivation)
 ) +
   geom_line()
 ```
 
 speghetti plots
-10 is a fairly large number of colours
-the colours in the legend are in different order
+10 is a fairly large number of colors
+
+Since the colors in the legend are in different order
 
 let's try separating out into different facets - see Chapter 1 (cross-ref needed)
-colour to fill
+color to fill
 geom_area \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
 
+\index{area chart}
+
 ```{r}
-#| label: museums-basic-plot-2
+#| label: fig-museums-basic-plot-2
+#| fig-cap: "An area chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet."
 ggplot(
   data = plot_data,
   mapping = aes(x = year, y = museums, fill = deprivation)
@@ -188,14 +195,16 @@ ggplot(
 ```
 
 this was the initial design i started with, but hard to compare
-let's go back to geom_line \index{gghighlight!gghighlight}
+let's go back to geom_line \index{gghighlight!gghighlight} \index{line chart}
 
 ```{r}
-#| label: museums-basic-plot-3
+#| label: fig-museums-basic-plot-3
+#| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
 #| message: false
+#| source-line-numbers: "7"
 ggplot(
   data = plot_data,
-  mapping = aes(x = year, y = museums, colour = deprivation)
+  mapping = aes(x = year, y = museums, color = deprivation)
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
@@ -225,11 +234,12 @@ new_plot_data <- plot_data |>
 let's plot instead
 
 ```{r}
-#| label: museums-basic-plot-4
+#| label: fig-museums-basic-plot-4
+#| fig-cap: "A line chart of percentage increase in museums (compared to 1960) for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
 #| message: false
 base_plot <- ggplot(
   data = new_plot_data,
-  mapping = aes(x = year, y = change, colour = deprivation)
+  mapping = aes(x = year, y = change, color = deprivation)
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
@@ -240,21 +250,22 @@ base_plot
 ## Advanced styling
 
 get rid of legend
-colours aren't great
+colors aren't great
 
-### Colours
+### colors
 
 {viridis} [@viridis] \index{viridis!scale\_color\_viridis}
 
 
 ```{r}
-#| label: museums-colours
+#| label: museums-colors
 bg_col <- "#fafafa"
 text_col <- "black"
 ```
 
 ```{r}
-#| label: museums-style-plot-1
+#| label: fig-museums-style-plot-1
+#| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
 col_plot <- base_plot +
   viridis::scale_color_viridis(discrete = TRUE, direction = -1)
 col_plot
@@ -303,8 +314,9 @@ text_plot <- col_plot +
 ### Adjusting themes
 
 ```{r}
-#| label: museums-style-plot-3
-#| fig-dpi: 300
+#| label: fig-museums-style-plot-3
+#| fig-cap: "A styled version of the previous plot - with a custom font, colored background, and better spacing."
+#| out-width: "5in"
 library(ggtext)
 text_plot +
   scale_y_continuous(limits = c(0, 300)) +
@@ -317,29 +329,29 @@ text_plot +
     panel.spacing = unit(1, "lines"),
     plot.margin = margin(10, 15, 10, 10),
     plot.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     panel.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     plot.title = element_textbox_simple(
-      colour = text_col,
+      color = text_col,
       lineheight = 0.5,
       size = rel(1.2),
       face = "bold",
       margin = margin(b = 5)
     ),
     plot.subtitle = element_textbox_simple(
-      colour = text_col,
+      color = text_col,
       lineheight = 0.5
     ),
     plot.caption = element_textbox_simple(
       hjust = 0,
-      colour = text_col,
+      color = text_col,
       lineheight = 0.5
     ),
     axis.text = element_text(
-      colour = text_col,
+      color = text_col,
       lineheight = 0.5
     )
   )
@@ -347,7 +359,7 @@ text_plot +
 
 ## Reflection
 
-What would I want to change about this plot? colour probably not needed
+What would I want to change about this plot? color probably not needed
 
 ::: {.content-visible when-format="html"}
 
