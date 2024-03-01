@@ -340,13 +340,13 @@ styled_plot +
 
 ## Reflection
 
-> Note: ℹ The package "mapproj" is required for `coord_map()`.
-✖ Would you like to install it? 1: Yes 2: No
-didn't use in original version
+When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colours were based on the log of this value - compare @fig-doctors-style-plot-5 and @fig-doctors-original. The raw values on the colour scale were hard to interpret, so the choice was made to use *Fewer doctors* and *More doctors* labels instead. For this version, where the underlying data is simpler and easier to interpret, having the values on the legend would add more useful information. The original title was also kept, but could probably be changed to something more informative.
 
-When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colours were based on the log of this value. The raw values on the colour scale were hard to interpret, so the choice was made to use *Fewer doctors* and *More doctors* labels instead. For this version, where the underlying data is simpler and easier to ... 
+![](images/doctors_original.png){#fig-doctors-original fig-align="center"}
 
-When we were processing the data, we made the choice to plot a map showing the values for the most recently available data. That means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Showing uncertainty on maps is tricky, ... perhaps setting the colours ... above or below average, with the intensity ... . Or at least a more detailed 
+When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the different is between times. Showing uncertainty on maps is tricky, and there's no straightforward solution here. Perhaps setting the colours to a binary scale showing whether he value is above or below average, with the intensity of the colour denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.
+
+One improvement to this map over the original is the use of `coord_sf()`\index{ggplot2!coord\_sf} to *correctly* scale the aspect ratio of the map. In the original map, using `coord_map()` (now deprecated in favour of `coord_sf()`) produced some odd looking results, and in the end, after applying the rest of the styling changes, the end result didn't look too squashed. But `coord_sf()` made it much easier to achieve.
 
 ::: {.content-visible when-format="html"}
 
