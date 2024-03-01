@@ -1,5 +1,5 @@
 ---
-fig-width: 5.1
+fig-width: 5
 fig-asp: 0.67
 fig-align: center
 fig-dpi: 300
@@ -29,9 +29,13 @@ technology <- readr::read_csv("data/technology.csv")
 
 The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns. The data is in long format, and 
 
+
+## Exploratory work
+
 What might be an interesting aspect of this data to visualize?
 
-## Initial exploration
+### Data exploration
+
 
 As in other chapters n this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot` function\index{barplot}:
 
@@ -78,11 +82,14 @@ There are a couple of obvious options that come to mind: a simple grouped bar ch
 
 At the time of writing, there isn't a built-in function in {ggplot2} to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, this initial sketch might give you an idea of what we're aiming for.
 
-photos of sketches
+### Exploratory sketches
+
 
 Before ... 
 
-## Data wrangling
+## Preparing a plot
+
+### Data wrangling
 
 ```{r}
 #| label: wrangle-technology
@@ -108,7 +115,7 @@ plot_data <- measles_data |>
 head(plot_data)
 ```
 
-## The {ggforce} extension package
+### The {ggforce} extension package
 
 The {ggforce}\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of {ggplot2}, many of them aimed at exploratory data visualisation. We won't cover many of it's function in this chapter, and instead we'll focus on how to use it to create gauge charts.
 
@@ -154,12 +161,12 @@ gauge_data <- plot_data |>
   )
 ```
 
-## Initial plots
+### The first plot
 
 basic plot
 
 ```{r}
-#| label: fig-technology-basic-plot
+#| label: fig-technology-basic-plot-1
 #| fig-cap: "Initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries."
 #| warning: false
 library(ggplot2)
@@ -184,8 +191,9 @@ basic_plot <- ggplot(data = gauge_data) +
 basic_plot
 ```
 
+## Advanced styling
 
-## Colors
+### Colours
 
 ```{r}
 #| label: technology-colors
@@ -197,7 +205,7 @@ bg_col <- "#dedede"
 add new colors to basic plot
 
 ```{r}
-#| label: fig-technology-basic-plot2
+#| label: fig-technology-basic-plot-2
 #| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color changed to a medium grey."
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
@@ -238,7 +246,7 @@ color_plot
 ```
 
 
-## Text and fonts
+### Text and fonts
 
 As we've seen in previous chapters, we can load in Google fonts using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` font for both the title and the body font. 
 
@@ -259,7 +267,7 @@ write text
 social to add
 
 ```{r}
-#| label: technology-text-vars
+#| label: technology-text
 #| code-overflow: wrap
 title <- "Measles Vaccinations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
@@ -297,18 +305,18 @@ text_plot
 
 You'll notice that the subtitle text runs off the page here. Let's fix that using {ggplot2} themes\index{ggplot2!theme} and {ggtext}\index{ggtext} functions.
 
-## Themes and styling
+### Adjusting themes
 
 We'll start by removing all of the theme element such as the grey background, grid lines, axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
 
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()`\index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
 ```{r}
-#| label: fig-technology-theme1
+#| label: fig-technology-style-1
 #| fig-cap: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed."
 theme_plot1 <- text_plot +
   coord_fixed() +
-  theme_void(base_family = body_font)
+  theme_void(base_size = 8, base_family = body_font)
 theme_plot1
 ```
 
@@ -320,7 +328,7 @@ remove legend
 Let's fix the first three of these issues.
 
 ```{r}
-#| label: fig-technology-theme2
+#| label: fig-technology-style-2
 #| fig-cap: "Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title."
 main_plot <- theme_plot1 +
   theme(
@@ -350,15 +358,13 @@ main_plot
 ```
 
 
-## Adding a better legend
+### Adding a better legend
 
 As we already saw in chapter ..., 
 
 ```{r}
 #| label: fig-technology-legend
 #| fig-cap: "Version of the gauge chart shown only for USA which will act as a legend."
-#| fig-width: 3
-#| fig-height: 3
 legend_plot <- ggplot(
   data = dplyr::filter(gauge_data, iso3c == "USA")
 ) +
@@ -393,7 +399,7 @@ legend_plot <- ggplot(
   ) +
   labs(title = "How do I read this plot?") +
   coord_fixed() +
-  theme_void(base_family = body_font) +
+  theme_void(base_size = 8, base_family = body_font) +
   theme(
     legend.position = "bottom",
     legend.title = element_blank(),
@@ -413,7 +419,7 @@ legend_plot <- ggplot(
 legend_plot
 ```
 
-## Combining legend with {patchwork}
+### Combining legend with {patchwork}
 
 Join with {patchwork}
 
