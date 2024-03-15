@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.506">
+<meta name="generator" content="quarto-1.4.549">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="description" content="Learn how to create data visualisations in R.">
 <title>The #TidyTuesday Cookbook - 3&nbsp; Doctors in an ageing population: making maps with {ggplot2}</title>
@@ -113,6 +113,7 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -309,18 +310,18 @@ div.csl-indent {
 6 Afghanistan AFG    1987                           0.179</code></pre>
 </div>
 </div>
-<p>Often when there’s a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualising time series data, a simple scatter plot can also indicate if there’s a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a <em>spaghetti chart</em> as discussed in <a href="uk-museums.html" class="quarto-xref"><span>Chapter&nbsp;2</span></a>.</p>
+<p>Often when there’s a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualising time series data, a simple scatter plot can also indicate if there’s a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a <em>spaghetti chart</em> as discussed in <a href="uk-museums.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">doctors</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">doctors</span><span class="op">$</span><span class="va">`Physicians (per 1,000 people)`</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Year"</span>, ylab <span class="op">=</span> <span class="st">"Physicians per 1,000 people"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-base-plot" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-base-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-base-plot-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.1: Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R.
 </figcaption></figure>
 </div>
@@ -329,11 +330,11 @@ Figure&nbsp;3.1: Simple non-styled scatterplot of number of physicians per 1,000
 <p>There seems to be a general increasing trend between 1960 and 2019. The other important component of this data that we may want to explore is the spatial aspect - is there a pattern over space as well as over time? The most common approach to visualising spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it’s very common to color the country based on the value of the variable. These are often termed <em>choropleth maps</em>.</p>
 </section><section id="exploratory-sketches" class="level3" data-number="3.2.2"><h3 data-number="3.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">3.2.2</span> Exploratory sketches</h3>
-<div id="fig-doctors-sketch" class="quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-doctors-sketch" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.2: Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right
 </figcaption></figure>
 </div>
@@ -416,11 +417,11 @@ Figure&nbsp;3.2: Initial sketch of a map of the world, showing title enclosed in
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map</a></span><span class="op">(</span>map <span class="op">=</span> <span class="va">map_data</span><span class="op">)</span></span>
 <span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-basic-plot-1" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-basic-plot-1" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-basic-plot-1-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.3: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched.
 </figcaption></figure>
 </div>
@@ -457,11 +458,11 @@ Figure&nbsp;3.3: Map of the world with countries colored based on number of doct
 <span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Fewer doctors"</span>, <span class="st">"More doctors"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">col_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-1" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-1" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-1-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.4: Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme.
 </figcaption></figure>
 </div>
@@ -519,11 +520,11 @@ Figure&nbsp;3.4: Map of the world with countries colored based on number of doct
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-3" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-3" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-3-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.5: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together.
 </figcaption></figure>
 </div>
@@ -589,11 +590,11 @@ Figure&nbsp;3.5: Map of the world with countries colored based on number of doct
 <span>  <span class="op">)</span></span>
 <span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-4" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-4" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-4-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.6: Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background.
 </figcaption></figure>
 </div>
@@ -679,11 +680,11 @@ Figure&nbsp;3.6: Map of the world with duplicated title in the facet strip text,
 <span>    legend.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-5" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-5" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-5-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.7: Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page.
 </figcaption></figure>
 </div>
@@ -692,17 +693,17 @@ Figure&nbsp;3.7: Final styled plot showing a map of the world, with title inside
 </section></section><section id="reflection" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">3.5</span> Reflection</h2>
 <p>When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colors were based on the log of this value - compare <a href="#fig-doctors-style-plot-5" class="quarto-xref">Figure&nbsp;<span>3.7</span></a> and <a href="#fig-doctors-original" class="quarto-xref">Figure&nbsp;<span>3.8</span></a>. The raw values on the color scale were hard to interpret, so the choice was made to use <em>Fewer doctors</em> and <em>More doctors</em> labels instead. For this version, where the underlying data is simpler and easier to interpret, having the values on the legend would add more useful information. The original title was also kept, but could probably be changed to something more informative.</p>
-<div id="fig-doctors-original" class="quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-doctors-original" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-original-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/doctors_original.png" id="fig-doctors-original" class="img-fluid quarto-figure quarto-figure-center anchored figure-img">
 </div>
-<figcaption class="figure quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-doctors-original-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-doctors-original-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.8
 </figcaption></figure>
 </div>
 <p>When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it’s much older. In fact, running <code>range(doctors$year)</code> shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there’s no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the different is between times. Showing uncertainty on maps is tricky, and there’s no straightforward solution here. Perhaps setting the colors to a binary scale showing whether he value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.</p>
 <p>One improvement to this map over the original is the use of <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> to <em>correctly</em> scale the aspect ratio of the map. In the original map, using <code><a href="https://ggplot2.tidyverse.org/reference/coord_map.html">coord_map()</a></code> (now deprecated in favour of <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code>) produced some odd looking results, and in the end, after applying the rest of the styling changes, the end result didn’t look too squashed. But <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> made it much easier to achieve.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, <a href="conclusion.html" class="quarto-xref"><span>Chapter&nbsp;5</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, <a href="conclusion.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/doctors.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
@@ -908,27 +909,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       }
     }
     stripColumnClz(note)
-    const typesetMath = (el) => {
-      if (window.MathJax) {
-        // MathJax Typeset
-        window.MathJax.typeset([el]);
-      } else if (window.katex) {
-        // KaTeX Render
-        var mathElements = el.getElementsByClassName("math");
-        var macros = [];
-        for (var i = 0; i < mathElements.length; i++) {
-          var texText = mathElements[i].firstChild;
-          if (mathElements[i].tagName == "SPAN") {
-            window.katex.render(texText.data, mathElements[i], {
-              displayMode: mathElements[i].classList.contains('display'),
-              throwOnError: false,
-              macros: macros,
-              fleqn: false
-            });
-          }
-        }
-      }
-    }
     if (id === null || id.startsWith('sec-')) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
@@ -943,10 +923,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             break;
           }
         }
-        typesetMath(container);
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
         return container.innerHTML
       } else {
-        typesetMath(note);
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
         return note.innerHTML;
       }
     } else {
@@ -955,8 +939,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (anchorLink) {
         anchorLink.remove();
       }
-      typesetMath(note);
-      return note.innerHTML;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
     }
   }
   for (var i=0; i<xrefs.length; i++) {
