@@ -234,11 +234,7 @@ plot_data <- results |>
 
 ### The first plot
 
-one of most common approaches - although already thinking about facets.worth seeing what it looks like - maybe want to highlight just one e.g. most deprived
-
-\index{ggplot2!geom\_line}
-
-\index{line chart}
+One of most common approaches to visualising multiple time series, is to plot multiple lines on the same plot. Although we're already thinking about facets, it's still worth seeing what those line charts look like. It can help us to understand the overall variability of the data. We can create the initial plot using `ggplot()` to define the data and the aesthetic mapping with the `aes()` function. We have `year` on the x-axis, `museums` on the y-axis, and each line will have a different color based on `deprivation`. The actual lines are then added with `geom_line()`. \index{ggplot2!geom\_line} \index{ggplot2!aes} \index{ggplot2!ggplot} \index{line chart}
 
 ```{r}
 #| label: fig-museums-basic-plot-1
@@ -252,16 +248,13 @@ ggplot(
   geom_line()
 ```
 
-speghetti plots
-10 is a fairly large number of colors
+There are a few things that jump out immediately about this plot:
 
-Since the colors in the legend are in different order
+* The variability is increasing over time: in 1960 the gap between the highest and lowest values is much smaller than the gap between the highest and lowest values in 2020.
+* It's difficult to tell which line belongs to which level of deprivation: some of the colors are quite similar, many of the lines intersect, and the order of the legend is generally in reverse to the order of the lines.
+* It's what we might call a *spaghetti plot*: it shows the overall trend across all levels, but it's hard to tell the difference between different levels of deprivation.
 
-let's try separating out into different facets - see Chapter 1 (cross-ref needed)
-color to fill
-geom_area \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
-
-\index{area chart}
+Let's go back to our previous idea, and try separating out the deprivation levels into different facets. We can do this using `facet_wrap(~deprivation, nrow = 2)` , with the `nrow` argument used to create that 5x2 grid we talked about earlier. Let's also try changing `geom_line()` to `geom_area()` (and remember to change `color` to `fill` in the aesthetic mapping). \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap} \index{area chart}
 
 ```{r}
 #| label: fig-museums-basic-plot-2

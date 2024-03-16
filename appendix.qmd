@@ -8,7 +8,7 @@
 renv <- jsonlite::read_json("renv.lock")
 ```
 
-This book was built using `r renv[[1]]$Version`.
+This book was built using R version `r renv[[1]]$Version`.
 
 ### R packages
 
@@ -20,13 +20,13 @@ All R packages required to build this book can be found in the following table.
 #| echo: false
 pkgs <- unlist(lapply(renv[[2]], function(x) x[["Package"]]))
 pkg_vs <- unlist(lapply(renv[[2]], function(x) x[["Version"]]))
-nr <- floor(length(pkgs)/3)
+nr <- ceiling(length(pkgs)/3)
 pkg_df <- tibble::tibble(
   Package = pkgs,
   Version = pkg_vs
 )
 knitr::kable(
-  list(pkg_df[1:nr,], pkg_df[(nr+1):(2*nr),], pkg_df[(2*nr+1):(3*nr),]),
+  list(pkg_df[1:nr,], pkg_df[(nr+1):(2*nr),], pkg_df[(2*nr+1):length(pkgs),]),
   booktabs = TRUE
 )
 ```
