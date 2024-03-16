@@ -27,7 +27,11 @@ The data contains information for `r ncol(museums)` different variables on `r nr
 
 Let's start exploring what these variables look like!
 
-> Remember that you can use `View(museums)` to inspect the data in a more human-readable format.
+::: {.callout-note icon=false appearance="simple"}
+
+Remember that you can use `View(museums)` to inspect the data in a more human-readable format.
+
+:::
 
 ### Data exploration
 
@@ -78,21 +82,25 @@ So let's get started on preparing the data to create this plot!
 
 ### Data wrangling
 
-This is one of those very *real* datasets - the data wrangling is ...
+This is one of those very *real* datasets - the data wrangling is not straightforward for the data. In fact, the two columns relating to opening and closing dates are the two that will require the most attention.
 
-In fact, the two columns relating to dates might be 
+First, let's drop any columns that we don't actually need using the `select()` function from {dplyr} - we only need the `Year_opened`, `Year_closed`, and `Area_Deprivation_index` columns to calculate the number of museums open each year \index{dplyr!select}. There are a few `NA` values in the `Area_Deprivation_index` column so we'll drop those rows using `drop_na()` from {tidyr} \index{tidyr!drop\_na}.
 
-\index{dplyr!select}
-\index{dplyr!mutate}
-\index{dplyr!rename}
-\index{dplyr!arrange}
-\index{tidyr!drop\_na}
-\index{tidyr!separate}
-You could alternatively use `separate_wider_delim()` \index{tidyr!separate\_wider\_delim}
+Now let's start dealing with the year columns. If you look at the values, you'll notice that they're not exactly what you'd expect in a *year* column:
 
 ```{r}
-#| label: museums-wrangle
-museum_data <- museums |>
+#| label: museums-year
+head(museums$Year_opened, 4)
+head(museums$Year_closed, 4)
+```
+
+Each entry is in fact two years, separated by a `:`. According to the Mapping Museums glossary, this is because these are actually date ranges. For some museums, it wasn't possible to establish an exact opening or closing date, and instead a date range is given based on partial information. For example, a value of `"2007:2017"` means the museum opened (or closed) sometime between 2007 and 2017.
+
+Let's separate out these year values into four columns instead of two using the `separate()` function from {tidyr} \index{tidyr!separate}. We separate based on the `:`, and create two new columns, `opened1` and `opened2`. from the `Year_opened` column. We do the same thing for the `Year_closed` closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use `mutate()` and `across()` from {dplyr} to convert them using `as.numeric()` \index{dplyr!mutate} \index{dplyr!across}. We can also convert the `Area_Deprivation_index` to a factor rather than a numeric and make sure the order is correct. 
+
+```{r}
+#| label: museums-wrangle1
+museum_subset <- museums |>
   dplyr::select(
     Year_opened, Year_closed, Area_Deprivation_index
   ) |>
@@ -112,7 +120,33 @@ museum_data <- museums |>
       c(opened1, opened2, closed1, closed2), as.numeric
     ),
     Area_Deprivation_index = factor(Area_Deprivation_index, levels = 1:10)
-  ) |>
+  )
+```
+
+::: {.callout-note icon=false appearance="simple"}
+
+You could alternatively use `separate_wider_delim()` instead of `separate()`. \index{tidyr!separate\_wider\_delim}
+
+:::
+
+Now we need to think about how to deal with all of these *year* columns: 
+
+* If the date before the `:` and the date after the `:` are the same, we want to treat it as an exact year and only keep one value.
+* If the dates do not match, we need to decide a way of choosing which year to use. The simplest approach is to take the midpoint of the date range. 
+* If the value in the `Year_closed` column is `"9999:9999"`, this means that the museum is still open. 
+
+Let's start with the last of these issues first. For the `closed1` and `closed2` columns, if the value is `"9999"`, we'll convert it to an `NA_real_` value and otherwise leave it as it is. We can do this using a combination of `mutate()`, `across()`, and `if_else()` from {dplyr} \index{dplyr!mutate} \index{dplyr!across} \index{dplyr!if\_else}.
+
+The remaining two issues can be dealt with at the same time using `case_when()` from {dplyr} \index{dplyr!case\_when}. We can create a new column called `closed` which:
+
+* if `closed1` and `closed2` are equal, takes this value;
+* if `closed1` and `closed2` are not equal, takes the value in the middle (rounded so that we work only with whole year values).
+
+The same approach is then applied to create another new column called `opened`. There are no instances in the data where one of the closing dates is `NA` but the other is not, so we don't need to worry about that. We can also tidy up the output by dropping any columns we don't need, renaming the `Area_Deprivation_index` to something a little bit shorter and easier to work with, and arranging the data by level of deprivation. \index{dplyr!rename} \index{dplyr!arrange} \index{dplyr!select} 
+
+```{r}
+#| label: museums-wrangle2
+museum_data <- museum_subset |> 
   dplyr::mutate(dplyr::across(
     c(closed1, closed2),
     ~ dplyr::if_else(.x == 9999, NA_real_, .x)
@@ -130,27 +164,34 @@ museum_data <- museums |>
   dplyr::arrange(deprivation)
 ```
 
+This gives us data that looks like this:
+
+```{r}
+#| label: museums-data-show
+head(museum_data)
+```
+
+What we want to know is how many museums were open in a given year for each level of deprivation. Let's create a function that takes three inputs: a year of interest, a level of deprivation, and the `museum_data`. Inside the function, we can then `filter()` the data to only the level of deprivation we're interested in. Then we can count how many museums opened before or in the year we're interested in, and then same for the how many museums closed (remembering to deal with the `NA` values for museums that are still open). The difference between the two will be how many were open in that year. \index{dplyr!filter}
+
 ```{r}
 #| label: museums-count-function
 num_year <- function(year, dep, data = museum_data) {
   df <- dplyr::filter(data, deprivation == dep)
-  num_open <- df |>
-    dplyr::filter(opened <= year) |>
-    nrow()
-  num_closed <- df |>
-    dplyr::filter(closed <= year) |>
-    nrow()
+  num_open <- sum(df$opened <= year)
+  num_closed <- sum(df$closed <= year, na.rm = TRUE)
   diff <- num_open - num_closed
   return(diff)
 }
 ```
 
-\index{purrr!pmap} [@purrr]
-\index{tibble!as\_tibble} 
-\index{dplyr!mutate}
-\index{tidyr!pivot\_longer}
+Let's test it works:
 
-[@tibble]
+```{r}
+#| label: museums-count-test
+num_year(1980, 3)
+```
+
+There were `r num_year(1980, 3)` museums open in 1980. Now, we need to run this function for every combination of year (from `1960` to `2021`) and deprivation level (from `1` to `10`). There are many different ways of doing this in R, and we're going to use the {purrr} package [@purrr]. We start by creating to variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use `expand.grid` to create a `data.frame` with all of the combinations and pass this in as the first argument to `pmap_vec` from {purrr}. The second argument to `pmap_vec` is the function we want to apply (`num_year()`) that we defined above), where the first argument of `num_year()` comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. \index{purrr!pmap\_vec} 
 
 ```{r}
 #| label: museums-count-1
@@ -167,8 +208,17 @@ results <- matrix(output,
 colnames(results) <- 1:10
 ```
 
+Now, our data looks like this:
+
 ```{r}
 #| label: museums-count-2
+head(results)
+```
+
+We're almost ready to start plotting our data! We just need to convert this into a `tibble()` (or `data.frame`), add the `year` column using `mutate()`, and put the data into a long format using `pivot_longer` from {tidyr} \index{tibble!as\_tibble} \index{dplyr!mutate} \index{tidyr!pivot\_longer}. We want to end up with a 3 column data set, where the 3 columns are: `year`, `deprivation`, and `museums` (number of open museums).
+
+```{r}
+#| label: museums-count-3
 plot_data <- results |>
   tibble::as_tibble() |>
   dplyr::mutate(year = all_years) |>
@@ -181,10 +231,6 @@ plot_data <- results |>
     deprivation = factor(deprivation, levels = 1:10)
   )
 ```
-
-### Packages and functions
-
-{gghighlight}
 
 ### The first plot
 
