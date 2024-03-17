@@ -48,7 +48,8 @@ Although these definitely warrant further exploration,
 Given the wealth of information around deprivation indices (8 different variables), that's the first aspect of the data that jumps out. How does the number of museums vary per index of deprivation?
 
 ```{r}
-#| label: museums-barplot
+#| label: fig-museums-barplot
+#| fig-cap: "Bar chart of number of museums per level of deprivation, with higher numbers of museums shown in levels 5 and 6."
 barplot(
   table(museums$Area_Deprivation_index),
   cex.axis = 0.5,
@@ -70,7 +71,7 @@ We have 10 deciles of deprivation, so we'll have 10 time series that we want to 
 
 If we go with line charts, and faceting by deprivation index, that might look something like this: 
 
-![](images/sketch-museums.png){#fig-museums-sketch fig-align="center" fig-cap="Initial sketch of a facetted plot showing change over time for each level of deprivation."}
+![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center"}
 
 We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in both Chapter ...(1) and Chapter ...(2) but we haven't really thought much about the layouts of those facets. In Chapter ...(1), we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. In Chapter ...(2), we used `facet_grid()` where the number of levels in two factor variables define the number of rows and columns. Here, we have a little bit more flexibility and we might want to think about controlling that layout. \index{ggplot2!facet\_grid}
 
@@ -254,7 +255,7 @@ There are a few things that jump out immediately about this plot:
 * It's difficult to tell which line belongs to which level of deprivation: some of the colors are quite similar, many of the lines intersect, and the order of the legend is generally in reverse to the order of the lines.
 * It's what we might call a *spaghetti plot*: it shows the overall trend across all levels, but it's hard to tell the difference between different levels of deprivation.
 
-Let's go back to our previous idea, and try separating out the deprivation levels into different facets. We can do this using `facet_wrap(~deprivation, nrow = 2)` , with the `nrow` argument used to create that 5x2 grid we talked about earlier. Let's also try changing `geom_line()` to `geom_area()` (and remember to change `color` to `fill` in the aesthetic mapping). \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap} \index{area chart}
+Let's go back to our previous idea, and try separating out the deprivation levels into different facets. We can do this using `facet_wrap(~deprivation, nrow = 2)` , with the `nrow` argument used to create that 5x2 grid we talked about earlier. Let's also try changing `geom_line()` to `geom_area()`. Although line charts and area charts can both show the same data, line charts often cause us to focus more on the trend over time. In contrast, area charts often cause us to focus on the total volume over time - helping to highlight differences in total number of open museums over time rather than just increases and decreases. Remember to also change `color` to `fill` in the aesthetic mapping! \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
 
 ```{r}
 #| label: fig-museums-basic-plot-2
@@ -267,8 +268,19 @@ ggplot(
   facet_wrap(~deprivation, nrow = 2)
 ```
 
-this was the initial design i started with, but hard to compare
-let's go back to geom_line \index{gghighlight!gghighlight} \index{line chart}
+This tells a similar story to the initial bar chart in @fig-museums-barplot - there are more museums open in the areas with moderate levels of deprivation. This plot still isn't ideal, for a couple of reasons:
+
+* The number of open museums in 1960 is different in each faceted plot: since they all start at different levels, it makes it more difficult to compare the relative increases or decreases.
+* It's hard to directly compare one facet to another since each facet only contains one trend line: we have to imagine overlaying the lines in our head to compare one trend line to another.
+
+We could solve these problems by making two changes:
+
+* Rescale the data based on the number of museums open in 1960; and
+* Show all 10 lines on each faceted plot but highlight only one relating to each level of deprivation. 
+
+### Highlighting with {gghighlight}
+
+The second change can be implemented easily using the {gghighlight} package [@gghighlight]. {gghighlight} is a {ggplot2} extension package, specifically designed for highlighting points and lines based on some conditions. Let's switch back to `geom_line()` and add `gghighlight::gghighlight()`. We set `use_direct_label = FALSE` because {gghighlight} will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it's facet label already. \index{gghighlight!gghighlight} \index{ggplot2!geom\_line} \index{line chart}
 
 ```{r}
 #| label: fig-museums-basic-plot-3
@@ -284,7 +296,7 @@ ggplot(
   gghighlight::gghighlight(use_direct_label = FALSE)
 ```
 
-some of them started higher lower levels, let's look at perc change instead
+We can also perform an additional bit of data wrangling to rescale the values by their 1960 levels. We start by filtering the data to only include data from the year 1960 and keeping only the `deprivation` and `museums` columns \index{dplyr!filter} \index{dplyr!select}. Then, we join this baseline data back to our original data based on the `deprivation` level, and for each year calculate the percentage change since 1960 and save it in a new column called `change`. \index{dplyr!mutate} \index{dplyr!rename} \index{dplyr!left\_join} \index{dplyr!select}
 
 ```{r}
 #| label: museums-wrangle-perc
@@ -304,7 +316,7 @@ new_plot_data <- plot_data |>
   dplyr::select(year, deprivation, change)
 ```
 
-let's plot instead
+We can then re-do our line chart using the rescaled `change` data on the y-axis instead:
 
 ```{r}
 #| label: fig-museums-basic-plot-4
@@ -320,21 +332,27 @@ base_plot <- ggplot(
 base_plot
 ```
 
+This is starting to look promising, but there are still ways that we can style our chart to improve it.
+
 ## Advanced styling
 
-get rid of legend
-colors aren't great
+So what can we do to make this chart better?
+
+* We can get rid of the legend. The colors are based on the levels of deprivation, which are already labelled on the facet titles.
+* The default choice of color isn't great - they're not grayscale printing friendly, and their not colorblind friendly either. 
+* It's not immediately clear what this chart shows: it could do with smoe text to explain what's going on.
 
 ### Colors
 
-{viridis} [@viridis] \index{viridis!scale\_color\_viridis}
-
+Let's get started with choosing some colors. As discussed in Chapter ...(1), we'll save color codes as variables: either using hex codes or color names. Let's use `"black"` for text, and `"#fafafa"` for the background color. The use of a light gray rather than white for the background is primarily personal preference - it's less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text.
 
 ```{r}
 #| label: museums-colors
 bg_col <- "#fafafa"
 text_col <- "black"
 ```
+
+For the colors of the lines, we can use the {viridis} package [@viridis]. The {viridis} package provides multiple different color palettes which are designed to be visually pleasing, perceptually-uniform ,and colorblind friendly. The default viridis palette includes purples, blues, greens, then yellows. Viridis color palettes are most commonly used with continuous data, rather than categorical data. However, since the categories that we wish to color (levels of deprivation) are ordered, they will work well here too. The {viridis} package includes functions to add the colors to plots made with {ggplot2}. Here, we use the `scale_color_viridis()` function, specify that we want a discrete palette and that the lowest values should have the yellow colors with `direction = -1` \index{viridis!scale\_color\_viridis}.
 
 ```{r}
 #| label: fig-museums-style-plot-1
@@ -346,6 +364,8 @@ col_plot
 
 ### Text and fonts
 
+Let's start by loading in a different font using `font_add_google()` from {sysfonts} and setting font options with {showtext} \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}. The *Raleway* font is a minimalist, sans serif font, and we'll use it for both body text and title text. We can save it as a single variable, `body_font`.
+
 ```{r}
 #| label: museums-fonts
 sysfonts::font_add_google("Raleway", "raleway")
@@ -354,16 +374,9 @@ showtext::showtext_opts(dpi = 300)
 body_font <- "raleway"
 ```
 
-{sysfonts}\index{sysfonts}
-{showtext}\index{showtext}
+We also need to define a title, subtitle, and caption. Adding a question as a title can help guide readers towards what you want them to see, but also force them to look for themselves. Here, we ask *Are there fewer museums opening in more deprived areas?* in the title - telling readers to look at changes across the levels of deprivation, but not giving them the answer straight away. 
 
-\index{sysfonts!font\_add\_google}
-\index{showtext!showtext\_auto}
-\index{showtext!showtext\_opts}
-
-Text 
-
-make sure text is correct one
+The subtitle then goes onto explain what the answer is, and exactly what is shown in the chart. The caption is more extended here than you may see in many charts because it explains more about the source of the data and what the variables actually are. Understanding definitions of variables isn't something we should ever take for granted. Unless you are already familiar with indices of deprivation, it may not be clear that `1` means higher levels of deprivation. 
 
 ```{r}
 #| label: museums-text
@@ -372,7 +385,12 @@ st <- "The change in the estimated number of open museums since 1960 is signific
 cap <- "*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).<br><br>**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.<br><br>N. Rennie | Data: museweb.dcs.bbk.ac.uk"
 ```
 
-\index{ggtext!element\_textbox\_simple}
+::: {.callout-note icon=false appearance="simple"}
+
+The caption includes HTML line breaks, `<br>`, since we'll be using `element_textbox_simple()` from {ggtext} for processing the text elements as we've done in previous chapters. \index{ggtext!element\_textbox\_simple}
+:::
+
+Let's add the title, subtitle, caption, and a y-axis label in using the `labs()` function. We can also remove the default column name label on the x-axis as it's very clear that the x-axis shows years. \index{ggplot2!labs}
 
 ```{r}
 #| label: museums-style-plot-2
@@ -385,6 +403,18 @@ text_plot <- col_plot +
 ```
 
 ### Adjusting themes
+
+Now we need to edit the `theme()` elements to apply the text fonts and styles, edit the background colors, and remove the legend. \index{ggplot2!theme}
+
+In {ggplot2}, the axis limits are chosen automatically based on the range of the data. It's often useful to chose limits (and breaks) that are *nice* - it makes it easier to calculate where other values are. We can set `scale_y_continuous(limits = c(0, 300))` to make the range of the y-axis between 0 and 300. We can also set `coord_cartesian(expand = FALSE)` to remove the extra space around the plot area that is added by default - giving a slightly cleaner look. Using `theme_minimal()` as a base, we can set the default font size and family using `base_size = 7` and `base_family = body_font`. \index{ggplot2!theme\_minimal} \index{ggplot2!coord\_cartesian} \index{ggplot2!scale\_y\_continuous}
+
+Setting `legend.position = "none"` removes the legend on the right hand side. The `plot.title.position = "plot"` and `plot.caption.position = "plot"` arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded grey by default), which doesn't look good when you have long axis labels, or a multi-line axis title on the y-axis.
+
+The `panel.spacing` argument controls how close the facets are to each other -  this can help to stop the year labels on side-by-side plots from overlapping. Setting `plot.margin = margin(10, 15, 10, 10)` adds some extra space around the outside of the plot, with the higher value on the right hand side compensating and balancing out the space from the axis title on the left hand side. The `plot.background` and `panel.background` arguments set the background color of the plot and panel areas to be the `bg_col` variable previously defined.
+
+For the `plot.title`, `plot.subtitle`, and `plot.caption`, arguments, we use `element_textbox_simple()` from {ggtext} to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a lineheight of `0.5`, and set to use the `text_col` variable for the color. The title font is made slightly larger and in bold. The `axis.text` is also set to be `text_col` colored with with a lineheight of `0.5` using `element_text()`. \index{ggplot2!element\_text} \index{ggplot2!theme}
+
+Now, we have our final plot:
 
 ```{r}
 #| label: fig-museums-style-plot-3
@@ -431,15 +461,14 @@ text_plot +
 
 ## Reflection
 
-What would I want to change about this plot?
+Is there anything that could still be improved about this plot? There are two main elements that jump out:
 
-- colors not good (is it continuous)
-- color probably not needed
-- 
+* The axis text denoting the years only appears on the bottom row of faceted plots. This makes it a little bit tricky to see what's going on in the first row without first looking at the years in the row below. It's a fairly minor point, but adding year labels to the top row would just make it easier for a reader.
+* We removed the legend from the plot with the reason that *the colors are based on the levels of deprivation, which are already labelled on the facet titles*. This same argument could be used to remove the colors altogether. There's no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g. red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean.
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, @sec-camcorder.
+Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
 
 ![](images/uk-museums.gif){fig-align="center"}
 
