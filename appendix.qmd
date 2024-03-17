@@ -14,6 +14,7 @@ This book was built using R version `r renv[[1]]$Version`. This book is built wi
 #| label: tbl-package-versions
 #| tbl-cap: "R packages and version numbers"
 #| echo: false
+options(knitr.kable.NA = "")
 pkgs <- unlist(lapply(renv[[2]], function(x) x[["Package"]]))
 pkg_vs <- unlist(lapply(renv[[2]], function(x) x[["Version"]]))
 nr <- ceiling(length(pkgs)/3)
@@ -21,9 +22,13 @@ pkg_df <- tibble::tibble(
   Package = pkgs,
   Version = pkg_vs
 )
+fill_NA <- as.data.frame(matrix(rep(c(NA, NA), times = nr*3 - length(pkgs)), ncol = 2))
+colnames(fill_NA) <- c("Package", "Version")
+padded_pkgs <- rbind(pkg_df[(2*nr+1):length(pkgs),], fill_NA)
+new_pkg_df <- 
+  cbind(pkg_df[1:nr,], pkg_df[(nr+1):(2*nr),], padded_pkgs)
 kableExtra::kbl(
-  list(pkg_df[1:nr,], pkg_df[(nr+1):(2*nr),], pkg_df[(2*nr+1):length(pkgs),]),
-  booktabs = TRUE,
+  new_pkg_df,
   longtable = TRUE
 ) |> 
   kableExtra::kable_styling(font_size = 7)
