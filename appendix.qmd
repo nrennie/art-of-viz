@@ -1,6 +1,6 @@
 # Appendix {.unnumbered .appendix}
 
-## R Version {.unnumbered}
+## Software requirements {.unnumbered}
 
 ```{r}
 #| label: r-version
@@ -8,11 +8,7 @@
 renv <- jsonlite::read_json("renv.lock")
 ```
 
-This book was built using R version `r renv[[1]]$Version`.
-
-### R packages
-
-All R packages required to build this book can be found in the following table.
+This book was built using R version `r renv[[1]]$Version`. This book is built with [Quarto](https://quarto.org/), using version number `r quarto::quarto_version()`. All R packages required to build this book can be found in the following table. Note that this table contains all packages required to create the book, not just those required for the examples.
 
 ```{r}
 #| label: tbl-package-versions
@@ -25,13 +21,11 @@ pkg_df <- tibble::tibble(
   Package = pkgs,
   Version = pkg_vs
 )
-knitr::kable(
+kableExtra::kbl(
   list(pkg_df[1:nr,], pkg_df[(nr+1):(2*nr),], pkg_df[(2*nr+1):length(pkgs),]),
-  booktabs = TRUE
-)
+  booktabs = TRUE,
+  longtable = TRUE
+) |> 
+  kableExtra::kable_styling(font_size = 7)
 ```
-
-### Quarto
-
-This book is built with Quarto, using version number `r quarto::quarto_version()`.
 
