@@ -50,14 +50,15 @@ All data sets used in this book, and links to the relevant licenses:
 #| output: asis
 data_data <- readr::read_csv("data/data.csv")
 for (i in seq_len(nrow(data_data))) {
-  
   pander::pandoc.list(
     list(
       glue::glue("Chapter {data_data$Chapter[i]}"),
-      list(data_data$Data[i],
-      glue::glue("Source: [{data_data$URL[i]}]({data_data$URL[i]})"),
-      glue::glue("License: {data_data$License[i]}")
-      ))
+      list(
+        glue::glue("{data_data$Data[i]} {data_data$BibTex[i]}"),
+        glue::glue("Source: [{stringr::str_remove(data_data$URL[i], 'https://')}]({data_data$URL[i]})"),
+        glue::glue("License: {data_data$License[i]}")
+      )
     )
+  )
 }
 ```
