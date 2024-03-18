@@ -14,7 +14,7 @@ execute:
 [@tidytuesdayR]
 
 ```{r}
-#| label: programming-data
+#| label: langauges-data
 #| message: false
 languages <- readr::read_csv("data/languages.csv")
 ```
@@ -22,12 +22,17 @@ languages <- readr::read_csv("data/languages.csv")
 What are the variables?
 
 ```{r}
-#| label: programming-data-head
+#| label: langauges-data-head
 head(languages)
 ```
 
 
 ## Exploratory work
+
+```{r}
+#| label: fig-languages-explore
+```
+
 
 ### Data exploration
 
@@ -38,7 +43,7 @@ head(languages)
 ### Data wrangling
 
 ```{r}
-#| label: data-wrangling
+#| label: langauges-data-wrangling
 plot_data <- languages |>
   dplyr::filter(type == "pl") |>
   dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
@@ -63,7 +68,7 @@ plot_data <- languages |>
 
 
 ```{r}
-#| label: basic-plot1
+#| label: fig-langauges-basic-plot1
 #| warning: false
 library(ggplot2)
 basic_plot <- ggplot(data = plot_data) +
@@ -76,7 +81,7 @@ basic_plot
 reorder axes
 
 ```{r}
-#| label: scales-plot
+#| label: fig-langauges-scales-plot
 basic_plot +
   scale_y_discrete(limits = rev) +
   scale_x_continuous(
@@ -95,7 +100,7 @@ update to open ended
 Why save colours as variables?
 
 ```{r}
-#| label: colour-vars
+#| label: langauges-colour-vars
 bg_col <- "grey5"
 main_col <- "#66FF00"
 ```
@@ -103,7 +108,7 @@ main_col <- "#66FF00"
 redo plot
 
 ```{r}
-#| label: basic-plot2
+#| label: fig-langauges-basic-plot2
 basic_plot <- ggplot(data = plot_data) +
   geom_line(
     mapping = aes(x = year, y = n, group = n),
@@ -134,7 +139,7 @@ basic_plot
 Text as variables
 
 ```{r}
-#| label: text-vars
+#| label: langauges-text-vars
 title <- "Programming Languages"
 subtitle <- "Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ;
 to define which lines are comments. 3,831 languages do not have a comment token listed."
@@ -144,7 +149,7 @@ caption <- "Data: Programming Language DataBase | Graphic: N. Rennie"
 add to plot
 
 ```{r}
-#| label: text_plot
+#| label: fig-langauges-text_plot
 text_plot <- basic_plot +
   labs(
     title = title,
@@ -160,7 +165,7 @@ showtext
 google fonts
 
 ```{r}
-#| label: showtext
+#| label: langauges-showtext
 sysfonts::font_add_google("VT323", "vt")
 sysfonts::font_add_google("Share Tech Mono", "share")
 showtext::showtext_auto()
@@ -171,7 +176,7 @@ font as variables
 
 
 ```{r}
-#| label: font-vars
+#| label: langauges-font-vars
 body_font <- "share"
 title_font <- "vt"
 ```
@@ -180,7 +185,7 @@ title_font <- "vt"
 basic theming
 
 ```{r}
-#| label: minimal-theme
+#| label: langauges-minimal-theme
 theme_plot1 <- text_plot +
   theme_minimal(
     base_size = 8,
@@ -193,7 +198,7 @@ theme_plot1 <- text_plot +
 better theme
 
 ```{r}
-#| label: style1
+#| label: fig-langauges-style1
 theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -242,7 +247,7 @@ stop subtitle running off
 ggtext
 
 ```{r}
-#| label: style2
+#| label: fig-langauges-style2
 theme_plot2 <- theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -292,7 +297,7 @@ theme_plot2
 Add labels
 
 ```{r}
-#| label: add-labels
+#| label: fig-langauges-add-labels
 theme_plot2 +
   geom_text(
     mapping = aes(x = 1932, y = n, label = title),
@@ -308,7 +313,7 @@ theme_plot2 +
 make better labels
 
 ```{r}
-#| label: better-labels
+#| label: langauges-better-labels
 plot_data <- plot_data |>
   dplyr::mutate(rank_label = glue::glue("{title}\nRank: {language_rank}"))
 ```
@@ -316,7 +321,7 @@ plot_data <- plot_data |>
 plot
 
 ```{r}
-#| label: add-better-labels
+#| label: fig-langauges-add-better-labels
 theme_plot2 +
   geom_text(
     data = plot_data,
@@ -333,7 +338,7 @@ theme_plot2 +
 make html labels instead
 
 ```{r}
-#| label: html-labels
+#| label: langauges-html-labels
 plot_data <- plot_data |>
   dplyr::mutate(rank_label = glue::glue("<p>{title}</p><p style='font-size:6pt;'>(Rank: {language_rank})</p>"))
 ```
@@ -341,7 +346,7 @@ plot_data <- plot_data |>
 plot with geom_richtext ggtext
 
 ```{r}
-#| label: add-html-labels
+#| label: fig-langauges-add-html-labels
 theme_plot2 +
   ggtext::geom_richtext(
     data = plot_data,
@@ -361,7 +366,7 @@ Saving an image
 comments on dpi
 
 ```{r}
-#| label: save
+#| label: langauges-save
 #| eval: false
 #| echo: true
 ggsave()
