@@ -8,9 +8,21 @@ Details of the original data source and accreditation can be found in the origin
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-03-21](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-03-21)
 
+Original sources: [https://pldb.com/](https://pldb.com/)
+
+Copyright info: [https://github.com/breck7/pldb](https://github.com/breck7/pldb)
+
+PLDB content is published to the public domain and you can use it freely.
+
 ## Bee colony losses
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11)
+
+Original source: [https://usda.library.cornell.edu/concern/publications/rn301137d](https://usda.library.cornell.edu/concern/publications/rn301137d)
+
+Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.cornell.edu/about)
+
+All publication files are considered government works and licensed with U.S. Public Domain.
 
 ## UK museums
 
@@ -26,9 +38,11 @@ Data downloaded from the Mapping Museums website at [www.mappingmuseums.org](www
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25)
 
-## Starbucks
+## Trash Wheel Collection Data
 
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-12-21](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-12-21)
+Source: [https://github.com/rfordatascience/tidytuesday/blob/master/data/2024/2024-03-05](https://github.com/rfordatascience/tidytuesday/blob/master/data/2024/2024-03-05)
+
+Original source: [https://docs.google.com/spreadsheets/d/1b8Lbe-z3PNb3H8nSsSjrwK2B0ReAblL2](https://docs.google.com/spreadsheets/d/1b8Lbe-z3PNb3H8nSsSjrwK2B0ReAblL2)
 
 ## UFO sightings
 
@@ -37,6 +51,16 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/20
 ## Cats
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31)
+
+Original sources:
+
+* [https://www.datarepository.movebank.org/entities/datapackage/4ef43458-a0c0-4ff0-aed4-64b07cedf11c](https://www.datarepository.movebank.org/entities/datapackage/4ef43458-a0c0-4ff0-aed4-64b07cedf11c)
+
+Copyright info: [https://www.datarepository.movebank.org/help/faq#how_are_datasets_in_the_repository_licensed](https://www.datarepository.movebank.org/help/faq#how_are_datasets_in_the_repository_licensed)
+
+Datasets in the Movebank Data Repository are licensed using the Creative Commons Zero License, is a "no rights reserved" license that places works in the public domain with as little legal restriction as possible. 
+
+The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
 ## Doctors in an ageing population
 
@@ -60,13 +84,32 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/20
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24)
 
+Original sources:
+
+* [https://lemur.duke.edu/duke-lemur-center-database/](https://lemur.duke.edu/duke-lemur-center-database/)
+* [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
+
+Copyright info: [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
+
+This work is licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license. 
+
 ## R vignettes
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-03-15](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-03-15)
 
+Original sources: [https://github.com/rmflight/vignette_analysis](https://github.com/rmflight/vignette_analysis)
+
 ## Global seafood
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
+
+Original sources:
+
+* [https://ourworldindata.org/fish-and-overfishing](https://ourworldindata.org/fish-and-overfishing)
+* [https://www.ramlegacy.org/](https://www.ramlegacy.org/)
+* [https://zenodo.org/records/4824192](https://zenodo.org/records/4824192)
+
+Copyright info: Creative Commons Attribution 4.0 International
 
 ## Technology adoption
 
@@ -83,3 +126,5 @@ Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/20
 ## Global human day
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-09-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-09-12)
+
+Creative Commons Attribution Non Commercial No Derivatives 2.0 Generic.
