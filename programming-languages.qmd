@@ -183,7 +183,7 @@ basic theming
 #| label: minimal-theme
 theme_plot1 <- text_plot +
   theme_minimal(
-    base_size = 12,
+    base_size = 8,
     base_family = body_font
   )
 ```
@@ -271,11 +271,12 @@ theme_plot2 <- theme_plot1 +
     plot.title = element_text(
       colour = main_col,
       family = title_font,
-      size = 40
+      size = rel(2)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
       colour = main_col,
-      margin = margin(b = 5)
+      margin = margin(b = 5),
+      lineheight = 0.5
     ),
     plot.caption = element_text(
       colour = main_col,
@@ -294,10 +295,11 @@ Add labels
 #| label: add-labels
 theme_plot2 +
   geom_text(
-    mapping = aes(x = 1930, y = n, label = title),
+    mapping = aes(x = 1932, y = n, label = title),
     family = body_font,
     vjust = 0.5,
     hjust = 0,
+    size = 3,
     colour = main_col
   )
 ```
@@ -318,10 +320,12 @@ plot
 theme_plot2 +
   geom_text(
     data = plot_data,
-    mapping = aes(x = 1930, y = n, label = rank_label),
+    mapping = aes(x = 1932, y = n, label = rank_label),
     family = body_font,
     vjust = 0.5,
+    lineheight = 0.7,
     hjust = 0,
+    size = 2.5,
     colour = main_col
   )
 ```
@@ -331,7 +335,7 @@ make html labels instead
 ```{r}
 #| label: html-labels
 plot_data <- plot_data |>
-  dplyr::mutate(rank_label = glue::glue("<p>{title}</p><p style='font-size:8pt;'>(Rank: {language_rank})</p>"))
+  dplyr::mutate(rank_label = glue::glue("<p>{title}</p><p style='font-size:6pt;'>(Rank: {language_rank})</p>"))
 ```
 
 plot with geom_richtext ggtext
@@ -341,12 +345,13 @@ plot with geom_richtext ggtext
 theme_plot2 +
   ggtext::geom_richtext(
     data = plot_data,
-    mapping = aes(x = 1930, y = n, label = rank_label),
+    mapping = aes(x = 1932, y = n, label = rank_label),
     family = body_font,
     fill = "transparent",
     label.colour = "transparent",
     vjust = 0.5,
     hjust = 0,
+    size = 2.5,
     colour = main_col
   )
 ```
