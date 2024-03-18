@@ -44,13 +44,20 @@ kableExtra::kbl(
 All data sets used in this book, and links to the relevant licenses:
 
 ```{r}
-#| label: tbl-data
+#| label: data-sources
 #| tbl-cap: "Data sources and licenses"
 #| echo: false
+#| output: asis
 data_data <- readr::read_csv("data/data.csv")
-data_data |>
-  kableExtra::kbl(
-    longtable = TRUE
-  ) |>
-  kableExtra::kable_styling(font_size = 7.5)
+for (i in seq_len(nrow(data_data))) {
+  
+  pander::pandoc.list(
+    list(
+      glue::glue("Chapter {data_data$Chapter[i]}"),
+      list(data_data$Data[i],
+      glue::glue("Source: {data_data$URL[i]}"),
+      glue::glue("License: {data_data$License[i]}")
+      ))
+    )
+}
 ```
