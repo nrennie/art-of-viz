@@ -4,7 +4,8 @@ The .csv files in this folder are downloaded from the [#TidyTuesday repository](
 
 Details of the original data source and accreditation can be found in the original repository, and will be added to the text of this book as each chapter is written.
 
-## Programming languages
+
+## Chapter 1: Programming languages
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-03-21](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-03-21)
 
@@ -14,7 +15,8 @@ Copyright info: [https://github.com/breck7/pldb](https://github.com/breck7/pldb)
 
 PLDB content is published to the public domain and you can use it freely.
 
-## Bee colony losses
+
+## Chapter 2: Bee colony losses
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11)
 
@@ -24,7 +26,8 @@ Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.co
 
 All publication files are considered government works and licensed with U.S. Public Domain.
 
-## UK museums
+
+## Chapter 3: UK museums
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22)
 
@@ -34,21 +37,8 @@ The data and other research material published on this website are open access a
 
 Data downloaded from the Mapping Museums website at [www.mappingmuseums.org](www.mappingmuseums.org). Accessed on 2022-11-22.
 
-## Board games
 
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-25)
-
-## Trash Wheel Collection Data
-
-Source: [https://github.com/rfordatascience/tidytuesday/blob/master/data/2024/2024-03-05](https://github.com/rfordatascience/tidytuesday/blob/master/data/2024/2024-03-05)
-
-Original source: [https://docs.google.com/spreadsheets/d/1b8Lbe-z3PNb3H8nSsSjrwK2B0ReAblL2](https://docs.google.com/spreadsheets/d/1b8Lbe-z3PNb3H8nSsSjrwK2B0ReAblL2)
-
-## UFO sightings
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-06-20](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-06-20)
-
-## Cats
+## Chapter 7: Cats
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31)
 
@@ -62,7 +52,8 @@ Datasets in the Movebank Data Repository are licensed using the Creative Commons
 
 The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
-## Doctors in an ageing population
+
+## Chapter 8: Doctors in an ageing population
 
 Source: [https://ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people)
 
@@ -72,15 +63,17 @@ All data produced by Our World in Data is completely open access under the Creat
 
 The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our documentation, so you should always check the license of any such third-party data before use and redistribution.
 
-## Bird sightings
 
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10)
+## Chapter 10: US House Election Results
 
-## Freedom in the world
+Source: [https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-11-07/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-11-07/readme.md)
 
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-02-22](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-02-22)
+Original data: [https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2)
 
-## Lemurs
+Copyright info: CC0 1.0 Deed (Public Domain)
+
+
+## Chapter 11: Lemurs
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24)
 
@@ -93,13 +86,8 @@ Copyright info: [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](ht
 
 This work is licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license. 
 
-## R vignettes
 
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-03-15](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-03-15)
-
-Original sources: [https://github.com/rmflight/vignette_analysis](https://github.com/rmflight/vignette_analysis)
-
-## Global seafood
+## Chapter 13: Global seafood
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
 
@@ -111,20 +99,11 @@ Original sources:
 
 Copyright info: Creative Commons Attribution 4.0 International
 
-## Technology adoption
+
+## Chapter 14: Technology adoption
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19)
 
 Copyright info: [https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset](https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset)
 
 The authors have made this dataset available for anyone to use and users should cite the following article: Comin, D. and Hohijn B., "Cross-Country Technological Adoption: Making the Theories Face the Facts". Journal of Monetary Economics, January 2004, pp. 39-83.
-
-## Premier league
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-04-04](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-04-04)
-
-## Global human day
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-09-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-09-12)
-
-Creative Commons Attribution Non Commercial No Derivatives 2.0 Generic.

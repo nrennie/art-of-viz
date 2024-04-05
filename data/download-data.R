@@ -16,30 +16,6 @@ download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-22/museums.csv",
   destfile = "data/museums.csv")
 
-# Board games
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-25/details.csv",
-  destfile = "data/details.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-25/ratings.csv",
-  destfile = "data/ratings.csv")
-
-# Starbucks
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-12-21/starbucks.csv",
-  destfile = "data/starbucks.csv")
-
-# UFO sightings
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-06-20/ufo_sightings.csv",
-  destfile = "data/ufo_sightings.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-06-20/places.csv",
-  destfile = "data/places.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-06-20/day_parts_map.csv",
-  destfile = "data/day_parts_map.csv")
-
 # Cats
 download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-31/cats_uk.csv",
@@ -52,20 +28,11 @@ download.file(
 library(owidR)
 doctors <- owid("physicians-per-1000-people")
 write.csv(doctors, "data/doctors.csv", row.names = FALSE)
-# still need population breakdown
 
-# Bird sightings
+# US House Elections
 download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv",
-  destfile = "data/PFW_2021_public.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_count_site_data_public_2021.csv",
-  destfile = "data/PFW_count_site_data_public_2021.csv")
-
-# Freedom in the world
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-02-22/freedom.csv",
-  destfile = "data/freedom.csv")
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-07/house.csv",
+  destfile = "data/house.csv")
 
 # Lemurs
 download.file(
@@ -74,14 +41,6 @@ download.file(
 download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/taxonomy.csv",
   destfile = "data/taxonomy.csv")
-
-## R vignettes
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-15/bioc.csv",
-  destfile = "data/bioc.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-15/cran.csv",
-  destfile = "data/cran.csv")
 
 ## Global seafood
 download.file(
@@ -110,52 +69,3 @@ download.file(
 download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-19/technology.csv",
   destfile = "data/technology.csv")
-
-## Premier league
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-04-04/soccer21-22.csv",
-  destfile = "data/soccer21-22.csv")
-
-## Global human day
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-09-12/all_countries.csv",
-  destfile = "data/all_countries.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-09-12/country_regions.csv",
-  destfile = "data/country_regions.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-09-12/global_human_day.csv",
-  destfile = "data/global_human_day.csv")
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-09-12/global_economic_activity.csv",
-  destfile = "data/global_economic_activity.csv")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
