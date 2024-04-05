@@ -5,6 +5,18 @@ execute:
   freeze: auto
 ---
 
+```{r}
+#| echo: false
+#| eval: true 
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true 
+#| file: R/social_caption.R
+```
+
 # Technology adoption: making gauge charts with {ggforce} {#technology}
 
 In this chapter we'll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.
@@ -268,6 +280,22 @@ title <- "Measles Vaccinations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries."
 ```
 
+custom caption as described in @sec-chap6.
+
+```{r}
+#| label: technology-style-3
+social <- social_caption(
+  icon_colour = highlight_col,
+  font_colour = text_col,
+  bg_colour = bg_col,
+  font_family = body_font
+)
+caption <- glue::glue(
+  "**Data**: data.nber.org (10.3386/w15319)<br>**Graphic**: {social}"
+)
+```
+
+
 Since axis labels tend not to make too much sense for `geom-arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
 
 ```{r}
@@ -293,7 +321,8 @@ text_plot <- color_plot +
   ) +
   labs(
     title = title,
-    subtitle = subtitle
+    subtitle = subtitle,
+    caption = caption
   )
 text_plot
 ```
@@ -355,30 +384,6 @@ styled_plot <- theme_plot +
     plot.margin = margin(5, 5, 5, 5)
   )
 styled_plot
-```
-
-custom caption
-
-```{r}
-#| label: technology-style-3
-social <- social_caption(
-  icon_colour = highlight_col,
-  font_colour = text_col,
-  bg_colour = bg_col,
-  font_family = body_font
-)
-caption <- glue::glue(
-  "**Data**: data.nber.org (10.3386/w15319)<br>**Graphic**: {social}"
-)
-```
-
-add to plot
-
-```{r}
-#| label: fig-technology-style-3
-#| fig-cap: "Previous plot with caption added, including Font Awesome icon"
-styled_plot +
-  labs(caption = caption)
 ```
 
 ## Reflection
