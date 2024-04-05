@@ -193,6 +193,7 @@ basic_plot
 #| label: technology-colors
 highlight_col <- "#990c58"
 second_col <- "#949398"
+text_col <- "black"
 bg_col <- "#dedede"
 ```
 
@@ -200,7 +201,7 @@ add new colors to basic plot
 
 ```{r}
 #| label: fig-technology-basic-plot-2
-#| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color changed to a medium grey."
+#| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color removed."
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
   ggforce::geom_arc_bar(
@@ -210,7 +211,7 @@ basic_plot <- ggplot(data = gauge_data) +
       start = ymin_2010, end = ymax_2010,
       fill = YN
     ),
-    color = second_col
+    color = NA
   ) +
   ggforce::geom_arc_bar(
     mapping = aes(
@@ -219,7 +220,7 @@ basic_plot <- ggplot(data = gauge_data) +
       start = ymin_1980, end = ymax_1980,
       fill = YN
     ),
-    color = second_col
+    color = NA
   ) +
   facet_wrap(~iso3c, nrow = 2)
 ```
@@ -264,7 +265,7 @@ social to add
 #| label: technology-text
 #| code-overflow: wrap
 title <- "Measles Vaccinations"
-subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries.\n\nN. Rennie | Data: data.nber.org (10.3386/w15319)"
+subtitle <- "The inner bar represents the percentage of children who received a measles immunisation in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunisation levels between 1980 and 2010 is seen across all countries."
 ```
 
 Since axis labels tend not to make too much sense for `geom-arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
@@ -278,7 +279,7 @@ text_df <- data.frame(
 )
 ```
 
-We can then add this to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text dataframe we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
+We can then add this to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text data.frame we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
 
 ```{r}
 #| label: fig-technology-text
@@ -308,23 +309,22 @@ You may have noticed that the current gauge plots look a bit squashed and not ex
 ```{r}
 #| label: fig-technology-style-1
 #| fig-cap: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed."
-theme_plot1 <- text_plot +
+theme_plot <- text_plot +
   coord_fixed() +
   theme_void(base_size = 8, base_family = body_font)
-theme_plot1
+theme_plot
 ```
 
 This looks better but it's still not great. What do we still need to improve with styling? The title text doesn't stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help? The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from {ggtext} \index{ggtext!element\_textbox\_simple}. 
 
-bg col
-remove legend
+labels also squashes
 
 Let's fix the first three of these issues.
 
 ```{r}
 #| label: fig-technology-style-2
 #| fig-cap: "Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title."
-main_plot <- theme_plot1 +
+styled_plot <- theme_plot +
   theme(
     legend.position = "none",
     plot.background = element_rect(
@@ -337,106 +337,55 @@ main_plot <- theme_plot1 +
       face = "bold", size = rel(1.2)
     ),
     plot.title = element_text(
-      margin = margin(t = 10, b = 10),
+      margin = margin(b = 10),
       face = "bold",
       size = rel(1.5)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
-      maxwidth = 0.8,
-      lineheight = 0.5,
-      hjust = 0.5,
+      margin = margin(b = 10),
+      lineheight = 0.6,
+      hjust = 0,
+      halign = 0
+    ),
+    plot.caption = ggtext::element_textbox_simple(
+      margin = margin(t = 10),
+      hjust = 0,
+      halign = 0
     ),
     plot.margin = margin(5, 5, 5, 5)
   )
-main_plot
+styled_plot
 ```
 
-
-### Adding a better legend
-
-As we already saw in chapter ..., 
+custom caption
 
 ```{r}
-#| label: fig-technology-legend
-#| fig-cap: "Version of the gauge chart shown only for USA which will act as a legend."
-legend_plot <- ggplot(
-  data = dplyr::filter(gauge_data, iso3c == "USA")
-) +
-  ggforce::geom_arc_bar(
-    mapping = aes(
-      x0 = 0, y0 = 0,
-      r0 = 0.7, r = 1,
-      start = ymin_2010, end = ymax_2010,
-      fill = YN
-    ),
-    color = second_col
-  ) +
-  ggforce::geom_arc_bar(
-    mapping = aes(
-      x0 = 0, y0 = 0,
-      r0 = 0.2, r = 0.5,
-      start = ymin_1980, end = ymax_1980,
-      fill = YN
-    ),
-    color = second_col
-  ) +
-  geom_text(
-    data = text_df,
-    mapping = aes(x = x, y = y, label = label),
-    family = body_font, size = 6
-  ) +
-  facet_wrap(~iso3c) +
-  scale_fill_manual(
-    breaks = c("value", "no_value"),
-    labels = c("Immunised", "Not Immunised"),
-    values = c(highlight_col, second_col)
-  ) +
-  labs(title = "How do I read this plot?") +
-  coord_fixed() +
-  theme_void(base_size = 8, base_family = body_font) +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_blank(),
-    plot.background = element_rect(
-      fill = "transparent", color = "transparent"
-    ),
-    panel.background = element_rect(
-      fill = "transparent", color = "transparent"
-    ),
-    plot.title = element_text(
-      hjust = 0.5,
-      face = "italic",
-      margin = margin(t = 10, b = 10)
-    ),
-    plot.margin = margin(5, 5, 5, 5)
-  )
-legend_plot
+#| label: technology-style-3
+social <- social_caption(
+  icon_colour = highlight_col,
+  font_colour = text_col,
+  bg_colour = bg_col,
+  font_family = body_font
+)
+caption <- glue::glue(
+  "**Data**: data.nber.org (10.3386/w15319)<br>**Graphic**: {social}"
+)
 ```
 
-### Combining legend with {patchwork}
-
-Join with {patchwork}
+add to plot
 
 ```{r}
-#| label: fig-technology-patchwork
-#| fig-cap: "Final gauge chart with overlaid legend in top right corner."
-#| warning: false
-library(patchwork)
-final_plot <- main_plot +
-  inset_element(legend_plot, 0.5, 0.9, 1.1, 1.4) &
-  theme(
-    plot.background = element_rect(
-      fill = bg_col, color = bg_col
-    ),
-    panel.background = element_rect(
-      fill = bg_col, color = bg_col
-    )
-  )
-final_plot
+#| label: fig-technology-style-3
+#| fig-cap: "Previous plot with caption added, including Font Awesome icon"
+styled_plot +
+  labs(caption = caption)
 ```
-
-As with previous examples, don't be fooled into thinking that the size of the legend and it's positioning within the main plot is something that happened perfectly this first. The values are often picked through a series of trial and error, and with practice you'll get better at choosing starting values.
 
 ## Reflection
 
 Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area . If you measure the change on arc length between 1980 and 2010, you'll get different answers to if you measured the proportional change in area for the two. 
+
+- also add social media captipn
+- original version also had separate legend, and grey outline
+- could add exact %
+- country names instead of abbr
