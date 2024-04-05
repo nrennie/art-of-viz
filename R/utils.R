@@ -1,14 +1,4 @@
 
-# Set styling for book ----------------------------------------------------
-
-transformers <- styler::tidyverse_style()
-transformers$line_break$set_line_break_before_closing_call <- NULL
-options(
-  styler.addins_style_transformer = transformers
-)
-styler::style_dir(".", transformers = transformer)
-
-
 # camcorder recording -----------------------------------------------------
 
 library(camcorder)
@@ -20,6 +10,9 @@ gg_record(
   units = "in",
   dpi = 300
 )
+
+# remove folder
+unlink("recording", recursive = TRUE)
 
 
 # Packages required for book ----------------------------------------------
