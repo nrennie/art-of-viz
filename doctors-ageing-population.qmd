@@ -2,8 +2,20 @@
 filters:
   - line-highlight
 execute: 
-  freeze: auto
+  freeze: true
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
 
 # Doctors in an ageing population: making maps with {ggplot2} {#doctors}
 
@@ -17,15 +29,29 @@ There are many open sources of data, covering a wide range of topics, time frame
 
 One fantastic source of data is the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)). The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you're ever looking for inspiration.\index{Our World in Data}
 
-For this chapter, we'll visualise data on [Medical doctors per 1,000 people](https://ourworldindata.org/grapher/physicians-per-1000-people),  a dataset which comes from the Our World in Data website [@doctors_data].
+For this chapter, we'll visualise data on [Medical doctors per 1,000 people](https://ourworldindata.org/grapher/physicians-per-1000-people),  a dataset which comes from the Our World in Data website [@doctors_data]. You can load the data using the {owidR} R package [@owidR]: \index{owidR!owid}
 
 ```{r}
-#| label: doctors-load-data
+#| label: doctors-load-data-show
+#| eval: false
+#| echo: true
+library(owidR)
+doctors <- owid("physicians-per-1000-people")
+```
+
+```{r}
+#| label: doctors-load-data-hide
 #| output: false
+#| echo: false
+#| eval: true
 doctors <- readr::read_csv("data/doctors.csv")
 ```
 
-\index{readr!read\_csv}
+::: {#tip-museums-view .callout-tip}
+
+You may choose to save a copy of `doctors` as a CSV file for later use, which you can read in with `read.csv` or `read_csv()` from {readr}. \index{readr!read\_csv}
+
+:::
 
 ## Exploratory work
 
@@ -48,7 +74,8 @@ Often when there's a time component to data, one of the most obvious patterns to
 plot(
   x = doctors$year,
   y = doctors$`Physicians (per 1,000 people)`,
-  xlab = "Year", ylab = "Physicians per 1,000 people")
+  xlab = "Year", ylab = "Physicians per 1,000 people"
+)
 ```
 
 There seems to be a general increasing trend between 1960 and 2019. The other important component of this data that we may want to explore is the spatial aspect - is there a pattern over space as well as over time? The most common approach to visualising spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it's very common to color the country based on the value of the variable. These are often termed *choropleth maps*.\index{choropleth map}
@@ -73,7 +100,8 @@ Since this data is already fairly tidy, there isn't too much data wrangling to b
 doctors <- doctors |>
   dplyr::rename(
     region = entity,
-    doctors = `Physicians (per 1,000 people)`) |>
+    doctors = `Physicians (per 1,000 people)`
+  ) |>
   dplyr::select(region, year, doctors) |>
   dplyr::group_by(region) |>
   dplyr::slice_max(year) |>
@@ -135,7 +163,7 @@ Now, we have everything we need to create a simple map.\index{map}
 
 We start, as almost always, with the `ggplot()` function, and pass in the data and aesthetic mappings that will apply to the whole plot. The longitude (`long`) and latitude (`lat`) are passed to the `x` and `y` axes; and we specify that the `fill` color of each country should be based on the `doctors` column. We also specify `map_id` - aesthetic mapping that isn't seen as often as the others. This is used to tell `geom_map()` which column defines (not entirely unlike the `group` aesthetic discussed in previous chapters). \index{ggplot2!geom\_map}\index{ggplot2!aes}
 
-Both `geom_sf()` and `geom_map()` are used for creating maps within {ggplot2}. However, they expect different formats of data: `geom_sf()` expects an `sf` object, whereas `geom_map()` works with coordinates as columns in a `data.frame` or `tibble`. Here, we'll use `geom_map()`. For examples of using `geom_sf()`, see Chapter ??. \index{ggplot2!geom\_map}\index{ggplot2!geom\_sf}
+Both `geom_sf()` and `geom_map()` are used for creating maps within {ggplot2}. However, they expect different formats of data: `geom_sf()` expects an `sf` object, whereas `geom_map()` works with coordinates as columns in a `data.frame` or `tibble`. Here, we'll use `geom_map()`. For examples of using `geom_sf()`, see Chapter @sec-chap9. \index{ggplot2!geom\_map}\index{ggplot2!geom\_sf}
 
 > Note: you could also use `geom_polygon()` to plot `map_data` instead of `geom_map()`.
 
@@ -192,30 +220,14 @@ col_plot <- base_plot +
     colors = col_palette,
     limits = c(0, 10),
     breaks = c(0.8, 9.2),
-    labels = c("Fewer doctors", "More doctors"))
+    labels = c("Fewer doctors", "More doctors")
+  )
 col_plot
 ```
 
 ### Text and fonts
 
-Now, we can define some text for the title, subtitle, and caption. As in previous chapters, we'll be using {ggtext} for formatting which means we can use markdown syntax to add bold font and line breaks.
-
-```{r}
-#| label: doctors-text
-title <- "Doctors in an ageing population"
-st <- "This map show the number of doctors per thousand people, revealing which countries* may be more likely to struggle in providing care for a population.<br><br>*using the most recent available data for each country."
-cap <- "**Data**: Our World in Data | **Graphic**: N. Rennie"
-```
-
-These text variables can then be passed into the `labs()` function in {ggplot2}\index{ggplot2!labs}:
-
-```{r}
-#| label: doctors-style-plot-2
-text_plot <- col_plot +
-  labs(title = title, subtitle = st, caption = cap)
-```
-
-Fonts can also be defined using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, the *Roboto* font is loaded through Google Fonts for the main font used, and *Roboto Slab* is loaded for use in the title. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+As in previous chapters, fonts can be defined using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, the *Roboto* font is loaded through Google Fonts for the main font used, and *Roboto Slab* is loaded for use in the title. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: doctors-font
@@ -227,7 +239,42 @@ body_font <- "roboto"
 title_font <- "roboto_slab"
 ```
 
-To apply these fonts to the plot, the `theme` elements need to be adjusted. \index{ggplot2!theme}
+Now, we can define some text for the title, subtitle, and caption. As in previous chapters, we'll be using {ggtext} for formatting which means we can use markdown syntax to add bold font and line breaks.
+
+```{r}
+#| label: doctors-text
+title <- "Doctors in an ageing population"
+subtitle <- "This map show the number of doctors per thousand people, revealing which countries* may be more likely to struggle in providing care for a population.<br><br>*using the most recent available data for each country."
+```
+
+Let's create a custom caption that includes Font Awesome icons, as described in Chapter @sec-chap6:
+
+```{r}
+#| label: technology-style-3
+social <- social_caption(
+  icon_colour = highlight_col,
+  font_colour = text_col,
+  bg_colour = bg_col,
+  font_family = body_font
+)
+caption <- glue::glue(
+  "**Data**: Our World in Data<br>**Graphic**: {social}"
+)
+```
+
+These text variables can then be passed into the `labs()` function in {ggplot2}\index{ggplot2!labs}:
+
+```{r}
+#| label: doctors-style-plot-2
+text_plot <- col_plot +
+  labs(
+    title = title,
+    subtitle = subtitle,
+    caption = caption
+  )
+```
+
+To apply our chosen fonts to the plot, the `theme` elements need to be adjusted. \index{ggplot2!theme}
 
 ### Adjusting themes
 
@@ -297,7 +344,11 @@ styled_plot <- ggplot(
     breaks = c(0.8, 9.2),
     labels = c("Fewer doctors", "More doctors")
   ) +
-  labs(title = title, subtitle = st, caption = cap) +
+  labs(
+    title = title,
+    subtitle = subtitle,
+    caption = caption
+  ) +
   facet_wrap(~label) +
   theme_void(base_size = 7, base_family = body_font) +
   theme(
@@ -344,7 +395,7 @@ To solve the third problem of the map looking stretched, we can apply `coord_sf(
 #| label: doctors-style-plot-4
 styled_plot2 <- styled_plot +
   labs(
-    title = NULL, subtitle = NULL, tag = st
+    title = NULL, subtitle = NULL, tag = subtitle
   ) +
   # add space for the tag (subtitle) text
   coord_sf(ylim = c(-60, 140)) +
@@ -382,9 +433,11 @@ To solve the final problem of the legend appearance, we can edit the style eleme
 
 The placement of the legend is set through the `legend.position`, `legend.justification.bottom`, `legend.margin`, and `legend.direction` arguments.
 
-::: {.callout-note icon=false appearance="simple"}
+::: {#tip-doctors-ggplot .callout-tip}
 
-Since version 3.5.0 of {ggplot2}, you can also style the `theme` of individual legends from inside the `guide_*()` functions. Prior to version 3.5.0, `legend.position` was used to position the legend inside the plot before `legend.position.inside` and `legend.justification.bottom` were introduced to allow custom legend positions more easily. The other difference is that `legend.ticks = element_blank()` can be used to remove the white tick marks inside the colorbar legend. In older versions of {ggplot2}, `guides(fill = guide_colorbar(ticks = FALSE))` could be used instead. \index{ggplot2!guides} \index{ggplot2!guide\_colorbar}
+Since version 3.5.0 of {ggplot2}, you can also style the `theme` of individual legends from inside the `guide_*()` functions. Prior to version 3.5.0, `legend.position` was used to position the legend inside the plot before `legend.position.inside` and `legend.justification.bottom` were introduced to allow custom legend positions more easily.
+
+The other difference is that `legend.ticks = element_blank()` can be used to remove the white tick marks inside the colorbar legend. In older versions of {ggplot2}, `guides(fill = guide_colorbar(ticks = FALSE))` could be used instead. \index{ggplot2!guides} \index{ggplot2!guide\_colorbar}
 
 :::
 
@@ -408,7 +461,7 @@ styled_plot2 +
     # legend position
     legend.position = "bottom",
     legend.justification.bottom = "right",
-    legend.margin = margin(0, 5, -5, 0),
+    legend.margin = margin(-5, 5, 0, 0),
     legend.direction = "horizontal",
     legend.ticks = element_blank()
   )
@@ -418,7 +471,7 @@ styled_plot2 +
 
 When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colors were based on the log of this value - compare @fig-doctors-style-plot-5 and @fig-doctors-original. The raw values on the color scale were hard to interpret, so the choice was made to use *Fewer doctors* and *More doctors* labels instead. For this version, where the underlying data is simpler and easier to interpret, having the values on the legend would add more useful information. The original title was also kept, but could probably be changed to something more informative.
 
-![](images/doctors_original.png){#fig-doctors-original fig-align="center"}
+![My original plot created for this data, with a slightly different underlying data set.](images/doctors_original.png){#fig-doctors-original fig-align="center"}
 
 When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the different is between times. Showing uncertainty on maps is tricky, and there's no straightforward solution here. Perhaps setting the colors to a binary scale showing whether he value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.
 
