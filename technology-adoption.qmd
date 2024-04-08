@@ -43,7 +43,14 @@ technology <- tuesdata$technology
 technology <- readr::read_csv("data/technology.csv")
 ```
 
-The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns. The data is in long format with the `variable` (and `label`) column contain information on what variable the row relates to e.g. `"% children who received a BCG immunization"` or `"Land naturally regenerating forest area 1000 ha"`. The `iso3c` column gives the ISO3 code the country the row relates to, and similarly the `year` column relates to the relevant year. The `group` column details whether the variable is related to `"Consumption"`, `"Production"`, `"Non-Tech"` (such as GDP), or `"Creation"`. The `category` column contains information about which category the variable falls into e.g. `"Vaccines"` or `"Agriculture"`. Finally, the `value` column provides the value of the variable for the given year and country.
+The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns.
+
+```{r}
+#| label: technology-head-data
+head(technology)
+```
+
+The data is in long format with the `variable` (and `label`) columns containing information on what variable the row relates to e.g. `"% children who received a BCG immunization"` or `"Land naturally regenerating forest area 1000 ha"`. The `iso3c` column gives the ISO3 code for the country the row relates to, and similarly the `year` column relates to the relevant year. The `group` column details whether the variable is related to `"Consumption"`, `"Production"`, `"Non-Tech"` (such as GDP), or `"Creation"`. The `category` column contains information about which category the variable falls into e.g. `"Vaccines"` or `"Agriculture"`. Finally, the `value` column provides the value of the variable for the given year and country.
 
 ## Exploratory work
 
@@ -68,7 +75,7 @@ barplot(
 )
 ```
 
-So we have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changes over time, using the `heatmap()` function in base R: \index{heatmap}
+We have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changed over time, using the `heatmap()` function in base R: \index{heatmap}
 
 ```{r}
 #| label: fig-technology-heatmap
@@ -106,7 +113,7 @@ For obvious reasons (the timing of when the first measles vaccine was created an
 
 A list of all ISO3 country codes can be obtained by running `unique(technology$iso3c)`, and from there we can choose a subset of countries we want to look at in more detail. Let's look at Great Britain, USA, Sweden, Brazil, New Zealand, and Venezuela, and store these choices in a vector called `countries`. 
 
-Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter`\index{dplyr!filter} function from {dplyr}\index{dplyr} to filter our `technology` data set to consider only the rows showing data about percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
+Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter`\index{dplyr!filter} function from {dplyr}\index{dplyr} to filter our `technology` data set to consider only the rows showing data about the percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
 
 We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from {dplyr}.
 
@@ -194,7 +201,7 @@ The {ggforce}\index{ggforce} extension package [@ggforce] contains many useful f
 
 The function that we're interested in for the purposes of creating a gauge chart is `geom_arc_bar()` \index{ggforce!geom\_arc\_bar}. The `geom_arc_bar()` function makes it possible to draw arcs in {ggplot2}. You can also use this function to create visualizations such as donut charts or sunburst plots. We'll use two calls to `geom_arc_bar()` to create the double gauge chart - one for the 1980 arc, and one for the 2010 arc. There are several required aesthetics when using `geom_arc_bar()`:
 
-* `x0`: The x-coordinate of the centre of the circle that the gauge chart lies on. For us, This will be a constant value so we can choose any number - `0` seems like an obvious choice.
+* `x0`: The x-coordinate of the centre of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice.
 * `y0`: The y-coordinate of the centre of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice again.
 * `r0`: The inner radius (from `x0` and `y0`) of the arc.
 * `r`: The outer radius (from `x0` and `y0`) of the arc. The difference between `r0` and `r` determines how thick the gauge chart will be. For each of the two arcs we will draw, these will be constant. For the outer arc (2010), we can set `r0 = 0.7` and ` r = 1`, and for the inner arc (1980), we can set `r0 = 0.2` and ` r = 0.5`. Note that the difference between the radii is 0.3 for both arcs so they are equally thick.
@@ -268,7 +275,7 @@ head(gauge_data)
 
 We're now finished with the data wrangling (finally!) and ready to create our first plot. As always, we start with the `ggplot()` function and pass in `gauge_data` that will be used for plotting the arcs. The aesthetics for each arc will vary so we'll hold off on passing them in globally. \index{ggplot2!ggplot} \index{ggplot2!aes}
 
-We then add two arcs by using `geom_arc_bar()` twice. We set the `x0`, `y0`, `r0`, and `r` constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the `aes()` function because they are *required* aesthetics. We then pass in the `ymin_*` and `ymax_*` columns in as the `start` and `end` aesthetics, and set the `fill` color based on the `YN` column. \index{ggforce!geom\_arc\_bar}
+We then add two arcs by using `geom_arc_bar()` twice. We set the `x0`, `y0`, `r0`, and `r` constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the `aes()` function because they are *required* aesthetics. We then pass the `ymin_*` and `ymax_*` columns in as the `start` and `end` aesthetics, and set the `fill` color based on the `YN` column. \index{ggforce!geom\_arc\_bar}
 
 We also use `facet_wrap()` to draw a pair of arcs for each country in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries. \index{ggplot2!facet\_wrap} 
 
@@ -306,7 +313,7 @@ We now have a double gauge chart - but it could look a lot nicer (and more infor
 
 ### Colors
 
-Let's start by defining some variables for our colors. Here, we define a `highlight_col` which we'll use for the segment showing the percentage who did have immunizations, so this should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, with black text (`text_col`).
+Let's start by defining some variables for our colors. Here, we define a `highlight_col` which we'll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black.
 
 ```{r}
 #| label: technology-colors
@@ -344,7 +351,7 @@ basic_plot <- ggplot(data = gauge_data) +
   facet_wrap(~iso3c, nrow = 2)
 ```
 
-Now we can the colors using `scale_fill_manual()` from {ggplot2}, setting the color values but also slightly more informative labels for legend at the same time. \index{ggplot2!scale\_fill\_manual}
+Now we can apply the colors using `scale_fill_manual()` from {ggplot2}, setting both the color values but also more informative labels for the legend at the same time. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-technology-color-plot
@@ -379,7 +386,7 @@ title <- "Measles Immunizations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
 ```
 
-We also create the custom caption with Font Awesome icons, as described in @sec-chap6. Remember to update the `caption` variable to include the source of the data for this visualisation.
+We also create a custom caption with Font Awesome icons, as described in @sec-chap6. Remember to update the `caption` variable to include the source of the data for this visualisation.
 
 ```{r}
 #| label: technology-style-3
@@ -394,7 +401,7 @@ caption <- glue::glue(
 )
 ```
 
-Since axis labels tend not to make too much sense for `geom_arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these of from the graph we already have since we haven't yet deleted the axis label), as well as the `label` that should appear.
+Since the axis labels do not make too much sense for `geom_arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these off from the graph we already have since we haven't yet deleted the axis labels), as well as the `label` that should appear.
 
 ```{r}
 #| label: technology-text-df
@@ -405,7 +412,7 @@ text_df <- data.frame(
 )
 ```
 
-We can then add this to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text data.frame we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
+We can then add this text to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
 
 ```{r}
 #| label: fig-technology-text
@@ -427,7 +434,7 @@ text_plot
 
 ### Adjusting themes
 
-We'll start by removing all of the theme elements such as the grey background, grid lines, axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
+We'll start by removing all of the theme elements such as the grey background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
 
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()` \index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
