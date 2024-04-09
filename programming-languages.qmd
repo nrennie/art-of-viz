@@ -2,39 +2,110 @@
 filters:
   - line-highlight
 execute: 
-  freeze: auto
+  freeze: true
 ---
 
 # Programming Languages: dumbbell charts with {ggplot2} {#programming}
+
+IN this cahpter, dumbeell charts, data-driven captions with {glue}, and styling using fonts and colours, wrapping text with ggtext
 
 ## Data
 
 [@pldb]
 
-[@tidytuesdayR]
+The PLDB was used as a \#TidyTuesday dataset in March 2023, meaning we can load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
+
+might be multiple datasets 
 
 ```{r}
-#| label: langauges-data
-#| message: false
+#| label: langauges-load-data-show
+#| eval: false
+#| echo: true
+tuesdata <- tidytuesdayR::tt_load("2023-03-21")
+languages <- tuesdata$languages
+```
+
+```{r}
+#| label: langauges-load-data-hide
+#| output: false
+#| echo: false
+#| eval: true
 languages <- readr::read_csv("data/languages.csv")
 ```
 
-What are the variables?
+You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tidytuesdayR::tt_load(2023, week = 12)`, but personally I find remember the date much easier! You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
+
+What does the data look like?
 
 ```{r}
 #| label: langauges-data-head
 head(languages)
 ```
 
+checks it's read in correctly 
+View
+
+The data has x rows and columsn
+
+What are the variables?
+
+there are many variables, many of them have lots of NA vaues
 
 ## Exploratory work
 
-```{r}
-#| label: fig-languages-explore
-```
-
+what is table - bar charts if categories, box plots if one cont one cat, scatter plot if two cont, line plot if over time
 
 ### Data exploration
+
+rank i smost obvious "response" if stat
+
+appeared last activ
+
+```{r}
+#| label: fig-languages-scatter
+#| fig-cap: ""
+plot(
+  languages$last_activity, languages$language_rank
+)
+```
+
+straight away highights the role of data vis in exploratory lang
+
+- are these incorrect values
+- are dates anchored wrong 01011970
+
+in this case actually years so prob correct we could filter out,
+
+first programming lang 1950s (need source)
+
+```{r}
+#| label: fig-languages-scatter-filter
+#| fig-cap: ""
+lang_df <- subset(languages, last_activity >= 1950)
+plot(
+  lang_df$last_activity, lang_df$language_rank
+)
+```
+
+callout tip - dplyr/base R
+
+are pl
+
+```{r}
+#| label: fig-languages-pl-barplot
+#| fig-cap: ""
+barplot(
+  table(lang_df$type)
+)
+```
+
+```{r}
+#| label: fig-languages-comment-barplot
+#| fig-cap: ""
+barplot(
+  sort(table(lang_df$line_comment_token))
+)
+```
 
 ### Exploratory sketches
 
@@ -43,18 +114,30 @@ head(languages)
 ### Data wrangling
 
 ```{r}
-#| label: langauges-data-wrangling
-plot_data <- languages |>
+#| label: langauges-data-wrangling-1
+comment_df <- lang_df |>
   dplyr::filter(type == "pl") |>
   dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
   dplyr::select(title, appeared, line_comment_token, last_activity, language_rank) |>
-  tidyr::drop_na() |>
+  tidyr::drop_na()
+```
+
+```{r}
+#| label: langauges-data-wrangling-2
+comment_df2 <- comment_df |> 
   dplyr::mutate(label = paste("Comment token:", line_comment_token)) |>
   dplyr::group_by(label) |>
   dplyr::slice_head(n = 10) |>
   dplyr::mutate(n = factor(dplyr::row_number(), levels = 1:10)) |>
   dplyr::ungroup() |>
-  dplyr::select(label, n, title, appeared, last_activity, language_rank) |>
+  dplyr::select(label, n, title, appeared, last_activity, language_rank)
+```
+
+need to rename to something better
+
+```{r}
+#| label: langauges-data-wrangling-3
+plot_data <- comment_df2 |> 
   tidyr::pivot_longer(
     cols = c(appeared, last_activity),
     names_to = "type",
@@ -66,6 +149,7 @@ plot_data <- languages |>
 
 ### The first plot
 
+maybe split into two or three
 
 ```{r}
 #| label: fig-langauges-basic-plot1
@@ -141,10 +225,11 @@ Text as variables
 ```{r}
 #| label: langauges-text-vars
 title <- "Programming Languages"
-subtitle <- "Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ;
-to define which lines are comments. 3,831 languages do not have a comment token listed."
+subtitle <- "Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ; to define which lines are comments. 3,831 languages do not have a comment token listed."
 caption <- "Data: Programming Language DataBase | Graphic: N. Rennie"
 ```
+
+subtitle ... can wegenerate from text - use glue 
 
 add to plot
 
@@ -159,6 +244,7 @@ text_plot <- basic_plot +
 text_plot
 ```
 
+runs off the edge - we'll deal with that later
 Choosing a font
 
 showtext
