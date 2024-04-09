@@ -19,3 +19,4 @@ unlink("recording", recursive = TRUE)
 
 library(xml2)
 library(downlit)
+library(lintr)

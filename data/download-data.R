@@ -29,6 +29,11 @@ library(owidR)
 doctors <- owid("physicians-per-1000-people")
 write.csv(doctors, "data/doctors.csv", row.names = FALSE)
 
+# Time Zones
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-28/timezones.csv",
+  destfile = "data/timezones.csv")
+
 # US House Elections
 download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-07/house.csv",

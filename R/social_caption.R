@@ -2,9 +2,9 @@ social_caption <- function(twitter = "@nrennie35",
                            mastodon = "fosstodon.org/@nrennie",
                            linkedin = "nicola-rennie",
                            github = "nrennie",
-                           icon_colour = nr_dark,
-                           font_colour = nr_dark,
-                           bg_colour = nr_light,
+                           icon_color = nr_dark,
+                           font_color = nr_dark,
+                           bg_color = nr_light,
                            font_family = "Commissioner") {
   icons <- list(
     twitter = "&#xf099",
@@ -23,7 +23,7 @@ social_caption <- function(twitter = "@nrennie35",
   for (name in names(social)) {
     icon <- icons[name]
     info <- social[name]
-    html <- glue::glue("<span style='font-family:\"Font Awesome 6 Brands\";color:{icon_colour};'>{icon};</span><span style='color:{bg_colour};'>.</span><span style='font-family:{font_family};color:{font_colour};'>{info}</span><span style='color:{bg_colour};'>..</span>")
+    html <- glue::glue("<span style='font-family:\"Font Awesome 6 Brands\";color:{icon_color};'>{icon};</span><span style='color:{bg_color};'>.</span><span style='font-family:{font_family};color:{font_color};'>{info}</span><span style='color:{bg_color};'>..</span>")
     caption <- paste0(caption, html)
   }
   return(caption)

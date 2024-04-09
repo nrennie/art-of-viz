@@ -63,6 +63,13 @@ All data produced by Our World in Data is completely open access under the Creat
 
 The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our documentation, so you should always check the license of any such third-party data before use and redistribution.
 
+## Chapter 9: Time Zones
+
+Source: [https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md)
+
+Original data: [https://data.iana.org/time-zones/tz-link.html#tzdb](https://data.iana.org/time-zones/tz-link.html#tzdb)
+
+Copyright info:  This web page is in the public domain, so clarified as of 2009-05-17 by Arthur David Olson. 
 
 ## Chapter 10: US House Election Results
 

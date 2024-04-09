@@ -2,7 +2,7 @@
 filters:
   - line-highlight
 execute: 
-  freeze: true
+  freeze: auto
 ---
 
 # UK Museums: highlighting line charts with {gghighlight} {#sec-museums}
@@ -11,7 +11,7 @@ In this chapter we'll consider different ways of visualising data that varies ov
 
 ## Data
 
-The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at [www.mappingmuseums.org](www.mappingmuseums.org). It was also used as a \#TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022, and we'll use that version for this chapter.
+The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at [museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home). It was also used as a \#TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022, and we'll use that version for this chapter.
 
 Let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
@@ -48,14 +48,12 @@ Remember that you can use `View(museums)` to inspect the data in a more human-re
 There are many different aspects of this data we could inspect:
 
 * How are museums spread out across the UK? Is there a higher concentration of museums in more affluent areas?
-* What types of museums are most prevalent in the UK? Does the vary based on whether the museum is accredited?
-* How is the number of museums open changing over time? Are more museums opening than closing?
+* What types of museums are most prevalent in the UK? Does this vary based on whether the museum is accredited?
+* How is the number of open museums changing over time? Are more museums opening than closing?
 
-Some of the variables, such as `DOMUS_Subject_Matter` have quite a lot of missing values which makes 
+Some of the variables, such as `DOMUS_Subject_Matter` have quite a lot of missing values which makes it more difficult to visualise and interpret them. Although these columns definitely warrant further exploration, we'll ignore them for now.
 
-Although these definitely warrant further exploration,
-
-Given the wealth of information around deprivation indices (8 different variables), that's the first aspect of the data that jumps out. How does the number of museums vary per index of deprivation?
+Given the wealth of information around deprivation indices (8 different variables), that's the first aspect of the data that jumps out. How does the number of museums vary by index of deprivation?
 
 ```{r}
 #| label: fig-museums-barplot
@@ -75,7 +73,7 @@ To get a better understanding of the relationship between deprivation and the nu
 
 We have 10 deciles of deprivation, so we'll have 10 time series that we want to plot that show the number of museums over time. There are different options for plotting time series like this. We need to think about some different choices:
 
-* What type of *geometry* will we use? Lines, points, shaded areas? Lines are the most common approach for 
+* What type of *geometry* will we use? Lines, points, shaded areas? Lines are the most common approach for time series data.
 * Do we plot all 10 lines on the same chart and use color to denote the different levels of deprivation?
 * Or do we use faceting to split it into multiple smaller plots by deprivation index?
 
@@ -83,7 +81,7 @@ If we go with line charts, and faceting by deprivation index, that might look so
 
 ![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center"}
 
-We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in both Chapter @sec-programming and Chapter @sec-bees but we haven't really thought much about the layouts of those facets. In Chapter @sec-bees, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. In Chapter @sec-bees, we used `facet_grid()` where the number of levels in two factor variables define the number of rows and columns. Here, we have a little bit more flexibility and we might want to think about controlling that layout. \index{ggplot2!facet\_grid}
+We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in both @sec-programming and @sec-bees but we haven't really thought much about the layouts of those facets. In @sec-bees, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. In @sec-bees, we used `facet_grid()` where the number of levels in two factor variables define the number of rows and columns. Here, we have a little bit more flexibility and we might want to think about controlling that layout. \index{ggplot2!facet\_grid}
 
 If we leave it to the default options, {ggplot2} usually tries to coerce it into something *square-ish*. Here, it would likely give us a 3x4 grid filled with 10 plots (for the 10 levels of deprivation) and 2 blank spaces. It's not always possible, but plots without those blank spaces often look a lot cleaner and tidier. We could do either a 5x2 (or 2x5) grid, or a 10x1 (or 1x10) grid to fit our small multiple plots into a perfect rectangle. A 5x2 grid works better here since we don't want to make a very wide but very short plot.
 
@@ -95,7 +93,7 @@ So let's get started on preparing the data to create this plot!
 
 This is one of those very *real* datasets - the data wrangling is not straightforward for the data. In fact, the two columns relating to opening and closing dates are the two that will require the most attention.
 
-First, let's drop any columns that we don't actually need using the `select()` function from {dplyr} - we only need the `Year_opened`, `Year_closed`, and `Area_Deprivation_index` columns to calculate the number of museums open each year \index{dplyr!select}. There are a few `NA` values in the `Area_Deprivation_index` column so we'll drop those rows using `drop_na()` from {tidyr} \index{tidyr!drop\_na}.
+First, let's drop any columns that we don't actually need using the `select()` function from {dplyr} - we only need the `Year_opened`, `Year_closed`, and `Area_Deprivation_index` columns to calculate the number of museums open each year\index{dplyr!select}. There are a few `NA` values in the `Area_Deprivation_index` column so we'll drop those rows using `drop_na()` from {tidyr}\index{tidyr!drop\_na}.
 
 Now let's start dealing with the year columns. If you look at the values, you'll notice that they're not exactly what you'd expect in a *year* column:
 
@@ -105,9 +103,9 @@ head(museums$Year_opened, 4)
 head(museums$Year_closed, 4)
 ```
 
-Each entry is in fact two years, separated by a `:`. According to the Mapping Museums glossary, this is because these are actually date ranges. For some museums, it wasn't possible to establish an exact opening or closing date, and instead a date range is given based on partial information. For example, a value of `"2007:2017"` means the museum opened (or closed) sometime between 2007 and 2017.
+Each entry is in fact two years, separated by a `:`. According to the [Mapping Museums glossary]([museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home)), this is because these are actually date ranges. For some museums, it wasn't possible to establish an exact opening or closing date, and instead a date range is given based on partial information. For example, a value of `"2007:2017"` means the museum opened (or closed) sometime between 2007 and 2017.
 
-Let's separate out these year values into four columns instead of two using the `separate()` function from {tidyr} \index{tidyr!separate}. We separate based on the `:`, and create two new columns, `opened1` and `opened2`. from the `Year_opened` column. We do the same thing for the `Year_closed` closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use `mutate()` and `across()` from {dplyr} to convert them using `as.numeric()` \index{dplyr!mutate} \index{dplyr!across}. We can also convert the `Area_Deprivation_index` to a factor rather than a numeric and make sure the order is correct. 
+Let's separate out these year values into four columns instead of two using the `separate_wider_delim()` function from {tidyr} \index{tidyr!separate\_wider\_delim}. We separate based on the `:`, and create two new columns, `opened1` and `opened2` from the `Year_opened` column. We do the same thing for the `Year_closed` closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use `mutate()` and `across()` from {dplyr} to convert them using `as.numeric()`\index{dplyr!mutate} \index{dplyr!across}. We can also convert the `Area_Deprivation_index` to a factor rather than a numeric and make sure the order is correct. 
 
 ```{r}
 #| label: museums-wrangle1
@@ -116,15 +114,15 @@ museum_subset <- museums |>
     Year_opened, Year_closed, Area_Deprivation_index
   ) |>
   tidyr::drop_na() |>
-  tidyr::separate(
+  tidyr::separate_wider_delim(
     Year_opened,
-    into = c("opened1", "opened2"),
-    sep = ":"
+    delim = ":",
+    names = c("opened1", "opened2")
   ) |>
-  tidyr::separate(
+  tidyr::separate_wider_delim(
     Year_closed,
-    into = c("closed1", "closed2"),
-    sep = ":"
+    delim = ":",
+    names = c("closed1", "closed2")
   ) |>
   dplyr::mutate(
     dplyr::across(
@@ -136,7 +134,7 @@ museum_subset <- museums |>
 
 ::: {#tip-museums-separate .callout-tip}
 
-You could alternatively use `separate_wider_delim()` instead of `separate()`. \index{tidyr!separate\_wider\_delim}
+In older versions of {tidyr} (including when this plot was originally made), the `separate()` function would have been used instead of `separate_wider_delim()`. The `separate()` function has now been superseded. \index{tidyr!separate}
 
 :::
 
@@ -146,11 +144,11 @@ Now we need to think about how to deal with all of these *year* columns:
 * If the dates do not match, we need to decide a way of choosing which year to use. The simplest approach is to take the midpoint of the date range. 
 * If the value in the `Year_closed` column is `"9999:9999"`, this means that the museum is still open. 
 
-Let's start with the last of these issues first. For the `closed1` and `closed2` columns, if the value is `"9999"`, we'll convert it to an `NA_real_` value and otherwise leave it as it is. We can do this using a combination of `mutate()`, `across()`, and `if_else()` from {dplyr} \index{dplyr!mutate} \index{dplyr!across} \index{dplyr!if\_else}.
+Let's start with the last of these issues first. For the `closed1` and `closed2` columns, if the value is `"9999"`, we'll convert it to an `NA_real_` value. We can do this using a combination of `mutate()`, `across()`, and `if_else()` from {dplyr} \index{dplyr!mutate} \index{dplyr!across} \index{dplyr!if\_else}.
 
 The remaining two issues can be dealt with at the same time using `case_when()` from {dplyr} \index{dplyr!case\_when}. We can create a new column called `closed` which:
 
-* if `closed1` and `closed2` are equal, takes this value;
+* if `closed1` and `closed2` are equal, takes this equal value;
 * if `closed1` and `closed2` are not equal, takes the value in the middle (rounded so that we work only with whole year values).
 
 The same approach is then applied to create another new column called `opened`. There are no instances in the data where one of the closing dates is `NA` but the other is not, so we don't need to worry about that. We can also tidy up the output by dropping any columns we don't need, renaming the `Area_Deprivation_index` to something a little bit shorter and easier to work with, and arranging the data by level of deprivation. \index{dplyr!rename} \index{dplyr!arrange} \index{dplyr!select} 
@@ -182,7 +180,9 @@ This gives us data that looks like this:
 head(museum_data)
 ```
 
-What we want to know is how many museums were open in a given year for each level of deprivation. Let's create a function that takes three inputs: a year of interest, a level of deprivation, and the `museum_data`. Inside the function, we can then `filter()` the data to only the level of deprivation we're interested in. Then we can count how many museums opened before or in the year we're interested in, and then same for the how many museums closed (remembering to deal with the `NA` values for museums that are still open). The difference between the two will be how many were open in that year. \index{dplyr!filter}
+The first entry in `museums_data` is a museum in the most deprived decile which opened in (approximately) 1988 and is still open.
+
+What we want to know is how many museums were open in a given year for each level of deprivation. Let's create a function that takes three inputs: a year of interest, a level of deprivation, and the `museum_data`. Inside the function, we can then `filter()` the data to only the level of deprivation we're interested in. Then we can count how many museums opened before or in the year we're interested in. We can then do the same for how many museums closed (remembering to deal with the `NA` values for museums that are still open). The difference between the two will be how many were open in that year. \index{dplyr!filter}
 
 ```{r}
 #| label: museums-count-function
@@ -202,7 +202,7 @@ Let's test it works:
 num_year(1980, 3)
 ```
 
-There were `r num_year(1980, 3)` museums open in 1980. Now, we need to run this function for every combination of year (from `1960` to `2021`) and deprivation level (from `1` to `10`). There are many different ways of doing this in R, and we're going to use the {purrr} package [@purrr]. We start by creating to variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use `expand.grid` to create a `data.frame` with all of the combinations and pass this in as the first argument to `pmap_vec` from {purrr}. The second argument to `pmap_vec` is the function we want to apply (`num_year()`) that we defined above), where the first argument of `num_year()` comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. \index{purrr!pmap\_vec} 
+There were `r num_year(1980, 3)` museums open in 1980, in an area in the third deprivation decile. Now, we need to run this function for every combination of year (from `1960` to `2021`) and deprivation level (from `1` to `10`). There are many different ways of doing this in R, and we're going to use the {purrr} package [@purrr]. We start by creating two variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use `expand.grid` to create a `data.frame` with all of the combinations and pass this in as the first argument to `pmap_vec` from {purrr}. The second argument to `pmap_vec` is the function we want to apply (`num_year()`) that we defined above), where the first argument of `num_year()` comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. \index{purrr!pmap\_vec} 
 
 ```{r}
 #| label: museums-count-1
@@ -349,12 +349,12 @@ This is starting to look promising, but there are still ways that we can style o
 So what can we do to make this chart better?
 
 * We can get rid of the legend. The colors are based on the levels of deprivation, which are already labelled on the facet titles.
-* The default choice of color isn't great - they're not grayscale printing friendly, and their not colorblind friendly either. 
-* It's not immediately clear what this chart shows: it could do with smoe text to explain what's going on.
+* The default choice of color isn't great - they're not grayscale printing friendly, and they're not colorblind friendly either. 
+* It's not immediately clear what this chart shows: it could do with some text to explain what's going on.
 
 ### Colors
 
-Let's get started with choosing some colors. As discussed in Chapter @sec-programming, we'll save color codes as variables: either using hex codes or color names. Let's use `"black"` for text, and `"#fafafa"` for the background color. The use of a light gray rather than white for the background is primarily personal preference - it's less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text.
+Let's get started with choosing some colors. As discussed in @sec-programming, we'll save color codes as variables: either using hex codes or color names. Let's use `"black"` for text, and `"#fafafa"` for the background color. The use of a light gray rather than white for the background is primarily personal preference - it's less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text.
 
 ```{r}
 #| label: museums-colors
@@ -374,7 +374,7 @@ col_plot
 
 ### Text and fonts
 
-Let's start by loading in a different font using `font_add_google()` from {sysfonts} and setting font options with {showtext} \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}. The *Raleway* font is a minimalist, sans serif font, and we'll use it for both body text and title text. We can save it as a single variable, `body_font`.
+Let's start by loading in a different font using `font_add_google()` from {sysfonts} and setting font options with {showtext}\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}. The *Raleway* font is a minimalist, sans serif font, and we'll use it for both body text and title text. We can save it as a single variable, `body_font`.
 
 ```{r}
 #| label: museums-fonts
@@ -423,7 +423,7 @@ Setting `legend.position = "none"` removes the legend on the right hand side. Th
 
 The `panel.spacing` argument controls how close the facets are to each other -  this can help to stop the year labels on side-by-side plots from overlapping. Setting `plot.margin = margin(10, 15, 10, 10)` adds some extra space around the outside of the plot, with the higher value on the right hand side compensating and balancing out the space from the axis title on the left hand side. The `plot.background` and `panel.background` arguments set the background color of the plot and panel areas to be the `bg_col` variable previously defined.
 
-For the `plot.title`, `plot.subtitle`, and `plot.caption`, arguments, we use `element_textbox_simple()` from {ggtext} to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a lineheight of `0.5`, and set to use the `text_col` variable for the color. The title font is made slightly larger and in bold. The `axis.text` is also set to be `text_col` colored with with a lineheight of `0.5` using `element_text()`. \index{ggplot2!element\_text} \index{ggplot2!theme}
+For the `plot.title`, `plot.subtitle`, and `plot.caption`, arguments, we use `element_textbox_simple()` from {ggtext} to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a `lineheight` of `0.5`, and set to use the `text_col` variable for the color. The title font is made slightly larger and in bold. The `axis.text` is also set to be `text_col` colored with a `lineheight` of `0.5` using `element_text()`. \index{ggplot2!element\_text} \index{ggplot2!theme}
 
 Now, we have our final plot:
 

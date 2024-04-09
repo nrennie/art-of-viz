@@ -1,38 +1,42 @@
 ---
-fig-width: 5
-fig-asp: 0.67
-fig-align: center
-fig-dpi: 300
 filters:
   - line-highlight
 execute: 
   freeze: auto
 ---
 
-# Other tips and tricks {#sec-camcorder}
+# Other tips and tricks {#sec-other}
 
-## Additional packages
+There are many functions within {ggplot2}, and many more within the wider community of extension packages, that the chapters in this book can't cover. Some of those packages are used to add different geometries, a few are used behind the scenes to help streamline workflows, and a few are more generally useful R packages.
 
-There are many functions within {ggplot2}, and many more within the wider community of extension packages, that 16 chapters can't cover. Some of those packages are used to add different geometries, a few are used behind the scenes to help streamline workflows, and a few are more generally useful R packages.
+## {camcorder} for recording gifs {#sec-camcorder}
 
-### {camcorder} for recording gifs {#camcorder}
-
-{camcorder} [@camcorder] is an R package to track and automatically save graphics generated with {ggplot2}. \index{camcorder} \index{camcorder!gg\_record}
+{camcorder} [@camcorder] is an R package to track and automatically save graphics generated with {ggplot2}. You can set up your R session to use {camcorder} by running `gg_record()`. If you're using RStudio, you'll notice that your plots now appear in the *Viewer* tab rather than the *Plots* tab. \index{camcorder} \index{camcorder!gg\_record}
 
 ```{r}
 #| eval: false
 library(camcorder)
 gg_record(
-  dir = "recording",
-  device = "png",
   width = 6,
-  height = 4,
-  units = "in",
-  dpi = 300
+  height = 4
 )
 ```
 
-If you're reading the online version of this book, you will have seen several examples of these gifs at the end of chapters.  \index{camcorder!gg\_playback}
+Have you ever spent ages tinkering with a plot you’re previewing in RStudio, before using `ggsave()` to save a higher resolution image, only to end up with the text looking ridiculously larger (or smaller) than you thought? Or do you struggle to preview plots with your desired aspect ratio? One of the nice features of using {camcorder} is the ability to preview plots with the same height, width, and resolution that you want your final plot to be in. Simply set the `height`, `width`, and `dpi` (and optionally `units`) arguments in `gg_record()` to your desired values. Then what you see is what you save!
+
+::: {#tip-other-dpi .callout-tip}
+
+The RStudio Plots tab shows images at 96dpi, but the default in `ggsave()` is 300dpi. This is what causes the mismatch between the sizes of text and other elements. The default dpi in `gg_record()` is also 300dpi so it integrates nicely with `ggsave()`. \index{ggplot2!ggsave}
+
+:::
+
+If you're reading the online version of this book, you will have seen several examples of gifs showing the visualization development process at the end of chapters. The `gg_playback()` function combines the previously saved images and saves them to a gif. You can set different preferences using the arguments in `gg_playback()`. For example, you can define the length of each frame in the gif, make the first and last frames longer or shorter, or set the background color. \index{camcorder!gg\_playback}
+
+::: {#tip-other-camcorder .callout-tip}
+
+Some of the built-in themes in {ggplot2} have a transparent background. If you've used these at some point during the development process, when you viewed them in RStudio the background likely appeared white. The default background color in `gg_playback()` is `"black"` - meaning that your gif might not quite look as you expect. Instead set the background color to something more sensible, for example your `bg_col` variable.
+
+:::
 
 ```{r}
 #| eval: false
@@ -45,19 +49,25 @@ gg_playback(
 )
 ```
 
-### {lintr} and {styler} for code formatting {#code-style}
+## Code formatting with {lintr} and {styler} {#sec-code-style}
 
-## Helper functions
+Writing code that follows a consistent style can make it easier for other people to read, makes collaboration simpler, and can help pick up code errors in your code more quickly. In R, the {lintr} package [@lintr] checks for adherence to a specified coding style and identifies possible syntax errors, then reports them so you can take action. \index{lintr}
 
-### Template files for #TidyTuesday
+The {styler} package [@styler] goes one step further in terms of code styling, and actually styles your code for you. Although you may be a little bit sceptical of packages that overwrite scripts you’ve written (I certainly was initially!), it makes it quick and easy to style code. Creating a keyboard shortcut for the `style_active_file()` function means you can apply code styling easily (without having to call a function manually or click a specific button). [@streamline] \index{styler!style\_active\_file}
 
-You may notice that each chapter of this book has followed a similar structure: load packages, read in some data, perform some exploratory analysis, load fonts and colors as variables, write relevant text, create a simple plot, add styling with {ggtext}, and save a png file. This means that for each plot, there's a lot of overlap in the structure of the .R files and the code they contain. 
+## Template files for #TidyTuesday {#sec-template-files}
 
-If you visualise data using R on a regular basis, you'll likely find yourself repeating similar steps. You might even find yourself copying and pasting code from a previous file to your new file.
+You may notice that each chapter of this book has followed a similar structure: load packages, read in some data, perform some exploratory analysis, load fonts and colors as variables, write relevant text, create a simple plot, add styling with {ggtext}, and save a PNG file. This means that for each plot, there's a lot of overlap in the structure of the .R files and the code they contain. 
+
+If you visualise data using R on a regular basis, you'll likely find yourself repeating similar steps. You might even find yourself copying and pasting code from a previous file to your new file. Like many things in the world of programming, if you find yourself copying and pasting the same thing several times, there is almost certainly a better way of doing it. And in this case there is - template files! \index{templates}
+
+For each \#TidyTuesday visualization, an .R script with the following file can be created [@template_files]:
 
 ```{r}
 #| label: template-files
 #| eval: false
+
+date_str <- "2024-04-02"
 
 # Load packages ----
 
@@ -71,7 +81,7 @@ library(glue)
 
 # Load data ----
 
-tuesdata <- tidytuesdayR::tt_load(date_chr)
+tuesdata <- tidytuesdayR::tt_load(date_str)
 
 
 # Load fonts ----
@@ -80,7 +90,7 @@ font_add_google("Roboto", "roboto")
 showtext_auto()
 
 
-# Define colours and fonts ----
+# Define colors and fonts ----
 
 bg_col <- ""
 text_col <- ""
@@ -97,7 +107,7 @@ title_font <- "roboto"
 # Start recording ----
 
 gg_record(
-  dir = file.path(yr, date_chr, "recording"),
+  dir = file.path(date_str, "recording"),
   device = "png",
   width = 7,
   height = 5,
@@ -109,14 +119,14 @@ gg_record(
 # Define text ----
 
 social <- social_caption(
-  bg_colour = bg_col,
-  icon_colour = highlight_col,
-  font_colour = text_col,
+  bg_color = bg_col,
+  icon_color = highlight_col,
+  font_color = text_col,
   font_family = body_font
 )
 title <- ""
-st <- ""
-cap <- paste0(
+subtitle <- ""
+caption <- paste0(
   "**Data**: <br>**Graphic**:", social
 )
 
@@ -126,10 +136,16 @@ cap <- paste0(
 
 theme(
   plot.margin = margin(5, 5, 5, 5),
-  plot.background = element_rect(fill = bg_col, colour = bg_col),
-  panel.background = element_rect(fill = bg_col, colour = bg_col),
+  plot.background = element_rect(
+    fill = bg_col,
+    color = bg_col
+  ),
+  panel.background = element_rect(
+    fill = bg_col,
+    color = bg_col
+  ),
   plot.title = element_textbox_simple(
-    colour = text_col,
+    color = text_col,
     hjust = 0.5,
     halign = 0.5,
     margin = margin(b = 10, t = 5),
@@ -137,7 +153,7 @@ theme(
     family = title_font
   ),
   plot.subtitle = element_textbox_simple(
-    colour = text_col,
+    color = text_col,
     hjust = 0.5,
     halign = 0.5,
     margin = margin(b = 10, t = 5),
@@ -145,7 +161,7 @@ theme(
     family = body_font
   ),
   plot.caption = element_textbox_simple(
-    colour = text_col,
+    color = text_col,
     hjust = 0.5,
     halign = 0.5,
     margin = margin(b = 5, t = 10),
@@ -158,7 +174,7 @@ theme(
 # Save gif ----
 
 gg_playback(
-  name = file.path(yr, date_chr, paste0(date_strip, ".gif")),
+  name = file.path(date_str, paste0(date_str, ".gif")),
   first_image_duration = 4,
   last_image_duration = 20,
   frame_duration = .25,
@@ -166,14 +182,26 @@ gg_playback(
 )
 ```
 
-@template_files
+There are several components of this script that make it useful: 
 
-\index{templates}
+* It's separated into different sections which can help to break down the process of creating a visualization into smaller, more manageable chunks. In RStudio, the Ctrl+Shift+R keyboard shortcut can be used to add a new section.
 
+* It defines variables and code snippets that are used repeatedly in different visualizations. For example, defining variables for the colors and fonts, or using the theme elements from {ggtext} to style the title and subtitle text.
 
+* There are also some elements of the script that are similar for each plot, but not exactly the same. For example, reading in the data using the {tidytuesdayR} package or saving the gif created by {camcorder}. Here, the code is changing based on the date associated with the \#TidyTuesday data. Instead of manually editing the date in the script in each location, a `date_str` variable is defined at the top of the script - meaning you only need to set the date once. 
 
+You can also create template files for other aspects of your data visualization workflow. For example, creating a `README.md` file for each visualization.
 
+## Writing your own helper functions
 
+As you've already seen in @sec-chap6, creating functions for code you reuse frequently can save time and space. In @sec-chap6, we created the function `social_caption()` for adding a plot caption that contained Font Awesome icons. This function has then been used in every subsequent chapter (and therefore also the template file described in the previous section). What other helper functions might be useful? \index{social\_caption} 
 
+* To use the Font Awesome icons, you need to load the Font Awesome font files. We did this using `sysfonts::font_add()` and specifying a path to the font file. You might also want to load other fonts that aren't normally available on your system or through Google Fonts. You could write a function that loads (multiple) font files that you use often. You could go one step further and place the fonts and your font loading function into an R package. 
 
+* For the template file discussed in the previous section, the date was defined as a variable at the top of the script. Instead, you could create a function that takes the date as in argument. The function could then create your .R script, insert the date where it needs to go, and save the file to the desired location. 
 
+* If you're creating plots for a corporate reports, creating your own {ggplot2} theme and color palette functions can save time implementing the same styling and colors for every visualization. It can also make it easier for other people you work with to use the same styling.
+
+\index{sysfonts!font\_add} 
+
+You can create helper functions for anything that you do often. If you don't use Font Awesome icons in your captions, you don't need to create the `social_caption()` function. But if, for example, you always save your images in a specific size with a specific background color, create a function that does that. You'll be amazed at how much time you can save. \index{social\_caption} 
