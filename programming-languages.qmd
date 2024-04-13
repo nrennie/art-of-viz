@@ -7,15 +7,15 @@ execute:
 
 # Programming Languages: dumbbell charts with {ggplot2} {#programming}
 
-IN this cahpter, dumbeell charts, data-driven captions with {glue}, and styling using fonts and colours, wrapping text with ggtext
+In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.
 
 ## Data
 
-[@pldb]
+In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb]. This database is an encyclopaedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
 
-The PLDB was used as a \#TidyTuesday dataset in March 2023, meaning we can load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
+The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a \#TidyTuesday dataset in March 2023, meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
 
-might be multiple datasets 
+The {tidytuesdayR} R package has several functions for helping to get data and information about \#TidyTusday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: langauges-load-data-show
@@ -35,31 +35,38 @@ languages <- readr::read_csv("data/languages.csv")
 
 You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tidytuesdayR::tt_load(2023, week = 12)`, but personally I find remember the date much easier! You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
 
-What does the data look like?
+What does the data look like? We can inspect the first six rows of the data using `head()`:
 
 ```{r}
 #| label: langauges-data-head
 head(languages)
 ```
 
-checks it's read in correctly 
-View
+You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the \#TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [https://pldb.io/csv.html](pldb.io/csv.html). Here, you'll also notice that the \#TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
 
-The data has x rows and columsn
+There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't just want to discard rows or columns with missing values as they can often tells us a lot of important information about our data. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. 
 
-What are the variables?
+for example - maybe due to github only being created in 2008 (a language that was created and died before 2008 is unlikely to have one - discarding rows with na .. means we bias our analysis to newer languages.)
 
-there are many variables, many of them have lots of NA vaues
+Having said that, this isn't a statistics book, so for the purposes of visualisation we'll focus on columns that are mostly complete.
+
+Often when we're working with data, there is some *outcome* that we're interested in. Depending on your field, you might instead hear this called the *response* variable or the *dependent variable*. You might have multiple outcomes of interest. For example, in the PLDB data, we might be interested in what affects the ranking and/or the number of GitHub stars for a programming language. 
+
+something about also visualising multiple covariates against each other. what are the variables of interest here 
 
 ## Exploratory work
 
-what is table - bar charts if categories, box plots if one cont one cat, scatter plot if two cont, line plot if over time
+beyond looking at teh data, counting the rows and oclumns, and imspecting the values in different columns, a key part of exploratory work is visualising data. These initial explorations can help you to check if there are any issues with your data (e.g. misspelled Monday as Mnoday). They can also help to identify interesting relationship or patterns in the data, which can guide you to further avenues for ... and appropriate modelling techniques.
+
+In this book, we'll primarily use base R for initial exploration and ..., and then {ggplot2} and it's associated extension packages to create our final .. in each chapter. not to say base R not good, 
+
+There are many different types of plot, ... ne wall the time,/ But often, for those initial ..., the classic ... . Scatter plots are useful for exploring a relationship between two continuous variables; Boxplots are useful for exploring between a categorical and continuous variable; bar charts for exploring between categories; and line charts for ... how change over time. 
 
 ### Data exploration
 
-rank i smost obvious "response" if stat
+we can#t explore every column here, so we'll start with 
 
-appeared last activ
+The `language_rank` is the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (joke about index at 1 being better). We might want to look at the `last_activity` column in relation to the rank - are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis).
 
 ```{r}
 #| label: fig-languages-scatter
@@ -69,14 +76,15 @@ plot(
 )
 ```
 
-straight away highights the role of data vis in exploratory lang
+Straight away this highlights the role of data visualisation in exploratory analysis. This scatter plot don't look quite right - the `last_activity` data ranges from around -1000 to just over 2000, with most of the values close to the 2000 mark. If this is supposedly a date column, we need to think about whether these values are correct. 
 
-- are these incorrect values
-- are dates anchored wrong 01011970
+* Are these simply incorrect entries?
+* Are these missing values? It's not uncommon for missing values to be encoded as `-999` for example. This is especially true if data has been processed in some other software before it's loaded into R. Just because you have  - values can be missing for different reasons, and sometimes they are encoded in multiple ways to demonstrate this difference. 
+* Are these values transformed in some way we don't expect? Dates can be encoded as integer values - often as number of dates since some origin time. The origin time used in R is often `"1970-01-01"`, so it's perfectly reasonable to have negative dates if you're dealing with data pre-1970. 
 
-in this case actually years so prob correct we could filter out,
+In this case, the dates are actually given as a year (rather than a `Date` object) so the negative values are unlikely to be  actually years so prob correct we could filter out,
 
-first programming lang 1950s (need source)
+first programming lang 1950s (need source) \index{base!subset}
 
 ```{r}
 #| label: fig-languages-scatter-filter
@@ -87,9 +95,22 @@ plot(
 )
 ```
 
-callout tip - dplyr/base R
+::: {#tip-languages-subset .callout-tip}
 
-are pl
+You can also subset the data using the `filter()` function from {dplyr}, either with or without the use of the pipe operator: \index{dplyr!filter}
+
+```{r}
+#| label: languages-filter
+#| eval: false
+#| echo: true
+lang_df <- dplyr::filter(languages, last_activity >= 1950)
+```
+
+The ... If we're plotting in {ggplot2}, we'll prepare data using other {tidyverse} packages. But here, where we're plotting in base R, we'll prepare data using base R as well.
+
+:::
+
+Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn't true. It also includes information on query languages, stylesheet languages, and protocols, amongst other things. Let's look at the balance between these different types of languages in the data using a bar chart created using the `barplot()` function from the {graphics} package in base R. \index{graphics!barplot}
 
 ```{r}
 #| label: fig-languages-pl-barplot
@@ -110,6 +131,8 @@ barplot(
 ### Exploratory sketches
 
 ## Preparing a plot
+
+mention dumbbell package
 
 ### Data wrangling
 
@@ -220,6 +243,8 @@ basic_plot
 {sysfonts}\index{sysfonts}
 {showtext}\index{showtext}
 
+alterntives to showtext
+
 Text as variables
 
 ```{r}
@@ -245,6 +270,7 @@ text_plot
 ```
 
 runs off the edge - we'll deal with that later
+
 Choosing a font
 
 showtext
@@ -329,7 +355,7 @@ theme_plot1 +
 ```
 
 make title bigger
-stop subtitle running off
+stop subtitle running off - a few options, line breaks. str_wrap, ggtext
 ggtext
 
 ```{r}
@@ -421,31 +447,6 @@ theme_plot2 +
   )
 ```
 
-make html labels instead
-
-```{r}
-#| label: langauges-html-labels
-plot_data <- plot_data |>
-  dplyr::mutate(rank_label = glue::glue("<p>{title}</p><p style='font-size:6pt;'>(Rank: {language_rank})</p>"))
-```
-
-plot with geom_richtext ggtext
-
-```{r}
-#| label: fig-langauges-add-html-labels
-theme_plot2 +
-  ggtext::geom_richtext(
-    data = plot_data,
-    mapping = aes(x = 1932, y = n, label = rank_label),
-    family = body_font,
-    fill = "transparent",
-    label.colour = "transparent",
-    vjust = 0.5,
-    hjust = 0,
-    size = 2.5,
-    colour = main_col
-  )
-```
 
 Saving an image
 
@@ -461,6 +462,8 @@ ggsave()
 ## Reflection
 
 open ended
+
+labels html in later chapters
 
 ::: {.content-visible when-format="html"}
 
