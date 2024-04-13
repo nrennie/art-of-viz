@@ -16,18 +16,7 @@ Copyright info: [https://github.com/breck7/pldb](https://github.com/breck7/pldb)
 PLDB content is published to the public domain and you can use it freely.
 
 
-## Chapter 2: Bee colony losses
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11)
-
-Original source: [https://usda.library.cornell.edu/concern/publications/rn301137d](https://usda.library.cornell.edu/concern/publications/rn301137d)
-
-Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.cornell.edu/about)
-
-All publication files are considered government works and licensed with U.S. Public Domain.
-
-
-## Chapter 3: UK museums
+## Chapter 2: UK museums
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-22)
 
@@ -38,7 +27,21 @@ The data and other research material published on this website are open access a
 Data downloaded from the Mapping Museums website at [www.mappingmuseums.org](www.mappingmuseums.org). Accessed on 2022-11-22.
 
 
-## Chapter 7: Cats
+## Chapter 3: Lemurs
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24)
+
+Original sources:
+
+* [https://lemur.duke.edu/duke-lemur-center-database/](https://lemur.duke.edu/duke-lemur-center-database/)
+* [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
+
+Copyright info: [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
+
+This work is licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license. 
+
+
+## Chapter 5: Cats
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31)
 
@@ -51,6 +54,19 @@ Copyright info: [https://www.datarepository.movebank.org/help/faq#how_are_datase
 Datasets in the Movebank Data Repository are licensed using the Creative Commons Zero License, is a "no rights reserved" license that places works in the public domain with as little legal restriction as possible. 
 
 The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
+
+
+## Chapter 7: Global seafood
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
+
+Original sources:
+
+* [https://ourworldindata.org/fish-and-overfishing](https://ourworldindata.org/fish-and-overfishing)
+* [https://www.ramlegacy.org/](https://www.ramlegacy.org/)
+* [https://zenodo.org/records/4824192](https://zenodo.org/records/4824192)
+
+Copyright info: Creative Commons Attribution 4.0 International
 
 
 ## Chapter 8: Doctors in an ageing population
@@ -80,37 +96,21 @@ Original data: [https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.
 Copyright info: CC0 1.0 Deed (Public Domain)
 
 
-## Chapter 11: Lemurs
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-08-24)
-
-Original sources:
-
-* [https://lemur.duke.edu/duke-lemur-center-database/](https://lemur.duke.edu/duke-lemur-center-database/)
-* [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
-
-Copyright info: [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974)
-
-This work is licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license. 
-
-
-## Chapter 13: Global seafood
-
-Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
-
-Original sources:
-
-* [https://ourworldindata.org/fish-and-overfishing](https://ourworldindata.org/fish-and-overfishing)
-* [https://www.ramlegacy.org/](https://www.ramlegacy.org/)
-* [https://zenodo.org/records/4824192](https://zenodo.org/records/4824192)
-
-Copyright info: Creative Commons Attribution 4.0 International
-
-
-## Chapter 14: Technology adoption
+## Chapter 11: Technology adoption
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-07-19)
 
 Copyright info: [https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset](https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset)
 
 The authors have made this dataset available for anyone to use and users should cite the following article: Comin, D. and Hohijn B., "Cross-Country Technological Adoption: Making the Theories Face the Facts". Journal of Monetary Economics, January 2004, pp. 39-83.
+
+
+## Chapter 12: Bee colony losses
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-01-11)
+
+Original source: [https://usda.library.cornell.edu/concern/publications/rn301137d](https://usda.library.cornell.edu/concern/publications/rn301137d)
+
+Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.cornell.edu/about)
+
+All publication files are considered government works and licensed with U.S. Public Domain.

@@ -2,16 +2,16 @@
 filters:
   - line-highlight
 execute: 
-  freeze: true
+  freeze: auto
 ---
 
-# Programming Languages: dumbbell charts with {ggplot2} {#programming}
+# Programming Languages: dumbbell charts with {ggplot2} {#sec-programming}
 
 In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.
 
 ## Data
 
-In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb]. This database is an encyclopaedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
+In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopaedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
 
 The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a \#TidyTuesday dataset in March 2023, meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
 
@@ -39,10 +39,11 @@ What does the data look like? We can inspect the first six rows of the data usin
 
 ```{r}
 #| label: langauges-data-head
+#| out-width: 50%
 head(languages)
 ```
 
-You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the \#TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [https://pldb.io/csv.html](pldb.io/csv.html). Here, you'll also notice that the \#TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
+You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the \#TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the \#TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
 
 There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't just want to discard rows or columns with missing values as they can often tells us a lot of important information about our data. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. 
 
@@ -130,6 +131,8 @@ barplot(
 
 ### Exploratory sketches
 
+![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages.png){#fig-languages-sketch fig-align="center"}
+
 ## Preparing a plot
 
 mention dumbbell package
@@ -141,19 +144,27 @@ mention dumbbell package
 comment_df <- lang_df |>
   dplyr::filter(type == "pl") |>
   dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
-  dplyr::select(title, appeared, line_comment_token, last_activity, language_rank) |>
+  dplyr::select(
+    title, appeared, line_comment_token, last_activity, language_rank
+    ) |>
   tidyr::drop_na()
 ```
 
 ```{r}
 #| label: langauges-data-wrangling-2
 comment_df2 <- comment_df |> 
-  dplyr::mutate(label = paste("Comment token:", line_comment_token)) |>
+  dplyr::mutate(
+    label = paste("Comment token:", line_comment_token)
+    ) |>
   dplyr::group_by(label) |>
   dplyr::slice_head(n = 10) |>
-  dplyr::mutate(n = factor(dplyr::row_number(), levels = 1:10)) |>
+  dplyr::mutate(
+    n = factor(dplyr::row_number(), levels = 1:10)
+    ) |>
   dplyr::ungroup() |>
-  dplyr::select(label, n, title, appeared, last_activity, language_rank)
+  dplyr::select(
+    label, n, title, appeared, last_activity, language_rank
+    )
 ```
 
 need to rename to something better
@@ -202,12 +213,12 @@ update to open ended
 
 ## Advanced styling
 
-### Colours
+### Colors
 
-Why save colours as variables?
+Why save colors as variables?
 
 ```{r}
-#| label: langauges-colour-vars
+#| label: langauges-color-vars
 bg_col <- "grey5"
 main_col <- "#66FF00"
 ```
@@ -219,11 +230,11 @@ redo plot
 basic_plot <- ggplot(data = plot_data) +
   geom_line(
     mapping = aes(x = year, y = n, group = n),
-    colour = main_col
+    color = main_col
   ) +
   geom_point(
     mapping = aes(x = year, y = n),
-    colour = main_col,
+    color = main_col,
     fill = bg_col,
     pch = 22
   ) +
@@ -315,37 +326,37 @@ theme_plot1 +
   theme(
     plot.background = element_rect(
       fill = bg_col,
-      colour = bg_col
+      color = bg_col
     ),
     panel.background = element_rect(
       fill = bg_col,
-      colour = alpha(main_col, 0.5),
+      color = alpha(main_col, 0.5),
       linewidth = 0.4
     ),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(
-      colour = alpha(main_col, 0.5),
+      color = alpha(main_col, 0.5),
       linewidth = 0.2
     ),
     panel.grid.major.y = element_blank(),
     strip.text = element_text(
-      colour = main_col
+      color = main_col
     ),
     axis.text.y = element_blank(),
     axis.text.x = element_text(
-      colour = main_col,
+      color = main_col,
       vjust = 2
     ),
     plot.title = element_text(
-      colour = main_col,
+      color = main_col,
       family = title_font
     ),
     plot.subtitle = element_text(
-      colour = main_col,
+      color = main_col,
       margin = margin(b = 5)
     ),
     plot.caption = element_text(
-      colour = main_col,
+      color = main_col,
       margin = margin(b = 5),
       hjust = 0
     ),
@@ -364,39 +375,39 @@ theme_plot2 <- theme_plot1 +
   theme(
     plot.background = element_rect(
       fill = bg_col,
-      colour = bg_col
+      color = bg_col
     ),
     panel.background = element_rect(
       fill = bg_col,
-      colour = alpha(main_col, 0.5),
+      color = alpha(main_col, 0.5),
       linewidth = 0.4
     ),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(
-      colour = alpha(main_col, 0.5),
+      color = alpha(main_col, 0.5),
       linewidth = 0.2
     ),
     panel.grid.major.y = element_blank(),
     strip.text = element_text(
-      colour = main_col
+      color = main_col
     ),
     axis.text.y = element_blank(),
     axis.text.x = element_text(
-      colour = main_col,
+      color = main_col,
       vjust = 2
     ),
     plot.title = element_text(
-      colour = main_col,
+      color = main_col,
       family = title_font,
       size = rel(2)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
-      colour = main_col,
+      color = main_col,
       margin = margin(b = 5),
       lineheight = 0.5
     ),
     plot.caption = element_text(
-      colour = main_col,
+      color = main_col,
       margin = margin(b = 5),
       hjust = 0
     ),
@@ -417,7 +428,7 @@ theme_plot2 +
     vjust = 0.5,
     hjust = 0,
     size = 3,
-    colour = main_col
+    color = main_col
   )
 ```
 
@@ -427,7 +438,9 @@ make better labels
 ```{r}
 #| label: langauges-better-labels
 plot_data <- plot_data |>
-  dplyr::mutate(rank_label = glue::glue("{title}\nRank: {language_rank}"))
+  dplyr::mutate(
+    rank_label = glue::glue("{title}\nRank: {language_rank}")
+    )
 ```
 
 plot
@@ -443,7 +456,7 @@ theme_plot2 +
     lineheight = 0.7,
     hjust = 0,
     size = 2.5,
-    colour = main_col
+    color = main_col
   )
 ```
 
