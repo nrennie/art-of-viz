@@ -3,12 +3,341 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.5
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
 
 # US House Elections: geography on a grid with {geofacet} {#sec-house}
 
-::: {.callout-caution}
+## Data
 
-This chapter is coming soon!
+```{r}
+#| label: elections-load-data-show
+#| eval: false
+#| echo: true
+tuesdata <- tidytuesdayR::tt_load("2023-11-07")
+house <- tuesdata$house
+```
+
+```{r}
+#| label: elections-load-data-hide
+#| output: false
+#| echo: false
+#| eval: true
+house <- readr::read_csv("data/house.csv")
+```
+
+
+```{r}
+#| label: elections-head-data
+head(house)
+```
+
+
+## Exploratory work
+
+### Data exploration
+
+### Exploratory sketches
+
+![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections.png){#fig-elections-sketch fig-align="center"}
+
+## Preparing a plot
+
+### Data wrangling
+
+```{r}
+#| label: elections-wrangling
+plot_data <- house |>
+  dplyr::mutate(party = dplyr::case_when(
+    party == "REPUBLICAN" ~ "Republican",
+    party == "DEMOCRAT" ~ "Democrat",
+    TRUE ~ "Other"
+  )) |>
+  dplyr::filter(stage == "GEN") |>
+  dplyr::group_by(year, state_po, party) |>
+  dplyr::summarise(votes = sum(candidatevotes)) |>
+  dplyr::ungroup()
+```
+
+
+### Packages and functions
+
+### The first plot
+
+```{r}
+#| label: elections-basic-plot
+#| warning: false
+library(ggplot2)
+base_plot <- ggplot(data = plot_data) +
+  geom_area(
+    mapping = aes(
+      x = year,
+      y = votes,
+      fill = party
+    ),
+    position = "fill"
+  )
+base_plot +
+  facet_wrap(~state_po)
+```
+
+
+```{r}
+#| label: elections-geofacet-plot
+#| warning: false
+library(geofacet)
+map_plot <- base_plot +
+  geofacet::facet_geo(~state_po, grid = "us_state_grid2")
+map_plot
+```
+
+
+## Advanced styling
+
+### Colours
+
+important not to play to stereotypes (e.g. pink for girls) but also use what is commonly known
+
+```{r}
+#| label: elections-colors
+text_col <- "#202A44"
+blue_col <- "#0015BC"
+red_col <- "#C41E3A"
+bg_col <- "#fafafa"
+```
+
+
+```{r}
+#| label: elections-add-colors
+#| warning: false
+col_plot <- map_plot +
+  scale_fill_manual(
+    values = c("Democrat" = blue_col, "Republican" = red_col, "Other" = "gray50")
+  )
+```
+
+
+### Text and fonts
+
+```{r}
+#| label: elections-fonts
+sysfonts::font_add_google("Roboto", "roboto")
+sysfonts::font_add_google("Carter One", "carter")
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "roboto"
+title_font <- "carter"
+```
+
+{sysfonts}\index{sysfonts}
+{showtext}\index{showtext}
+
+\index{sysfonts!font\_add\_google}
+\index{showtext!showtext\_auto}
+\index{showtext!showtext\_opts}
+
+```{r}
+#| label: elections-text
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = blue_col,
+  font_color = text_col,
+  font_family = body_font
+)
+st <- glue::glue("Areas indicate the percentage of votes for <span style='color:{blue_col};'>Democrat</span>, <span style='color:{red_col};'>Republican</span>, and
+           <span style='color:#aaaaaa;'>Other</span> parties in general elections between
+           1976 and 2022.")
+cap <- paste0(
+  st,
+  "<br><br>",
+  "**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab."
+)
+title <- "US House Election Results"
+```
+
+
+```{r}
+text_plot <- col_plot +
+  labs(
+    title = title,
+    tag = cap,
+    caption = social
+  )
+```
+
+
+### Adjusting themes
+
+```{r}
+#| label: fig-elections-geofacet-style-1
+#| warning: false
+styled_plot_1 <- text_plot +
+  geom_text(
+    mapping = aes(
+      x = mean(range(year)),
+      y = 0.5,
+      label = state_po
+    ),
+    family = title_font,
+    colour = alpha(bg_col, 0.5),
+    size = 2.5
+  ) +
+  coord_cartesian(expand = FALSE)
+```
+
+```{r}
+#| label: fig-elections-plot-style-2
+#| warning: false
+styled_plot_2 <- styled_plot_1 +
+  theme_void(base_size = 6, base_family = body_font) +
+  theme(
+    plot.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    ),
+    plot.margin = margin(5, 5, 5, 125),
+    legend.position = "none",
+    plot.title = ggtext::element_textbox_simple(
+      hjust = -0.94,
+      halign = -0.94,
+      colour = text_col,
+      face = "bold",
+      family = title_font,
+      size = rel(1.4)
+    ),
+    plot.tag = ggtext::element_textbox_simple(
+      hjust = 0,
+      colour = text_col,
+      maxwidth = 0.65,
+      lineheight = 0.6,
+      size = rel(1.0)
+    ),
+    plot.caption = ggtext::element_textbox_simple(
+      hjust = 1,
+      halign = 1,
+      colour = text_col,
+      maxwidth = 0.65,
+      margin = margin(b = 0, t = 10)
+    ),
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    panel.spacing = unit(0.05, "lines"),
+    plot.tag.position = c(-0.51, 0.74)
+  )
+styled_plot_2
+```
+
+
+### Legend
+
+```{r}
+#| label: elections-inset-plot
+p_inset <- ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
+  geom_area(
+    mapping = aes(
+      x = year,
+      y = votes,
+      fill = party
+    ),
+    position = "fill"
+  ) +
+  # label for state
+  geom_text(
+    mapping = aes(
+      x = mean(range(year)),
+      y = 0.5,
+      label = state_po
+    ),
+    family = title_font,
+    colour = alpha(bg_col, 0.7),
+    size = 4
+  ) +
+  # year labels
+  geom_text(
+    mapping = aes(
+      x = min(year) + 5,
+      y = 0.1,
+      label = min(year)
+    ),
+    family = body_font,
+    colour = alpha(bg_col, 0.7),
+    size = 3
+  ) +
+  geom_text(
+    mapping = aes(
+      x = max(year) - 5,
+      y = 0.1,
+      label = max(year)
+    ),
+    family = body_font,
+    colour = alpha(bg_col, 0.7),
+    size = 3
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Democrat" = blue_col,
+      "Republican" = red_col,
+      "Other" = "#aaaaaa"
+    )
+  ) +
+  coord_cartesian(expand = FALSE) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    )
+  )
+```
+
+
+```{r}
+#|label: fig-combine-plots
+library(patchwork)
+styled_plot_2 + inset_element(p_inset, 0.02, 0.087, 0.28, 0.55, align_to = "full", clip = FALSE) +
+  theme(
+    plot.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    )
+  )
+```
+
+
+## Reflection
+
+::: {.content-visible when-format="html"}
+
+Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
+
+> Note: when using {camcorder} with {geofacet}, you may need to run `record_polaroid()` after each plot, rather than relying on the automated plot capture.
+
+![](images/elections.gif){fig-align="center"}
 
 :::
