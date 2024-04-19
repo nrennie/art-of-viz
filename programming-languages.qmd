@@ -213,11 +213,13 @@ Now we're ready to start plotting!
 
 ### The first plot
 
-Let's start by loading {ggplot2} using the `library()` command.
+One of the especially nice features of {ggplot2} is the ability to save plots as variables, and iteratively add (using `+`) layers to it. To make the code a little bit clearer, we'll be creating each aspect of our plot in stages, and gradually adding more complex styling to it. We'll save the first plot we create as `basic_plot`. Let's start by loading {ggplot2} using the `library()` command.
 
-> DO THIS
+As with most plots created with {ggplot2}, we'll start by calling the `ggplot()` function. In {ggplot2} we can define which data and aesthetic mapping we want to use either globally (in the `ggplot()` function) or in each individual layer. We'll be using the same data (`plot_data`) for all layers, so we pass it into the `data` argument of `ggplot()`. \index{ggplot2!ggplot}
 
-One of the ... things about {ggplot2} is that .... . And so we'll be iteratively adding to our plots. saving as objects 
+Next, we start adding geometries: lines and points. The order we add the geometries is important here. We want the points to be plotted on top of the lines so that we don't see the lines overlapping with the points. This means we need to plot the lines first, then the points. We add geometries using the different `geom_*` functions. To add lines, we use `geom_line()`. Although {ggplot2} is smart, it's not smart enough to guess which variables will be plotted on each axis. We need to specify an *aesthetic mapping* using the `aes()` function - to define which columns from the data are going on the `x` and `y` axes. We want to draw horizontal lines for our dumbbell chart, meaning that `year` goes on the `x`-axis, and the rank category, `n`, goes on the `y`-axis. By default, `geom_line()` draws lines between the co-ordinates in the order of the variable on the x-axis. That's not really what we want here. We want a separate line drawn for each language, i.e. each rank, `n`. So we pass this into the `group` argument as well. This will still draw lines between co-ordinates in order of the variable of the x-axis, but separately for each rank category. To add points at each end of the dumbbell, we add `geom_point()` - specifying the aesthetic mapping to put the year on the x-axis and the rank on the y-axis again. We don't need to specify a `group` here, although it won't make any difference if we do. \index{ggplot2!geom\_point} \index{ggplot2!geom\_line} \index{ggplot2!aes}
+
+Finally, we also add `facet_wrap()` to create a small multiple plot (facet) for each category in the `label` column. Note the `~` required before the name of the column we wish to facet by.  \index{ggplot2!facet\_wrap}
 
 ```{r}
 #| label: fig-langauges-basic-plot1
@@ -334,7 +336,7 @@ If you need to use a curly bracket inside the string text, you can change the `.
 
 :::
 
-Since the values are going into a sentence we can make use of the `format()` function to add commas into the number formatting - showing `4,303` instead of `4303`: \index{base:format} \index{glue!glue}
+Since the values are going into a sentence we can make use of the `format()` function to add commas into the number formatting - showing `4,303` instead of `4303`: \index{base!format} \index{glue!glue}
 
 ```{r}
 #| label: langauges-text-vars-3
@@ -415,15 +417,15 @@ We can edit the background color using the `panel.background` and `plot.backgrou
 
 #### Grid lines
 
-> DO THIS
+Grid lines in {ggplot2} fall into two categories: major and minor. Major grid lines are usually slightly bolder and correspond to the axis text labels. Minor grid lines are usually lighter and unlabelled. They can be controlled using the `panel.grid.major` and `panel.grid.minor` arguments, with finer control possible for x- and y-axis gridlines. They are all defined using `element_line()`. We can change the color of the major x-axis gridlines using the color element. To ensure the bright green color doesn't become distracting as a background element, we can make it semi-transparent using the `alpha()` function from {ggplot2} - `0` means fully transparent and `1` means fully opaque. The `linewidth` controls the width of the lines. We remove all the y-axis grid lines and all minor grid lines by setting both `panel.grid.major.y` and `panel.grid.minor` to `element_blank()` which removes the elements completely. We can also remove all axis ticks using `axis.ticks = element_blank()`.
 
 #### Text elements
 
-> DO THIS
+Unfortunately, there is no `base_color` argument that allows us to change the color of all text elements in the same way as the `base_size` and base_`family` arguments. Instead, we need to edit the color of all text elements and change them to the green `main_col` color. This includes the `strip.text` (the facet title text) and `axis.text` (axis value labels), as well as the `plot.title`, `plot.subtitle`, and `plot.caption`. For the x-axis text, we also adjust the `vjust` argument to move the text slightly higher up closer to the plot area. For the y-axis text, we'll remove it using `element_blank()` as well add our own labels later. The `family` of the title text can also be adjusted to the `title_font` variable we defined earlier to change the font family. We may also want to make the title font even larger by adjusting the `size` element. Instead of specifying a number directly in the `size` argument, we instead use the `rel()` function. The `rel()` function defines the font size relative to the base size - meaning that if you change the base size, the title will also rescale accordingly. \index{ggplot2!rel}
 
 #### Margins
 
-> DO THIS
+To add a little bit of space around the outside edge of the plot, we can define the `plot.margin` argument. This is specified using the `margin()` function (instead of one of the `element_*()` functions) which takes four arguments: the top, right, bottom, and left margins. A little bit of trial and error can help you to find values that look good.
 
 ```{r}
 #| label: fig-langauges-style1
