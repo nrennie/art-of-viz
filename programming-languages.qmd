@@ -77,7 +77,7 @@ In this case, the dates are actually given as just a year (rather than a `Date` 
 
 ```{r}
 #| label: languages-view-odd
-languages[order(languages$last_activity),] |> head()
+languages[order(languages$last_activity), ] |> head()
 ```
 
 Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn't true. It also includes information on query languages, stylesheet languages, and protocols, amongst other things. Including numeral systems as you can see here.
@@ -173,10 +173,10 @@ comment_df <- pl_df |>
   dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
   dplyr::mutate(
     label = paste("Comment token:", line_comment_token)
-    ) |>
+  ) |>
   dplyr::select(
     title, appeared, last_activity, label, language_rank
-    ) |>
+  ) |>
   tidyr::drop_na()
 ```
 
@@ -188,19 +188,18 @@ To aid in plotting, we also want to reformat the data to put both year columns (
 
 ```{r}
 #| label: langauges-data-wrangling-2
-plot_data <- comment_df |> 
+plot_data <- comment_df |>
   dplyr::group_by(label) |>
   dplyr::slice_head(n = 10) |>
   dplyr::mutate(
     n = factor(dplyr::row_number(), levels = 1:10)
-    ) |>
-  dplyr::ungroup() |> 
+  ) |>
+  dplyr::ungroup() |>
   tidyr::pivot_longer(
     cols = c(appeared, last_activity),
     names_to = "type",
     values_to = "year"
   )
-
 ```
 
 Our `plot_data` looks like this:
@@ -215,6 +214,8 @@ Now we're ready to start plotting!
 ### The first plot
 
 Let's start by loading {ggplot2} using the `library()` command.
+
+> DO THIS
 
 One of the ... things about {ggplot2} is that .... . And so we'll be iteratively adding to our plots. saving as objects 
 
@@ -406,13 +407,30 @@ theme_plot1
 
 ### Adjusting themes
 
-better theme
+We can make some further adjustments to the styling by editing individual arguments in the `theme()` function. When editing `theme()` arguments in {ggplot2}, many arguments are specified as a type of element: `element_text()`, `element_line()`, `element_rect()`, `element_grob()`, `element_render()`, or `element_blank()`. 
+
+#### Background color
+
+We can edit the background color using the `panel.background` and `plot.background` arguments. The `panel.background` refers to the area within the plot e.g. the area that is gray by default. The `plot.background` refers to area outside of this. Both of these are specified using `element_rect()` since they are effectively just rectangles. We want to change both the `fill` (inner color of the rectangle) and `color` (outline color of the rectangle to our chosen background color.)
+
+#### Grid lines
+
+> DO THIS
+
+#### Text elements
+
+> DO THIS
+
+#### Margins
+
+> DO THIS
 
 ```{r}
 #| label: fig-langauges-style1
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with a dark gray background and green text."
 theme_plot1 +
   theme(
+    # Background color
     plot.background = element_rect(
       fill = bg_col,
       color = bg_col
@@ -422,12 +440,15 @@ theme_plot1 +
       color = alpha(main_col, 0.5),
       linewidth = 0.4
     ),
-    panel.grid.minor = element_blank(),
+    # Grid lines
     panel.grid.major.x = element_line(
       color = alpha(main_col, 0.5),
       linewidth = 0.2
     ),
     panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.ticks = element_blank(),
+    # Text elements
     strip.text = element_text(
       color = main_col
     ),
@@ -438,7 +459,8 @@ theme_plot1 +
     ),
     plot.title = element_text(
       color = main_col,
-      family = title_font
+      family = title_font,
+      size = rel(2),
     ),
     plot.subtitle = element_text(
       color = main_col,
@@ -449,18 +471,25 @@ theme_plot1 +
       margin = margin(b = 5),
       hjust = 0
     ),
-    axis.ticks = element_blank(),
+    # Margins
     plot.margin = margin(10, 15, 5, 0)
   )
 ```
 
-make title bigger
-stop subtitle running off - a few options, line breaks. str_wrap, ggtext
-ggtext
+We also need to deal with the fact that the subtitle text is too long and is running off the side of the page. There are a few options for this:
+
+* We can manually add line breaks by adding in `"\n"` to the subtitle string where we want the line to break. This is very much a manual approach that requires a lot of trial and error. 
+* We can use `str_wrap()` from {stringr} to split the text with a specified number of characters per line. This still involves a bit of trial and error to find the best line length. It also means you need to re-optimise the line length if you change the text size.
+* One of the best solutions I've found is to use `element_textbox_simple()` from the {ggtext} package [@ggtext]. The {ggtext} package provides improved text rendering support for {ggplot2}, including support for using Markdown and HTML text which you'll see several examples of in later chapters. The `element_textbox_simple()` function enables you to places text in a box, with word wrapping. 
+
+\index{stringr!str\_wrap} \index{ggtext!element\_textbox\_simple}
+
+We can replace `element_text()` with `element_textbox_simple()` in the `theme()` argument for `plot.subtitle` to wrap the subtitle text at any font size:
 
 ```{r}
 #| label: fig-langauges-style2
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The subtitle text now wraps to the width of the page."
+#| source-line-numbers: "28,30-34"
 theme_plot2 <- theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -507,7 +536,15 @@ theme_plot2 <- theme_plot1 +
 theme_plot2
 ```
 
-Add labels
+Finally, since we've removed the y-axis labels, we need to add in some labels using `geom_text()`. The `geom_text()` function has three required aesthetics: the `x` and `y` co-ordinates of where the label should be placed, and `label` which defines what text is written. Here, we use the language `title` as the label, and put a label in each rank category, `n`, on the y-axis. We override the `x` aesthetic to place all labels in the same horizontal alignment - the exact value will take a little bit of trial and error to get right. 
+
+We also need to edit the appearance of the text, since its styling is separate from the `theme` elements. We pass out `body_font` variable into the `family` argument to set the font family for the labels, and set `hjust = 0` to left-align the text. The `size` and `color` arguments can also be adjusted.
+
+::: {#tip-languages-font-size .callout-tip}
+
+The default font size of `geom_text()` is 3.88. This is slightly confusing because the size in `geom_text()` is defined in `mm` whereas the size in `theme()` elements is defined in `pt`. To match the font size in `geom_text()` to the theme’s font size, specify `size.unit = "pt"` in `geom_text()`. This argument is available from version 3.5.0 of {ggplot2}.
+
+:::
 
 ```{r}
 #| label: fig-langauges-add-labels
@@ -516,7 +553,6 @@ theme_plot2 +
   geom_text(
     mapping = aes(x = 1932, y = n, label = title),
     family = body_font,
-    vjust = 0.5,
     hjust = 0,
     size = 3,
     color = main_col
@@ -530,10 +566,10 @@ Although these labels are an improvement on not having any language label, they'
 plot_data <- plot_data |>
   dplyr::mutate(
     rank_label = glue::glue("{title}\nRank: {language_rank}")
-    )
+  )
 ```
 
-Let's add these new and improved labels to our plot using `geom_text()`: \index{ggplot2!geom\_text}
+Let's add these new and improved labels to our plot using `geom_text()`. Note that since we've updated the `plot_data` object, we need to pass the data in again: \index{ggplot2!geom\_text}
 
 ```{r}
 #| label: fig-langauges-add-better-labels
