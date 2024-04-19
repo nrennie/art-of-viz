@@ -61,7 +61,7 @@ We can't explore every column in this chapter, but I encourage you to do so at h
 
 ```{r}
 #| label: fig-languages-scatter
-#| fig-cap: ""
+#| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
 plot(
   languages$last_activity, languages$language_rank
 )
@@ -86,7 +86,7 @@ Let's look at the balance between these different types of languages in the data
 
 ```{r}
 #| label: fig-languages-pl-barplot
-#| fig-cap: ""
+#| fig-cap: "A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right."
 barplot(
   sort(table(languages$type))
 )
@@ -96,7 +96,7 @@ Almost all of them are programming languages so let's focus on them only, and re
 
 ```{r}
 #| label: fig-languages-scatter-filter
-#| fig-cap: ""
+#| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing clustering of languages with last activity before and after 2000."
 pl_df <- subset(languages, type == "pl")
 plot(
   pl_df$last_activity, pl_df$language_rank
@@ -124,7 +124,7 @@ Which other columns might we explore? In R, we write comments using the `#` symb
 
 ```{r}
 #| label: fig-languages-comment-barplot
-#| fig-cap: ""
+#| fig-cap: "A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right."
 barplot(
   sort(table(pl_df$line_comment_token))
 )
@@ -134,7 +134,7 @@ Using `#` for comments is the second most common symbol behind `//`. Is this a n
 
 ### Exploratory sketches
 
-The aspects of the data that we are interested in visualising are:
+The aspects of the data that we are interested in visualizing are:
 
 * when the programme language has been used (the time between `appeared` and `last_activity_date`)
 * what the comment symbol is
@@ -147,8 +147,6 @@ A dumbbell chart for the timelines of languages that use a `#` for comments migh
 ![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages.png){#fig-languages-sketch fig-align="center"}
 
 To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In {ggplot2}, these are called *facets*, and might look something like this:
-
-> REDO small multiple chart
 
 ![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages-2.png){#fig-languages-sketch-2 fig-align="center"}
 
@@ -222,6 +220,7 @@ One of the ... things about {ggplot2} is that .... . And so we'll be iteratively
 
 ```{r}
 #| label: fig-langauges-basic-plot1
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol."
 #| warning: false
 library(ggplot2)
 basic_plot <- ggplot(data = plot_data) +
@@ -237,6 +236,7 @@ The current y-axis labels are not especially informative - it would be more usef
 
 ```{r}
 #| label: fig-langauges-scales-plot
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030."
 basic_plot +
   scale_y_discrete(limits = rev) +
   scale_x_continuous(
@@ -274,12 +274,13 @@ bg_col <- "grey5"
 main_col <- "#66FF00"
 ```
 
-Although you can use `update_geom_defaults()` to change the default colors used for lines, points, and text, I'm not a fan of this approach since it changes the colors for all plots in your R session and it's quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the `aes()` function since they are not mapped to variables in the data. \index{ggplot2!aes} \index{ggplot2!update_geom_defaults}
+Although you can use `update_geom_defaults()` to change the default colors used for lines, points, and text, I'm not a fan of this approach since it changes the colors for all plots in your R session and it's quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the `aes()` function since they are not mapped to variables in the data. \index{ggplot2!aes} \index{ggplot2!update\_geom\_defaults}
 
 The point character (`pch`) for `geom_point()` is also set to `22` - a square which allows you to color the square and its outline different colors. The outline `color` is set to our green `main_col` and the square `fill` color is set to the dark grey `bg_col`.
 
 ```{r}
 #| label: fig-langauges-basic-plot2
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark grey points."
 #| source-line-numbers: "4,8,9,10"
 basic_plot <- ggplot(data = plot_data) +
   geom_line(
@@ -303,7 +304,7 @@ basic_plot <- ggplot(data = plot_data) +
 basic_plot
 ```
 
-### Text and fonts
+### Text and fonts {#sec-lang-text-fonts}
 
 Adding text to a visualization is important - a title, subtitle, and perhaps caption can add information to make it easier for a reader to understand what's going on. A title quickly explains what the chart is about. Though more informative titles may be viewed as more aesthetically pleasing, there's no evidence that they are more effective for conveying information [@Wanzer2021].  A subtitle might give some more information about the underlying data, explain how to interpret more complex charts, or state the conclusions a reader should come to. Captions are a good place to put information such as who made the graphic, what the source of the data is, or other important conditions on the data.
 
@@ -343,6 +344,7 @@ Let's add the title, subtitle, and caption to the plot using the `labs()` functi
 
 ```{r}
 #| label: fig-langauges-text_plot
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added."
 text_plot <- basic_plot +
   labs(
     title = title,
@@ -352,23 +354,30 @@ text_plot <- basic_plot +
 text_plot
 ```
 
-You'll notice that the subtitle text runs off the edge of the plot here - we'll deal with that a little bit later. Let's first decide on a font to use in the plot.
+You'll notice that the subtitle text runs off the edge of the plot here - we'll deal with that a little bit later. Let's first decide on a font to use in the plot. As with choosing colors, when choosing fonts it's useful to think about choosing a font that fits with the theme. Think about the fonts used in horror films posters. Isn't it quite different to the font used in marketing childrens' toys? Since we're going with a monochrome monitor theme for the colors, we can extend that to the font choice by choosing a monospace font reminiscent of early computers. 
 
-{sysfonts}\index{sysfonts}
-{showtext}\index{showtext}
+Working with fonts in R isn't always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the `font_add_google()` function from {sysfonts} [@sysfonts]. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at [fonts.google.com](https://fonts.google.com/). The `VT323` and `Share Tech Mono` fonts both look like they'll fit in with our theme. The `font_add_google()` function looks through the Google Fonts database for the specified font `name` (e.g. `"VT323"`) and loads the font files you'll need. The second argument, `family` is how we'll refer to the font when using it to plot in R. By default it's the same as the `name` but it's often useful to change it to something else (e.g. `"vt"`), especially for long font names. \index{sysfonts} \index{sysfonts!font\_add\_google}
 
-alterntives to showtext
+We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the {showtext} package [@showtext] comes in. By running `showtext_auto()`, this means that the {showtext} package is automatically used to render text. We can also set `showtext_opts(dpi = 300)` to use fonts in the resolution we plan to save our image in later - see @sec-save-image for more details on image resolution. \index{showtext} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
 #| label: langauges-showtext
-sysfonts::font_add_google("VT323", "vt")
-sysfonts::font_add_google("Share Tech Mono", "share")
+sysfonts::font_add_google(name = "VT323", family = "vt")
+sysfonts::font_add_google(name = "Share Tech Mono", family = "share")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 ```
 
-font as variables
+::: {#tip-languages-showtext .callout-tip}
 
+There are several alternatives to {showtext} for working with fonts in R. Depending on what you're creating, you might find one of these works better for you:
+
+* The {ragg} package [@ragg] uses a different graphics device, and allows to use any fonts installed on your system. You can usually install additional fonts by downloading the relevant font files, then right clicking and choosing the install option.
+* The {extrafont} package [@extrafont] which focuses on using TrueType fonts in PDF formats.
+
+:::
+
+Exactly, as we did with colors, we'll save font names as variables to make it easier to see how our plots look with different fonts. We'll save two variables: `title_font` that store the font for the title (and other important elements), and `body_font` for all other text.
 
 ```{r}
 #| label: langauges-font-vars
@@ -386,6 +395,7 @@ We can also set the `base_family` equal to `body_font` - the variable we defined
 
 ```{r}
 #| label: langauges-minimal-theme
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The default font has been changed, and the font made slightly smaller."
 theme_plot1 <- text_plot +
   theme_minimal(
     base_size = 8,
@@ -400,6 +410,7 @@ better theme
 
 ```{r}
 #| label: fig-langauges-style1
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with a dark gray background and green text."
 theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -449,6 +460,7 @@ ggtext
 
 ```{r}
 #| label: fig-langauges-style2
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The subtitle text now wraps to the width of the page."
 theme_plot2 <- theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -499,6 +511,7 @@ Add labels
 
 ```{r}
 #| label: fig-langauges-add-labels
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge."
 theme_plot2 +
   geom_text(
     mapping = aes(x = 1932, y = n, label = title),
@@ -510,8 +523,7 @@ theme_plot2 +
   )
 ```
 
-
-make better labels
+Although these labels are an improvement on not having any language label, they're still not as informative as they could be. There's no information about the overall rank included in the plot. There's no way to tell if the top ranked language that uses `#` as a comment symbol is also the top ranked language overall or ranked as low as 1000! Let's create a more informative label using the {glue} package again. We can create a new `rank_label` column using `mutate()` which combines the language name from the `title` column, the text `"Rank: `, and the rank from the `language_rank` column. The `\n` adds a line break between the language name and rank text. \index{dplyr!mutate} \index{glue!glue}
 
 ```{r}
 #| label: langauges-better-labels
@@ -521,10 +533,11 @@ plot_data <- plot_data |>
     )
 ```
 
-plot
+Let's add these new and improved labels to our plot using `geom_text()`: \index{ggplot2!geom\_text}
 
 ```{r}
 #| label: fig-langauges-add-better-labels
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge and rank."
 theme_plot2 +
   geom_text(
     data = plot_data,
@@ -538,8 +551,9 @@ theme_plot2 +
   )
 ```
 
+And we're finished!
 
-### Saving to an image file
+### Saving to an image file {#sec-save-image}
 
 There are many different options available for saving plots created with R to a file you can later use in presentations, on social media, in publications, or anywhere else you might need to: \index{grDevices!png} \index{ragg!agg\_png}
 
