@@ -3,7 +3,21 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.92
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
 
 # Time Zones: Spatial data and mapping with {sf} {#sec-time-zones}
 
@@ -35,17 +49,238 @@ timezones <- readr::read_csv("data/timezones.csv")
 
 ### Data wrangling
 
-### Packages and functions
+As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2}> Here, let's look at an alternative: {rnaturalearth}
+
+```{r}
+#| label: timezones-map-data
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+```
+
+### Spatial objects with {sf}
+
+```{r}
+#| label: timezones-sf
+timezones_sf <- timezones |>
+  dplyr::select(-comments) |>
+  sf::st_as_sf(coords = c("longitude", "latitude")) |>
+  sf::st_set_crs(4326) |>
+  tidyr::separate(zone, into = c("continent", "place"), sep = "/")
+```
+
 
 ### The first plot
+
+```{r}
+#| label: fig-timezones-basic-map
+library(ggplot2)
+basic_map <- ggplot() +
+  geom_sf(data = world) +
+  geom_sf(
+    data = timezones_sf,
+    mapping = aes(colour = continent)
+  )
+basic_map
+```
+
+```{r}
+#| label: fig-timezones-basic-map
+basic_map <- ggplot() +
+  geom_sf(data = world) +
+  geom_sf(
+    data = timezones_sf,
+    mapping = aes(colour = continent)
+  )
+basic_map
+```
 
 ## Advanced styling
 
 ### Colours
 
+```{r}
+#| label: timezones-colors
+text_col <- "#2F4F4F"
+bg_col <- "#F0F5F5"
+col_palette <- c(
+  "#CC6677", "#332288", "#DDCC77",
+  "#117733", "#88CCEE", "#882255",
+  "#44AA99", "#999933", "#AA4499"
+)
+```
+
+### Bar chart legend
+
+```{r}
+bar_data <- timezones_sf |>
+  dplyr::group_by(continent) |>
+  dplyr::summarise(n = n()) |>
+  sf::st_drop_geometry()
+```
+
+
+```{r}
+bar_plot <-
+  ggplot(
+    data = bar_data,
+    mapping = aes(
+      x = continent, y = n,
+      fill = continent, label = continent
+    )
+  ) +
+  geom_col() +
+  scale_fill_manual(
+    values = c(
+      "#CC6677", "#332288", "#DDCC77",
+      "#117733", "#88CCEE", "#882255",
+      "#44AA99", "#999933", "#AA4499"
+    )
+  )
+bar_plot
+```
+
+```{r}
+legend_plot <- bar_plot + 
+  ggtext::geom_textbox(
+    mapping = aes(
+      hjust = dplyr::case_when(
+        n > 45 ~ 1,
+        TRUE ~ 0
+      ),
+      halign = dplyr::case_when(
+        n > 45 ~ 1,
+        TRUE ~ 0
+      ),
+      colour = dplyr::case_when(
+        n > 45 ~ I(bg_col),
+        TRUE ~ I(text_col)
+      )
+    ),
+    #family = "Commissioner",
+    size = 7,
+    fill = NA,
+    box.colour = NA,
+    orientation = "left-rotated"
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "none"
+  )
+legend_plot
+```
+
+
 ### Text and fonts
 
+```{r}
+#| label: timezones-text
+title <- "<span style='font-size:44pt;font-family:Fraunces;color:#2F4F4F;'>Time Zones of the World</span><br>"
+cap <- "Time zones tend to follow the boundaries between countries and their subdivisions
+instead of strictly following longitude. For every one-hour time, a point on the earth moves
+through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the
+IANA time zone database. The colours show which time zones are in
+<span style='color:#CC6677;'>Africa</span>,
+<span style='color:#332288;'>America</span>,
+<span style='color:#DDCC77;'>Antarctica</span>,
+<span style='color:#117733;'>Asia</span>,
+<span style='color:#88CCEE;'>Atlantic</span>,
+<span style='color:#882255;'>Australia</span>,
+<span style='color:#44AA99;'>Europe</span>,
+<span style='color:#999933;'>Indian</span>, and
+<span style='color:#AA4499;'>Pacific</span> zones.<br>Data: IANA tz database<br>"
+social <- social_caption(
+  bg_color = bg_col, icon_color = text_col,
+  font_color = text_col
+)
+caption <- paste0(title, cap)
+```
+
+
 ### Adjusting themes
+
+```{r}
+#| label: fig-timezones-style-map
+g <- ggplot() +
+  geom_sf(
+    data = world,
+    colour = nr_dark,
+    fill = alpha(nr_mid, 0.3)
+  ) +
+  geom_sf(
+    data = timezones_sf, size = 0.4,
+    mapping = aes(colour = continent)
+  ) +
+  ggtext::geom_textbox(
+    data = data.frame(x = -110, y = 93, label = social),
+    aes(x = x, y = y, label = label),
+    family = "Commissioner",
+    size = 7,
+    fill = NA,
+    halign = 0,
+    hjust = 0.5,
+    valign = 0,
+    box.colour = NA
+  ) +
+  geom_sf(
+    data = timezones_sf, size = 1.6,
+    pch = 21,
+    fill = "transparent",
+    mapping = aes(colour = continent)
+  ) +
+  geom_segment(
+    data = data.frame(x = seq(-180, 180, by = 15)),
+    mapping = aes(x = x, y = -170, xend = x, yend = 100),
+    linewidth = 0.2,
+    colour = alpha(nr_mid, 0.2)
+  ) +
+  scale_colour_manual(
+    values = c(
+      "#CC6677", "#332288", "#DDCC77",
+      "#117733", "#88CCEE", "#882255",
+      "#44AA99", "#999933", "#AA4499"
+    )
+  ) +
+  scale_x_continuous(
+    breaks = seq(-180, 180, by = 15),
+    limits = c(-190, 190)
+  ) +
+  coord_sf(expand = FALSE) +
+  labs(tag = caption) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(0, 0, 0, 0),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    plot.background = element_rect(fill = nr_light, colour = nr_light),
+    panel.background = element_rect(fill = nr_light, colour = nr_light),
+    panel.grid = element_blank(),
+    plot.tag.position = c(-0.01, 0.12),
+    plot.tag = element_textbox_simple(
+      family = "Commissioner",
+      colour = nr_dark,
+      hjust = 0,
+      maxwidth = grid::unit(200, "pt"),
+      lineheight = 0.6,
+      margin = margin(
+        l = 15,
+        t = 5,
+        b = 10
+      )
+    )
+  )
+g
+```
+
+### Join with {patchwork}
+
+```{r}
+#| label: fig-final-plot
+library(patchwork)
+g + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
+  theme(plot.margin = margin(0, 0, 0, 0))
+```
+
 
 ## Reflection
 
