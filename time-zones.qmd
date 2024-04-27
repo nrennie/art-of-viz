@@ -82,43 +82,54 @@ basic_map <- ggplot() +
 basic_map
 ```
 
-```{r}
-#| label: fig-timezones-basic-map
-basic_map <- ggplot() +
-  geom_sf(data = world) +
-  geom_sf(
-    data = timezones_sf,
-    mapping = aes(colour = continent)
-  )
-basic_map
-```
-
-## Advanced styling
+## Custom legend
 
 ### Colours
 
 ```{r}
 #| label: timezones-colors
 text_col <- "#2F4F4F"
+highlight_col <- "#508080"
 bg_col <- "#F0F5F5"
 col_palette <- c(
-  "#CC6677", "#332288", "#DDCC77",
-  "#117733", "#88CCEE", "#882255",
-  "#44AA99", "#999933", "#AA4499"
+  "Africa" = "#CC6677",
+  "America" = "#332288",
+  "Antarctica" = "#DDCC77",
+  "Asia" = "#117733",
+  "Atlantic" = "#88CCEE",
+  "Australia" = "#882255",
+  "Europe" = "#44AA99",
+  "Indian" = "#999933",
+  "Pacific" = "#AA4499"
 )
+```
+
+### Fonts
+
+
+```{r}
+#| label: timezones-fonts
+sysfonts::font_add_google("Commissioner", "commissioner")
+sysfonts::font_add_google("Fraunces", "fraunces")
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "commissioner"
+title_font <- "fraunces"
 ```
 
 ### Bar chart legend
 
 ```{r}
+#| label: timezones-bar-data
 bar_data <- timezones_sf |>
   dplyr::group_by(continent) |>
-  dplyr::summarise(n = n()) |>
+  dplyr::summarise(n = dplyr::n()) |>
   sf::st_drop_geometry()
 ```
 
 
 ```{r}
+#| label: fig-timezones-bar-plot-1
 bar_plot <-
   ggplot(
     data = bar_data,
@@ -129,17 +140,14 @@ bar_plot <-
   ) +
   geom_col() +
   scale_fill_manual(
-    values = c(
-      "#CC6677", "#332288", "#DDCC77",
-      "#117733", "#88CCEE", "#882255",
-      "#44AA99", "#999933", "#AA4499"
-    )
+    values = col_palette
   )
 bar_plot
 ```
 
 ```{r}
-legend_plot <- bar_plot + 
+#| label: fig-timezones-bar-plot-2
+legend_plot <- bar_plot +
   ggtext::geom_textbox(
     mapping = aes(
       hjust = dplyr::case_when(
@@ -155,8 +163,8 @@ legend_plot <- bar_plot +
         TRUE ~ I(text_col)
       )
     ),
-    #family = "Commissioner",
-    size = 7,
+    family = body_font,
+    size = 3,
     fill = NA,
     box.colour = NA,
     orientation = "left-rotated"
@@ -168,100 +176,131 @@ legend_plot <- bar_plot +
 legend_plot
 ```
 
+## Advanced styling
 
-### Text and fonts
+### Text 
+
+```{r}
+#| label: timezones-text-social
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = highlight_col,
+  font_color = text_col
+)
+```
 
 ```{r}
 #| label: timezones-text
-title <- "<span style='font-size:44pt;font-family:Fraunces;color:#2F4F4F;'>Time Zones of the World</span><br>"
-cap <- "Time zones tend to follow the boundaries between countries and their subdivisions
-instead of strictly following longitude. For every one-hour time, a point on the earth moves
-through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the
-IANA time zone database. The colours show which time zones are in
-<span style='color:#CC6677;'>Africa</span>,
-<span style='color:#332288;'>America</span>,
-<span style='color:#DDCC77;'>Antarctica</span>,
-<span style='color:#117733;'>Asia</span>,
-<span style='color:#88CCEE;'>Atlantic</span>,
-<span style='color:#882255;'>Australia</span>,
-<span style='color:#44AA99;'>Europe</span>,
-<span style='color:#999933;'>Indian</span>, and
-<span style='color:#AA4499;'>Pacific</span> zones.<br>Data: IANA tz database<br>"
-social <- social_caption(
-  bg_color = bg_col, icon_color = text_col,
-  font_color = text_col
-)
+cap <- glue::glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colours show which time zones are in
+<span style='color:{col_palette[\"Africa\"]};'>Africa</span>,
+<span style='color:{col_palette[\"America\"]};'>America</span>,
+<span style='color:{col_palette[\"Antarctica\"]};'>Antarctica</span>,
+<span style='color:{col_palette[\"Asia\"]};'>Asia</span>,
+<span style='color:{col_palette[\"Atlantic\"]};'>Atlantic</span>,
+<span style='color:{col_palette[\"Australia\"]};'>Australia</span>,
+<span style='color:{col_palette[\"Europe\"]};'>Europe</span>,
+<span style='color:{col_palette[\"Indian\"]};'>Indian</span>, and
+<span style='color:{col_palette[\"Pacific\"]};'>Pacific</span> zones.<br>**Data**: IANA tz database<br>")
+title <- glue::glue("<span style='font-size:12pt;font-family:{title_font};color:{text_col};'>Time Zones of the World</span><br>")
 caption <- paste0(title, cap)
 ```
-
 
 ### Adjusting themes
 
 ```{r}
-#| label: fig-timezones-style-map
-g <- ggplot() +
+#| label: fig-timezones-basic-map-2
+basic_map <- ggplot() +
   geom_sf(
     data = world,
-    colour = nr_dark,
-    fill = alpha(nr_mid, 0.3)
+    colour = text_col,
+    fill = alpha(highlight_col, 0.3)
   ) +
   geom_sf(
-    data = timezones_sf, size = 0.4,
-    mapping = aes(colour = continent)
-  ) +
-  ggtext::geom_textbox(
-    data = data.frame(x = -110, y = 93, label = social),
-    aes(x = x, y = y, label = label),
-    family = "Commissioner",
-    size = 7,
-    fill = NA,
-    halign = 0,
-    hjust = 0.5,
-    valign = 0,
-    box.colour = NA
+    data = timezones_sf,
+    mapping = aes(colour = continent),
+    size = 0.4,
   ) +
   geom_sf(
-    data = timezones_sf, size = 1.6,
+    data = timezones_sf,
+    mapping = aes(colour = continent),
+    size = 1.6,
     pch = 21,
-    fill = "transparent",
-    mapping = aes(colour = continent)
-  ) +
+    fill = "transparent"
+  )
+basic_map
+```
+
+apply colours and text
+
+```{r}
+#| label: timezones-style-map-1
+col_map <- basic_map +
+  scale_colour_manual(
+    values = col_palette
+  )
+```
+
+add lines
+
+```{r}
+#| label: fig-timezones-style-map-2
+line_map <- col_map +
   geom_segment(
     data = data.frame(x = seq(-180, 180, by = 15)),
     mapping = aes(x = x, y = -170, xend = x, yend = 100),
     linewidth = 0.2,
-    colour = alpha(nr_mid, 0.2)
-  ) +
-  scale_colour_manual(
-    values = c(
-      "#CC6677", "#332288", "#DDCC77",
-      "#117733", "#88CCEE", "#882255",
-      "#44AA99", "#999933", "#AA4499"
-    )
+    colour = alpha(highlight_col, 0.2)
   ) +
   scale_x_continuous(
     breaks = seq(-180, 180, by = 15),
     limits = c(-190, 190)
   ) +
-  coord_sf(expand = FALSE) +
-  labs(tag = caption) +
-  theme_minimal(base_size = 14) +
+  coord_sf(expand = FALSE)
+line_map
+```
+
+```{r}
+#| label: timezones-style-map-3
+text_map <- line_map +
+  ggtext::geom_textbox(
+    data = data.frame(x = 0, y = 93, label = social),
+    aes(x = x, y = y, label = label),
+    family = body_font,
+    size = 2.5,
+    fill = NA,
+    halign = 0.5,
+    hjust = 0.5,
+    valign = 0,
+    box.colour = NA
+  ) +
+  labs(tag = caption)
+```
+
+
+```{r}
+#| label: fig-timezones-style-map-4
+styled_map <- text_map +
+  theme_minimal(base_size = 6.5, base_family = body_font) +
   theme(
     legend.position = "none",
     plot.margin = margin(0, 0, 0, 0),
     axis.ticks = element_blank(),
     axis.title = element_blank(),
     axis.text = element_blank(),
-    plot.background = element_rect(fill = nr_light, colour = nr_light),
-    panel.background = element_rect(fill = nr_light, colour = nr_light),
+    plot.background = element_rect(
+      fill = bg_col,
+      colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
     panel.grid = element_blank(),
     plot.tag.position = c(-0.01, 0.12),
-    plot.tag = element_textbox_simple(
-      family = "Commissioner",
-      colour = nr_dark,
+    plot.tag = ggtext::element_textbox_simple(
+      colour = text_col,
       hjust = 0,
       maxwidth = grid::unit(200, "pt"),
-      lineheight = 0.6,
+      lineheight = 0.8,
       margin = margin(
         l = 15,
         t = 5,
@@ -269,20 +308,24 @@ g <- ggplot() +
       )
     )
   )
-g
+styled_map
 ```
 
 ### Join with {patchwork}
 
 ```{r}
-#| label: fig-final-plot
+#| label: fig-timezones-final-plot
 library(patchwork)
-g + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
+styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```
 
 
 ## Reflection
+
+* vert lines don't need to go through text as well
+
+* bars could do with some exaplantion
 
 ::: {.content-visible when-format="html"}
 
