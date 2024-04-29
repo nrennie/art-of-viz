@@ -23,6 +23,8 @@ fig-asp: 0.92
 
 ## Data
 
+[@zones_data]
+
 ```{r}
 #| label: load-timezones-data-show
 #| eval: false
@@ -49,14 +51,22 @@ timezones <- readr::read_csv("data/timezones.csv")
 
 ### Data wrangling
 
-As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2} Here, let's look at an alternative: {rnaturalearth}
+As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2} Here, let's look at an alternative: {rnaturalearth} [@rnaturalearth]
+
+[@sf]
 
 ```{r}
 #| label: timezones-map-data
-world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+world <- rnaturalearth::ne_countries(
+  scale = "medium",
+  returnclass = "sf"
+)
 ```
 
 ### Spatial objects with {sf}
+
+\index{sf!st\_as\_sf} \index{sf!st\_set\_crs}
+
 
 ```{r}
 #| label: timezones-sf
@@ -64,7 +74,11 @@ timezones_sf <- timezones |>
   dplyr::select(-comments) |>
   sf::st_as_sf(coords = c("longitude", "latitude")) |>
   sf::st_set_crs(4326) |>
-  tidyr::separate(zone, into = c("continent", "place"), sep = "/")
+  tidyr::separate(
+    zone,
+    into = c("continent", "place"),
+    sep = "/"
+  )
 ```
 
 
@@ -128,10 +142,12 @@ bar_data <- timezones_sf |>
   sf::st_drop_geometry()
 ```
 
+\index{sf!st\_drop\_geometry}
 
 ```{r}
 #| label: fig-timezones-bar-plot-1
 #| fig-cap: "test"
+#| fig-asp: 0.7
 bar_plot <-
   ggplot(
     data = bar_data,
@@ -150,6 +166,7 @@ bar_plot
 ```{r}
 #| label: fig-timezones-bar-plot-2
 #| fig-cap: "test"
+#| fig-asp: 0.7
 legend_plot <- bar_plot +
   ggtext::geom_textbox(
     mapping = aes(
@@ -195,16 +212,16 @@ social <- social_caption(
 ```{r}
 #| label: timezones-text
 cap <- glue::glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colours show which time zones are in
-<span style='color:{col_palette[\"Africa\"]};'>Africa</span>,
-<span style='color:{col_palette[\"America\"]};'>America</span>,
-<span style='color:{col_palette[\"Antarctica\"]};'>Antarctica</span>,
-<span style='color:{col_palette[\"Asia\"]};'>Asia</span>,
-<span style='color:{col_palette[\"Atlantic\"]};'>Atlantic</span>,
-<span style='color:{col_palette[\"Australia\"]};'>Australia</span>,
-<span style='color:{col_palette[\"Europe\"]};'>Europe</span>,
-<span style='color:{col_palette[\"Indian\"]};'>Indian</span>, and
-<span style='color:{col_palette[\"Pacific\"]};'>Pacific</span> zones.<br>**Data**: IANA tz database<br>")
-title <- glue::glue("<span style='font-size:12pt;font-family:{title_font};color:{text_col};'>Time Zones of the World</span><br>")
+<span style='color:{col_palette[\"Africa\"]};'>Africa </span>,
+<span style='color:{col_palette[\"America\"]};'>America </span>,
+<span style='color:{col_palette[\"Antarctica\"]};'>Antarctica </span>,
+<span style='color:{col_palette[\"Asia\"]};'>Asia </span>,
+<span style='color:{col_palette[\"Atlantic\"]};'>Atlantic </span>,
+<span style='color:{col_palette[\"Australia\"]};'>Australia </span>,
+<span style='color:{col_palette[\"Europe\"]};'>Europe </span>,
+<span style='color:{col_palette[\"Indian\"]};'>Indian </span>, and
+<span style='color:{col_palette[\"Pacific\"]};'>Pacific </span> zones.<br>**Data**: IANA tz database<br>")
+title <- glue::glue("<span style='font-size:12pt; font-family:{title_font}; color:{text_col};'>Time Zones of the World</span><br>")
 caption <- paste0(title, cap)
 ```
 
@@ -295,7 +312,8 @@ styled_map <- text_map +
       colour = bg_col
     ),
     panel.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col,
+      colour = bg_col
     ),
     # add and position text
     plot.tag.position = c(-0.01, 0.12),
@@ -312,6 +330,8 @@ styled_map
 ```
 
 ### Join with {patchwork}
+
+[@patchwork]
 
 ```{r}
 #| label: fig-timezones-final-plot
