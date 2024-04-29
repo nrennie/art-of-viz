@@ -72,6 +72,7 @@ timezones_sf <- timezones |>
 
 ```{r}
 #| label: fig-timezones-basic-map
+#| fig-cap: ""
 library(ggplot2)
 basic_map <- ggplot() +
   geom_sf(data = world) +
@@ -130,6 +131,7 @@ bar_data <- timezones_sf |>
 
 ```{r}
 #| label: fig-timezones-bar-plot-1
+#| fig-cap: ""
 bar_plot <-
   ggplot(
     data = bar_data,
@@ -147,6 +149,7 @@ bar_plot
 
 ```{r}
 #| label: fig-timezones-bar-plot-2
+#| fig-cap: ""
 legend_plot <- bar_plot +
   ggtext::geom_textbox(
     mapping = aes(
@@ -209,6 +212,7 @@ caption <- paste0(title, cap)
 
 ```{r}
 #| label: fig-timezones-basic-map-2
+#| fig-cap: ""
 basic_map <- ggplot() +
   geom_sf(
     data = world,
@@ -244,6 +248,7 @@ add lines
 
 ```{r}
 #| label: fig-timezones-style-map-2
+#| fig-cap: ""
 line_map <- col_map +
   geom_segment(
     data = data.frame(x = seq(-180, 180, by = 15)),
@@ -279,14 +284,12 @@ text_map <- line_map +
 
 ```{r}
 #| label: fig-timezones-style-map-4
+#| fig-cap: ""
 styled_map <- text_map +
-  theme_minimal(base_size = 6.5, base_family = body_font) +
+  theme_void(base_size = 6, base_family = body_font) +
   theme(
     legend.position = "none",
     plot.margin = margin(0, 0, 0, 0),
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
     plot.background = element_rect(
       fill = bg_col,
       colour = bg_col
@@ -294,17 +297,14 @@ styled_map <- text_map +
     panel.background = element_rect(
       fill = bg_col, colour = bg_col
     ),
-    panel.grid = element_blank(),
+    # add and position text
     plot.tag.position = c(-0.01, 0.12),
     plot.tag = ggtext::element_textbox_simple(
       colour = text_col,
       hjust = 0,
       maxwidth = grid::unit(200, "pt"),
-      lineheight = 0.8,
       margin = margin(
-        l = 15,
-        t = 5,
-        b = 10
+        l = 15, t = 5, b = 10
       )
     )
   )
@@ -315,6 +315,7 @@ styled_map
 
 ```{r}
 #| label: fig-timezones-final-plot
+#| fig-cap: ""
 library(patchwork)
 styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
