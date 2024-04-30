@@ -25,6 +25,8 @@ fig-asp: 0.92
 
 [@zones_data]
 
+The time zones data was used as a \#TidyTuesday dataset in March 2023, and we can load it in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR].
+
 \index{tidytuesdayR!tt\_load}
 
 ```{r}
@@ -47,6 +49,16 @@ timezones <- readr::read_csv("data/timezones.csv")
 
 ### Data exploration
 
+```{r}
+#| label: timezones-head
+head(timezones)
+```
+
+```{r}
+#| label: timezones-head
+print(head(timezones), width = 10)
+```
+
 ### Exploratory sketches
 
 ![Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.](images/sketch-time-zones.png){#fig-time-zones-sketch fig-align="center"}
@@ -64,8 +76,7 @@ As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2}
 ```{r}
 #| label: timezones-map-data
 world <- rnaturalearth::ne_countries(
-  scale = "medium",
-  returnclass = "sf"
+  scale = "medium"
 )
 ```
 
@@ -107,7 +118,7 @@ timezones_sf <- timezones |>
 
 ```{r}
 #| label: fig-timezones-basic-map
-#| fig-cap: "test"
+#| fig-cap: "Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map."
 basic_map <- bg_map +
   geom_sf(
     data = timezones_sf,
@@ -181,7 +192,7 @@ bar_data <- timezones_sf |>
 
 ```{r}
 #| label: fig-timezones-bar-plot-1
-#| fig-cap: "test"
+#| fig-cap: "Bar chart showing the number of time zone locations in each continent, with different colors for each continent."
 #| fig-asp: 0.7
 bar_plot <-
   ggplot(
@@ -202,7 +213,7 @@ bar_plot
 
 ```{r}
 #| label: fig-timezones-bar-plot-2
-#| fig-cap: "test"
+#| fig-cap: "A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent."
 #| fig-asp: 0.7
 legend_plot <- bar_plot +
   ggtext::geom_textbox(
@@ -350,7 +361,9 @@ text_map <- line_map +
   labs(tag = caption)
 ```
 
-\index{ggplot2!theme\_void} \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_rect}
+theme void \index{ggplot2!theme\_void}
+
+theme \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_rect}
 
 ```{r}
 #| label: fig-timezones-style-map-4
@@ -382,6 +395,10 @@ styled_map
 
 Finally, we need to join the legend bar chart to our main plot. For this, we'll use the {patchwork} package [@patchwork] - just as we did in @sec-lemurs to assembly multiple plots into a grid. 
 
+In this visualisation, rather than arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The positions ... \index{patchwork!inset\_element}
+
+theme \index{ggplot2!theme}
+
 ```{r}
 #| label: fig-timezones-final-plot
 #| fig-cap: "test"
@@ -390,7 +407,7 @@ styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```
 
-\index{patchwork!inset\_element} \index{ggplot2!theme}
+Our map is finished!
 
 ## Reflection
 
