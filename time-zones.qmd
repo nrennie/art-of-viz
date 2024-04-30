@@ -25,6 +25,8 @@ fig-asp: 0.92
 
 [@zones_data]
 
+\index{tidytuesdayR!tt\_load}
+
 ```{r}
 #| label: load-timezones-data-show
 #| eval: false
@@ -51,11 +53,13 @@ timezones <- readr::read_csv("data/timezones.csv")
 
 ## Preparing a plot
 
-### Data wrangling
+### Background maps with {rnaturalearth}
 
 As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2} Here, let's look at an alternative: {rnaturalearth} [@rnaturalearth]
 
 [@sf]
+
+\index{rnaturalearth!ne\_countries}
 
 ```{r}
 #| label: timezones-map-data
@@ -65,10 +69,23 @@ world <- rnaturalearth::ne_countries(
 )
 ```
 
+You'll notice that there's no `mapping` 
+
+\index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
+
+```{r}
+#| label: fig-timezones-bg-map
+#| fig-cap: "Map of the world showing country outlines, with the default gray background."
+library(ggplot2)
+bg_map <- ggplot() +
+  geom_sf(data = world)
+bg_map
+```
+
+
 ### Spatial objects with {sf}
 
-\index{sf!st\_as\_sf} \index{sf!st\_set\_crs}
-
+\index{sf!st\_as\_sf} \index{sf!st\_set\_crs} \index{dplyr!select} \index{tidyr!separate}
 
 ```{r}
 #| label: timezones-sf
@@ -86,28 +103,40 @@ timezones_sf <- timezones |>
 
 ### The first plot
 
+\index{ggplot2!aes} \index{ggplot2!geom\_sf}
+
 ```{r}
 #| label: fig-timezones-basic-map
 #| fig-cap: "test"
-library(ggplot2)
-basic_map <- ggplot() +
-  geom_sf(data = world) +
+basic_map <- bg_map +
   geom_sf(
     data = timezones_sf,
-    mapping = aes(colour = continent)
+    mapping = aes(color = continent)
   )
 basic_map
 ```
 
-## Custom legend
+## Creating a custom legend
 
-### Colours
+Before we create a legend map, we need to define which colors will be used in the legend (and the rest of the plot).
+
+### Colors
+
+As we've done in previous chapters, we start by defining a text color, highlight color, and background color as variables.
 
 ```{r}
 #| label: timezones-colors
 text_col <- "#2F4F4F"
 highlight_col <- "#508080"
 bg_col <- "#F0F5F5"
+```
+
+Then we define a named vector of colors, mapping the names of regions to different hex codes.
+
+adapted from https://personal.sron.nl/~pault/
+
+```{r}
+#| label: timezones-col-palette
 col_palette <- c(
   "Africa" = "#CC6677",
   "America" = "#332288",
@@ -123,28 +152,32 @@ col_palette <- c(
 
 ### Fonts
 
+\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: timezones-fonts
-sysfonts::font_add_google("Commissioner", "commissioner")
-sysfonts::font_add_google("Fraunces", "fraunces")
+sysfonts::font_add_google("Commissioner")
+sysfonts::font_add_google("Fraunces")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-body_font <- "commissioner"
-title_font <- "fraunces"
+body_font <- "Commissioner"
+title_font <- "Fraunces"
 ```
 
 ### Bar chart legend
 
+The ... the `geometry` column in ... is often described as *sticky*. 
+
+\index{sf!st\_drop\_geometry} \index{dplyr!count}
+
 ```{r}
 #| label: timezones-bar-data
 bar_data <- timezones_sf |>
-  dplyr::group_by(continent) |>
-  dplyr::summarise(n = dplyr::n()) |>
+  dplyr::count(continent) |>
   sf::st_drop_geometry()
 ```
 
-\index{sf!st\_drop\_geometry}
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_col} \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-timezones-bar-plot-1
@@ -165,6 +198,8 @@ bar_plot <-
 bar_plot
 ```
 
+\index{ggtext!geom\_textbox} \index{dplyr!case\_when} \index{base!I}  \index{ggplot2!theme} \index{ggplot2!theme\_void}
+
 ```{r}
 #| label: fig-timezones-bar-plot-2
 #| fig-cap: "test"
@@ -180,7 +215,7 @@ legend_plot <- bar_plot +
         n > 45 ~ 1,
         TRUE ~ 0
       ),
-      colour = dplyr::case_when(
+      color = dplyr::case_when(
         n > 45 ~ I(bg_col),
         TRUE ~ I(text_col)
       )
@@ -188,7 +223,7 @@ legend_plot <- bar_plot +
     family = body_font,
     size = 3,
     fill = NA,
-    box.colour = NA,
+    box.color = NA,
     orientation = "left-rotated"
   ) +
   theme_void() +
@@ -200,20 +235,65 @@ legend_plot
 
 ## Advanced styling
 
+### Applying colors
+
+\index{ggplot2!ggplot} \index{ggplot2!alpha} \index{ggplot2!geom\_sf} \index{ggplot2!aes}
+
+```{r}
+#| label: fig-timezones-basic-map-2
+#| fig-cap: "test"
+basic_map <- ggplot() +
+  geom_sf(
+    data = world,
+    color = text_col,
+    fill = alpha(highlight_col, 0.3)
+  ) +
+  geom_sf(
+    data = timezones_sf,
+    mapping = aes(color = continent),
+    size = 0.4,
+  ) +
+  geom_sf(
+    data = timezones_sf,
+    mapping = aes(color = continent),
+    size = 1.6,
+    pch = 21,
+    fill = "transparent"
+  )
+basic_map
+```
+
+We also apply the same colors (remembering to use `scale_color_manual()` rather than `scale_fill_manual()` as ... )
+
+\index{ggplot2!scale\_color\_manual}
+
+```{r}
+#| label: timezones-style-map-1
+col_map <- basic_map +
+  scale_color_manual(
+    values = col_palette
+  )
+```
+
 ### Text 
 
+\index{social\_caption}
+ 
 ```{r}
 #| label: timezones-text-social
 social <- social_caption(
   bg_color = bg_col,
   icon_color = highlight_col,
-  font_color = text_col
+  font_color = text_col,
+  font_family = body_font
 )
 ```
 
+\index{glue!glue}
+ 
 ```{r}
 #| label: timezones-text
-cap <- glue::glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colours show which time zones are in
+cap <- glue::glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colors show which time zones are in
 <span style='color:{col_palette[\"Africa\"]};'>Africa </span>,
 <span style='color:{col_palette[\"America\"]};'>America </span>,
 <span style='color:{col_palette[\"Antarctica\"]};'>Antarctica </span>,
@@ -224,46 +304,14 @@ cap <- glue::glue("Time zones tend to follow the boundaries between countries an
 <span style='color:{col_palette[\"Indian\"]};'>Indian </span>, and
 <span style='color:{col_palette[\"Pacific\"]};'>Pacific </span> zones.<br>**Data**: IANA tz database<br>")
 title <- glue::glue("<span style='font-size:12pt; font-family:{title_font}; color:{text_col};'>Time Zones of the World</span><br>")
-caption <- paste0(title, cap)
+caption <- glue::glue("{title}{cap}")
 ```
 
 ### Adjusting themes
 
-```{r}
-#| label: fig-timezones-basic-map-2
-#| fig-cap: "test"
-basic_map <- ggplot() +
-  geom_sf(
-    data = world,
-    colour = text_col,
-    fill = alpha(highlight_col, 0.3)
-  ) +
-  geom_sf(
-    data = timezones_sf,
-    mapping = aes(colour = continent),
-    size = 0.4,
-  ) +
-  geom_sf(
-    data = timezones_sf,
-    mapping = aes(colour = continent),
-    size = 1.6,
-    pch = 21,
-    fill = "transparent"
-  )
-basic_map
-```
-
-apply colours and text
-
-```{r}
-#| label: timezones-style-map-1
-col_map <- basic_map +
-  scale_colour_manual(
-    values = col_palette
-  )
-```
-
 add lines
+
+\index{ggplot2!geom\_segment} \index{ggplot2!aes} \index{ggplot2!alpha} \index{ggplot2!scale\_x\_continuous} \index{ggplot2!coord\_sf}
 
 ```{r}
 #| label: fig-timezones-style-map-2
@@ -273,7 +321,7 @@ line_map <- col_map +
     data = data.frame(x = seq(-180, 180, by = 15)),
     mapping = aes(x = x, y = -170, xend = x, yend = 100),
     linewidth = 0.2,
-    colour = alpha(highlight_col, 0.2)
+    color = alpha(highlight_col, 0.2)
   ) +
   scale_x_continuous(
     breaks = seq(-180, 180, by = 15),
@@ -283,23 +331,26 @@ line_map <- col_map +
 line_map
 ```
 
+\index{ggtext!geom\_textbox} \index{ggplot2!aes} \index{ggplot2!labs}
+
 ```{r}
 #| label: timezones-style-map-3
 text_map <- line_map +
   ggtext::geom_textbox(
     data = data.frame(x = 0, y = 93, label = social),
-    aes(x = x, y = y, label = label),
+    mapping = aes(x = x, y = y, label = label),
     family = body_font,
     size = 2.5,
     fill = NA,
     halign = 0.5,
     hjust = 0.5,
     valign = 0,
-    box.colour = NA
+    box.color = NA
   ) +
   labs(tag = caption)
 ```
 
+\index{ggplot2!theme\_void} \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_rect}
 
 ```{r}
 #| label: fig-timezones-style-map-4
@@ -311,16 +362,12 @@ styled_map <- text_map +
     plot.margin = margin(0, 0, 0, 0),
     plot.background = element_rect(
       fill = bg_col,
-      colour = bg_col
-    ),
-    panel.background = element_rect(
-      fill = bg_col,
-      colour = bg_col
+      color = bg_col
     ),
     # add and position text
     plot.tag.position = c(-0.01, 0.12),
     plot.tag = ggtext::element_textbox_simple(
-      colour = text_col,
+      color = text_col,
       hjust = 0,
       maxwidth = grid::unit(200, "pt"),
       margin = margin(
@@ -333,7 +380,7 @@ styled_map
 
 ### Join with {patchwork}
 
-[@patchwork]
+Finally, we need to join the legend bar chart to our main plot. For this, we'll use the {patchwork} package [@patchwork] - just as we did in @sec-lemurs to assembly multiple plots into a grid. 
 
 ```{r}
 #| label: fig-timezones-final-plot
@@ -343,6 +390,7 @@ styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```
 
+\index{patchwork!inset\_element} \index{ggplot2!theme}
 
 ## Reflection
 
