@@ -1,4 +1,10 @@
 
+# Source needed files -----------------------------------------------------
+
+source("R/social_caption.R")
+source("R/load_font_awesome.R")
+
+
 # camcorder recording -----------------------------------------------------
 
 library(camcorder)
