@@ -66,24 +66,35 @@ head(timezones)
 
 ## Preparing a plot
 
-### Background maps with {rnaturalearth}
+### Maps with {rnaturalearth}
 
-As in @sec-doctors, we need a bg map. In chap8 we used `map_data` from {ggplot2} Here, let's look at an alternative: {rnaturalearth} [@rnaturalearth]
+Before we start plotting points on a map, we need a map of the world that we can use as a background to show the underlying countries. 
+In @sec-doctors, we used `map_data` from {ggplot2}. Here, let's look at an alternative using the {rnaturalearth} package [@rnaturalearth]. 
 
-[@sf]
-
-\index{rnaturalearth!ne\_countries}
+The {rnaturalearth} package allows you to interact with [Natural Earth](https://www.naturalearthdata.com/) map data. You can download polygons for different geographic regions using the `ne_countries()` function. The default is to download data for all countries: \index{rnaturalearth!ne\_countries}
 
 ```{r}
 #| label: timezones-map-data
-world <- rnaturalearth::ne_countries(
-  scale = "medium"
-)
+world <- rnaturalearth::ne_countries()
 ```
 
-You'll notice that there's no `mapping` 
+::: {#tip-timezones-rnatearth .callout-tip}
 
-\index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
+If you wanted only the polygon(s) for a specific country or region, you can specify the `country` argument:
+
+```{r}
+#| label: timezones-ne-country
+#| eval: false
+uk <- rnaturalearth::ne_countries(country = "united kingdom")
+```
+
+For specified countries, the `ne_states()` function provides administrative level 1 polygons e.g. major within-country regions such as states.
+
+:::
+
+The default output from the `ne_countries()` function is an `sf` object. The {sf} package ... .`sf` stands for *simple feature*. [@sf]
+
+Luckily, {ggplot2} has built-in capabilities for plotting `sf` objects - through the `geom_sf()` function. That means that we can build maps from `sf` objects, in the same we we build other types of charts: by starting with the `ggplot()` function, and then layering on the `geom_sf()` geometry: \index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
 
 ```{r}
 #| label: fig-timezones-bg-map
@@ -94,8 +105,11 @@ bg_map <- ggplot() +
 bg_map
 ```
 
+You'll notice that there's one key difference - there's no aesthetic mapping using the `aes()` function. Since the spatial coordinates are embedded within the `sf` object, there's no need to explicitly map the `x` and `y` variables. The `geom_sf()` function can directly extract and use the embedded coordinates for plotting.
 
 ### Spatial objects with {sf}
+
+Though you can combine `geom_sf()` with other geometries, such as `geom_point()`, it's often easier to convert .. . 
 
 \index{sf!st\_as\_sf} \index{sf!st\_set\_crs} \index{dplyr!select} \index{tidyr!separate}
 
