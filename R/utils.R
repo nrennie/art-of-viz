@@ -1,4 +1,10 @@
 
+# Source needed files -----------------------------------------------------
+
+source("R/social_caption.R")
+source("R/load_font_awesome.R")
+
+
 # camcorder recording -----------------------------------------------------
 
 library(camcorder)
@@ -6,7 +12,7 @@ gg_record(
   dir = file.path("recording"),
   device = "png",
   width = 5,
-  height = 3.35,
+  height = 4.6,
   units = "in",
   dpi = 300
 )
