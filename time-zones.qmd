@@ -27,13 +27,13 @@ fig-asp: 0.92
 
 # Time Zones: Spatial data and mapping with {sf} {#sec-time-zones}
 
+In this chapter we'll learn how to obtain map data using {rnaturalearth}, manipulate spatial data using {sf} and plot it with {ggplot2}, and add a custom bar chart legend to a map of the world. \index{sf} \index{ggplot2} \index{rnaturalearth}
+
 ## Data
 
-[@zones_data]
+The [IANA (Interet Assigned Numbers Authority) tz database](https://data.iana.org/time-zones/tz-link.html) contains data on the history of local time for different locations around the world [@zones_data]. The website states that *"each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970."* Many websites use the data in the IANA tz database to operate.
 
-The time zones data was used as a \#TidyTuesday dataset in March 2023, and we can load it in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR].
-
-\index{tidytuesdayR!tt\_load}
+The time zones data was used as a [\#TidyTuesday dataset in March 2023](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md), where the data wrangling code was adapted from code by [Davis Vaughan](https://gist.github.com/DavisVaughan). There are actually four data sets included but we'll focus on the `timezones` data for now. We can load the data in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR]: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-timezones-data-show
@@ -51,20 +51,72 @@ timezones <- tuesdata$timezones
 timezones <- readr::read_csv("data/timezones.csv")
 ```
 
+The data contains information for `r ncol(timezones)` different variables on `r nrow(timezones)` time zones. The `zone` column contains the time zone name; the `latitude` and `longitude` columns contain coordinates for the time zones *principal location* e.g. biggest city; and the `comments` column contains comments from the original time zone definition file.
+
 ## Exploratory work
 
+Let's start by looking at what the `timezones` data looks like!
+
 ### Data exploration
+
+When we inspect the first few rows of the data:
 
 ```{r}
 #| label: timezones-head
 head(timezones)
 ```
 
+the first thing that jumps out is the `comments` column which appears to have a lot of missing data. Let's plot it to confirm, making use of the `is.na()` function to plot only the counts of missing and non-missing data:
+
+```{r}
+#| label: timezones-barplot-na
+barplot(
+  table(is.na(timezones$comments)),
+  cex.axis = 0.5,
+  cex.names = 0.5
+)
+```
+
+almost 40% of the time zones have no comments associated with them. Inspecting the data further tells us that these comments typically offer clarification or an alternative for the timezone name. Although we could explore how the presence of these comments varies across the globe, we'll use `select()` from {dplyr} to drop the `comments` column for now since it's not the most interesting thing to plot in the data.
+
+The first column, `zone`, contains information on the timezone name - it's typically in the form of `"Continent/City"`. To explore the spread of time zones across continents, we need to split this variable into two (or extract just the continent name from the timezone name). We can use `separate_wider_delim()` from {tidyr} to create two new columns from the `zone` column, splitting on the `/` character. Some of the timezone names have two `/` in their name e.g. `"America/North_Dakota/New_Salem"` meaning there are *too many* pieces for two columns. We can tell `separate_wider_delim()` to merge the last pieces since it still uniquely specifies the location. \index{dplyr!select} \index{tidyr!separate\_wider\_delim}
+
+```{r}
+#| label: timezones-tidy
+timezones_data <- timezones |>
+  dplyr::select(-comments) |> 
+  tidyr::separate_wider_delim(
+    cols = zone,
+    delim = "/",
+    names = c("continent", "place"),
+    too_many = "merge"
+  )
+```
+
+Now, we can explore how many time zones there are per continent:
+
+```{r}
+#| label: timezones-barplot-loc
+barplot(
+  table(timezones_data$continent),
+  cex.axis = 0.5,
+  cex.names = 0.5
+)
+```
+
+We can see that, actually, the first part of the time zone names don't quite map to continents since there are nine values - but they do map onto large geographic regions. 
+
+Of course, when we have coordinate data, the most obvious thing to do is plot those coordinates on a map...
+
 ### Exploratory sketches
+
+
 
 ![Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.](images/sketch-time-zones.png){#fig-time-zones-sketch fig-align="center"}
 
 ## Preparing a plot
+
+To make our plot, we need to get some background map data and understand how to work with multiple spatial data files at once.
 
 ### Maps with {rnaturalearth}
 
@@ -92,9 +144,9 @@ For specified countries, the `ne_states()` function provides administrative leve
 
 :::
 
-The default output from the `ne_countries()` function is an `sf` object. The {sf} package ... .`sf` stands for *simple feature*. [@sf]
+The default output from the `ne_countries()` function is an `sf` object - where `sf` stands for *Simple Features*. Simple Features is a standardised model for representing geometric objects such as points, lines, and polygons in spatial databases and geographic information systems (GIS). The {sf} package [@sf] implements simple features in R, allowing simple features to be represented as a `data.frame` (or `tibble`). \index{sf} 
 
-Luckily, {ggplot2} has built-in capabilities for plotting `sf` objects - through the `geom_sf()` function. That means that we can build maps from `sf` objects, in the same we we build other types of charts: by starting with the `ggplot()` function, and then layering on the `geom_sf()` geometry: \index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
+Since `sf` objects in R can be thought of as fancy data.frames, this means they can be plotted using {ggplot2}. In fact, {ggplot2} has built-in capabilities for plotting `sf` objects - through the `geom_sf()` function. That means that we can build maps from `sf` objects, in the same we we build other types of charts: by starting with the `ggplot()` function, and then layering on the `geom_sf()` geometry: \index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
 
 ```{r}
 #| label: fig-timezones-bg-map
@@ -109,23 +161,31 @@ You'll notice that there's one key difference - there's no aesthetic mapping usi
 
 ### Spatial objects with {sf}
 
-Though you can combine `geom_sf()` with other geometries, such as `geom_point()`, it's often easier to convert .. . 
+Though you can combine `geom_sf()` with other geometries, such as `geom_point()`, it's often easier to convert the other geometries to `sf` objects first. The main reason for this is to ensure the *coordinate reference system (CRS)* is the same for both geometries. Coordinate reference systems define how the three dimensional nature of the earth is mapped onto a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you're combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: `X = 492983` and `Y = 188837`. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: `Longitude (X) = 1.200235W` and `Latitude (Y) = 53.870659N`. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first. 
 
-\index{sf!st\_as\_sf} \index{sf!st\_set\_crs} \index{dplyr!select} \index{tidyr!separate}
+In R, you use the {sf} to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code `4326`. This is the coordinate reference system used in the `world` data that we're using for the background map. You can check using the `st_crs()` function from {sf} which retrieves the CRS from an object: \index{sf!st\_crs}
+
+```{r}
+#| label: crs-sf
+sf::st_crs(world)
+```
+
+To make sure the CRS of the `timezones` data matches the CRS of the `world` data, we can set the CRS of the `timezones` data as `4326`. At the moment, the `timezones` data is not a spatial object - it's just a simple `data.frame` that contains two columns with latitude and longitude information. First, we need to convert it into an `sf` object using the `st_as_sf()` function from {sf}, also specifying the column names that relate to the coordinates data. \index{sf!st\_as\_sf} 
+
+The latitude and longitude coordinates given in the `timezones` data are given in the `EPSG:4326` CRS, so we don't need to convert the CRS - just set it. We know it's in `EPSG:4326` because this information is given to us with the data. We can use the `st_set_crs()` to set the coordinate reference system to `EPSG:4326` \index{sf!st\_set\_crs}.
 
 ```{r}
 #| label: timezones-sf
-timezones_sf <- timezones |>
-  dplyr::select(-comments) |>
+timezones_sf <- timezones_data |>
   sf::st_as_sf(coords = c("longitude", "latitude")) |>
-  sf::st_set_crs(4326) |>
-  tidyr::separate(
-    zone,
-    into = c("continent", "place"),
-    sep = "/"
-  )
+  sf::st_set_crs(4326)
 ```
 
+::: {#tip-timezones-crs .callout-tip}
+
+If you don't know which CRS your coordinates are in, the best thing to do is go back to the source of the data to see if you can find that information. Otherwise, you may wish to try the `guess_crs()` function from {crsuggest} [@crsuggest] which will *guess* potential coordinate reference systems for data that are lacking a defined CRS. \index{crsuggest!guess\_crs}
+
+:::
 
 ### The first plot
 
@@ -157,9 +217,9 @@ highlight_col <- "#508080"
 bg_col <- "#F0F5F5"
 ```
 
-Then we define a named vector of colors, mapping the names of regions to different hex codes.
+Then we define a named vector of colors, mapping the names of regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol ... ... [website](https://personal.sron.nl/~pault/) [@Tol2021]
 
-adapted from https://personal.sron.nl/~pault/
+Here, we use the *muted qualitative color scheme* palette from @Tol2021:
 
 ```{r}
 #| label: timezones-col-palette
