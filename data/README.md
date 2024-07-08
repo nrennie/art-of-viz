@@ -114,3 +114,13 @@ Original source: [https://usda.library.cornell.edu/concern/publications/rn301137
 Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.cornell.edu/about)
 
 All publication files are considered government works and licensed with U.S. Public Domain.
+
+## Chapter 13: Nobel Prize Laureates
+
+Source: [github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14)
+
+Original (updated) source: [https://api.nobelprize.org/2.1/laureates](https://api.nobelprize.org/2.1/laureates)
+
+Copyright info: [www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org](https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/)
+
+CC0 1.0 Deed (Public Domain)
