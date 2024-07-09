@@ -27,7 +27,7 @@ fig-asp: 0.8
 
 # Nobel Prize Laureates: positioning text and parameterising plots {#sec-nobel}
 
-In this chapter, we'll learn how to access data through an API, ....., and create parameterised plot functions.
+In this chapter, we'll learn how to access data through an API, create custom text layouts, and build parameterised plot functions. 
 
 ## Data
 
@@ -35,7 +35,9 @@ In this chapter, we'll learn how to access data through an API, ....., and creat
 * Use API [@nobel_data]
 * Different categories, start with Physics
 
+\index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
+\index{utils!read\.csv} \index{utils!write\.csv}
 
 ```{r}
 #| label: nobel-load-data-show
@@ -45,7 +47,7 @@ nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nob
 write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
 ```
 
-Read it from the CSV
+Read it from the CSV \index{readr!read\_csv}
 
 ```{r}
 #| label: nobel-load-data-csv
@@ -73,6 +75,7 @@ award_age <- nobel_physics$year - lubridate::year(nobel_physics$birthdate)
 hist(award_age)
 ```
 
+\index{base!table} \index{graphics!barplot} \index{graphics!hist}
 
 ```{r}
 #| label: nobel-barplot
@@ -89,11 +92,13 @@ barplot(
 
 ## Preparing a plot
 
+Let's (when you get to the last section of this chapter, it'll make even more sense!)
+
 ```{r}
 nobel_category <- "Physics"
 ```
 
-It's always worth double checking...
+It's always worth double checking... \index{base!table} \index{graphics!barplot}
 
 ```{r}
 barplot(
@@ -103,11 +108,13 @@ barplot(
 
 ... because sometimes you find something unexpected!
 
-Even though we've asked for only Physics. The data relates to Laureates not prizes - so the list includes all laureates who have won at least one prize (in Physics). Marie Curie won two: in 1903 for Physics, and in 1911 for Chemistry.
+Even though we've asked for only physics data from the API. The data relates to Laureates not prizes - so the list includes all laureates who have won at least one prize (in Physics). Marie Curie won two: in 1903 for Physics, and in 1911 for Chemistry.
 
 ### Data wrangling
 
 We'll filter out 
+
+\index{dplyr!filter} \index{dplyr!select} \index{dplyr!arrange}
 
 ```{r}
 physics_data <- nobel_physics |>
@@ -115,6 +122,8 @@ physics_data <- nobel_physics |>
   dplyr::select(name, gender, year) |>
   dplyr::arrange(year)
 ```
+
+\index{dplyr!mutate} \index{base!seq} \index{base!cos} \index{base!sin}
 
 ```{r}
 plot_data <- physics_data |>
@@ -129,13 +138,15 @@ plot_data <- physics_data |>
 
 ### The first plot
 
+\index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
+
 ```{r}
 library(ggplot2)
 ggplot() +
   geom_text(
     data = plot_data,
     mapping = aes(
-      x = x, y = y, angle = angle, label = name, colour = gender
+      x = x, y = y, angle = angle, label = name, color = gender
     )
   )
 ```
@@ -143,6 +154,9 @@ ggplot() +
 ## Advanced styling
 
 ### Fonts
+
+\index{sysfonts!font\_add\_google}
+\index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
 sysfonts::font_add_google("Passion One", "Passion")
@@ -153,12 +167,14 @@ body_font <- "Ubuntu"
 title_font <- "Passion"
 ```
 
+\index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
+
 ```{r}
 base_plot <- ggplot() +
   geom_text(
     data = plot_data,
     mapping = aes(
-      x = x, y = y, angle = angle, label = name, colour = gender
+      x = x, y = y, angle = angle, label = name, color = gender
     ),
     family = body_font,
     hjust = 1,
@@ -175,9 +191,11 @@ primary_col <- "black"
 secondary_col <- "grey45"
 ```
 
+\index{ggplot2!scale\_color\_manual}
+
 ```{r}
 col_plot <- base_plot +
-  scale_colour_manual(
+  scale_color_manual(
     values = c(
       "male" = secondary_col,
       "female" = primary_col
@@ -189,18 +207,23 @@ col_plot <- base_plot +
 
 Annotations
 
+\index{ggplot2!annotate}
+
 ```{r}
 annotated_plot <- col_plot +
   annotate("text",
     x = 10, y = 0,
-    hjust = 1, label = "Nobel Prize Laureates",
-    colour = primary_col,
+    label = "Nobel Prize Laureates",
+    hjust = 1,
+    color = primary_col,
     family = title_font,
     size = 7
   ) +
   annotate("text",
-    x = 10, y = -1, hjust = 1, label = nobel_category,
-    colour = primary_col,
+    x = 10, y = -1,
+    label = nobel_category,
+    hjust = 1,
+    color = primary_col,
     family = body_font,
     size = 5
   )
@@ -208,6 +231,8 @@ annotated_plot
 ```
 
 Caption
+
+\index{social\_caption} \index{base!paste0}
 
 ```{r}
 social <- social_caption(
@@ -219,6 +244,8 @@ social <- social_caption(
 cap <- paste0("**Data**: The Nobel Foundation<br>**Graphic**: ", social)
 ```
 
+\index{ggplot2!labs}
+
 ```{r}
 text_plot <- annotated_plot +
   labs(caption = cap)
@@ -226,6 +253,11 @@ text_plot
 ```
 
 ### Adjusting themes
+
+\index{ggplot2!scale\_x\_continuous}
+\index{ggplot2!scale\_y\_continuous}
+\index{ggplot2!coord\_fixed}
+
 
 ```{r}
 #| label: nobel-style-plot-1
@@ -236,6 +268,11 @@ styled_plot <- text_plot +
 styled_plot
 ```
 
+\index{ggplot2!theme\_void} \index{ggplot2!theme}
+\index{ggplot2!element\_rect}
+\index{ggtext!element\_textbox\_simple}
+\index{ggplot2!margin}
+
 ```{r}
 #| label: nobel-style-plot-2
 styled_plot +
@@ -243,12 +280,13 @@ styled_plot +
   theme(
     legend.position = "none",
     plot.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     panel.background = element_rect(
-  fill = bg_col, colour = bg_col),
+      fill = bg_col, color = bg_col
+    ),
     plot.caption = ggtext::element_textbox_simple(
-      colour = primary_col,
+      color = primary_col,
       hjust = 0,
       halign = 0,
       lineheight = 0.5,
@@ -277,7 +315,7 @@ category_plot <- function(
     dplyr::filter(category == nobel_category) |>
     dplyr::select(name, gender, year) |>
     dplyr::arrange(year)
-  plot_data <- category_data |> 
+  plot_data <- category_data |>
     dplyr::mutate(
       theta = seq(
         pi / 4, (7 / 4) * pi,
@@ -303,13 +341,13 @@ category_plot <- function(
     geom_text(
       data = plot_data,
       mapping = aes(
-        x = x, y = y, angle = angle, label = name, colour = gender
+        x = x, y = y, angle = angle, label = name, color = gender
       ),
       family = body_font,
       hjust = 1,
       size = 1
     ) +
-    scale_colour_manual(
+    scale_color_manual(
       values = c(
         "male" = secondary_col,
         "female" = primary_col
@@ -317,14 +355,17 @@ category_plot <- function(
     ) +
     annotate("text",
       x = 10, y = 0,
-      hjust = 1, label = "Nobel Prize Laureates",
-      colour = primary_col,
+      label = "Nobel Prize Laureates",
+      hjust = 1,
+      color = primary_col,
       family = title_font,
       size = 7
     ) +
     annotate("text",
-      x = 10, y = -1, hjust = 1, label = nobel_category,
-      colour = primary_col,
+      x = 10, y = -1,
+      label = nobel_category,
+      hjust = 1,
+      color = primary_col,
       family = body_font,
       size = 5
     ) +
@@ -336,13 +377,13 @@ category_plot <- function(
     theme(
       legend.position = "none",
       plot.background = element_rect(
-        fill = bg_col, colour = bg_col
+        fill = bg_col, color = bg_col
       ),
       panel.background = element_rect(
-        fill = bg_col, colour = bg_col
+        fill = bg_col, color = bg_col
       ),
       plot.caption = ggtext::element_textbox_simple(
-        colour = primary_col,
+        color = primary_col,
         hjust = 0,
         halign = 0,
         lineheight = 0.5,
@@ -350,12 +391,12 @@ category_plot <- function(
       )
     )
   return(g)
-    }
+}
 ```
 
 
 * Download chemistry data
-* Example of plot with new colours
+* Example of plot with new colors
 
 ```{r}
 #| label: nobel-download-peace
@@ -397,5 +438,5 @@ ggsave("peace_plot.png", peace_plot, width = 5, height = 4)
 
 ## Reflection
 
-* needs some explanation to go with it
+* needs some explanation to go with it (colored text)
 * radius as param, maybe also do start and finish angle
