@@ -31,26 +31,52 @@ In this chapter, we'll learn how to access data through an API, create custom te
 
 ## Data
 
-* Originally used as a TidyTuesday data set back in 2019. Since that data is a little bit outdated. 
-* Use API [@nobel_data]
-* Different categories, start with Physics
+In this chapter, we're going to explore Nobel Prize Laureates. Since 1901, the Nobel Prizes have been awarded to those who, during the preceding year, have conferred the greatest benefit to humankind. Awards are granted in the fields of Physics, Chemistry, Physiology or Medicine, Literature, Peace, and (since 1969) Economic Sciences.
 
-\index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+In May 2019, the TidyTuesday challenge used [several datasets about Nobel Prize Laureates](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14) and their publications. Those datasets contain data up to the year 2016. Since that data is now a little bit outdated, we're going to look at an alternative way of obtaining the data and getting it into R - using an API! \index{TidyTuesday}
 
-\index{utils!read.csv} \index{utils!write.csv}
+An API (Application Programming Interface) is essentially a tool that lets different software programs communicate with each other [@harmon2024]. The Nobel Prize API endpoint [@nobel_data] can be accessed at [https://api.nobelprize.org/2.1/laureates](https://api.nobelprize.org/2.1/laureates), with some instructions and guidance about how to use it available on the [nobelprize.org](https://www.nobelprize.org/) website at [www.nobelprize.org/organization/developer-zone-2](https://www.nobelprize.org/organization/developer-zone-2/), which also links to the [Terms of Use](https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/).
+
+This API doesn't require an API key, so we don't need to worry about registering, or authenticating an account. Instead, we simply pass the options into a URL and then read the CSV from that URL.
+
+Let's look at the data for just one of the fields to start with: Physics. There are lots of different options available for accessing the API, but we only need to specify a few of them:
+
+* **limit**: how many results are returned. The default is `25` but there are more than 25 Nobel Laureates in physics so we need to use a higher value.
+* **nobelPrizeCategory**: the field. The value is a three letter (lowercase) abbreviation for the field. For physics, the value is `phy`. 
+* **format**: the output format. The options are JSON or CSV, and we'll use CSV since these files are easier to work with in R.
+
+::: {#tip-nobel-api .callout-tip}
+
+## Choosing an API Limit
+
+It's important to be polite and not make too many API requests at once, so don't choose 1,000 if you need 20 results. 
+
+If you have a limit of 250 requests and the data returned contains 250 results, you may want to check if you actually have all of the results!
+
+:::
+
+We construct a URL in the following format: the base API URL, followed by the endpoint, followed by a `?`, then a list of query parameters separated by `&`. Here, the base URL is `http://api.nobelprize.org/2.1/` and the endpoint is `laureates`. You can either (1) build the URL as one long character string, or (2) construct the strings separately and stick them together with `glue()` as we've done here. If you are making multiple, slightly different, API calls then the second approach is more appropriate since you can re-use the base URL. 
+
+Once we've constructed the URL, we simply pass it into `read.csv()` (or `read_csv()` from {readr} if you prefer) and save the output to a variable - `nobel_physics` in this case. \index{utils!read.csv} \index{readr!read\_csv} 
 
 ```{r}
-#| label: nobel-load-data-show
+#| label: nobel-api
 #| eval: false
 #| echo: true
-# call API
 api_url <- "http://api.nobelprize.org/2.1/laureates"
 nobel_physics <- read.csv(
   glue::glue(
-    "{api_url}?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en"
+    "{api_url}?limit=250&nobelPrizeCategory=phy&format=csv"
   )
 )
-# save as a CSV file
+```
+
+We want to avoid querying the API multiple times if we don't need to. Once we've downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the `write.csv()` option to save the data to a file called `nobel_physics.csv` in an existing folder called `data` - you might choose to save it somewhere slightly different! \index{utils!write.csv}
+
+```{r}
+#| label: nobel-api-csv
+#| eval: false
+#| echo: true
 write.csv(
   nobel_physics,
   "data/nobel_physics.csv",
@@ -58,7 +84,7 @@ write.csv(
 )
 ```
 
-Read it from the CSV \index{readr!read\_csv}
+We can keep using the existing `nobel_physics` object, or we can read it back in from the CSV file using `read_csv()`: \index{readr!read\_csv}
 
 ```{r}
 #| label: nobel-load-data-csv
@@ -66,14 +92,24 @@ Read it from the CSV \index{readr!read\_csv}
 nobel_physics <- readr::read_csv("data/nobel_physics.csv")
 ```
 
-## Exploratory work
-
-### Data exploration
+Let's have a quick look at the data:
 
 ```{r}
 #| label: nobel-head
 head(nobel_physics)
 ```
+
+The data contains information for `r ncol(nobel_physics)` variables for `r nrow(nobel_physics)` laureates. The `id` column uniquely identifies a Nobel laureate. The `name`, `gender`, `birthdate`, `birthplace`, `deathdate`, and `deathplace` are fairly self-explanatory variables relating to the individual laureate. The `category` variable gives us the field of the award e.g. Physics. The year they were awarded the prize is given in the `year` column. Nobel Prizes can be shared among multiple people, and the `share` column indicates what fraction of the award each individual has. For example, a value of `"1"` for `share` indicates the individual was the sole recipient, and a value of `"1/3"` indicates they were one of three recipients.
+
+The `overallmotivation` and `motivation` columns give an explanation of the reason why an individual was awarded the prize, There are many missing values in the `overallmotivation` column and, for those that do have a non-missing value, this appears to be a more general statement than the one given in `motivation`. The Nobel Laureates affiliations are also listed in the `affiliations` column.
+
+## Exploratory work
+
+There are many different aspects of the data that we could explore: the demographics of the Nobel Laureates; how the geographical profile of awardees varies; or how the age of awardees has changed over time. Let's have a look at the data to see if these are interesting questions to explore further. 
+
+### Data exploration
+
+Let's start by exploring the relationship between year of birth and year of award. We would expect that the people born earlier in time, are also the people awarded Nobel Prizes earlier in time, and a scatter plot confirms this:
 
 ```{r}
 #| label: fig-nobel-scatter
@@ -81,14 +117,17 @@ head(nobel_physics)
 plot(nobel_physics$birthdate, nobel_physics$year)
 ```
 
+We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the `year()` function from {lubridate} to convert the `birthdate` into a year and subtract this from the award `year` to get an approximate age. Then plot this against the award year: \index{lubridate!year}
+
 ```{r}
 #| label: fig-nobel-hist
 #| fig-cap: ""
-award_age <- nobel_physics$year - lubridate::year(nobel_physics$birthdate)
-hist(award_age)
+award_age <- nobel_physics$year -
+  lubridate::year(nobel_physics$birthdate)
+plot(nobel_physics$year, award_age)
 ```
 
-\index{base!table} \index{graphics!barplot} \index{graphics!hist}
+It looks like the age of awardees might be increasing slightly - this could be interesting to explore further. But let's also look at the gender split for Nobel Laureates in Physics. We can calculate the number of `"male"` and `"female"` values in the `gender` column using the `table()` function, then plot it using `barplot()`: \index{base!table} \index{graphics!barplot} 
 
 ```{r}
 #| label: fig-nobel-gender-barplot
@@ -98,24 +137,35 @@ barplot(
 )
 ```
 
+This is quite a significant difference! Let's find a way to communicate this and highlight this disparity. 
+
 ### Exploratory sketches
 
-* Accuracy of information vs art
-* Catch attention
-* Showcasing interesting aspects of data
+When thinking about how to construct a visualisation, it's important to consider multiple factors [@signif2024a]:
 
-**Insert sketch here**
+* What message are you trying to convey?
+* Who are you trying to reach and what is their background?
+* What is the purpose of the visualisation?
+* Does the way you've built that visualisation support the purpose?
+
+Let's say that the purpose of the visualisation is to highlight the gender disparity in Nobel Prize awardees. Yes, the bar chart of how many male and female Nobel Laureates there are shows the disparity very clearly. It's a simple message. But it's not eye-catching. It's not a visualisation that really makes a reader stop and pay attention. And it aggregates data down to just two categories - ignoring that these are individual people. 
+
+Instead, let's think outside of the box are present the information in a very non-standard way:
+
+![Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.](images/sketch-nobel.png){#fig-nobel-sketch fig-align="center"}
+
+A bar chart would be a quicker, more efficient way of displaying how many male and female Nobel Laureates there are. A visualisation of the names of every single Nobel Laureate might be a quicker, more efficient way of catching someone's attention. This alternative visualisation doesn't sacrifice accuracy of information, but it might take a reader a little bit longer to digest the information. Whether that's a sacrifice worth making comes back to what the purpose of the visualisation is.
 
 ## Preparing a plot
 
-Let's (when you get to the last section of this chapter, it'll make even more sense!)
+So let's start making our custom visualisation! We start by defining a variable for the award category we're interested in - Physics. This first step might seem a little odd since we've only queried the API for physics data anyway, but when you get to the last section of this chapter, it'll make more sense!
 
 ```{r}
 #| label: nobel-category
 nobel_category <- "Physics"
 ```
 
-It's always worth double checking... \index{base!table} \index{graphics!barplot}
+It's always worth double checking that we do actually only have the data we expect... \index{base!table} \index{graphics!barplot}
 
 ```{r}
 #| label: fig-nobel-barplot-category
@@ -125,7 +175,7 @@ barplot(
 )
 ```
 
-... because sometimes you find something unexpected!
+...because sometimes you find something unexpected!
 
 Even though we've asked for only physics data from the API, the data also includes an entry relating to the Chemistry prize. If we read the [documentation for the API](https://www.nobelprize.org/organization/developer-zone-2/), this gives us the explanation as to why. The API we've used relates to Nobel Laureates, not Nobel Prizes - meaning the list includes all laureates who have won a prize in Physics. Marie Curie won two Nobel Prizes - in 1903 for Physics, and in 1911 for Chemistry.
 
@@ -155,27 +205,29 @@ To calculate the x- and y- coordinates, we want to start thinking in polar coord
 * the radius (` r`) of the circle: how far away from `(0, 0)` does the text start? This will be a constant value for all text labels.
 * the angle (`theta`) of arc: how far round the circle from the horizontal axis should the text appear? This value will vary for each text label since we want the labels to be equally spaces around the (semi-)circle.
 
-Let's start by defining a variable for the radius. It doesn't really matter what value you choose at this point (everything else can be rescaled around a different radius).
+Let's start by defining a variable for the radius. It doesn't really matter what value you choose at this point since everything else can be re-scaled around a different radius.
 
 ```{r}
 #| label: nobel-radius
 r <- 5
 ```
 
-**Insert circle plot with labels here**
+![Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.](images/sketch-nobel-theta.png){#fig-nobel-sketch-theta fig-align="center"}
 
-(between 1 and 2 on a clock face)
+Assuming that we know the radius and angle of a point, we can calculate the x- and y- coordinates of a point using the following equations: 
 
-$$
-x = r cos(\theta) \\
-y = r sin(\theta)
-$$
+\begin{equation}
+\begin{split}
+x & = r cos(\theta) \\
+y & = r sin(\theta)
+\end{split}
+\end{equation}
 
-\index{dplyr!mutate} \index{base!seq} \index{base!cos} \index{base!sin}
+We don't want to put the text all the way around the circle, since we want to leave some space to add the title as shown in @fig-nobel-sketch. We'll leave a gap starting from $\pi/4$ (between 1 and 2 on a clock face) to $7\pi/4$ (between 4 and 5 on a clock face). We start by generating a sequence of equally spaced $\theta$ values, starting from $\pi/4$ and going to $7\pi/4$, with one value for each observation in the data. This is added as a new column in the data using `mutate()` from {dplyr}. We then calculate the `x` and `y` coordinates using the equations above and, again, add these as new columns to the data. \index{dplyr!mutate} 
 
-We start by generating a sequence of equally spaced $\theta$ values, starting from $\pi/4$ and going to $7\pi/4$, with one value for each observation in the data. This is added as a new column in the data using `mutate()` from {dplyr}. We then calculate the `x` and `y` coordinates using the equations above and, again, add these as new columns to the data.
+The angle of the text is a little bit more tricky. We want the text to be positioned perpendicular to the circle i.e. the angle of the text is different for each name. We can use the value of `theta` to calculate the angle of the text. 
 
-
+When we later pass the angle value into {ggplot2} functions for plotting, it's expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in `angle = 90` rather than `angle = pi/2`. So we need to transform `theta` to degrees by dividing by $2\pi$ and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. \index{base!seq} \index{base!cos} \index{base!sin}
 
 ```{r}
 #| label: nobel-theta-data
@@ -192,12 +244,14 @@ plot_data <- physics_data |>
   )
 ```
 
+Let's have a quick look at the data:
 
 ```{r}
 #| label: nobel-plot-data
 head(plot_data)
 ```
 
+Now we're ready to start plotting with {ggplot2}!
 
 ### The first plot
 
@@ -219,9 +273,9 @@ ggplot() +
   )
 ```
 
-At first glance, this might look like a complete mess. 
+## More advanced styling
 
-## Advanced styling
+At first glance, this first plot might look like a complete mess but with a little bit of work it will soon start looking like @fig-nobel-sketch.
 
 ### Fonts
 
@@ -340,7 +394,7 @@ text_plot <- annotated_plot +
 
 At the moment, the text isn't arranged in a circle as such - it's taking on more of an oval shape. To make sure it is displayed in a circle, we can use `coord_fixed()` to make sure that one unit on the x-axis is equal to one unit on the y-axis. 
 
-The limits of the plot also need to be extended. The scales are currently based on ... (the text at the near edge of the circle, which means the text runs of the page. We can do this by extending the limits using `scale_x_continuous()` and `scale_y_continuous()`. We can extend the right hand side of the x-axis a little bit further to accommodate the added annotations. \index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
+The limits of the plot also need to be extended. The scales are currently based on the x- and y- coordinates we passed in (the text at the inner edge of the circle) which means the text runs of the page. We can do this by extending the limits using `scale_x_continuous()` and `scale_y_continuous()`. We can extend the right hand side of the x-axis a little bit further to accommodate the added annotations. \index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
 
 ```{r}
 #| label: nobel-style-plot-1
@@ -353,7 +407,7 @@ styled_plot
 
 Since this is an *artistic* visualization, we want to remove the distracting grid lines and axis labels (which don't make much sense for this type of plot). As we've done in earlier chapters (such as @sec-time-zones), we use `theme_void()` to remove these background theme elements. \index{ggplot2!theme\_void}
 
-We can some further, final customizations by changing the following `theme()` elements: \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggtext!element\_textbox\_simple} \index{ggplot2!margin}
+We can some further, final customization by changing the following `theme()` elements: \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggtext!element\_textbox\_simple} \index{ggplot2!margin}
 
 * removing the legend
 * changing the background color by passing in the `bg_col` variable to `element_rect()`
@@ -533,7 +587,7 @@ Now let's test if our function works with a completely different set of data! Le
 #| echo: true
 nobel_peace <- read.csv(
   glue::glue(
-    "{api_url}?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en"
+    "{api_url}?limit=250&nobelPrizeCategory=pea&format=csv"
   )
 )
 write.csv(
