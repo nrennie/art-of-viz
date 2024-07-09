@@ -12,7 +12,7 @@ gg_record(
   dir = file.path("recording"),
   device = "png",
   width = 5,
-  height = 4.6,
+  height = 4,
   units = "in",
   dpi = 300
 )
@@ -26,3 +26,6 @@ unlink("recording", recursive = TRUE)
 library(xml2)
 library(downlit)
 library(lintr)
+library(styler)
+library(maps)
+

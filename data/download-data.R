@@ -79,4 +79,6 @@ download.file(
 
 # Nobel Prize Laureates
 nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en")
-write.csv(nobel_physics, "data/nobel_physics.csv")
+write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
+nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en")
+write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
