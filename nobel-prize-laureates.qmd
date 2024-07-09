@@ -37,14 +37,25 @@ In this chapter, we'll learn how to access data through an API, create custom te
 
 \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
-\index{utils!read\.csv} \index{utils!write\.csv}
+\index{utils!read.csv} \index{utils!write.csv}
 
 ```{r}
 #| label: nobel-load-data-show
 #| eval: false
 #| echo: true
-nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en")
-write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
+# call API
+api_url <- "http://api.nobelprize.org/2.1/laureates"
+nobel_physics <- read.csv(
+  glue::glue(
+    "{api_url}?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en"
+  )
+)
+# save as a CSV file
+write.csv(
+  nobel_physics,
+  "data/nobel_physics.csv",
+  row.names = FALSE
+)
 ```
 
 Read it from the CSV \index{readr!read\_csv}
@@ -154,7 +165,7 @@ r <- 5
 (between 1 and 2 on a clock face)
 
 $$
-x = r cos(\theta)
+x = r cos(\theta) \\
 y = r sin(\theta)
 $$
 
@@ -168,7 +179,11 @@ We start by generating a sequence of equally spaced $\theta$ values, starting fr
 #| label: nobel-theta-data
 plot_data <- physics_data |>
   dplyr::mutate(
-    theta = seq(pi / 4, (7 / 4) * pi, length.out = nrow(physics_data)),
+    theta = seq(
+      from = pi / 4,
+      to = (7 / 4) * pi,
+      length.out = nrow(physics_data)
+    ),
     x = r * cos(theta),
     y = r * sin(theta),
     angle = 180 + 360 * (theta / (2 * pi))
@@ -194,7 +209,10 @@ ggplot() +
   geom_text(
     data = plot_data,
     mapping = aes(
-      x = x, y = y, angle = angle, label = name, color = gender
+      x = x, y = y,
+      label = name,
+      angle = angle,
+      color = gender
     )
   )
 ```
@@ -227,7 +245,10 @@ base_plot <- ggplot() +
   geom_text(
     data = plot_data,
     mapping = aes(
-      x = x, y = y, angle = angle, label = name, color = gender
+      x = x, y = y,
+      label = name,
+      angle = angle,
+      color = gender
     ),
     family = body_font,
     hjust = 1,
@@ -299,17 +320,18 @@ social <- social_caption(
   font_color = primary_col,
   font_family = body_font
 )
-cap <- paste0("**Data**: The Nobel Foundation<br>**Graphic**: ", social)
+cap <- paste0(
+  "**Data**: The Nobel Foundation<br>**Graphic**: ",
+  social
+)
 ```
 
 \index{ggplot2!labs}
 
 ```{r}
-#| label: fig-nobel-text-plot
-#| fig-cap: ""
+#| label: nobel-text-plot
 text_plot <- annotated_plot +
   labs(caption = cap)
-text_plot
 ```
 
 ### Adjusting themes
@@ -350,7 +372,7 @@ styled_plot +
       hjust = 0,
       halign = 0,
       lineheight = 0.5,
-      margin = margin(l = 10, b = -5)
+      margin = margin(l = 5, b = 5)
     )
   )
 ```
@@ -423,7 +445,8 @@ category_plot <- function(
   plot_data <- category_data |>
     dplyr::mutate(
       theta = seq(
-        pi / 4, (7 / 4) * pi,
+        from = pi / 4,
+        to = (7 / 4) * pi,
         length.out = nrow(category_data)
       ),
       x = r * cos(theta),
@@ -446,7 +469,10 @@ category_plot <- function(
     geom_text(
       data = plot_data,
       mapping = aes(
-        x = x, y = y, angle = angle, label = name, color = gender
+        x = x, y = y,
+        label = name,
+        angle = angle,
+        color = gender
       ),
       family = body_font,
       hjust = 1,
@@ -492,7 +518,7 @@ category_plot <- function(
         hjust = 0,
         halign = 0,
         lineheight = 0.5,
-        margin = margin(l = 10, b = -5)
+        margin = margin(l = 5, b = 5)
       )
     )
   return(g)
@@ -503,12 +529,22 @@ category_plot <- function(
 * Download chemistry data
 * Example of plot with new colors
 
+\index{utils!write.csv}
+
 ```{r}
 #| label: nobel-download-peace
 #| eval: false
 #| echo: true
-nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en")
-write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
+nobel_peace <- read.csv(
+  glue::glue(
+    "{api_url}?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en"
+  )
+)
+write.csv(
+  nobel_peace,
+  "data/nobel_peace.csv",
+  row.names = FALSE
+)
 ```
 
 If you've downloaded the data previously, you can read in the data from the CSV file: \index{readr!read\_csv}
