@@ -27,7 +27,7 @@ fig-asp: 0.8
 
 # Nobel Prize Laureates: positioning text and parameterising plots {#sec-nobel}
 
-In this chapter, we'll learn how to access data through an API, create custom text layouts, and build parameterised plot functions. 
+In this chapter, we'll learn how to access data through an API, create custom text layouts, and build parameterized plot functions. 
 
 ## Data
 
@@ -65,12 +65,14 @@ head(nobel_physics)
 ```
 
 ```{r}
-#| label: nobel-scatter
+#| label: fig-nobel-scatter
+#| fig-cap: ""
 plot(nobel_physics$birthdate, nobel_physics$year)
 ```
 
 ```{r}
-#| label: nobel-hist
+#| label: fig-nobel-hist
+#| fig-cap: ""
 award_age <- nobel_physics$year - lubridate::year(nobel_physics$birthdate)
 hist(award_age)
 ```
@@ -78,7 +80,8 @@ hist(award_age)
 \index{base!table} \index{graphics!barplot} \index{graphics!hist}
 
 ```{r}
-#| label: nobel-barplot
+#| label: fig-nobel-gender-barplot
+#| fig-cap: ""
 barplot(
   table(nobel_physics$gender)
 )
@@ -95,12 +98,15 @@ barplot(
 Let's (when you get to the last section of this chapter, it'll make even more sense!)
 
 ```{r}
+#| label: nobel-category
 nobel_category <- "Physics"
 ```
 
 It's always worth double checking... \index{base!table} \index{graphics!barplot}
 
 ```{r}
+#| label: fig-nobel-barplot-category
+#| fig-cap: "A bar chart of the number of *Physics* laureates ..."
 barplot(
   table(nobel_physics$category)
 )
@@ -108,31 +114,71 @@ barplot(
 
 ... because sometimes you find something unexpected!
 
-Even though we've asked for only physics data from the API. The data relates to Laureates not prizes - so the list includes all laureates who have won at least one prize (in Physics). Marie Curie won two: in 1903 for Physics, and in 1911 for Chemistry.
+Even though we've asked for only physics data from the API, the data also includes an entry relating to the Chemistry prize. If we read the [documentation for the API](https://www.nobelprize.org/organization/developer-zone-2/), this gives us the explanation as to why. The API we've used relates to Nobel Laureates, not Nobel Prizes - meaning the list includes all laureates who have won a prize in Physics. Marie Curie won two Nobel Prizes - in 1903 for Physics, and in 1911 for Chemistry.
 
 ### Data wrangling
 
-We'll filter out 
-
-\index{dplyr!filter} \index{dplyr!select} \index{dplyr!arrange}
+We'll start by using `filter()` from {dplyr} to filter out any non-Physics entries, and then selecting only the columns we need for our plot: `name`, `gender`, and `year`. The data is currently arranged alphabetically based on `name`, so we'll use the `arrange()` function to sort by year. \index{dplyr!filter} \index{dplyr!select} \index{dplyr!arrange}
 
 ```{r}
+#| label: nobel-physics-data
 physics_data <- nobel_physics |>
   dplyr::filter(category == nobel_category) |>
   dplyr::select(name, gender, year) |>
   dplyr::arrange(year)
 ```
 
-\index{dplyr!mutate} \index{base!seq} \index{base!cos} \index{base!sin}
+Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in {ggplot2} to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot.  \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial}
+
+We could make use of the {ggplot2} extension package, {geomtextpath} [@geomtextpath], which allows you to write text in {ggplot2} that follows a curved path. But (just for the fun of it) let's try to make the plot from scratch using only {ggplot2}. 
+
+We need to define the following to be able to position the text:
+
+* the x- and y- coordinates of where the text should end
+* the angle that the text should be positioned at
+
+To calculate the x- and y- coordinates, we want to start thinking in polar coordinates. To keep it simple, let's assume that the circle which the text is positioned around is centered at `(0, 0)`. For the coordinates, this means we need to know:
+
+* the radius (` r`) of the circle: how far away from `(0, 0)` does the text start? This will be a constant value for all text labels.
+* the angle (`theta`) of arc: how far round the circle from the horizontal axis should the text appear? This value will vary for each text label since we want the labels to be equally spaces around the (semi-)circle.
+
+Let's start by defining a variable for the radius. It doesn't really matter what value you choose at this point (everything else can be rescaled around a different radius).
 
 ```{r}
+#| label: nobel-radius
+r <- 5
+```
+
+**Insert circle plot with labels here**
+
+(between 1 and 2 on a clock face)
+
+$$
+x = r cos(\theta)
+y = r sin(\theta)
+$$
+
+\index{dplyr!mutate} \index{base!seq} \index{base!cos} \index{base!sin}
+
+We start by generating a sequence of equally spaced $\theta$ values, starting from $\pi/4$ and going to $7\pi/4$, with one value for each observation in the data. This is added as a new column in the data using `mutate()` from {dplyr}. We then calculate the `x` and `y` coordinates using the equations above and, again, add these as new columns to the data.
+
+
+
+```{r}
+#| label: nobel-theta-data
 plot_data <- physics_data |>
   dplyr::mutate(
     theta = seq(pi / 4, (7 / 4) * pi, length.out = nrow(physics_data)),
-    x = 5 * cos(theta),
-    y = 5 * sin(theta),
+    x = r * cos(theta),
+    y = r * sin(theta),
     angle = 180 + 360 * (theta / (2 * pi))
   )
+```
+
+
+```{r}
+#| label: nobel-plot-data
+head(plot_data)
 ```
 
 
@@ -141,6 +187,8 @@ plot_data <- physics_data |>
 \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
 
 ```{r}
+#| label: fig-nobel-base-plot
+#| fig-cap: ""
 library(ggplot2)
 ggplot() +
   geom_text(
@@ -151,6 +199,8 @@ ggplot() +
   )
 ```
 
+At first glance, this might look like a complete mess. 
+
 ## Advanced styling
 
 ### Fonts
@@ -159,6 +209,7 @@ ggplot() +
 \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
+#| label: nobel-fonts
 sysfonts::font_add_google("Passion One", "Passion")
 sysfonts::font_add_google("Ubuntu", "Ubuntu")
 showtext::showtext_auto()
@@ -170,6 +221,8 @@ title_font <- "Passion"
 \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
 
 ```{r}
+#| label: fig-nobel-base-plot-2
+#| fig-cap: ""
 base_plot <- ggplot() +
   geom_text(
     data = plot_data,
@@ -186,6 +239,7 @@ base_plot
 ### Colors
 
 ```{r}
+#| label: nobel-color
 bg_col <- "grey95"
 primary_col <- "black"
 secondary_col <- "grey45"
@@ -194,6 +248,7 @@ secondary_col <- "grey45"
 \index{ggplot2!scale\_color\_manual}
 
 ```{r}
+#| label: nobel-col-plot
 col_plot <- base_plot +
   scale_color_manual(
     values = c(
@@ -210,6 +265,8 @@ Annotations
 \index{ggplot2!annotate}
 
 ```{r}
+#| label: fig-nobel-annotated
+#| fig-cap: ""
 annotated_plot <- col_plot +
   annotate("text",
     x = 10, y = 0,
@@ -235,6 +292,7 @@ Caption
 \index{social\_caption} \index{base!paste0}
 
 ```{r}
+#| label: nobel-text
 social <- social_caption(
   bg_color = bg_col,
   icon_color = primary_col,
@@ -247,6 +305,8 @@ cap <- paste0("**Data**: The Nobel Foundation<br>**Graphic**: ", social)
 \index{ggplot2!labs}
 
 ```{r}
+#| label: fig-nobel-text-plot
+#| fig-cap: ""
 text_plot <- annotated_plot +
   labs(caption = cap)
 text_plot
@@ -296,11 +356,56 @@ styled_plot +
 ```
 
 
-## Parameterising 
+## Parameterized plots
 
-* Example of why we use variables...
+Let's say
+
+This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let's say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the .... . You don't have to rewrite the plotting code every month, you just need to call your ... function. 
+
+Throughout this book, we've been ... as variables (such as the colors, fonts, ...). This makes it easier to change a ... . But it also makes it easier to convert your code into a function: those variables just become function arguments!
+
+When ... functions:
+
+* Arguments a user needs to specify: 
+  * which category they want to plot (we can't read their mind or know what data they have)
+  * what the data is called (we don't know what they've called their `data.frame`)
+  * the radius of the circle (we might need to vary this depending on how many observations are in a given category)
+  
+::: {#tip-nobel-dataframe .callout-tip}
+
+## Checking columns exist
+
+The data wrangling code assumes that `year`, `name`, `gender`, and `category` are columns that exist in the input data frame. Since we're only working... but, to make ... A first step in the function to check that these columns exist.
+
+:::
+
+Tip: type checking for data frame
+
+* Arguments a user *could* specify:
+  * background color
+  * primary color
+  * secondary color
+  * body font
+  * title font
+For these arguments, we can specify a default. This means that ..., but a user is free to customise ... . None of these elements have a fundamental ... i.e. other than how aesthetically pleasing it is, the choice of these parameters don't have any ... 
+
+::: {#tip-nobel-fonts .callout-tip}
+
+## Using fonts in functions
+
+dont want to load font within the function (not doing it every time)
+but can't assume.
+A good default is `"sans"` 
+(Or at the very least, add instructions for loading fonts )
+
+:::
+
+Now we can bundle up all the code you've seen already, into the function. Note that
+
+
 
 ```{r}
+#| label: nobel-param-plot-func
 category_plot <- function(
     nobel_category,
     nobel_data,
@@ -406,13 +511,15 @@ nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobel
 write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
 ```
 
-Read it from the CSV
+If you've downloaded the data previously, you can read in the data from the CSV file: \index{readr!read\_csv}
 
 ```{r}
 #| label: nobel-load-peace
 #| output: false
 nobel_peace <- readr::read_csv("data/nobel_peace.csv")
 ```
+
+Then we pass the `"Peace"` category into our `category_plot()` function, alongside out newly downloaded data. The `nobel_peace` data doesn't have quite as many observations as the `nobel_physics` data, so we can reduce the radius slightly and start the text a little bit closer to the middle of the circle. We can also choose some different colors for the visualisation (but leave the defaults for the fonts):
 
 ```{r}
 #| label: nobel-peace-plot
@@ -427,7 +534,9 @@ peace_plot <- category_plot(
 peace_plot
 ```
 
-* notice a third color (organisation)
+What you might notice about this version of the chart is that a third color has appeared! In `scale_color_manual()`, we only specified which colors relate to `"male"` and `"female"` laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) grey text relates to organisations listed in the `nobel_peace` data.
+
+We can save a copy of the visualisation using `ggsave()`: \index{ggplot2!ggsave}
 
 ```{r}
 #| label: nobel-save-plot
@@ -440,3 +549,4 @@ ggsave("peace_plot.png", peace_plot, width = 5, height = 4)
 
 * needs some explanation to go with it (colored text)
 * radius as param, maybe also do start and finish angle
+* ggtextcircle [@ggtextcircle]
