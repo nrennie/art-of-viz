@@ -255,7 +255,9 @@ Now we're ready to start plotting with {ggplot2}!
 
 ### The first plot
 
-\index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
+Constructing the base plot is reasonably straightforward - we've done the hard work in defining the x values, y values, the angles already. Since our plot is a visualisation of text data, we'll use `geom_text()` to add the text. All we have to do is tell {ggplot2} what to put where! \index{ggplot2!geom\_text}
+
+We pass `plot_data` into the `data` argument, and then set the aesthetic mapping using `aes()`. The mappings are as you would expect: `x` goes on the x-axis, `y` goes on the y-axis, the `label` comes from the `name` column, the text `angle` is defined by the `angle` column we created, and the `color` is based on the values in the `gender` column. This mapping could be passed into either `ggplot()` or directly into `geom_text()` as we've done here. Since we'll only be using one geometry for this plot, it won't make a difference! \index{ggplot2!ggplot} \index{ggplot2!aes}
 
 ```{r}
 #| label: fig-nobel-base-plot
@@ -279,8 +281,12 @@ At first glance, this first plot might look like a complete mess but with a litt
 
 ### Fonts
 
-\index{sysfonts!font\_add\_google}
-\index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
+Let's start by choosing some fonts for our visualization. We're going to pick two fonts:
+
+* `title_font`: a bold font that will, as the name suggests, be used for the title. We'll use *Passion One* - a display font with thick, bold strokes which make it ideal for titles. 
+* a `body_font`: a simple font that will be used for all other text elements, including the text displaying the awardee names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple font. We'll use *Ubuntu* - a sans serif font.
+
+Both fonts are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
 #| label: nobel-fonts
@@ -292,7 +298,7 @@ body_font <- "Ubuntu"
 title_font <- "Passion"
 ```
 
-\index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
+Now, let's remake our `base_plot` - this time also setting the font `famly` to `body_font`. We'll also right align the text using `hjust = 1` to make the text appear around the outer edge of the circle. The text also needs to be a bit smaller to avoid overlapping between names positioned next to each other. \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
 
 ```{r}
 #| label: fig-nobel-base-plot-2
@@ -339,11 +345,11 @@ col_plot <- base_plot +
   )
 ```
 
-### Text
+### Adding text
 
-Annotations
+Rather than adding a title and subtitle at the top of the plot, we'll add them in the gap in the right hand side of the circle. We'll use the `annotate()` function from {ggplot2} to add the text. Remember that for `annotate()`, we need to start by specifying the type of geometry we're annotating - in this case, `"text"`. \index{ggplot2!annotate}
 
-\index{ggplot2!annotate}
+We'll add two separate annotations: one for the title (*Nobel Prize Laureates*) and for a subtitle indicating the award category (*Physics*). The title and subtitle should be right-aligned, so we set the x-coordinate for each annotation to be equal to 10 and set `hjust = 1`. The title is vertically aligned with the center of the circle (at `y = 0`), and the subtitle slightly below it at `y = -1`. The font family is adjusted to either the `body_font` or `title_font` using the `family` argument, and the text `size` and `color` is also adjusted.
 
 ```{r}
 #| label: fig-nobel-annotated
@@ -368,9 +374,9 @@ annotated_plot <- col_plot +
 annotated_plot
 ```
 
-Caption
+We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the `social_caption()` function we defined in @sec-chap4. We make both the icons and text the same color - `primary_col`.
 
-\index{social\_caption} \index{base!paste0}
+We'll later use {ggtext} again to apply Markdown formatting to the caption, and so we add `**` to make the words **Data** and **Graphic** in bold font. The HTML line break `<br>` separates the data source text and the social media caption onto two separate lines. We can join the data source text with the social media caption into one character string using the `paste0()` function. \index{social\_caption} \index{base!paste0}
 
 ```{r}
 #| label: nobel-text
@@ -386,7 +392,7 @@ cap <- paste0(
 )
 ```
 
-We then add the caption to our existing plot using the `caption` argument in the `labs()` function: \index{ggplot2!labs}
+We then add this caption to our existing plot using the `caption` argument in the `labs()` function: \index{ggplot2!labs}
 
 ```{r}
 #| label: nobel-text-plot
