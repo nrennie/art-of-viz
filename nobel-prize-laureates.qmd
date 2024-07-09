@@ -3,6 +3,8 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.8
 ---
 
 ```{r}
@@ -25,13 +27,15 @@ execute:
 
 # Nobel Prize Laureates: positioning text and parameterising plots {#sec-nobel}
 
+In this chapter, we'll learn how to access data through an API, ....., and create parameterised plot functions.
+
 ## Data
 
 * Originally used as a TidyTuesday data set back in 2019. Since that data is a little bit outdated. 
-* Use API
+* Use API [@nobel_data]
 * Different categories, start with Physics
 
-[@nobel_data]
+
 
 ```{r}
 #| label: nobel-load-data-show
@@ -41,41 +45,357 @@ nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nob
 write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
 ```
 
+Read it from the CSV
+
 ```{r}
-#| label: nobel-load-data-hide
+#| label: nobel-load-data-csv
 #| output: false
-#| echo: false
-#| eval: true
 nobel_physics <- readr::read_csv("data/nobel_physics.csv")
-```
-
-dataw wrangling
-
-```{r}
-physics_data <- nobel_physics2 |> 
-  dplyr::select(name, gender, category, year)
 ```
 
 ## Exploratory work
 
 ### Data exploration
 
+```{r}
+#| label: nobel-head
+head(nobel_physics)
+```
+
+```{r}
+#| label: nobel-scatter
+plot(nobel_physics$birthdate, nobel_physics$year)
+```
+
+```{r}
+#| label: nobel-hist
+award_age <- nobel_physics$year - lubridate::year(nobel_physics$birthdate)
+hist(award_age)
+```
+
+
+```{r}
+#| label: nobel-barplot
+barplot(
+  table(nobel_physics$gender)
+)
+```
+
 ### Exploratory sketches
+
+* Accuracy of information vs art
+* Catch attention
+* Showcasing interesting aspects of data
 
 ## Preparing a plot
 
+```{r}
+nobel_category <- "Physics"
+```
+
+It's always worth double checking...
+
+```{r}
+barplot(
+  table(nobel_physics$category)
+)
+```
+
+... because sometimes you find something unexpected!
+
+Even though we've asked for only Physics. The data relates to Laureates not prizes - so the list includes all laureates who have won at least one prize (in Physics). Marie Curie won two: in 1903 for Physics, and in 1911 for Chemistry.
+
 ### Data wrangling
 
-### Packages and functions
+We'll filter out 
+
+```{r}
+physics_data <- nobel_physics |>
+  dplyr::filter(category == nobel_category) |>
+  dplyr::select(name, gender, year) |>
+  dplyr::arrange(year)
+```
+
+```{r}
+plot_data <- physics_data |>
+  dplyr::mutate(
+    theta = seq(pi / 4, (7 / 4) * pi, length.out = nrow(physics_data)),
+    x = 5 * cos(theta),
+    y = 5 * sin(theta),
+    angle = 180 + 360 * (theta / (2 * pi))
+  )
+```
+
 
 ### The first plot
 
+```{r}
+library(ggplot2)
+ggplot() +
+  geom_text(
+    data = plot_data,
+    mapping = aes(
+      x = x, y = y, angle = angle, label = name, colour = gender
+    )
+  )
+```
+
 ## Advanced styling
 
-### Colours
+### Fonts
 
-### Text and fonts
+```{r}
+sysfonts::font_add_google("Passion One", "Passion")
+sysfonts::font_add_google("Ubuntu", "Ubuntu")
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "Ubuntu"
+title_font <- "Passion"
+```
+
+```{r}
+base_plot <- ggplot() +
+  geom_text(
+    data = plot_data,
+    mapping = aes(
+      x = x, y = y, angle = angle, label = name, colour = gender
+    ),
+    family = body_font,
+    hjust = 1,
+    size = 1
+  )
+base_plot
+```
+
+### Colors
+
+```{r}
+bg_col <- "grey95"
+primary_col <- "black"
+secondary_col <- "grey45"
+```
+
+```{r}
+col_plot <- base_plot +
+  scale_colour_manual(
+    values = c(
+      "male" = secondary_col,
+      "female" = primary_col
+    )
+  )
+```
+
+### Text
+
+Annotations
+
+```{r}
+annotated_plot <- col_plot +
+  annotate("text",
+    x = 10, y = 0,
+    hjust = 1, label = "Nobel Prize Laureates",
+    colour = primary_col,
+    family = title_font,
+    size = 7
+  ) +
+  annotate("text",
+    x = 10, y = -1, hjust = 1, label = nobel_category,
+    colour = primary_col,
+    family = body_font,
+    size = 5
+  )
+annotated_plot
+```
+
+Caption
+
+```{r}
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = primary_col,
+  font_color = primary_col,
+  font_family = body_font
+)
+cap <- paste0("**Data**: The Nobel Foundation<br>**Graphic**: ", social)
+```
+
+```{r}
+text_plot <- annotated_plot +
+  labs(caption = cap)
+text_plot
+```
 
 ### Adjusting themes
 
+```{r}
+#| label: nobel-style-plot-1
+styled_plot <- text_plot +
+  scale_x_continuous(limits = c(-9, 12)) +
+  scale_y_continuous(limits = c(-7.5, 7.5)) +
+  coord_fixed()
+styled_plot
+```
+
+```{r}
+#| label: nobel-style-plot-2
+styled_plot +
+  theme_void(base_size = 6, base_family = body_font) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    panel.background = element_rect(
+  fill = bg_col, colour = bg_col),
+    plot.caption = ggtext::element_textbox_simple(
+      colour = primary_col,
+      hjust = 0,
+      halign = 0,
+      lineheight = 0.5,
+      margin = margin(l = 10, b = -5)
+    )
+  )
+```
+
+
+## Parameterising 
+
+* Example of why we use variables...
+
+```{r}
+category_plot <- function(
+    nobel_category,
+    nobel_data,
+    r = 5,
+    bg_col = "grey95",
+    primary_col = "black",
+    secondary_col = "grey70",
+    body_font = "Ubuntu",
+    title_font = "Passion") {
+  # Data wrangling
+  category_data <- nobel_data |>
+    dplyr::filter(category == nobel_category) |>
+    dplyr::select(name, gender, year) |>
+    dplyr::arrange(year)
+  plot_data <- category_data |> 
+    dplyr::mutate(
+      theta = seq(
+        pi / 4, (7 / 4) * pi,
+        length.out = nrow(category_data)
+      ),
+      x = r * cos(theta),
+      y = r * sin(theta),
+      angle = 180 + 360 * (theta / (2 * pi))
+    )
+  # Text
+  social <- social_caption(
+    bg_color = bg_col,
+    icon_color = primary_col,
+    font_color = primary_col,
+    font_family = body_font
+  )
+  cap <- paste0(
+    "**Data**: The Nobel Foundation<br>**Graphic**: ",
+    social
+  )
+  # Plot
+  g <- ggplot() +
+    geom_text(
+      data = plot_data,
+      mapping = aes(
+        x = x, y = y, angle = angle, label = name, colour = gender
+      ),
+      family = body_font,
+      hjust = 1,
+      size = 1
+    ) +
+    scale_colour_manual(
+      values = c(
+        "male" = secondary_col,
+        "female" = primary_col
+      )
+    ) +
+    annotate("text",
+      x = 10, y = 0,
+      hjust = 1, label = "Nobel Prize Laureates",
+      colour = primary_col,
+      family = title_font,
+      size = 7
+    ) +
+    annotate("text",
+      x = 10, y = -1, hjust = 1, label = nobel_category,
+      colour = primary_col,
+      family = body_font,
+      size = 5
+    ) +
+    labs(caption = cap) +
+    scale_x_continuous(limits = c(-9, 12)) +
+    scale_y_continuous(limits = c(-7.5, 7.5)) +
+    coord_fixed() +
+    theme_void(base_size = 6, base_family = body_font) +
+    theme(
+      legend.position = "none",
+      plot.background = element_rect(
+        fill = bg_col, colour = bg_col
+      ),
+      panel.background = element_rect(
+        fill = bg_col, colour = bg_col
+      ),
+      plot.caption = ggtext::element_textbox_simple(
+        colour = primary_col,
+        hjust = 0,
+        halign = 0,
+        lineheight = 0.5,
+        margin = margin(l = 10, b = -5)
+      )
+    )
+  return(g)
+    }
+```
+
+
+* Download chemistry data
+* Example of plot with new colours
+
+```{r}
+#| label: nobel-download-peace
+#| eval: false
+#| echo: true
+nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en")
+write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
+```
+
+Read it from the CSV
+
+```{r}
+#| label: nobel-load-peace
+#| output: false
+nobel_peace <- readr::read_csv("data/nobel_peace.csv")
+```
+
+```{r}
+#| label: nobel-peace-plot
+peace_plot <- category_plot(
+  "Peace",
+  nobel_peace,
+  r = 4,
+  bg_col = "#FFEDE1",
+  primary_col = "#8B1E3F",
+  secondary_col = "#7286A0"
+)
+peace_plot
+```
+
+* notice a third color (organisation)
+
+```{r}
+#| label: nobel-save-plot
+#| eval: false
+#| echo: true
+ggsave("peace_plot.png", peace_plot, width = 5, height = 4)
+```
+
 ## Reflection
+
+* needs some explanation to go with it
+* radius as param, maybe also do start and finish angle
