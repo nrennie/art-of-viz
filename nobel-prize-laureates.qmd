@@ -104,6 +104,8 @@ barplot(
 * Catch attention
 * Showcasing interesting aspects of data
 
+**Insert sketch here**
+
 ## Preparing a plot
 
 Let's (when you get to the last section of this chapter, it'll make even more sense!)
@@ -336,10 +338,9 @@ text_plot <- annotated_plot +
 
 ### Adjusting themes
 
-\index{ggplot2!scale\_x\_continuous}
-\index{ggplot2!scale\_y\_continuous}
-\index{ggplot2!coord\_fixed}
+At the moment, the text isn't arranged in a circle as such - it's taking on more of an oval shape. To make sure it is displayed in a circle, we can use `coord_fixed()` to make sure that one unit on the x-axis is equal to one unit on the y-axis. 
 
+The limits of the plot also need to be extended. The scales are currently based on ... (the text at the near edge of the circle, which means the text runs of the page. We can do this by extending the limits using `scale_x_continuous()` and `scale_y_continuous()`. We can extend the right hand side of the x-axis a little bit further to accommodate the added annotations. \index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
 
 ```{r}
 #| label: nobel-style-plot-1
@@ -350,10 +351,13 @@ styled_plot <- text_plot +
 styled_plot
 ```
 
-\index{ggplot2!theme\_void} \index{ggplot2!theme}
-\index{ggplot2!element\_rect}
-\index{ggtext!element\_textbox\_simple}
-\index{ggplot2!margin}
+Since this is an *artistic* visualization, we want to remove the distracting grid lines and axis labels (which don't make much sense for this type of plot). As we've done in earlier chapters (such as @sec-time-zones), we use `theme_void()` to remove these background theme elements. \index{ggplot2!theme\_void}
+
+We can some further, final customizations by changing the following `theme()` elements: \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggtext!element\_textbox\_simple} \index{ggplot2!margin}
+
+* removing the legend
+* changing the background color by passing in the `bg_col` variable to `element_rect()`
+* using `element_textbox_simple()` from {ggtext} to format the HTML tags that add the social media icons in the caption
 
 ```{r}
 #| label: nobel-style-plot-2
@@ -362,9 +366,6 @@ styled_plot +
   theme(
     legend.position = "none",
     plot.background = element_rect(
-      fill = bg_col, color = bg_col
-    ),
-    panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
     plot.caption = ggtext::element_textbox_simple(
@@ -377,54 +378,53 @@ styled_plot +
   )
 ```
 
+And we now have a creative way of visualizing the recipients of the Nobel Prize for Physics! How might we go about visualizing the recipients of the other prize categories in a similar way?
 
 ## Parameterized plots
 
-Let's say
+Although we could copy and paste the code we already have, and change out `physics` for `peace` everywhere, for example, this isn't a sustainable approach if we're not just looking to create one additional plot. What if we also want to create plots for medicine, economics, chemistry, and literature? That's a lot of copy and pasting! Instead, we might want to think about creating our own function. 
 
-This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let's say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the .... . You don't have to rewrite the plotting code every month, you just need to call your ... function. 
+This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let's say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the updated title. You don't have to rewrite the plotting code every month, you just need to call your custom plot function. 
 
-Throughout this book, we've been ... as variables (such as the colors, fonts, ...). This makes it easier to change a ... . But it also makes it easier to convert your code into a function: those variables just become function arguments!
+Throughout this book, we've been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments!
 
-When ... functions:
+When we're converting our code into a function, we need to think about what a user has to tell us, in order for the code to work. In the sales histogram example above, a user would need to specify which month they want the plot for. In our example of the Nobel Prize visualisations, a user need to specify: 
 
-* Arguments a user needs to specify: 
-  * which category they want to plot (we can't read their mind or know what data they have)
-  * what the data is called (we don't know what they've called their `data.frame`)
-  * the radius of the circle (we might need to vary this depending on how many observations are in a given category)
+* which category they want to plot (we can't read their mind or know what data they have)
+* what the data is called (we don't know what they've called their `data.frame`)
+* the radius of the circle (we might need to vary this depending on how many observations are in a given category)
   
 ::: {#tip-nobel-dataframe .callout-tip}
 
 ## Checking columns exist
 
-The data wrangling code assumes that `year`, `name`, `gender`, and `category` are columns that exist in the input data frame. Since we're only working... but, to make ... A first step in the function to check that these columns exist.
+The data wrangling code assumes that `year`, `name`, `gender`, and `category` are columns that exist in the input `data.frame`. Since we're working with data from an API that outputs it in a consistent format, this is a reasonable assumption to make. However, the API might change it some point. Or someone may want to use it with data sourced from somewhere else. To make the function more robust, we could add an initial step to check if those columns exist!
 
 :::
 
-Tip: type checking for data frame
+Now, we can also think about adding arguments that a user *could* specify:
 
-* Arguments a user *could* specify:
-  * background color
-  * primary color
-  * secondary color
-  * body font
-  * title font
-For these arguments, we can specify a default. This means that ..., but a user is free to customise ... . None of these elements have a fundamental ... i.e. other than how aesthetically pleasing it is, the choice of these parameters don't have any ... 
+* background color
+* primary color
+* secondary color
+* body font
+* title font
+  
+For these arguments, we can specify a default. This means that the function will work if a user doesn't want to choose their own colors, but they are free to customize them if they choose to. None of these parameter choices make a fundamental difference to the plot created (other than how aesthetically pleasing it is).
 
 ::: {#tip-nobel-fonts .callout-tip}
 
 ## Using fonts in functions
 
-dont want to load font within the function (not doing it every time)
-but can't assume.
-A good default is `"sans"` 
-(Or at the very least, add instructions for loading fonts )
+Here, we've specified that the default title font is `"Passion"`. A similar approach is used for the body font. Usually, I'd strongly recommend against such an approach since there's no guarantee that a user will have the `"Passion"` font installed or loaded when running the function. This makes it a bad choice of default font. 
+
+We *could* add the `sysfonts::font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the font every time we run the function. A better option is to specify one of the integrated fonts as a default e.g. `title_font = "sans"`.
+
+(Or at the very least, add instructions for how to load the fonts you've used as a default!)
 
 :::
 
-Now we can bundle up all the code you've seen already, into the function. Note that
-
-
+Now we can stitch together all the code we've used in this chapter, into the function body:
 
 ```{r}
 #| label: nobel-param-plot-func
@@ -525,11 +525,7 @@ category_plot <- function(
 }
 ```
 
-
-* Download chemistry data
-* Example of plot with new colors
-
-\index{utils!write.csv}
+Now let's test if our function works with a completely different set of data! Let's use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use `nobelPrizeCategory=pea` (`pea` for *peace*) and then save the output to a CSV file, just as we did before for the physics data. \index{utils!write.csv} \index{utils!read.csv}
 
 ```{r}
 #| label: nobel-download-peace
@@ -547,7 +543,7 @@ write.csv(
 )
 ```
 
-If you've downloaded the data previously, you can read in the data from the CSV file: \index{readr!read\_csv}
+Again, we can either keep working with the loaded data from the API, or read in the data from the CSV file: \index{readr!read\_csv}
 
 ```{r}
 #| label: nobel-load-peace
@@ -555,7 +551,7 @@ If you've downloaded the data previously, you can read in the data from the CSV 
 nobel_peace <- readr::read_csv("data/nobel_peace.csv")
 ```
 
-Then we pass the `"Peace"` category into our `category_plot()` function, alongside out newly downloaded data. The `nobel_peace` data doesn't have quite as many observations as the `nobel_physics` data, so we can reduce the radius slightly and start the text a little bit closer to the middle of the circle. We can also choose some different colors for the visualisation (but leave the defaults for the fonts):
+Then we pass the `"Peace"` category into our `category_plot()` function, alongside out newly downloaded `nobel_peace` data. The `nobel_peace` data doesn't have quite as many observations as the `nobel_physics` data, so we can reduce the radius (` r`) slightly and start the text a little bit closer to the middle of the circle. We can also choose some different colors for the visualization (but leave the defaults for the fonts):
 
 ```{r}
 #| label: nobel-peace-plot
@@ -572,7 +568,7 @@ peace_plot
 
 What you might notice about this version of the chart is that a third color has appeared! In `scale_color_manual()`, we only specified which colors relate to `"male"` and `"female"` laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) grey text relates to organisations listed in the `nobel_peace` data.
 
-We can save a copy of the visualisation using `ggsave()`: \index{ggplot2!ggsave}
+We can save a copy of the visualization using `ggsave()`: \index{ggplot2!ggsave}
 
 ```{r}
 #| label: nobel-save-plot
