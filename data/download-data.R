@@ -31,15 +31,16 @@ download.file(
 )
 
 # R package use
-r_pkgs <-
+files_to_check <-
   funspotr::list_files_github_repo("nrennie/tidytuesday",
     branch = "main"
-  ) |>
-  dplyr::filter(relative_paths != "data/make_data.R") |>
+  )
+r_pkgs <- files_to_check |>
+  dplyr::filter(stringr::str_detect(relative_paths, "2023")) |>
   funspotr::spot_funs_files(
     show_each_use = TRUE,
     keep_in_multiple_pkgs = TRUE
-  ) |> 
+  ) |>
   funspotr::unnest_results()
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 
