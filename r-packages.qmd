@@ -1,0 +1,107 @@
+---
+filters:
+  - line-highlight
+execute: 
+  freeze: auto
+---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/options.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
+
+# R Package Use: editing grobs for custom facet labels {#sec-r-pkgs}
+
+## Data
+
+```{r}
+#| label: r-pkgs-load-data
+#| eval: false
+#| echo: true
+r_pkgs <-
+  funspotr::list_files_github_repo("nrennie/tidytuesday",
+    branch = "main"
+  ) |>
+  dplyr::filter(relative_paths != "data/make_data.R") |>
+  funspotr::spot_funs_files(
+    show_each_use = TRUE,
+    keep_in_multiple_pkgs = TRUE
+  ) |>
+  funspotr::unnest_results()
+write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
+```
+
+
+```{r}
+#| label: r-pkgs-load-data-csv
+#| output: false
+r_pkgs <- readr::read_csv("data/r_pkgs.csv")
+```
+
+
+## Exploratory work
+
+### Data exploration
+
+### Exploratory sketches
+
+## Preparing a plot
+
+### Data wrangling
+
+```{r}
+core_tidyverse <- c(
+  "dplyr", "forcats", "ggplot2", "purrr",
+  "readr", "stringr", "tibble", "tidyr"
+)
+```
+
+
+```{r}
+plot_data <- r_pkgs |> 
+  dplyr::filter(pkgs %in% core_tidyverse) |> 
+  tidyr::separate_wider_delim(
+    relative_paths,
+    delim = "/",
+    names = c(NA, "date", NA)
+  ) |> 
+  dplyr::mutate(date = lubridate::ymd(date)) |> 
+  dplyr::group_by(date, pkgs) |> 
+  dplyr::count()
+```
+
+
+### Packages and functions
+
+### The first plot
+
+## Advanced styling
+
+### Colours
+
+### Text and fonts
+
+### Adjusting themes
+
+## Reflection
+
+::: {.content-visible when-format="html"}
+
+## The making of...
+
+![]()
+
+:::

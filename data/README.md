@@ -56,6 +56,13 @@ Datasets in the Movebank Data Repository are licensed using the Creative Commons
 The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
 
+## Chapter 6: R package use
+
+Source: [https://github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday)
+
+Copyright info: CC-BY-4.0 License
+
+
 ## Chapter 7: Global seafood
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
