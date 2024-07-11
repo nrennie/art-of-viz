@@ -3,6 +3,8 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.5
 ---
 
 ```{r}
@@ -28,24 +30,37 @@ execute:
 ## Data
 
 ```{r}
-#| label: r-pkgs-load-data
+#| label: r-pkgs-load-data-1
 #| eval: false
 #| echo: true
 files_to_check <-
   funspotr::list_files_github_repo("nrennie/tidytuesday",
     branch = "main"
-  )
-r_pkgs <- files_to_check |>
-  dplyr::filter(stringr::str_detect(relative_paths, "2023")) |>
+  ) |>
+  dplyr::filter(stringr::str_detect(relative_paths, "2023"))
+```
+
+```{r}
+#| label: r-pkgs-load-data-2
+#| eval: false
+#| echo: true
+r_funs <- files_to_check |>
   funspotr::spot_funs_files(
     show_each_use = TRUE,
     keep_in_multiple_pkgs = TRUE
-  ) |>
-  funspotr::unnest_results()
-write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
+  )
 ```
 
 got a few errors here, maybe try re-running or debugging
+
+```{r}
+#| label: r-pkgs-load-data-3
+#| eval: false
+#| echo: true
+r_pkgs <- rfuns |>
+  funspotr::unnest_results()
+write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
+```
 
 
 ```{r}
@@ -54,10 +69,34 @@ got a few errors here, maybe try re-running or debugging
 r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ```
 
-
 ## Exploratory work
 
 ### Data exploration
+
+```{r}
+#| fig-height: 6
+barplot(
+  sort(table(r_pkgs$pkgs)),
+  # make labels smaller so they fit on the page
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
+  horiz = TRUE
+)
+```
+
+(base R + tidyverse) is better than base R or tidyverse
+
+```{r}
+r_pkgs <- r_pkgs |>
+  dplyr::mutate(
+    pkgs = dplyr::case_when(
+      pkgs == "ggplot" ~ "ggplot2",
+      TRUE ~ pkgs
+    )
+  )
+```
+
 
 ### Exploratory sketches
 
@@ -74,30 +113,225 @@ core_tidyverse <- c(
 
 
 ```{r}
-plot_data <- r_pkgs |> 
-  dplyr::filter(pkgs %in% core_tidyverse) |> 
+r_pkgs_date <- r_pkgs |>
+  dplyr::filter(pkgs %in% core_tidyverse) |>
   tidyr::separate_wider_delim(
     relative_paths,
     delim = "/",
     names = c(NA, "date", NA)
-  ) |> 
-  dplyr::mutate(date = lubridate::ymd(date)) |> 
-  dplyr::group_by(date, pkgs) |> 
-  dplyr::count()
+  ) |>
+  dplyr::mutate(date = lubridate::ymd(date))
 ```
+
+```{r}
+plot_data <- r_pkgs_date |>
+  dplyr::group_by(date, pkgs) |>
+  dplyr::count() |>
+  dplyr::ungroup() |>
+  dplyr::mutate(
+  pkgs = factor(pkgs, levels = core_tidyverse)
+  )
+```
+
+
 
 
 ### Packages and functions
 
 ### The first plot
 
+```{r}
+library(ggplot2)
+base_plot <- ggplot(plot_data) +
+  geom_area(
+    mapping = aes(
+      x = date,
+      y = n,
+      fill = pkgs
+    )
+  ) +
+  facet_wrap(~pkgs, nrow = 1, drop = FALSE)
+base_plot
+```
+
+
 ## Advanced styling
 
 ### Colours
 
-### Text and fonts
+```{r}
+bg_col <- "#3A3B3C"
+text_col <- "white"
+col_palette <- rcartocolor::carto_pal(9, "Bold")[1:8]
+highlight_col <- col_palette[1]
+```
+
+```{r}
+col_plot <- base_plot +
+  scale_fill_manual(
+    values = col_palette
+  )
+col_plot
+```
+
+### Fonts
+
+```{r}
+sysfonts::font_add_google(
+  name = "Source Code Pro",
+  family = "source"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "source"
+```
+
+### Text
+
+
+```{r}
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = highlight_col,
+  font_color = text_col,
+  font_family = body_font
+)
+```
+
+```{r}
+title <- "How many times did I use {tidyverse} packages for TidyTuesday?"
+st <- "The tidyverse is a collection of open source R packages that *share
+an underlying design philosophy, grammar, and data structures of tidy data*.
+Of the 8 core tidyverse packages {ggplot2} was my most used package for TidyTuesday
+visualisations in 2023."
+cap <- paste0(
+  st, "<br>**Data**: github.com/nrennie/tidytuesday<br>**Graphic**:", social
+)
+```
+
+```{r}
+text_plot <- col_plot +
+  labs(
+    title = title,
+    subtitle = cap,
+    x = "",
+    y = "Number of package calls"
+  )
+```
+
+
 
 ### Adjusting themes
+
+```{r}
+limits_plot <- text_plot +
+  scale_x_date(
+    limits = c(
+      lubridate::ymd(20230101), lubridate::ymd(20231231)
+    ),
+    breaks = c(
+      lubridate::ymd(20230101), lubridate::ymd(20230701)
+    ),
+    labels = c("Jan", "Jul")
+  ) +
+  scale_y_continuous(
+    limits = c(0, 150),
+    breaks = c(0, 50, 100, 150)
+  ) +
+  coord_cartesian(expand = F)
+limits_plot
+```
+
+```{r}
+theme_plot <- limits_plot +
+  theme_dark(
+    base_size = 6, 
+  base_family = body_font
+  ) +
+  theme(
+    legend.position = "none",
+    plot.margin = margin(5, 10, 5, 10),
+    plot.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    strip.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    plot.title.position = "plot",
+    plot.title = ggtext::element_textbox_simple(
+      colour = text_col,
+      hjust = 0,
+      halign = 0,
+      margin = margin(b = 5, t = 10),
+      lineheight = 0.5,
+      face = "bold",
+      size = rel(1.9)
+    ),
+    plot.subtitle = ggtext::element_textbox_simple(
+      colour = text_col,
+      hjust = 0,
+      halign = 0,
+      margin = margin(b = 10, t = 10),
+      lineheight = 0.5
+    ),
+    panel.spacing = unit(0.5, "lines"),
+    axis.text = element_text(
+  colour = text_col),
+    axis.title = element_text(
+  colour = text_col),
+    panel.grid.major = element_line(
+      colour = alpha(text_col, 0.2),
+      linewidth = 0.2
+    ),
+    panel.grid.minor = element_line(
+      colour = alpha(text_col, 0.3),
+      linewidth = 0.2
+    ),
+    axis.ticks = element_blank()
+  )
+theme_plot
+```
+
+
+
+
+## Images for facet labels
+
+no need for PNG, ggimage etc. adding images outside of the plotting area.
+
+we've already ... the package we need - ggtext
+can also do with marquee
+
+```{r}
+core_lvls <- glue::glue(
+  "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{core_tidyverse}.png' width='20'>"
+)
+```
+
+```{r}
+img_label_data <- plot_data |>
+  dplyr::mutate(
+    pkgs = glue::glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
+  ) |>
+  dplyr::mutate(
+  pkgs = factor(pkgs, levels = core_lvls)
+  )
+```
+
+```{r}
+theme_plot +
+  theme(
+    strip.text.x = ggtext::element_textbox_simple(
+      color = text_col,
+  face = "bold",
+  hjust = 0.5, 
+  halign = 0.5
+    ),
+  )
+```
 
 ## Reflection
 
@@ -105,6 +339,6 @@ plot_data <- r_pkgs |>
 
 ## The making of...
 
-![]()
+![](images/r-pkgs.gif){fig-align="center"}
 
 :::
