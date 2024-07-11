@@ -74,7 +74,7 @@ r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ### Data exploration
 
 ```{r}
-#| fig-height: 6
+#| fig-asp: 8
 barplot(
   sort(table(r_pkgs$pkgs)),
   # make labels smaller so they fit on the page
@@ -111,6 +111,8 @@ core_tidyverse <- c(
 )
 ```
 
+mayeb reoorder by most used in total?
+
 
 ```{r}
 r_pkgs_date <- r_pkgs |>
@@ -129,7 +131,7 @@ plot_data <- r_pkgs_date |>
   dplyr::count() |>
   dplyr::ungroup() |>
   dplyr::mutate(
-  pkgs = factor(pkgs, levels = core_tidyverse)
+    pkgs = factor(pkgs, levels = core_tidyverse)
   )
 ```
 
@@ -154,6 +156,7 @@ base_plot <- ggplot(plot_data) +
 base_plot
 ```
 
+get a warning
 
 ## Advanced styling
 
@@ -245,8 +248,8 @@ limits_plot
 ```{r}
 theme_plot <- limits_plot +
   theme_dark(
-    base_size = 6, 
-  base_family = body_font
+    base_size = 6,
+    base_family = body_font
   ) +
   theme(
     legend.position = "none",
@@ -265,23 +268,26 @@ theme_plot <- limits_plot +
       colour = text_col,
       hjust = 0,
       halign = 0,
-      margin = margin(b = 5, t = 10),
-      lineheight = 0.5,
+      margin = margin(b = 5, t = 5),
       face = "bold",
-      size = rel(1.9)
+      size = rel(1.4)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
       colour = text_col,
       hjust = 0,
       halign = 0,
-      margin = margin(b = 10, t = 10),
-      lineheight = 0.5
+      margin = margin(b = 5, t = 0)
     ),
     panel.spacing = unit(0.5, "lines"),
     axis.text = element_text(
-  colour = text_col),
+      colour = text_col
+    ),
     axis.title = element_text(
-  colour = text_col),
+      colour = text_col
+    ),
+    strip.text.x = element_text(
+      face = "bold"
+    ),
     panel.grid.major = element_line(
       colour = alpha(text_col, 0.2),
       linewidth = 0.2
@@ -312,23 +318,30 @@ core_lvls <- glue::glue(
 ```
 
 ```{r}
-img_label_data <- plot_data |>
+plot_img_data <- plot_data |>
   dplyr::mutate(
     pkgs = glue::glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
   ) |>
   dplyr::mutate(
-  pkgs = factor(pkgs, levels = core_lvls)
+    pkgs = factor(pkgs, levels = core_lvls)
   )
 ```
 
+how to update data
+
 ```{r}
-theme_plot +
+img_plot <- theme_plot %+% plot_img_data
+```
+
+
+```{r}
+img_plot +
   theme(
     strip.text.x = ggtext::element_textbox_simple(
       color = text_col,
-  face = "bold",
-  hjust = 0.5, 
-  halign = 0.5
+      face = "bold",
+      hjust = 0.5,
+      halign = 0.5
     ),
   )
 ```
