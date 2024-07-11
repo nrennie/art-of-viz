@@ -25,7 +25,9 @@ fig-asp: 0.5
 #| file: R/social_caption.R
 ```
 
-# R Package Use: editing grobs for custom facet labels {#sec-r-pkgs}
+# R Package Use: using images for custom facet labels {#sec-r-pkgs}
+
+In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
 
 ## Data
 
@@ -74,7 +76,9 @@ r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ### Data exploration
 
 ```{r}
-#| fig-asp: 8
+#| label: fig-r-pkgs-barplot
+#| fig-cap: "Plot"
+#| fig-asp: 1
 barplot(
   sort(table(r_pkgs$pkgs)),
   # make labels smaller so they fit on the page
@@ -88,6 +92,7 @@ barplot(
 (base R + tidyverse) is better than base R or tidyverse
 
 ```{r}
+#| label: r-pkgs-pkgs
 r_pkgs <- r_pkgs |>
   dplyr::mutate(
     pkgs = dplyr::case_when(
@@ -105,6 +110,7 @@ r_pkgs <- r_pkgs |>
 ### Data wrangling
 
 ```{r}
+#| label: r-pkgs-core
 core_tidyverse <- c(
   "dplyr", "forcats", "ggplot2", "purrr",
   "readr", "stringr", "tibble", "tidyr"
@@ -115,6 +121,7 @@ mayeb reoorder by most used in total?
 
 
 ```{r}
+#| label: r-pkgs-date
 r_pkgs_date <- r_pkgs |>
   dplyr::filter(pkgs %in% core_tidyverse) |>
   tidyr::separate_wider_delim(
@@ -122,19 +129,34 @@ r_pkgs_date <- r_pkgs |>
     delim = "/",
     names = c(NA, "date", NA)
   ) |>
-  dplyr::mutate(date = lubridate::ymd(date))
+  dplyr::mutate(date = lubridate::ymd(date)) |>
+  dplyr::count(date, pkgs)
 ```
 
 ```{r}
+#| label: r-pkgs-orders
+pkgs_ordered <- r_pkgs_date |>
+  dplyr::summarise(n = sum(n), .by = pkgs) |>
+  dplyr::arrange(-n) |>
+  dplyr::pull(pkgs)
+pkgs_ordered
+```
+
+notice that tibble is missing
+
+```{r}
+#| label: r-pkgs-levels
+pkgs_levels <- c(
+  pkgs_ordered,
+  setdiff(core_tidyverse, pkgs_ordered)
+)
 plot_data <- r_pkgs_date |>
-  dplyr::group_by(date, pkgs) |>
-  dplyr::count() |>
-  dplyr::ungroup() |>
   dplyr::mutate(
-    pkgs = factor(pkgs, levels = core_tidyverse)
+    pkgs = factor(pkgs, levels = pkgs_levels)
   )
 ```
 
+or use desc
 
 
 
@@ -143,6 +165,9 @@ plot_data <- r_pkgs_date |>
 ### The first plot
 
 ```{r}
+#| label: fig-r-pkgs-base-plot-1
+#| fig-cap: "Plot"
+#| warning: true
 library(ggplot2)
 base_plot <- ggplot(plot_data) +
   geom_area(
@@ -158,11 +183,45 @@ base_plot
 
 get a warning
 
+You'll also notice there's one week 141 times. I double checked this data and it is actually correct
+
+misleading - stringr and readr have same number of uses, but it looks like stringr is used significantly more - 0 is not included
+forcats has only one use - but represented 0 times since 
+
+
+```{r}
+#| label: r-pkgs-new-data
+new_plot_data <- plot_data |>
+  tidyr::complete(
+    date, pkgs,
+    fill = list(n = 0)
+  )
+```
+
+
+
+```{r}
+#| label: r-pkgs-head-new
+head(new_plot_data, n = 8)
+```
+
+notice that tibble now included as well
+
+updating data set on plot, could just rerun
+
+```{r}
+#| label: fig-r-pkgs-base-plot-2
+#| fig-cap: "Plot"
+base_plot <- base_plot %+% new_plot_data
+base_plot
+```
+
 ## Advanced styling
 
 ### Colours
 
 ```{r}
+#| label: r-pkgs-cols
 bg_col <- "#3A3B3C"
 text_col <- "white"
 col_palette <- rcartocolor::carto_pal(9, "Bold")[1:8]
@@ -170,9 +229,12 @@ highlight_col <- col_palette[1]
 ```
 
 ```{r}
+#| label: fig-r-pkgs-col-plot
+#| fig-cap: "Plot"
 col_plot <- base_plot +
   scale_fill_manual(
-    values = col_palette
+    values = col_palette,
+    drop = FALSE
   )
 col_plot
 ```
@@ -180,6 +242,7 @@ col_plot
 ### Fonts
 
 ```{r}
+#| label: r-pkgs-fonts
 sysfonts::font_add_google(
   name = "Source Code Pro",
   family = "source"
@@ -193,6 +256,7 @@ body_font <- "source"
 
 
 ```{r}
+#| label: r-pkgs-social
 social <- social_caption(
   bg_color = bg_col,
   icon_color = highlight_col,
@@ -202,17 +266,16 @@ social <- social_caption(
 ```
 
 ```{r}
+#| label: r-pkgs-text
 title <- "How many times did I use {tidyverse} packages for TidyTuesday?"
-st <- "The tidyverse is a collection of open source R packages that *share
-an underlying design philosophy, grammar, and data structures of tidy data*.
-Of the 8 core tidyverse packages {ggplot2} was my most used package for TidyTuesday
-visualisations in 2023."
+st <- "The tidyverse is a collection of open source R packages that *share an underlyingdesign philosophy, grammar, and data structures of tidy data*. Of the 8 core tidyverse packages {ggplot2} was my most used package for TidyTuesday visualisations in 2023."
 cap <- paste0(
   st, "<br>**Data**: github.com/nrennie/tidytuesday<br>**Graphic**:", social
 )
 ```
 
 ```{r}
+#| label: r-pkgs-text-plot
 text_plot <- col_plot +
   labs(
     title = title,
@@ -227,6 +290,8 @@ text_plot <- col_plot +
 ### Adjusting themes
 
 ```{r}
+#| label: fig-r-pkgs-limits-plot
+#| fig-cap: "Plot"
 limits_plot <- text_plot +
   scale_x_date(
     limits = c(
@@ -246,6 +311,8 @@ limits_plot
 ```
 
 ```{r}
+#| label: fig-r-pkgs-theme-plot
+#| fig-cap: "Plot"
 theme_plot <- limits_plot +
   theme_dark(
     base_size = 6,
@@ -254,15 +321,22 @@ theme_plot <- limits_plot +
   theme(
     legend.position = "none",
     plot.margin = margin(5, 10, 5, 10),
+    # plot background
     plot.background = element_rect(
       fill = bg_col, colour = bg_col
     ),
     panel.background = element_rect(
       fill = bg_col, colour = bg_col
     ),
+    # facet strip text and background
     strip.background = element_rect(
       fill = bg_col, colour = bg_col
     ),
+    strip.text = element_text(
+      face = "bold"
+    ),
+    panel.spacing = unit(0.5, "lines"),
+    # title and subtitle text
     plot.title.position = "plot",
     plot.title = ggtext::element_textbox_simple(
       colour = text_col,
@@ -278,16 +352,14 @@ theme_plot <- limits_plot +
       halign = 0,
       margin = margin(b = 5, t = 0)
     ),
-    panel.spacing = unit(0.5, "lines"),
+    # axes styling and grid lines
     axis.text = element_text(
       colour = text_col
     ),
     axis.title = element_text(
       colour = text_col
     ),
-    strip.text.x = element_text(
-      face = "bold"
-    ),
+    axis.ticks = element_blank(),
     panel.grid.major = element_line(
       colour = alpha(text_col, 0.2),
       linewidth = 0.2
@@ -295,8 +367,7 @@ theme_plot <- limits_plot +
     panel.grid.minor = element_line(
       colour = alpha(text_col, 0.3),
       linewidth = 0.2
-    ),
-    axis.ticks = element_blank()
+    )
   )
 theme_plot
 ```
@@ -312,29 +383,35 @@ we've already ... the package we need - ggtext
 can also do with marquee
 
 ```{r}
-core_lvls <- glue::glue(
-  "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{core_tidyverse}.png' width='20'>"
+#| label: r-pkgs-new-levels
+new_levels <- glue::glue(
+  "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs_levels}.png' width='20'>"
 )
 ```
 
 ```{r}
-plot_img_data <- plot_data |>
+#| label: r-pkgs-img-data
+plot_img_data <- new_plot_data |>
   dplyr::mutate(
     pkgs = glue::glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
   ) |>
   dplyr::mutate(
-    pkgs = factor(pkgs, levels = core_lvls)
+    pkgs = factor(pkgs, levels = new_levels)
   )
 ```
 
-how to update data
+As we did earlier, let's update the data
 
 ```{r}
+#| label: r-pkgs-img-plot
 img_plot <- theme_plot %+% plot_img_data
 ```
 
+We also 
 
 ```{r}
+#| label: fig-r-pkgs-final-plot
+#| fig-cap: "Plot"
 img_plot +
   theme(
     strip.text.x = ggtext::element_textbox_simple(
@@ -348,9 +425,18 @@ img_plot +
 
 ## Reflection
 
+maybe a lgo scale - skewed by ne big value (maybe point out the big value - hard to see)
+
+importance of explcitly capturing 0 (implicitly not good)
+implicit/explicit missing data - does it mean 0 
+
+match the colors to the image colors - green for stringr
+
 ::: {.content-visible when-format="html"}
 
 ## The making of...
+
+Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
 
 ![](images/r-pkgs.gif){fig-align="center"}
 
