@@ -45,7 +45,6 @@ All data sets used in this book, and links to the relevant licenses:
 
 ```{r}
 #| label: data-sources
-#| tbl-cap: "Data sources and licenses"
 #| echo: false
 #| output: asis
 data_data <- readr::read_csv("data/data.csv") |> 
@@ -58,6 +57,30 @@ for (i in seq_len(nrow(data_data))) {
         glue::glue("{data_data$Data[i]} {data_data$BibTex[i]}"),
         glue::glue("Source: [{stringr::str_remove(data_data$URL[i], 'https://')}]({data_data$URL[i]})"),
         glue::glue("License: {data_data$License[i]}")
+      )
+    )
+  )
+}
+```
+
+## Images {.unnumbered}
+
+All images used in this book (which were not created by the author) and links to the relevant licenses:
+
+```{r}
+#| label: img-sources
+#| echo: false
+#| output: asis
+img_data <- readr::read_csv("images/data.csv") |> 
+  tidyr::drop_na()
+for (i in seq_len(nrow(img_data))) {
+  pander::pandoc.list(
+    list(
+      glue::glue("Chapter {img_data$Chapter[i]}"),
+      list(
+        glue::glue("Image: {img_data$Photographer[i]}"),
+        glue::glue("Source: {stringr::str_remove(img_data$Source[i], 'https://')}]({img_data$Source[i]}) {img_data$BibTex[i]}"),
+        glue::glue("License: {img_data$License[i]}")
       )
     )
   )
