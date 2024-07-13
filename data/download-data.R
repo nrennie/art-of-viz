@@ -18,6 +18,10 @@ download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/taxonomy.csv",
   destfile = "data/taxonomy.csv")
 
+# Canadian Wind Turbines
+wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx",sheet=1)
+write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
+
 # Cats
 download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-31/cats_uk.csv",
