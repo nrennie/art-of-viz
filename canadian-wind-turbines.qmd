@@ -1,0 +1,110 @@
+---
+filters:
+  - line-highlight
+execute: 
+  freeze: auto
+---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/options.R
+```
+
+# Canadian Wind Turbines: waffle plots, pictograms, and icons {#sec-chap4}
+
+In this chapter, we'll learn how 
+
+## Data
+
+[https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)
+
+[@readxl] [@openxlsx]
+
+```{r}
+#| label: turbines-download
+#| eval: false
+#| echo: true
+wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx",sheet=1)
+write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
+```
+
+
+```{r}
+#| label: turbines-data
+#| output: false
+wind_turbines <- readr::read_csv("data/wind_turbines.csv")
+```
+
+
+## Exploratory work
+
+### Data exploration
+
+### Exploratory sketches
+
+## Preparing a plot
+
+### Data wrangling
+
+```{r}
+extract_after_last_slash <- function(texts) {
+  has_slash <- stringr::str_detect(texts, "/")
+  extracted <- stringr::str_match(texts, ".*/(.*)$")[,2]
+  output <- dplyr::if_else(has_slash, extracted, texts)
+  return(output)
+}
+```
+
+```{r}
+turbines_year <- wind_turbines |> 
+  dplyr::select(`Province/Territory`, Commissioning.date) |> 
+  dplyr::mutate(
+    Year = extract_after_last_slash(Commissioning.date),
+    Year = as.numeric(Year)
+  )
+```
+
+```{r}
+plot_data <- turbines_year |> 
+  dplyr::filter(Year >= 2001 & Year <= 2020) |> 
+  dplyr::mutate(
+    Year_Group = dplyr::case_when(
+      Year %in% seq(2001, 2005) ~ "2001 - 2005",
+      Year %in% seq(2006, 2010) ~ "2006 - 2010",
+      Year %in% seq(2011, 2015) ~ "2011 - 2015",
+      Year %in% seq(2016, 2020) ~ "2016 - 2020"
+    )
+  ) |> 
+  dplyr::count(`Province/Territory`, Year_Group)
+```
+
+### Packages and functions
+
+### The first plot
+
+## Advanced styling
+
+### Colours
+
+### Text and fonts
+
+### Using Font Awesome icons
+
+```{r}
+#| echo: true
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| file: R/social_caption.R
+```
+
+
+### Adjusting themes
+
+## Reflection
+
