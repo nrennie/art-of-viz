@@ -25,11 +25,15 @@ fig-asp: 0.5
 #| file: R/social_caption.R
 ```
 
-# R Package Use: using images for custom facet labels {#sec-r-pkgs}
+# R Packages: using images for custom facet labels {#sec-r-pkgs}
 
 In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
 
 ## Data
+
+All of the directories containing code for visualisation are in file based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R`. Since it takes a while to run, let's it to code for visualisations created in `2023`. We can use `str_detect()` from {stringr} to find any ... in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect}
+
+see [@streamline].
 
 ```{r}
 #| label: r-pkgs-load-data-1
@@ -41,6 +45,8 @@ files_to_check <-
   ) |>
   dplyr::filter(stringr::str_detect(relative_paths, "2023"))
 ```
+
+Then pass intp `spot_funs_files()` from {funspotr}
 
 ```{r}
 #| label: r-pkgs-load-data-2
@@ -64,6 +70,7 @@ r_pkgs <- rfuns |>
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
+We can then read the CSV back in using `read_csv()` from {readr} at any ... 
 
 ```{r}
 #| label: r-pkgs-load-data-csv
