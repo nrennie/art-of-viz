@@ -25,11 +25,15 @@ fig-asp: 0.5
 #| file: R/social_caption.R
 ```
 
-# R Package Use: using images for custom facet labels {#sec-r-pkgs}
+# R Packages: using images for custom facet labels {#sec-r-pkgs}
 
 In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
 
 ## Data
+
+All of the directories containing code for visualisation are in file based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R`. Since it takes a while to run, let's it to code for visualisations created in `2023`. We can use `str_detect()` from {stringr} to find any ... in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect}
+
+see [@streamline].
 
 ```{r}
 #| label: r-pkgs-load-data-1
@@ -41,6 +45,8 @@ files_to_check <-
   ) |>
   dplyr::filter(stringr::str_detect(relative_paths, "2023"))
 ```
+
+Then pass intp `spot_funs_files()` from {funspotr}
 
 ```{r}
 #| label: r-pkgs-load-data-2
@@ -64,6 +70,7 @@ r_pkgs <- rfuns |>
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
+We can then read the CSV back in using `read_csv()` from {readr} at any ... 
 
 ```{r}
 #| label: r-pkgs-load-data-csv
@@ -109,6 +116,8 @@ r_pkgs <- r_pkgs |>
 
 ### Data wrangling
 
+We're going to focus on the [core {tidyverse}](https://www.tidyverse.org/packages/#core-tidyverse) packages [@tidyverse]
+
 ```{r}
 #| label: r-pkgs-core
 core_tidyverse <- c(
@@ -117,7 +126,9 @@ core_tidyverse <- c(
 )
 ```
 
-mayeb reoorder by most used in total?
+We use 
+
+\index{dplyr!filter} \index{tidyr!separate\_wider\_delim} \index{dplyr!mutate} \index{dplyr!count} \index{lubridate!ymd}
 
 
 ```{r}
@@ -133,6 +144,11 @@ r_pkgs_date <- r_pkgs |>
   dplyr::count(date, pkgs)
 ```
 
+
+\index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull}
+
+or use `desc()` \index{dplyr!desc}
+
 ```{r}
 #| label: r-pkgs-orders
 pkgs_ordered <- r_pkgs_date |>
@@ -141,6 +157,8 @@ pkgs_ordered <- r_pkgs_date |>
   dplyr::pull(pkgs)
 pkgs_ordered
 ```
+
+\index{dplyr!mutate} \index{base!factor}
 
 notice that tibble is missing
 
@@ -163,6 +181,10 @@ or use desc
 ### Packages and functions
 
 ### The first plot
+
+\index{ggplot2!ggplot} \index{ggplot2!geom\_area} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
+
+We set `drop = FALSE` to allow the {tibble}
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
@@ -188,6 +210,7 @@ You'll also notice there's one week 141 times. I double checked this data and it
 misleading - stringr and readr have same number of uses, but it looks like stringr is used significantly more - 0 is not included
 forcats has only one use - but represented 0 times since 
 
+\index{tidyr!complete}
 
 ```{r}
 #| label: r-pkgs-new-data
@@ -198,7 +221,7 @@ new_plot_data <- plot_data |>
   )
 ```
 
-
+\index{utils!head}
 
 ```{r}
 #| label: r-pkgs-head-new
@@ -220,6 +243,10 @@ base_plot
 
 ### Colours
 
+[@rcartocolor]
+
+\index{rcartocolor!carto\_pal}
+
 ```{r}
 #| label: r-pkgs-cols
 bg_col <- "#3A3B3C"
@@ -227,6 +254,8 @@ text_col <- "white"
 col_palette <- rcartocolor::carto_pal(9, "Bold")[1:8]
 highlight_col <- col_palette[1]
 ```
+
+\index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-r-pkgs-col-plot
@@ -241,6 +270,8 @@ col_plot
 
 ### Fonts
 
+\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+
 ```{r}
 #| label: r-pkgs-fonts
 sysfonts::font_add_google(
@@ -254,6 +285,7 @@ body_font <- "source"
 
 ### Text
 
+\index{social\_caption}
 
 ```{r}
 #| label: r-pkgs-social
@@ -274,6 +306,8 @@ cap <- paste0(
 )
 ```
 
+\index{ggplot2!labs}
+
 ```{r}
 #| label: r-pkgs-text-plot
 text_plot <- col_plot +
@@ -288,6 +322,9 @@ text_plot <- col_plot +
 
 
 ### Adjusting themes
+
+\index{ggplot2!scale\_x\_date} \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_cartesian} \index{lubridate!ymd}
+
 
 ```{r}
 #| label: fig-r-pkgs-limits-plot
@@ -309,6 +346,8 @@ limits_plot <- text_plot +
   coord_cartesian(expand = F)
 limits_plot
 ```
+
+\index{ggplot2!theme\_dark} \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-theme-plot
@@ -372,15 +411,16 @@ theme_plot <- limits_plot +
 theme_plot
 ```
 
+## Using images as facet labels
 
-
-
-## Images for facet labels
+Packages such as {ggimage} [@ggimage] or {ggtextures} [@ggtextures] can be used to plot images based on columns in the data. For example, ... . However, here we want to plot images based on ...
 
 no need for PNG, ggimage etc. adding images outside of the plotting area.
 
 we've already ... the package we need - ggtext
 can also do with marquee
+
+\index{glue!glue}
 
 ```{r}
 #| label: r-pkgs-new-levels
@@ -388,6 +428,8 @@ new_levels <- glue::glue(
   "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs_levels}.png' width='20'>"
 )
 ```
+
+\index{dplyr!mutate} \index{glue!glue} \index{base!factor}
 
 ```{r}
 #| label: r-pkgs-img-data
@@ -408,6 +450,8 @@ img_plot <- theme_plot %+% plot_img_data
 ```
 
 We also 
+
+\index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-final-plot
