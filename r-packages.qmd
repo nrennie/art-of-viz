@@ -46,7 +46,7 @@ files_to_check <-
   dplyr::filter(stringr::str_detect(relative_paths, "2023"))
 ```
 
-Then pass intp `spot_funs_files()` from {funspotr}
+Then pass intp `spot_funs_files()` from {funspotr} [@funspotr]
 
 ```{r}
 #| label: r-pkgs-load-data-2
@@ -276,7 +276,9 @@ col_plot
 
 ### Fonts
 
-\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+Similar to @sec-programming, since code is the subject of the visualisation, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
+
+In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: r-pkgs-fonts
@@ -340,6 +342,8 @@ There are multiple different ways to remove the axis labels. You can set `x = ""
 :::
 
 ### Adjusting themes
+
+We .. process text 
 
 \index{ggplot2!scale\_x\_date} \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_cartesian} \index{lubridate!ymd}
 
@@ -431,12 +435,14 @@ theme_plot
 
 ## Using images as facet labels
 
-Packages such as {ggimage} [@ggimage] or {ggtextures} [@ggtextures] can be used to plot images based on columns in the data. For example, ... . However, here we want to plot images based on ...
+As we saw in @sec-lemurs, packages such as {ggimage} [@ggimage] or {ggtextures} [@ggtextures] can be used to plot images within the plotting area. Here, we want to use images outside of the plotting area in the facet labels. There are several options for overlaying images on existing plots (including outside of the main plot area). The `inset_element()` function from {patchwork} [@patchwork] can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly, `draw_image()` function from {cowplot} [@cowplot] simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. 
 
-no need for PNG, ggimage etc. adding images outside of the plotting area.
+We've used the {ggtext} package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with {ggtext} to format the facet labels!
 
-we've already ... the package we need - ggtext
-can also do with marquee
+We need to make two edits:
+
+* the facet 
+* the factor levels 
 
 \index{glue!glue}
 
@@ -485,6 +491,13 @@ img_plot +
   )
 ```
 
+
+::: {#tip-packages-axis .callout-tip}
+
+## Facet label images using {marquee}
+
+:::
+
 ## Reflection
 
 maybe a lgo scale - skewed by ne big value (maybe point out the big value - hard to see)
@@ -492,7 +505,7 @@ maybe a lgo scale - skewed by ne big value (maybe point out the big value - hard
 importance of explcitly capturing 0 (implicitly not good)
 implicit/explicit missing data - does it mean 0 
 
-match the colors to the image colors - green for stringr
+The use of color could also be improved here. The colors are used to denote the different packages, and so don't provide any further information not already given by the facet labels - similar to what we discussed in @sec-museums. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the {stringr} hex sticker image is quite similar to the green used in the {dplyr} area chart - this might be a little bit confusing. 
 
 ::: {.content-visible when-format="html"}
 
