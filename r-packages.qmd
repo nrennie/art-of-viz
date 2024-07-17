@@ -61,6 +61,8 @@ r_funs <- files_to_check |>
 
 got a few errors here, maybe try re-running or debugging
 
+We then use the `unnest_results()` function from {funspotr} to get a row in the data for each use of the package. Since the code above takes a while to run, it's also important that we save the data in a format that means we can use it later (rather than having to re-download it). We'll save it as a CSV file using `write.csv()`, choosing an appropriate file name and removing the row names. \index{funspotr!unnest\_results} \index{utils!write.csv}
+
 ```{r}
 #| label: r-pkgs-load-data-3
 #| eval: false
@@ -70,7 +72,7 @@ r_pkgs <- rfuns |>
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
-We can then read the CSV back in using `read_csv()` from {readr} at any ... 
+We can then read the CSV back in using `read_csv()` from {readr} at any ... (or `read.csv()` if you prefer!) \index{readr!read\_csv}
 
 ```{r}
 #| label: r-pkgs-load-data-csv
@@ -81,6 +83,8 @@ r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ## Exploratory work
 
 ### Data exploration
+
+\index{base!sort}
 
 ```{r}
 #| label: fig-r-pkgs-barplot
@@ -97,6 +101,8 @@ barplot(
 ```
 
 (base R + tidyverse) is better than base R or tidyverse
+
+\index{dplyr!mutate} \index{dplyr!case\_when}
 
 ```{r}
 #| label: r-pkgs-pkgs
@@ -439,19 +445,32 @@ As we saw in @sec-lemurs, packages such as {ggimage} [@ggimage] or {ggtextures} 
 
 We've used the {ggtext} package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with {ggtext} to format the facet labels!
 
-We need to make two edits:
+Before we get started, we need to get some images! The hex stickers for many R packages can be found at [github.com/rstudio/hex-stickers](https://github.com/rstudio/hex-stickers). For each of the 8 packages included in the plot, we can download the relevant hex sticker and **save it somewhere sensible**. Here, we'll save each image as a PNG file and the name of the file is the same as the name of the package e.g. the hex sticker for {dplyr} is saved as `dplyr.png`. To keep our directories looking clean and tidy, we might choose to save them in a folder. Here, we'll save them in a nested folder: `images/hex/`. This means the (relative) file path for our {dplyr} hex sticker is `images/hex/dplyr.png`. This is what we want to pass in as the image source in the `<img>` HTML tag for the {dplyr} facet label.
 
-* the facet 
-* the factor levels 
+This means we need to make two edits to our data:
 
-\index{glue!glue}
+* including `<img>` tags in the `pkgs` column that is used as the faceting variable.
+* including `<img>` tags in the factor levels of the `pkgs` column to keep the correct ordering.
+
+Let's start with the factor levels. Currently, the factor levels are just the package names. Luckily, we've been smart enough to save the images with the package name as the file name. This means we can use `glue()` from the {glue} package to stick together the package names with the HTML code. Let's pass in the `pkgs_levels` vector we created earlier in to the end of the image file path, to create a new vector for the factor levels: \index{glue!glue}
 
 ```{r}
-#| label: r-pkgs-new-levels
+#| label: r-pkgs-new-levels-1
+new_levels <- glue::glue(
+  "<img src='images/hex/{pkgs_levels}.png'>"
+)
+```
+
+We can also control how the images appear within the `<img>` tag (to some extent). For example, we can set the width of the image (this will take a little bit of trial and error!). The images will be left-aligned by default within the facet label area and, unfortunately, the `hjust` arguments don't seem to affect the image. Instead, we can use a slightly *hacky* solution and add some blank space to the left hand side. In HTML, `&nbsp;` can be used to add a (non-breaking) space. Again, a little bit of trial and error is needed to figure out how many spaces we need to add.
+
+```{r}
+#| label: r-pkgs-new-levels-2
 new_levels <- glue::glue(
   "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs_levels}.png' width='20'>"
 )
 ```
+
+Now we need to do the same thing to the `pkgs` column. It's important that we overwrite the `pkgs` column here rather than making an entirely new column. This means that we can use the `%+%` operator to update the data and the ...
 
 \index{dplyr!mutate} \index{glue!glue} \index{base!factor}
 
@@ -466,41 +485,35 @@ plot_img_data <- new_plot_data |>
   )
 ```
 
-As we did earlier, let's update the data
+As we did earlier, let's update the data to use our new `plot_img_data` using the `%+%` operator:
 
 ```{r}
 #| label: r-pkgs-img-plot
 img_plot <- theme_plot %+% plot_img_data
 ```
 
-We also 
-
-\index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
+We also need to tell {ggplot2} that the facet labels are using HTML tags, just as we've done with the caption. We edit the `theme()` function further and update the styling for `strip.text.x`. We again use `element_textbox_simple()` from {ggtext}, but don't need to pass in any further arguments since everything is controlled through the HTML tags. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-final-plot
 #| fig-cap: "Plot"
 img_plot +
   theme(
-    strip.text.x = ggtext::element_textbox_simple(
-      color = text_col,
-      face = "bold",
-      hjust = 0.5,
-      halign = 0.5
-    ),
+    strip.text.x = ggtext::element_textbox_simple(),
   )
 ```
-
 
 ::: {#tip-packages-axis .callout-tip}
 
 ## Facet label images using {marquee}
 
+You can do a very similar thin
+
 :::
 
 ## Reflection
 
-maybe a lgo scale - skewed by ne big value (maybe point out the big value - hard to see)
+Maybe using a log transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability. 
 
 importance of explcitly capturing 0 (implicitly not good)
 implicit/explicit missing data - does it mean 0 
