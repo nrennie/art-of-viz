@@ -245,7 +245,9 @@ Now we're ready to create a first draft of @fig-packages-sketch-1!
 
 \index{ggplot2!ggplot} \index{ggplot2!geom\_area} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
 
-We set `drop = FALSE` to allow the {tibble}
+This is very similar to the initial plots created in @sec-museums.
+
+Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown.
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
@@ -264,14 +266,40 @@ base_plot <- ggplot(plot_data) +
 base_plot
 ```
 
-get a warning
+You might notice two things here:
 
-You'll also notice there's one week 141 times. I double checked this data and it is actually correct
+* alongside the plot, a (slightly confusing) warning message is returned;
+* the ordering of the plot doesn't look quite right.
 
-misleading - stringr and readr have same number of uses, but it looks like stringr is used significantly more - 0 is not included
-forcats has only one use - but represented 0 times since 
+> You might also notice the large spike in the {ggplot2} facet which shows 141 uses of the {ggplot2} package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
 
-\index{tidyr!complete}
+Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the {stringr} package looks much larger than the area for the {readr} package - even though it should be smaller. It also looks as though there are no values in the {forcats} facet - but we know this isn't true for {forcats}, only for {tibble}. Why is this happening?
+
+The problem is that 0 is not included in the data. The areas are being drawn between only the strictly positive values, never going back down to 0. For packages that are used a lot but only in a few scripts, this makes their area larger than packages that are used once or twice in many scripts.
+
+In our data set, if a package isn't used in a script, there is no entry in the data. This makes sense since there are tens of thousands of packages and it would be much more difficult and time consuming to list every package that isn't used, rather than just those that are. But in our case, these missing, unobserved values aren't really missing values - they are 0 values. 
+
+> The warning message returned from the plot is also trying to tell us about this problem (the warning just isn't very clear!)
+
+::: {#tip-packages-area .callout-tip}
+
+## Don't ignore the warning signs!
+
+This *is it a zero or is it missing?* question has highlighted a few important aspects of plotting charts and data processing:
+
+* Don't simply ignore warning messages if you don't understand them. It might be tempting to ignore the warning message because you ended up with a plot that looks kind of like what you expected, and the warning message isn't very clear about what's wrong. But here, the warning was telling us that something was wrong with our assumptions about the data.
+
+* Ordering your data (sensibly) can help you to spot issues. If the facets hadn't been ordered, it would have been harder to recognize that some area were overestimated, and some were underestimated.
+
+* Sometimes missing values are explicitly represented as `NA` values (or something else), and other times missing values are simply rows that do not exist in the data. We often think about missing values more when we see them as `NA` values. But just because you have no `NA` values in your data, doesn't mean that you don't have any missing values.
+
+* When you have missing values (whether explicit or implicit), it's important to think about why they are missing and whether they are really missing. Does a missing values mean 0? Or does it mean it's actually missing? Or does it mean something else entirely? It's important to understand the process of data collection to answer this question correctly.
+
+:::
+
+Let's go ahead and add in zeros where they should be. We know that the `date` and `pkgs` columns are complete: there are no missing values in the `date` column and we've already addressed the issue with the missing `"tibble"` values. We need to make sure that every possible combination of `date` and `pkgs` exists in the data: any that do not already exist should be added and given a value of `0` in the `n` column.
+
+We can use the `complete()` function from {tidyr} to *complete* the data. We pass in the `date` and `pkgs` columns to say which combinations of columns we need to make sure exist. By default, missing combinations are represented by `NA`, but we can override the `fill` argument to use `0` instead. \index{tidyr!complete}
 
 ```{r}
 #| label: r-pkgs-new-data
@@ -282,16 +310,18 @@ new_plot_data <- plot_data |>
   )
 ```
 
-\index{utils!head}
+Let's take a quick look at our updated data using `head()` to make sure this has worked: \index{utils!head}
 
 ```{r}
 #| label: r-pkgs-head-new
 head(new_plot_data, n = 8)
 ```
 
-notice that tibble now included as well
+We can see that there are now quite a few `0` values included in the `n` column. Notice that `"tibble"` is now explicitly included as well, with `0` in the `n` column for all observations. This is because, by default, `complete()` uses all levels of the factor even if they aren't observed in the data.
 
-updating data set on plot, could just rerun
+Now we need to update the data that is used in our `base_plot`. We *could* simply edit (or copy and paste) the code from above and substitute `plot_data` for `new_plot_data`. But we can alternatively use the `%+%` operator.
+
+need something here
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
@@ -299,6 +329,8 @@ updating data set on plot, could just rerun
 base_plot <- base_plot %+% new_plot_data
 base_plot
 ```
+
+> Notice that the warning message has now disappeared.
 
 ## Advanced styling
 
