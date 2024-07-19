@@ -25,6 +25,12 @@ fig-asp: 0.5
 #| file: R/social_caption.R
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/source_caption.R
+```
+
 # R Packages: using images for custom facet labels {#sec-r-pkgs}
 
 In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
@@ -296,29 +302,48 @@ base_plot
 
 ## Advanced styling
 
-### Colours
+Now that we have a first draft of the plot, it's time to work on polishing it. We'll make some adjustments to the colors, fonts, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like @fig-packages-sketch-2.
 
-[@rcartocolor]
+### colors
 
-\index{rcartocolor!carto\_pal}
+Let's go for a dark theme for our plot this time. We'll choose a dark grey for the background color, and white for the text to ensure sufficient contrast.
 
 ```{r}
-#| label: r-pkgs-cols
+#| label: r-pkgs-cols-1
 bg_col <- "#3A3B3C"
 text_col <- "white"
+```
+
+Let's also define a color palette that we'll use for the fill color of the area charts. We're looking for 8 different colors - one for each core {tidyverse} package. The {rcartocolor} [@rcartocolor] package provides access to the [CARTOColors](https://carto.com/carto-colors/) color palettes for maps designed by [CARTO](https://carto.com/) [@cartocolors]. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics. 
+
+In the {rcartocolor} package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using `display_carto_all()`: \index{rcartocolor!display\_carto\_all}
+
+```{r}
+#| label: fig-r-pkgs-rcarto
+#| fig-cap: "All qualitative color palettes with at least 8 colors in the {rcartocolor} package."
+rcartocolor::display_carto_all(
+  n = 8, type = "qualitative"
+)
+```
+
+Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-r-pkgs-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. \index{rcartocolor!carto\_pal}
+
+To keep a more consistent color theme in the plot, we define our highlight color variable, `highlight_col`, to be the first color in our chosen color palette.
+
+```{r}
+#| label: r-pkgs-cols-2
 col_palette <- rcartocolor::carto_pal(9, "Bold")[1:8]
 highlight_col <- col_palette[1]
 ```
 
-\index{ggplot2!scale\_fill\_manual}
+We can then pass this `col_palette` vector into `scale_fill_manual()` function to apply the colors to our plot: \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-r-pkgs-col-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Each area chart is colored using a different color from the {rcartocolor} package."
 col_plot <- base_plot +
   scale_fill_manual(
-    values = col_palette,
-    drop = FALSE
+    values = col_palette
   )
 col_plot
 ```
@@ -354,19 +379,23 @@ social <- social_caption(
 )
 ```
 
-, ... quote from the ... [... website]() in italics using `*`.
-
-We also join together the subtitle text, data source information, and social media caption using `paste0()` (although you could use `glue()` instead). \index{base!paste0}
+The subtitle includes a quote from the [{tidyverse} website](https://www.tidyverse.org/), so we'll format it in italics using `*`. We also use the `source_caption()` function we defined in @sec-cats to create a caption with information about the data source, combined with the social icons to attribute the graphic. \index{source\_caption}
 
 ```{r}
-#| label: r-pkgs-text
+#| label: r-pkgs-text-1
 title <- "How many times did I use {tidyverse} packages for TidyTuesday?"
-st <- "The tidyverse is a collection of open source R packages that *share an underlyingdesign philosophy, grammar, and data structures of tidy data*. Of the 8 core tidyverse packages, {ggplot2} was my most used package for TidyTuesday visualisations in 2023."
-cap <- paste0(
-  st,
-  "<br>**Data**: github.com/nrennie/tidytuesday<br>**Graphic**:",
-  social
+st <- "The tidyverse is a collection of open source R packages that *share an underlying design philosophy, grammar, and data structures*. Of the 8 core tidyverse packages, {ggplot2} was my most used package for TidyTuesday visualisations in 2023."
+source_cap <- source_caption(
+  source = "github.com/nrennie/tidytuesday",
+  graphic = social
 )
+```
+
+We also join together the subtitle text with the data and graphic source information using `paste0()` (although you could use `glue()` instead). \index{base!paste0}
+
+```{r}
+#| label: r-pkgs-text-2
+cap <- paste0(st, "<br", source_cap)
 ```
 
 We can then pass this text into the `labs()` function to apply it to our plot. We also set `x = ""` to remove the x-axis text, and define a more informative y-axis title. \index{ggplot2!labs}
@@ -392,27 +421,18 @@ There are multiple different ways to remove the axis labels. You can set `x = ""
 
 ### Adjusting scales and themes
 
-We can adjust the x- and y- axes labeling to deal with the over-crowding of the labels. By default, labels have been added on each facet, at every three months. Although the data only covers 2023, {ggplot2} also extends the x-axis to cover the beginning of 2024. We can adjust the `limits` and `breaks` of the x-axis scale to show only 2023, and have fewer labels. Since the values on the x-axis are dates, we use `scale_x_date()` to make the adjustments.
+We can adjust the x- and y- axes labeling to deal with the over-crowding of the labels. By default, labels have been added on each facet, at every three months. Although the data only covers 2023, {ggplot2} also extends the x-axis to cover the beginning of 2024. We can adjust the `limits` and `breaks` of the x-axis scale to show only 2023, and have fewer labels. Since the values on the x-axis are dates, we use `scale_x_date()` to make the adjustments. This also means that the values we pass into the `breaks` and `limits` arguments of `scale_x_date()` should be dates, and so we again make use of `ymd()` from {lubridate}. We set the x-axis limits to be from January 1 to December 31 of 2023, and add labels on the first of January and July. \index{ggplot2!scale\_x\_date} \index{lubridate!ymd}
 
-\index{ggplot2!scale\_x\_date} \index{lubridate!ymd}
-
-y axis
-
-To remove the excess space around the edge of each facet plot, we also set `expand = FALSE` in `coord_cartesian()`. \index{ggplot2!coord\_cartesian} 
+For the y-axis, we choose *nice* limits and breaks - setting the limits to between 0 and 150, with breaks every 50. To remove the excess space around the edge of each facet plot, we also set `expand = FALSE` in `coord_cartesian()`. \index{ggplot2!coord\_cartesian} 
 \index{ggplot2!scale\_y\_continuous} 
-
 
 ```{r}
 #| label: fig-r-pkgs-limits-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
 limits_plot <- text_plot +
   scale_x_date(
-    limits = c(
-      lubridate::ymd(20230101), lubridate::ymd(20231231)
-    ),
-    breaks = c(
-      lubridate::ymd(20230101), lubridate::ymd(20230701)
-    ),
+    limits = lubridate::ymd(c("20230101", "20231231")),
+    breaks = lubridate::ymd(c("20230101", "20230701")),
     labels = c("Jan", "Jul")
   ) +
   scale_y_continuous(
@@ -438,14 +458,14 @@ theme_plot <- limits_plot +
     plot.margin = margin(5, 10, 5, 10),
     # plot background
     plot.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     panel.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     # facet strip text and background
     strip.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     strip.text = element_text(
       face = "bold"
@@ -454,7 +474,7 @@ theme_plot <- limits_plot +
     # title and subtitle text
     plot.title.position = "plot",
     plot.title = ggtext::element_textbox_simple(
-      colour = text_col,
+      color = text_col,
       hjust = 0,
       halign = 0,
       margin = margin(b = 5, t = 5),
@@ -462,25 +482,25 @@ theme_plot <- limits_plot +
       size = rel(1.4)
     ),
     plot.subtitle = ggtext::element_textbox_simple(
-      colour = text_col,
+      color = text_col,
       hjust = 0,
       halign = 0,
       margin = margin(b = 5, t = 0)
     ),
     # axes styling and grid lines
     axis.text = element_text(
-      colour = text_col
+      color = text_col
     ),
     axis.title = element_text(
-      colour = text_col
+      color = text_col
     ),
     axis.ticks = element_blank(),
     panel.grid.major = element_line(
-      colour = alpha(text_col, 0.2),
+      color = alpha(text_col, 0.2),
       linewidth = 0.2
     ),
     panel.grid.minor = element_line(
-      colour = alpha(text_col, 0.3),
+      color = alpha(text_col, 0.3),
       linewidth = 0.2
     )
   )
@@ -518,9 +538,7 @@ new_levels <- glue::glue(
 )
 ```
 
-Now we need to do the same thing to the `pkgs` column. It's important that we overwrite the `pkgs` column here rather than making an entirely new column. This means that we can use the `%+%` operator to update the data and the ...
-
-\index{dplyr!mutate} \index{glue!glue} \index{base!factor}
+Now we need to do the same thing to the `pkgs` column. It's important that we overwrite the `pkgs` column here rather than making an entirely new column. This means that we can use the `%+%` operator to update the data and {ggplot2} will still be able to find the correct variable to facet by. We again use `glue()` to add the `pkgs` column into HTML `<img>` tags - being very careful to make sure that the new column values match exactly to the factor levels we defined in `new_levels`. This allows us to then apply these factor levels using `mutate()` to make sure the ordering of the packages from most to least used in retained. \index{dplyr!mutate} \index{glue!glue} \index{base!factor}
 
 ```{r}
 #| label: r-pkgs-img-data
@@ -555,7 +573,7 @@ img_plot +
 
 ## Facet label images using {marquee}
 
-You can do a very similar thin
+You can do a very similar thing using the {marquee} package [@marquee] instead of {ggtext}. 
 
 :::
 
