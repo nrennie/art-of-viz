@@ -243,11 +243,9 @@ Now we're ready to create a first draft of @fig-packages-sketch-1!
 
 ### The first plot
 
-\index{ggplot2!ggplot} \index{ggplot2!geom\_area} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
+We start our plot by passing `plot_data` into `ggplot()` to use this data as the base for all elements in the plot. We then add `geom_area()` to create the geometry for the area chart, specifying the aesthetic mapping using `aes()` again. We put the `date` on the x-axis, `n` on the y-axis. and set the fill color of the area chart based on the category in `pkgs`. This is very similar to the initial plots created in @sec-museums. \index{ggplot2!ggplot} \index{ggplot2!geom\_area} \index{ggplot2!aes} 
 
-This is very similar to the initial plots created in @sec-museums.
-
-Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown.
+We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We want our facet plots all in one line rather than arranged as a grid, so we set `nrow = 1` inside `facet_wrap()`. Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown. \index{ggplot2!facet\_wrap}
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
@@ -321,7 +319,7 @@ We can see that there are now quite a few `0` values included in the `n` column.
 
 Now we need to update the data that is used in our `base_plot`. We *could* simply edit (or copy and paste) the code from above and substitute `plot_data` for `new_plot_data`. But we can alternatively use the `%+%` operator.
 
-need something here
+The `%+%` operator allows you to replace the current default data frame on an existing plot. We start with our existing `base_plot`, and then use `%+%` to set `new_plot_data` as the data used in the plot.
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
