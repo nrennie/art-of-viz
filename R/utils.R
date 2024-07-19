@@ -2,6 +2,7 @@
 # Source needed files -----------------------------------------------------
 
 source("R/social_caption.R")
+source("R/source_caption.R")
 source("R/load_font_awesome.R")
 
 
