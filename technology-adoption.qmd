@@ -224,7 +224,9 @@ Think again about stacked bar charts instead of gauge charts for a second (since
 
 ::: {#tip-technology-ymin .callout-tip}
 
-There is almost certainly a nicer way of doing this in base R that contains fewer lines of code and is easier to read. Consider the following code block as an experiment in seeing whether I *could* do this in a piped workflow, without considering whether I *should*...
+## Just because you can doesn't mean you should
+
+There is almost certainly a nicer way of doing this in base R that contains fewer lines of code and is easier to read. Consider the following code block as an experiment in seeing whether we *could* do this in a piped workflow, without considering whether we *should*...
 
 :::
 
@@ -257,6 +259,8 @@ All of our variables are currently scaled between 0 and 1 (since they relate to 
 We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from {dplyr} in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent {dplyr} from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
 
 ::: {#tip-technology-mutate .callout-tip}
+
+## Older versions of `mutate()`
 
 In older versions of {dplyr} (including when this plot was originally made), the `mutate_at()` function would have been used instead of `mutate()` and `across()`. The `mutate_at()` function has now been superseded. 
 
@@ -392,7 +396,7 @@ title <- "Measles Immunizations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
 ```
 
-We also create a custom caption with Font Awesome icons, as described in @sec-chap4. Remember to update the `caption` variable to include the source of the data for this visualisation.
+We also create a custom caption with Font Awesome icons, as described in @sec-cats. Remember to update the `caption` variable to include the source of the data for this visualisation.
 
 ```{r}
 #| label: technology-style-3
@@ -515,7 +519,7 @@ We have a few different options for dealing with the legend. Some options for a 
 
 * Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. We would also need to add a better title (or remove the title completely).
 * We could design a custom legend, similar to the one created in @sec-house. This might be a good option as double gauge charts are less common and readers might be less familiar with them. Adding additional information about how they work might prove helpful.
-* We could instead use colored text in the subtitle to indicate what the categories are, as we did in @sec-chap4. For this visualisation, highlighting the *Immunized* would be enough as there are only two categories.
+* We could instead use colored text in the subtitle to indicate what the categories are, as we did in @sec-turbines and @sec-cats. For this visualisation, highlighting the *Immunized* would be enough as there are only two categories.
 
 What might a custom legend look like? A custom legend could be a subset of the full plot with some additional annotations. For example, we could subset the data to only include one country (`"USA"` in this case) and recreate the plot we already have. Here, we also remove the built-in legend and add a *How do I read this plot?* title.
 
@@ -528,14 +532,14 @@ legend_plot <- ggplot(
       x0 = 0, y0 = 0, r0 = 0.7, r = 1,
       start = ymin_2010, end = ymax_2010, fill = YN
     ),
-    colour = NA
+    color = NA
   ) +
   ggforce::geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0, r0 = 0.2, r = 0.5,
       start = ymin_1980, end = ymax_1980, fill = YN
     ),
-    colour = NA
+    color = NA
   ) +
   geom_text(
     data = text_df,
