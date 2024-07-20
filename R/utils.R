@@ -1,4 +1,11 @@
 
+# Source needed files -----------------------------------------------------
+
+source("R/social_caption.R")
+source("R/source_caption.R")
+source("R/load_font_awesome.R")
+
+
 # camcorder recording -----------------------------------------------------
 
 library(camcorder)
@@ -20,3 +27,6 @@ unlink("recording", recursive = TRUE)
 library(xml2)
 library(downlit)
 library(lintr)
+library(styler)
+library(maps)
+

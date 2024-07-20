@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.37">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="description" content="Learn how to create data visualisations in R.">
+<title>The #TidyTuesday Cookbook – 8&nbsp; Doctors in an Ageing Population: making maps with {ggplot2}</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./time-zones.html" rel="next">
+<link href="./spatial.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head>
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualising spatial data</a></li><li class="breadcrumb-item"><a href="./doctors-ageing-population.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The #TidyTuesday Cookbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./author.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common charts don't need to be boring!</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./programming-languages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Programming Languages: dumbbell charts with {ggplot2}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./uk-museums.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./icons-images.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Making use of icons, fonts, and text</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./canadian-wind-turbines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./global-seafood.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualising spatial data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./us-house-elections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./weird-wonderful.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weird and wonderful: completely custom charts</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bee-colony-losses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nobel-prize-laureates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliography</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">8.1</span> Data</a></li>
+  <li>
+<a href="#exploratory-work" id="toc-exploratory-work" class="nav-link" data-scroll-target="#exploratory-work"><span class="header-section-number">8.2</span> Exploratory work</a>
+  <ul class="collapse">
+<li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">8.2.1</span> Data exploration</a></li>
+  <li><a href="#exploratory-sketches" id="toc-exploratory-sketches" class="nav-link" data-scroll-target="#exploratory-sketches"><span class="header-section-number">8.2.2</span> Exploratory sketches</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">8.3</span> Preparing a plot</a>
+  <ul class="collapse">
+<li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">8.3.1</span> Data wrangling</a></li>
+  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">8.3.2</span> The first plot</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#advanced-styling" id="toc-advanced-styling" class="nav-link" data-scroll-target="#advanced-styling"><span class="header-section-number">8.4</span> Advanced styling</a>
+  <ul class="collapse">
+<li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">8.4.1</span> Colors</a></li>
+  <li><a href="#text-and-fonts" id="toc-text-and-fonts" class="nav-link" data-scroll-target="#text-and-fonts"><span class="header-section-number">8.4.2</span> Text and fonts</a></li>
+  <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">8.4.3</span> Adjusting themes</a></li>
+  </ul>
+</li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">8.5</span> Reflection</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualising spatial data</a></li><li class="breadcrumb-item"><a href="./doctors-ageing-population.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="sec-doctors" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><p>In this chapter we’ll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.</p>
+<section id="data" class="level2" data-number="8.1"><h2 data-number="8.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">8.1</span> Data</h2>
+<p>There’s often a <em>Bring Your Own Data</em> week each year of #TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
+<p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some compaies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
+<p>One fantastic source of data is the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>). The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you’re ever looking for inspiration.</p>
+<p>For this chapter, we’ll visualise data on <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">Medical doctors per 1,000 people</a>, a dataset which comes from the Our World in Data website <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. You can load the data using the {owidR} R package <span class="citation" data-cites="owidR">(<a href="references.html#ref-owidR" role="doc-biblioref">York 2023</a>)</span>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">owidR</span><span class="op">)</span></span>
+<span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/owidR/man/owid.html">owid</a></span><span class="op">(</span><span class="st">"physicians-per-1000-people"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-museums-view" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You may choose to save a copy of <code>doctors</code> as a CSV file for later use, which you can read in with <code>read.csv</code> or <code>read_csv()</code> from {readr}. </p>
+</div>
+</div>
+</section><section id="exploratory-work" class="level2" data-number="8.2"><h2 data-number="8.2" class="anchored" data-anchor-id="exploratory-work">
+<span class="header-section-number">8.2</span> Exploratory work</h2>
+<p>Let’s start by exploring the data to see if there are interesting patterns that can be visualised.</p>
+<section id="data-exploration" class="level3" data-number="8.2.1"><h3 data-number="8.2.1" class="anchored" data-anchor-id="data-exploration">
+<span class="header-section-number">8.2.1</span> Data exploration</h3>
+<p>The data is reasonably small, containing only 4 columns: <code>entity</code> (denoting the country or a larger region), <code>code</code> (the country code), <code>year</code> (year the data relates to), and <code>Physicians (per 1,000 people)</code>. The 4682 rows of data cover 221 different regions (some aggregates of others), with data covering 60 years.</p>
+<div class="cell">
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">doctors</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 6 × 4
+  entity      code   year
+  &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;
+1 Afghanistan AFG    1960
+2 Afghanistan AFG    1965
+3 Afghanistan AFG    1970
+4 Afghanistan AFG    1981
+5 Afghanistan AFG    1986
+6 Afghanistan AFG    1987
+# ℹ 1 more variable:
+#   `Physicians (per 1,000 people)` &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>Often when there’s a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualising time series data, a simple scatter plot can also indicate if there’s a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a <em>spaghetti chart</em> as discussed in <a href="uk-museums.html" class="quarto-xref"><span>Chapter 2</span></a>.</p>
+<div class="cell">
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">doctors</span><span class="op">$</span><span class="va">year</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">doctors</span><span class="op">$</span><span class="va">`Physicians (per 1,000 people)`</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Year"</span>, ylab <span class="op">=</span> <span class="st">"Physicians per 1,000 people"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-base-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>There seems to be a general increasing trend between 1960 and 2019. The other important component of this data that we may want to explore is the spatial aspect - is there a pattern over space as well as over time?</p>
+</section><section id="exploratory-sketches" class="level3" data-number="8.2.2"><h3 data-number="8.2.2" class="anchored" data-anchor-id="exploratory-sketches">
+<span class="header-section-number">8.2.2</span> Exploratory sketches</h3>
+<p>The most common approach to visualising spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it’s very common to color the country based on the value of the variable. These are often termed <em>choropleth maps</em>.</p>
+<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.2: Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right
+</figcaption></figure>
+</div>
+<p>At this point, it’s also often a good time to start thinking about the orientation and aspect ratio of the plot you’ll create. This will depend a lot of where the plot is going to end up - for example, plots in a single column academic article will typically be landscape graphs. The choice of orientation and aspect ratio can also affect how clearly your data is displayed - choosing a very wide plot for time series data can stretch the series and obliterate any appearance of trend. With maps, you’re a little bit more constrained because there is already an underlying aspect ratio in the plot you’re creating. For this map, a landscape orientation with a 6x4 aspect ratio should work reasonably well. </p>
+</section></section><section id="preparing-a-plot" class="level2" data-number="8.3"><h2 data-number="8.3" class="anchored" data-anchor-id="preparing-a-plot">
+<span class="header-section-number">8.3</span> Preparing a plot</h2>
+<p>To create the map sketched out in <a href="#fig-doctors-sketch" class="quarto-xref">Figure&nbsp;<span>8.2</span></a>, we need to do two things (i) decide which data to plot: which regions, and which years; and (ii) source some spatial data beyond just region names and country codes.</p>
+<section id="data-wrangling" class="level3" data-number="8.3.1"><h3 data-number="8.3.1" class="anchored" data-anchor-id="data-wrangling">
+<span class="header-section-number">8.3.1</span> Data wrangling</h3>
+<p>Since this data is already fairly tidy, there isn’t too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don’t need, and renaming a couple of columns to make them easier to work with. We can use the <code>rename()</code> function from {dplyr} to rename the <code>entity</code> column to <code>region</code> (for reasons that will become clear in the next paragraph!). We also rename the <code>Physicians (per 1,000 people)</code> column to <code>doctors</code> to make it easier to work with. The data has multiple entries for each country, spanning different years. We <em>could</em> make an animated map to show how the number of doctors is changing over time, but for now we’ll keep it simple with a static map showing a snapshot at one point in time. However, there’s a bit of a problem. If you inspect the data, you’ll see that not every country has an entry for each year - let’s use the most recent data available for each country. For each <code>region</code>, we keep the row with only the most recent year using a combination of <code>group_by()</code> and <code>slice_max()</code> from {dplyr}.</p>
+<div class="cell">
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="va">doctors</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span></span>
+<span>    region <span class="op">=</span> <span class="va">entity</span>,</span>
+<span>    doctors <span class="op">=</span> <span class="va">`Physicians (per 1,000 people)`</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">region</span>, <span class="va">year</span>, <span class="va">doctors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To plot this data on a world map, we also need data for the country borders. Luckily, the <code><a href="https://ggplot2.tidyverse.org/reference/map_data.html">map_data()</a></code> function built into {ggplot2} can help us with that! This function takes data from the {maps} package and turns it into an object you can plot directly with {ggplot2}.</p>
+<div class="cell">
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/map_data.html">map_data</a></span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Of course, it’s never quite that straightforward. We need to join the <code>world</code> map data to our <code>doctors</code> data, and to do that we need a column in each data sets to join by - we’ll use the <code>region</code> column. If you try to join these two data sets using the <code>region</code> column, you’ll notice that you end up with some unexpected <code>NA</code> values. So what’s going on?</p>
+<div id="tip-doctors-join" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You don’t need to rename columns in your data to be able to join them, but for this example, I found it a little bit easier to work with the data after renaming <code>entity</code> to <code>region</code>.</p>
+</div>
+</div>
+<p>There are two issues here. Firstly, there are more regions in the <code>world</code> data than there are in the <code>doctors</code> data:</p>
+<div class="cell">
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">world</span><span class="op">$</span><span class="va">region</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>[1] 252</code></pre>
+</div>
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">doctors</span><span class="op">$</span><span class="va">region</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>[1] 221</code></pre>
+</div>
+</div>
+<p>This is partly due to the fact that the <code>doctors</code> data has implicitly missing values - if no data is available for a region, no rows exists in the data for that region. It isn’t listed with <code>NA</code> values. Note that there are also some <em>regions</em> in <code>doctors</code> which do not exist in <code>world</code> - for example, the entity <code>"Upper-middle-income countries"</code> is listed within <code>doctors</code>.</p>
+<p>Secondly, if you inspect the region names, you’ll see that for some countries, their names are encoded differently. For example, in the <code>world</code> data, the United States is listed as <code>"USA"</code> whilst in the <code>doctors</code> data, it’s listed as <code>"United States"</code>. Here, the easiest thing to do is manually rename the values that differ in one of the datasets. We can use the <code>recode()</code> function from {dplyr} to do that. Note that <code>recode()</code> has the rather unusual (for the {tidyverse}) syntax of <code>old_name = new_name</code>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">doctors</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    region <span class="op">=</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/recode.html">recode</a></span><span class="op">(</span><span class="va">region</span>,</span>
+<span>        <span class="st">"United Kingdom"</span> <span class="op">=</span> <span class="st">"UK"</span>,</span>
+<span>        <span class="st">"United States"</span> <span class="op">=</span> <span class="st">"USA"</span>,</span>
+<span>        <span class="st">"Democratic Republic of Congo"</span> <span class="op">=</span> <span class="st">"Democratic Republic of the Congo"</span>,</span>
+<span>        <span class="st">"Cote d'Ivoire"</span> <span class="op">=</span> <span class="st">"Ivory Coast"</span>,</span>
+<span>        <span class="st">"Congo"</span> <span class="op">=</span> <span class="st">"Republic of Congo"</span>,</span>
+<span>        <span class="st">"Czechia"</span> <span class="op">=</span> <span class="st">"Czech Republic"</span></span>
+<span>      <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The entries in the <code>region</code> column of <code>doctors</code> that don’t correspond to countries e.g.&nbsp;<code>"Upper-middle-income countries"</code> are not values that are required for the map. Therefore a <code>left_join()</code> can be performed, with <code>world</code> on the left - keeping all the countries listed in <code>world</code> and joining only those with a corresponding value in <code>doctors</code>. The remaining countries in <code>world</code> with no match in <code>doctors</code> are listed with <code>NA</code> values. The rows for <code>"Antarctica"</code> are filtered out - Antarctica is often given a disproportionate amount of space on world maps (at least those not centered on Antarctica) in the process of projecting a sphere onto a rectangle. </p>
+<div class="cell">
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">world</span>, <span class="va">plot_data</span>, by <span class="op">=</span> <span class="st">"region"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">region</span> <span class="op">!=</span> <span class="st">"Antarctica"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we have everything we need to create a simple map.</p>
+</section><section id="the-first-plot" class="level3" data-number="8.3.2"><h3 data-number="8.3.2" class="anchored" data-anchor-id="the-first-plot">
+<span class="header-section-number">8.3.2</span> The first plot</h3>
+<p>We start, as almost always, with the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, and pass in the data and aesthetic mappings that will apply to the whole plot. The longitude (<code>long</code>) and latitude (<code>lat</code>) are passed to the <code>x</code> and <code>y</code> axes; and we specify that the <code>fill</code> color of each country should be based on the <code>doctors</code> column. We also specify <code>map_id</code> - an aesthetic mapping that isn’t seen as often as the others. This is used to tell <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code> which column defines each region polygon (not entirely unlike the <code>group</code> aesthetic discussed in previous chapters). </p>
+<p>Both <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code> are used for creating maps within {ggplot2}. However, they expect different formats of data: <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> expects an <code>sf</code> object, whereas <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code> works with coordinates as columns in a <code>data.frame</code> or <code>tibble</code>. Here, we’ll use <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code>. For examples of using <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code>, see <a href="time-zones.html" class="quarto-xref"><span>Chapter 9</span></a>. </p>
+<div id="tip-doctors-polygon" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note: you could also use <code><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon()</a></code> to plot <code>map_data</code> instead of <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code>. </p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">map_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">long</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">lat</span>,</span>
+<span>    map_id <span class="op">=</span> <span class="va">region</span>,</span>
+<span>    fill <span class="op">=</span> <span class="va">doctors</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map</a></span><span class="op">(</span>map <span class="op">=</span> <span class="va">map_data</span><span class="op">)</span></span>
+<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-basic-plot-1-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.3: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>So we have a simple map that shows our data, but there are several problems with it:</p>
+<ul>
+<li>The map looks as if someone has stretched it vertically, since there’s no map projection specified. Countries are still recognizable, but not quite the right shape.</li>
+<li>The color palette is not ideal. It’s more intuitive for brighter or lighter colors to represent smaller values, and for darker colors to represent higher values - at least for light colored backgrounds <span class="citation" data-cites="Schloss">(<a href="references.html#ref-Schloss" role="doc-biblioref">Schloss et al. 2019</a>)</span>. The default gradient color scale in {ggplot2} is the opposite way around.</li>
+<li>There are labels that don’t need to be there (<code>lat</code> and <code>long</code>), and missing labels that should be there (<code>title</code> and <code>subtitle</code>, for example).</li>
+</ul>
+<p>So let’s fix those elements of the initial plot.</p>
+</section></section><section id="advanced-styling" class="level2" data-number="8.4"><h2 data-number="8.4" class="anchored" data-anchor-id="advanced-styling">
+<span class="header-section-number">8.4</span> Advanced styling</h2>
+<p>We’ll start by considering alternative color palettes, then think about text that should be added, before finalising the layout.</p>
+<section id="colors" class="level3" data-number="8.4.1"><h3 data-number="8.4.1" class="anchored" data-anchor-id="colors">
+<span class="header-section-number">8.4.1</span> Colors</h3>
+<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favourite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
+<p>{MetBrewer} does have functions that interface directly with {ggplot2} (such as <code><a href="https://rdrr.io/pkg/MetBrewer/man/scale_fill_met_c.html">scale_fill_met_c()</a></code>) but we’re going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the <code>"Hokusai2"</code> palette. The <code>text_col</code> is the 18th color and <code>highlight_col</code> is the 15th color. A variable containing the background color, <code>bg_col</code>, is also defined.</p>
+<div class="cell">
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
+<span><span class="va">col_palette</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MetBrewer/man/met.brewer.html">met.brewer</a></span><span class="op">(</span><span class="st">"Hokusai2"</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="va">col_palette</span><span class="op">[</span><span class="fl">18</span><span class="op">]</span></span>
+<span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="va">col_palette</span><span class="op">[</span><span class="fl">15</span><span class="op">]</span></span>
+<span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#EADEDA"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These colors can then be passed into <code><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn()</a></code> from {ggplot2}. The limits of the color scale can also be set. Rather than adding labels for values on the legend, we can add text labels for <em>Fewer doctors</em> and <em>More doctors</em>. These are positioned 0.8 in from the limits of the color scale.</p>
+<div class="cell">
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn</a></span><span class="op">(</span></span>
+<span>    colors <span class="op">=</span> <span class="va">col_palette</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">9.2</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Fewer doctors"</span>, <span class="st">"More doctors"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">col_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-1-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.4: Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="text-and-fonts" class="level3" data-number="8.4.2"><h3 data-number="8.4.2" class="anchored" data-anchor-id="text-and-fonts">
+<span class="header-section-number">8.4.2</span> Text and fonts</h3>
+<p>As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. Here, the <em>Roboto</em> font is loaded through Google Fonts for the main font used, and <em>Roboto Slab</em> is loaded for use in the title. </p>
+<div class="cell">
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span><span class="op">)</span></span>
+<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto Slab"</span>, family <span class="op">=</span> <span class="st">"roboto_slab"</span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"roboto"</span></span>
+<span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"roboto_slab"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can define some text for the title, subtitle, and caption. As in previous chapters, we’ll be using {ggtext} for formatting which means we can use markdown syntax to add bold font and line breaks.</p>
+<div class="cell">
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Doctors in an ageing population"</span></span>
+<span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"This map show the number of doctors per thousand people, revealing which countries* may be more likely to struggle in providing care for a population.&lt;br&gt;&lt;br&gt;*using the most recent available data for each country."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s create a custom caption that includes Font Awesome icons, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 5</span></a>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
+<span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>  bg_color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
+<span>  <span class="st">"**Data**: Our World in Data&lt;br&gt;**Graphic**: {social}"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These text variables can then be passed into the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function in {ggplot2}:</p>
+<div class="cell">
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="va">title</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="va">subtitle</span>,</span>
+<span>    caption <span class="op">=</span> <span class="va">caption</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To apply our chosen fonts to the plot, the <code>theme</code> elements need to be adjusted. </p>
+</section><section id="adjusting-themes" class="level3" data-number="8.4.3"><h3 data-number="8.4.3" class="anchored" data-anchor-id="adjusting-themes">
+<span class="header-section-number">8.4.3</span> Adjusting themes</h3>
+<p>We start by adding <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> from {ggplot2}. The <code>theme_void</code> function removes all <code>theme</code> elements - including grid lines, axis labels, and the background. The legend and specified titles and subtitles remain. This theme is especially useful for maps where it’s more common for axis lines, axis titles, and grid lines not to be displayed. Like other built-in theme options, we can still set the <code>base_size</code> and <code>base_family</code> to set the default size and font family for any text that is displayed. </p>
+<p>We also set the <code>plot.title</code>, <code>plot.subtitle</code>, and <code>plot.caption</code> to use <code>element_textbox_simple</code> from {ggtext} to allow the markdown syntax and automatically wrap long subtitles as we’ve seen in previous chapters.</p>
+<div class="cell">
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
+<span><span class="va">text_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">8</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      family <span class="op">=</span> <span class="va">title_font</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-style-plot-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-3-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.5: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>One of the aesthetic design choices we might want to make here, is to include the title within a banner with a different colored background. Although this might seem like a fairly straightforward thing to want, it’s actually not that easy with {ggplot2}. There are some solutions to the problem using packages like {cowplot} <span class="citation" data-cites="cowplot">(<a href="references.html#ref-cowplot" role="doc-biblioref">C. O. Wilke 2024</a>)</span> or {grid} <span class="citation" data-cites="rproj">(<a href="references.html#ref-rproj" role="doc-biblioref">R Core Team 2024</a>)</span> to draw rectangles and text. But we can do this within {ggplot2} - by using facets in a way they were not designed to be used. Let’s start by adding an additional column called <code>label</code> to <code>map_data</code> that contains the title (for every row in the data): </p>
+<div class="cell">
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_data</span><span class="op">$</span><span class="va">label</span> <span class="op">&lt;-</span> <span class="va">title</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-doctors-label" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note: this column does not need to be called <code>label</code>, you can use any name you choose as long as it’s not an existing column.</p>
+</div>
+</div>
+<p>Then we can use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> and facet across the <code>label</code> column. Since there’s only one value of <code>label</code> in the data, this just adds the title as strip text at the top of the plot. While we’re here, let’s make the country outlines in the map the same color as the background, and make the lines a little bit thicker. </p>
+<div class="cell">
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">map_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>    <span class="va">long</span>,</span>
+<span>    <span class="va">lat</span>,</span>
+<span>    map_id <span class="op">=</span> <span class="va">region</span>,</span>
+<span>    fill <span class="op">=</span> <span class="va">doctors</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map</a></span><span class="op">(</span></span>
+<span>    map <span class="op">=</span> <span class="va">map_data</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    linewidth <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn</a></span><span class="op">(</span></span>
+<span>    colors <span class="op">=</span> <span class="va">col_palette</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">9.2</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Fewer doctors"</span>, <span class="st">"More doctors"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="va">title</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="va">subtitle</span>,</span>
+<span>    caption <span class="op">=</span> <span class="va">caption</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">label</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">7</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    strip.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">highlight_col</span>, color <span class="op">=</span> <span class="va">highlight_col</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-style-plot-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-4-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.6: Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>It’s obvious that there are some issues with this plot now that the strip text contains the title:</p>
+<ul>
+<li>There is a duplicate title set using <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code>, and the <code>strip.text</code> title is too dark to read against the blue background.</li>
+<li>The subtitle is above the title.</li>
+<li>The map still appears stretched.</li>
+<li>The legend is taking up quite a lot of space, and the white ticks in the colorbar are distracting.</li>
+</ul>
+<p>To solve the first two problems, the <code>title</code> and <code>subtitle</code> arguments of <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be set to <code>NULL</code> to remove them from the plot. Instead, the <code>tag</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be used to set the subtitle. The nice thing about using <code>tag</code> is the <code>plot.tag.position</code> argument within <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> which allows you to position the text anywhere on the plot. The <code>strip.text</code> and <code>plot.tag</code> arguments of theme should also be set using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from {ggtext} to allow the text to be styled as we wish. The top, left, and right margins of the plot should be set to <code>0</code> using <code>plot.margin</code> to make sure that the strip text banner goes to the edge of the plot. </p>
+<p>To solve the third problem of the map looking stretched, we can apply <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> which applies the World Geodetic System 1984 (WGS84) CRS (coordinate reference system). The upper limit of the <code>y</code> axis can also be extended beyond the range of the data to make room for the subtitle added using <code>tag</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">&lt;-</span> <span class="va">styled_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="cn">NULL</span>, subtitle <span class="op">=</span> <span class="cn">NULL</span>, tag <span class="op">=</span> <span class="va">subtitle</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># add space for the tag (subtitle) text</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">60</span>, <span class="fl">140</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># move and format the tag (subtitle) text</span></span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
+<span>    plot.tag <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      maxwidth <span class="op">=</span> <span class="fl">0.98</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># add margin for caption</span></span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>l <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.6</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># change title text color</span></span>
+<span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">5</span>, <span class="fl">7</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.7</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that the values used in <code>plot.tag.position = c(0.015, 0.8)</code> and the <code>strip.text</code> argument <code>margin = margin(7, 5, 7, 5)</code> took a lot of trial and error to get <em>just right</em>. There’s no magic involved in choosing these values!</p>
+<p>To solve the final problem of the legend appearance, we can edit the style elements in <code>theme</code>. The <code>legend.title</code> is removed by setting it to a blank element with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank()</a></code>, and the legend text labels are styled with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. </p>
+<p>The placement of the legend is set through the <code>legend.position</code>, <code>legend.justification.bottom</code>, <code>legend.margin</code>, and <code>legend.direction</code> arguments.</p>
+<div id="tip-doctors-ggplot" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Since version 3.5.0 of {ggplot2}, you can also style the <code>theme</code> of individual legends from inside the <code>guide_*()</code> functions. Prior to version 3.5.0, <code>legend.position</code> was used to position the legend inside the plot before <code>legend.position.inside</code> and <code>legend.justification.bottom</code> were introduced to allow custom legend positions more easily.</p>
+<p>The other difference is that <code>legend.ticks = element_blank()</code> can be used to remove the white tick marks inside the colorbar legend. In older versions of {ggplot2}, <code>guides(fill = guide_colorbar(ticks = FALSE))</code> could be used instead. </p>
+</div>
+</div>
+<p>The size of the legend is controlled through the <code>legend.key.width</code> and <code>legend.key.height</code> arguments.</p>
+<div class="cell">
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># legend text</span></span>
+<span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>      hjust <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># legend size</span></span>
+<span>    legend.key.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="st">"cm"</span><span class="op">)</span>,</span>
+<span>    legend.key.height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="st">"cm"</span><span class="op">)</span>,</span>
+<span>    <span class="co"># legend position</span></span>
+<span>    legend.position <span class="op">=</span> <span class="st">"bottom"</span>,</span>
+<span>    legend.justification.bottom <span class="op">=</span> <span class="st">"right"</span>,</span>
+<span>    legend.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    legend.direction <span class="op">=</span> <span class="st">"horizontal"</span>,</span>
+<span>    legend.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-doctors-style-plot-5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="doctors-ageing-population_files/figure-html/fig-doctors-style-plot-5-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.7: Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section></section><section id="reflection" class="level2" data-number="8.5"><h2 data-number="8.5" class="anchored" data-anchor-id="reflection">
+<span class="header-section-number">8.5</span> Reflection</h2>
+<p>When the original plot of this data was created, it plotted the number of doctors per 1,000 people over the age of 70 and the colors were based on the log of this value - compare <a href="#fig-doctors-style-plot-5" class="quarto-xref">Figure&nbsp;<span>8.7</span></a> and <a href="#fig-doctors-original" class="quarto-xref">Figure&nbsp;<span>8.8</span></a>. The raw values on the color scale were hard to interpret, so the choice was made to use <em>Fewer doctors</em> and <em>More doctors</em> labels instead. For this version, where the underlying data is simpler and easier to interpret, having the values on the legend would add more useful information. The original title was also kept, but could probably be changed to something more informative.</p>
+<div id="fig-doctors-original" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-original-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/doctors_original.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-original-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.8: My original plot created for this data, with a slightly different underlying data set.
+</figcaption></figure>
+</div>
+<p>When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it’s much older. In fact, running <code>range(doctors$year)</code> shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there’s no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the different is between times. Showing uncertainty on maps is tricky, and there’s no straightforward solution here. Perhaps setting the colors to a binary scale showing whether the value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.</p>
+<p>One improvement to this map over the original is the use of <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> to <em>correctly</em> scale the aspect ratio of the map. In the original map, using <code><a href="https://ggplot2.tidyverse.org/reference/coord_map.html">coord_map()</a></code> (now deprecated in favour of <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code>) produced some odd looking results, and in the end, after applying the rest of the styling changes, the end result didn’t look too squashed. But <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> made it much easier to achieve.</p>
+<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="images/doctors.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-img_anderson" class="csl-entry" role="listitem">
+Anderson, Lance. 2017. <span>“School of Gray Fish.”</span> <a href="https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg">https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg</a>.
+</div>
+<div id="ref-geomtextpath" class="csl-entry" role="listitem">
+Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
+</div>
+<div id="ref-cartocolors" class="csl-entry" role="listitem">
+CARTO. 2016. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://carto.com/carto-colors/">https://carto.com/carto-colors/</a>.
+</div>
+<div id="ref-extrafont" class="csl-entry" role="listitem">
+Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using Fonts</em>. <a href="https://CRAN.R-project.org/package=extrafont">https://CRAN.R-project.org/package=extrafont</a>.
+</div>
+<div id="ref-dumbbell" class="csl-entry" role="listitem">
+Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
+</div>
+<div id="ref-technology_data" class="csl-entry" role="listitem">
+Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+</div>
+<div id="ref-seafood_data" class="csl-entry" role="listitem">
+Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
+</div>
+<div id="ref-img_dibbern" class="csl-entry" role="listitem">
+Dibbern, Lilian. 2019. <span>“Lemur Beside Tree.”</span> <a href="https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY">https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY</a>.
+</div>
+<div id="ref-Hullman2021" class="csl-entry" role="listitem">
+Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
+</div>
+<div id="ref-viridis" class="csl-entry" role="listitem">
+Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-geofacet" class="csl-entry" role="listitem">
+Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
+</div>
+<div id="ref-harmon2024" class="csl-entry" role="listitem">
+Harmon, Jon. 2024. <em><span class="nocase">Web APIs with R</span></em>. <span>CRC Press</span>. <a href="https://wapir.io/">https://wapir.io/</a>.
+</div>
+<div id="ref-lintr" class="csl-entry" role="listitem">
+Hester, Jim, Florent Angly, Russ Hyde, Michael Chirico, Kun Ren, Alexander Rosenstock, and Indrajeet Patil. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
+</div>
+<div id="ref-glue" class="csl-entry" role="listitem">
+Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Interpreted String Literals</em>. <a href="https://glue.tidyverse.org/">https://glue.tidyverse.org/</a>.
+</div>
+<div id="ref-camcorder" class="csl-entry" role="listitem">
+Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plot History</em>. <a href="https://CRAN.R-project.org/package=camcorder">https://CRAN.R-project.org/package=camcorder</a>.
+</div>
+<div id="ref-tidytuesdayR" class="csl-entry" role="listitem">
+———. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
+</div>
+<div id="ref-paletteer" class="csl-entry" role="listitem">
+Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
+</div>
+<div id="ref-zones_data" class="csl-entry" role="listitem">
+Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+</div>
+<div id="ref-kays2020" class="csl-entry" role="listitem">
+Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
+</div>
+<div id="ref-museums_data" class="csl-entry" role="listitem">
+Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
+</div>
+<div id="ref-rnaturalearth" class="csl-entry" role="listitem">
+Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
+</div>
+<div id="ref-cats_data" class="csl-entry" role="listitem">
+McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-MetBrewer" class="csl-entry" role="listitem">
+Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
+</div>
+<div id="ref-elections_data" class="csl-entry" role="listitem">
+MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
+</div>
+<div id="ref-styler" class="csl-entry" role="listitem">
+Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</span>: Non-Invasive Pretty Printing of <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=styler">https://CRAN.R-project.org/package=styler</a>.
+</div>
+<div id="ref-tibble" class="csl-entry" role="listitem">
+Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
+</div>
+<div id="ref-rcartocolor" class="csl-entry" role="listitem">
+Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-doctors_data" class="csl-entry" role="listitem">
+Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
+</div>
+<div id="ref-sf" class="csl-entry" role="listitem">
+Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Standardized Support for Spatial Vector Data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
+</div>
+<div id="ref-ggforce" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Accelerating <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggforce">https://CRAN.R-project.org/package=ggforce</a>.
+</div>
+<div id="ref-patchwork" class="csl-entry" role="listitem">
+———. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
+</div>
+<div id="ref-marquee" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-ragg" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.
+</div>
+<div id="ref-pldb_data" class="csl-entry" role="listitem">
+PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Database.”</span> <em><span>PLDB</span></em>.
+</div>
+<div id="ref-sysfonts" class="csl-entry" role="listitem">
+Qiu, Yixuan, and authors/contributors of the included fonts. See file AUTHORS for details. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
+</div>
+<div id="ref-showtext" class="csl-entry" role="listitem">
+Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+</div>
+<div id="ref-rproj" class="csl-entry" role="listitem">
+R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-tidytuesday" class="csl-entry" role="listitem">
+R4DS Online Learning Community. 2023. <span>“Tidy Tuesday: A Weekly Social Data Project.”</span> <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
+</div>
+<div id="ref-social_icons" class="csl-entry" role="listitem">
+Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span>.”</span> <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
+</div>
+<div id="ref-template_files" class="csl-entry" role="listitem">
+———. 2023b. <span>“Creating Template Files with <span>R</span>.”</span> <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
+</div>
+<div id="ref-streamline" class="csl-entry" role="listitem">
+———. 2023c. <span>“Four Ways to Streamline Your <span>R</span> Workflows.”</span> <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
+</div>
+<div id="ref-ggtextcircle" class="csl-entry" role="listitem">
+———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
+</div>
+<div id="ref-pkgs_data" class="csl-entry" role="listitem">
+———. 2024b. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+</div>
+<div id="ref-signif2024a" class="csl-entry" role="listitem">
+Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
+</div>
+<div id="ref-hex_forcats" class="csl-entry" role="listitem">
+RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
+</div>
+<div id="ref-hex_ggplot2" class="csl-entry" role="listitem">
+———. 2018b. <span>“<span class="nocase">ggplot2</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
+</div>
+<div id="ref-hex_purrr" class="csl-entry" role="listitem">
+———. 2018c. <span>“<span class="nocase">purrr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
+</div>
+<div id="ref-hex_readr" class="csl-entry" role="listitem">
+———. 2018d. <span>“<span class="nocase">readr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
+</div>
+<div id="ref-hex_tibble" class="csl-entry" role="listitem">
+———. 2018e. <span>“<span class="nocase">tibble</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
+</div>
+<div id="ref-hex_dplyr" class="csl-entry" role="listitem">
+———. 2020a. <span>“<span class="nocase">dplyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
+</div>
+<div id="ref-hex_stringr" class="csl-entry" role="listitem">
+———. 2020b. <span>“<span class="nocase">stringr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
+</div>
+<div id="ref-hex_tidyr" class="csl-entry" role="listitem">
+———. 2020c. <span>“<span class="nocase">tidyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
+</div>
+<div id="ref-ggalt" class="csl-entry" role="listitem">
+Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</span>: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’Ggplot2’</em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
+</div>
+<div id="ref-Schloss" class="csl-entry" role="listitem">
+Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
+</div>
+<div id="ref-funspotr" class="csl-entry" role="listitem">
+Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-Tol2021" class="csl-entry" role="listitem">
+Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
+</div>
+<div id="ref-bees_data" class="csl-entry" role="listitem">
+United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
+</div>
+<div id="ref-crsuggest" class="csl-entry" role="listitem">
+Walker, Kyle. 2022. <em>Crsuggest: Obtain Suggested Coordinate Reference System Information for Spatial Data</em>. <a href="https://CRAN.R-project.org/package=crsuggest">https://CRAN.R-project.org/package=crsuggest</a>.
+</div>
+<div id="ref-Wanzer2021" class="csl-entry" role="listitem">
+Wanzer, Dana Linnell, Tarek Azzam, Natalie D. Jones, and Darrel Skousen. 2021. <span>“The Role of Titles in Enhancing Data Visualization.”</span> <em>Evaluation and Program Planning</em> 84: 101896. https://doi.org/<a href="https://doi.org/10.1016/j.evalprogplan.2020.101896">https://doi.org/10.1016/j.evalprogplan.2020.101896</a>.
+</div>
+<div id="ref-ggplot2" class="csl-entry" role="listitem">
+Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
+</div>
+<div id="ref-stringr" class="csl-entry" role="listitem">
+———. 2023. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-r4ds" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em><span>R</span> for Data Science</em>. O-Reilly. <a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>.
+</div>
+<div id="ref-dplyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis Vaughan. 2023. <em><span class="nocase">dplyr</span>: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.
+</div>
+<div id="ref-purrr" class="csl-entry" role="listitem">
+Wickham, Hadley, and Lionel Henry. 2023. <em><span class="nocase">purrr</span>: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.
+</div>
+<div id="ref-readr" class="csl-entry" role="listitem">
+Wickham, Hadley, Jim Hester, and Jennifer Bryan. 2024. <em><span class="nocase">readr</span>: Read Rectangular Text Data</em>. <a href="https://CRAN.R-project.org/package=readr">https://CRAN.R-project.org/package=readr</a>.
+</div>
+<div id="ref-scales" class="csl-entry" role="listitem">
+Wickham, Hadley, Thomas Lin Pedersen, and Dana Seidel. 2023. <em><span class="nocase">scales</span>: Scale Functions for Visualization</em>. <a href="https://CRAN.R-project.org/package=scales">https://CRAN.R-project.org/package=scales</a>.
+</div>
+<div id="ref-tidyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Davis Vaughan, and Maximilian Girlich. 2024. <em><span class="nocase">tidyr</span>: Tidy Messy Data</em>. <a href="https://CRAN.R-project.org/package=tidyr">https://CRAN.R-project.org/package=tidyr</a>.
+</div>
+<div id="ref-ggtextures" class="csl-entry" role="listitem">
+Wilke, Claus. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
+</div>
+<div id="ref-cowplot" class="csl-entry" role="listitem">
+Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot Theme and Plot Annotations for <span class="nocase">’ggplot2’</span></em>. <a href="https://wilkelab.org/cowplot/">https://wilkelab.org/cowplot/</a>.
+</div>
+<div id="ref-ggtext" class="csl-entry" role="listitem">
+Wilke, Claus O., and Brenton M. Wiernik. 2022. <em><span class="nocase">ggtext</span>: Improved Text Rendering Support for <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggtext">https://CRAN.R-project.org/package=ggtext</a>.
+</div>
+<div id="ref-nobel_data" class="csl-entry" role="listitem">
+www.nobelprize.org. 2024. <span>“<span>Nobel Prize API Version 2.1</span>.”</span> <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
+</div>
+<div id="ref-owidR" class="csl-entry" role="listitem">
+York, Piers. 2023. <em><span class="nocase">owidR</span>: Import Data from Our World in Data</em>. <a href="<https://github.com/piersyork/owidR>">&lt;https://github.com/piersyork/owidR&gt;</a>.
+</div>
+<div id="ref-ggimage" class="csl-entry" role="listitem">
+Yu, Guangchuang. 2023. <em><span class="nocase">ggimage: Use Image in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggimage">https://CRAN.R-project.org/package=ggimage</a>.
+</div>
+<div id="ref-gghighlight" class="csl-entry" role="listitem">
+Yutani, Hiroaki. 2023. <em><span class="nocase">gghighlight</span>: Highlight Lines and Points in <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=gghighlight">https://CRAN.R-project.org/package=gghighlight</a>.
+</div>
+<div id="ref-lemurs_data" class="csl-entry" role="listitem">
+Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, and Anne D. Yoder. 2014. <span>“<span class="nocase">Life history profiles for 27 strepsirrhine primate taxa generated using captive data from the Duke Lemur Center</span>.”</span> <em>Scientific Data</em> 1 (1). <a href="https://doi.org/10.1038/sdata.2014.19">https://doi.org/10.1038/sdata.2014.19</a>.
+</div>
+</div>
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./spatial.html" class="pagination-link" aria-label="Visualising spatial data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Visualising spatial data</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./time-zones.html" class="pagination-link" aria-label="Time Zones: spatial data and mapping with {sf}">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+<script src="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.js" defer="true"></script>
+</body></html>
