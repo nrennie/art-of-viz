@@ -56,6 +56,13 @@ Datasets in the Movebank Data Repository are licensed using the Creative Commons
 The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission.
 
 
+## Chapter 6: R package use
+
+Source: [https://github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday)
+
+Copyright info: CC-BY-4.0 License
+
+
 ## Chapter 7: Global seafood
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12](https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-10-12)
@@ -114,3 +121,13 @@ Original source: [https://usda.library.cornell.edu/concern/publications/rn301137
 Copyright info: [https://usda.library.cornell.edu/about](https://usda.library.cornell.edu/about)
 
 All publication files are considered government works and licensed with U.S. Public Domain.
+
+## Chapter 13: Nobel Prize Laureates
+
+Source: [github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14)
+
+Original (updated) source: [https://api.nobelprize.org/2.1/laureates](https://api.nobelprize.org/2.1/laureates)
+
+Copyright info: [www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org](https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/)
+
+CC0 1.0 Deed (Public Domain)
