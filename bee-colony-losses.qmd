@@ -3,14 +3,40 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.5
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/options.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/source_caption.R
+```
 
 # Bee Colony Losses: visualising density with Poisson disk sampling {#sec-bees}
 
 ## Data
 
 ```{r}
-#| label: load-bees-data-show
+#| label: bees-data-show
 #| eval: false
 #| echo: true
 tuesdata <- tidytuesdayR::tt_load("2022-01-11")
@@ -19,7 +45,7 @@ stressor <- tuesdata$stressor
 ```
 
 ```{r}
-#| label: load-bees-data-hide
+#| label: bees-data-hide
 #| output: false
 #| echo: false
 #| eval: true
@@ -38,17 +64,212 @@ colony <- readr::read_csv("data/colony.csv")
 
 ### Data wrangling
 
+```{r}
+#| label: bees-states
+states_to_plot <- c(
+  "California", "Texas", "Florida",
+  "New York", "Alabama", "Illinois"
+)
+```
+
+
+```{r}
+#| label: bees-prep-data
+plot_data <- colony |>
+  dplyr::filter(
+    state %in% states_to_plot,
+    year != "6/"
+  ) |>
+  dplyr::group_by(year, state) |>
+  dplyr::summarise(bees = mean(colony_n, na.rm = TRUE)) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(year = as.numeric(year))
+```
+
+Data unavailable for apr-jun 2019, and for end of 2021
+
+
+```{r}
+#| label: bees-state_order
+state_levels <- plot_data |>
+  dplyr::filter(year == 2021) |>
+  dplyr::arrange(-bees) |>
+  dplyr::pull(state)
+```
+
+
+```{r}
+```
+
+
 ### Packages and functions
+
+@poissoned
+
+```{r}
+bees_grid <- plot_data |>
+  dplyr::rowwise() |>
+  dplyr::mutate(
+    t = sqrt(bees / 1000),
+    pnts = list(
+      poissoned::poisson_disc(ncols = t, nrows = t, cell_size = 1 / t)
+    )
+  ) |>
+  dplyr::ungroup() |>
+  tidyr::unnest(pnts) |>
+  dplyr::mutate(state = factor(state, levels = state_levels))
+```
+
 
 ### The first plot
 
+```{r}
+#| label: fig-bees-base-plot
+#| fig-cap: "Plot"
+library(ggplot2)
+base_plot <- ggplot(data = bees_grid) +
+  geom_point(
+    mapping = aes(x = x, y = y),
+    size = 0.3
+  ) +
+  facet_grid(state ~ year, switch = "both")
+base_plot
+```
+
 ## Advanced styling
 
-### Colours
+### Colors
 
-### Text and fonts
+```{r}
+#| label: bees-colors
+highlight_col <- "#fecc27"
+bg_col <- "black"
+```
+
+```{r}
+#| label: fig-bees-base-plot-2
+#| fig-cap: "Plot"
+base_plot <- ggplot(data = bees_grid) +
+  annotate(
+    geom = "tile",
+    x = 0.5, y = 0.5,
+    width = 1.07, height = 1.07,
+    fill = highlight_col,
+    color = bg_col,
+    linewidth = 0.5
+  ) +
+  geom_point(
+    mapping = aes(x = x, y = y),
+    size = 0.2,
+    color = bg_col
+  ) +
+  facet_grid(state ~ year, switch = "both")
+base_plot
+```
+
+### Fonts
+
+```{r}
+#| label: bees-fonts
+sysfonts::font_add_google(
+  name = "Source Code Pro",
+  family = "source"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "source"
+```
+
+### Adding text
+
+```{r}
+#| label: bees-social
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = highlight_col,
+  font_color = highlight_col,
+  font_family = body_font
+)
+```
+
+```{r}
+#| label: bees-text
+title <- "Bee colony losses in the United States"
+st <- "Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors."
+```
+
+```{r}
+#| label: bees-cap
+source_cap <- source_caption(
+  source = "USDA",
+  graphic = social,
+  sep = " | "
+)
+```
+
+```{r}
+#| label: fig-bees-text-plot
+#| fig-cap: "Plot"
+text_plot <- base_plot +
+  labs(
+    title = title,
+    subtitle = st,
+    caption = source_cap,
+    x = NULL, y = NULL
+  )
+text_plot
+```
+
 
 ### Adjusting themes
 
+
+```{r}
+#| label: bees-theme-plot-1
+theme_plot <- text_plot +
+  theme_void(
+    base_family = body_font,
+    base_size = 7
+  )
+```
+
+```{r}
+#| label: bees-theme-plot-2
+#| fig-cap: "Plot"
+theme_plot +
+  theme(
+    # background colors
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    strip.background = element_rect(
+      fill = bg_col
+    ),
+    # facet labels
+    strip.text.x = element_text(
+      color = highlight_col
+    ),
+    strip.text.y = element_text(
+      color = highlight_col,
+      angle = 90
+    ),
+    # text formatting
+    plot.title = ggtext::element_textbox_simple(
+      color = highlight_col,
+      face = "bold"
+    ),
+    plot.subtitle = ggtext::element_textbox_simple(
+      color = highlight_col,
+      margin = margin(t = 5, b = 5)
+    ),
+    plot.caption = ggtext::element_textbox_simple(
+      color = highlight_col,
+      margin = margin(t = 5)
+    ),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+```
+
 ## Reflection
 
+* wider range of states, difficult to see trend over time
