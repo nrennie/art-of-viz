@@ -2,9 +2,9 @@ social_caption <- function(twitter = "@nrennie35",
                            mastodon = "fosstodon.org/@nrennie",
                            linkedin = "nicola-rennie",
                            github = "nrennie",
-                           icon_color = nr_dark,
-                           font_color = nr_dark,
-                           bg_color = nr_light,
+                           icon_color = "black",
+                           font_color = "black",
+                           bg_color = "white",
                            font_family = "Commissioner") {
   icons <- list(
     twitter = "&#xf099",
