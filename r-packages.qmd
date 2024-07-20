@@ -37,22 +37,24 @@ In this chapter, we'll learn about how to collect data on which packages and fun
 
 ## Data
 
-All of the directories containing code for visualisation are in file based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R`. Since it takes a while to run, let's it to code for visualisations created in `2023`. We can use `str_detect()` from {stringr} to find any ... in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect}
+In July 2024, TidyTuesday [@TidyTuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
 
-see [@streamline].
+Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from {funspotr} to get this list of files: specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
+
+All of the files in this repository, that contain code for visualisations, are in named and organised in the following structure based on dates: `yyyy/yyyy-mm-dd/yyyymmdd.R` [@streamline]. Since the code to extract used functions takes a while to run, let's filter this list of files to only visualisations created in `2023`. We can use `str_detect()` from {stringr} to find any values in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect} \index{dplyr!filter}
 
 ```{r}
 #| label: r-pkgs-load-data-1
 #| eval: false
 #| echo: true
-files_to_check <-
-  funspotr::list_files_github_repo("nrennie/tidytuesday",
-    branch = "main"
-  ) |>
+files_to_check <- funspotr::list_files_github_repo(
+  repo = "nrennie/tidytuesday",
+  branch = "main"
+) |>
   dplyr::filter(stringr::str_detect(relative_paths, "2023"))
 ```
 
-Then pass into `spot_funs_files()` from {funspotr} [@funspotr]
+We then pass this data frame into `spot_funs_files()` from {funspotr} to get the list of function and packages uses in each file listed in `files_to_check`. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
 
 ```{r}
 #| label: r-pkgs-load-data-2
@@ -60,14 +62,11 @@ Then pass into `spot_funs_files()` from {funspotr} [@funspotr]
 #| echo: true
 r_funs <- files_to_check |>
   funspotr::spot_funs_files(
-    show_each_use = TRUE,
-    keep_in_multiple_pkgs = TRUE
+    show_each_use = TRUE
   )
 ```
 
-got a few errors here, maybe try re-running or debugging
-
-We then use the `unnest_results()` function from {funspotr} to get a row in the data for each use of the package. Since the code above takes a while to run, it's also important that we save the data in a format that means we can use it later (rather than having to re-download it). We'll save it as a CSV file using `write.csv()`, choosing an appropriate file name and removing the row names. \index{funspotr!unnest\_results} \index{utils!write.csv}
+We then use the `unnest_results()` function from {funspotr} to get a row in the data for each use of a function. Since the code above takes a while to run, it's also important that we save the data in a format that means we can use it later (rather than having to re-download it). We'll save it as a CSV file using `write.csv()`, choosing an appropriate file name and removing the row names. \index{funspotr!unnest\_results} \index{utils!write.csv}
 
 ```{r}
 #| label: r-pkgs-load-data-3
@@ -78,7 +77,7 @@ r_pkgs <- rfuns |>
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
-We can then read the CSV back in using `read_csv()` from {readr} at any ... (or `read.csv()` if you prefer!) \index{readr!read\_csv}
+We can then read the CSV back in using `read_csv()` from {readr} (or `read.csv()` if you prefer!) \index{readr!read\_csv}
 
 ```{r}
 #| label: r-pkgs-load-data-csv
@@ -86,7 +85,7 @@ We can then read the CSV back in using `read_csv()` from {readr} at any ... (or 
 r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ```
 
-The `r_pkgs` data has `r nrow(r_pkgs)` rows and `r ncol(r_pkgs)` columns.
+The `r_pkgs` data has `r nrow(r_pkgs)` rows and `r ncol(r_pkgs)` columns. The `funs` column contains names of each function used, `pkgs` has the name of the package that function comes from. The remaining two columns are the `relative_paths` and `absolute_paths` columns that identify which file the function was found in. Let's have a quick look at the data using `head()`: \index{utils!head}
 
 ```{r}
 #| label: r-pkgs-head
@@ -95,9 +94,11 @@ head(r_pkgs)
 
 ## Exploratory work
 
+The obvious questions to start with here are: which packages are used most often? Which functions are used most often?
+
 ### Data exploration
 
-The obvious question here is: which packages are used most often? Let's start by counting the number of package uses with the `table()` function, and using `sort()` to arrange packages from least to most used. \index{base!table} \index{base!sort}
+Let's start by counting the number of package uses with the `table()` function, and using `sort()` to arrange packages from least to most used. \index{base!table} \index{base!sort}
 
 We can then pass this into the `barplot()` function to obtain an ordered bar chart of package use - setting `horiz = TRUE` to make a horizontal bar chart. Since there is a large number of bars, we also adjust the labels to be a little smaller. We can see that `ggplot` comes out on top, closely followed by `base`! 
 
@@ -105,7 +106,7 @@ We can then pass this into the `barplot()` function to obtain an ordered bar cha
 
 ```{r}
 #| label: fig-r-pkgs-barplot
-#| fig-cap: "Ordere bar chart showing the number of times each package was used in 2023. The 'ggplot2' package is used most."
+#| fig-cap: "Ordered bar chart showing the number of times each package was used in 2023. The 'ggplot2' package is used most."
 #| fig-asp: 1
 barplot(
   sort(table(r_pkgs$pkgs)),
@@ -222,7 +223,7 @@ Let's find a generalisable way to figure out which core {tidyverse} packages are
 The difference in the two vectors (in this case `"tibble"`) can then be appended to the end of the `pkgs_ordered` vector, to create a complete list of packages in order from most to least used, including zero usage:
 
 ```{r}
-#| label: r-pkgs-levels-2
+#| label: r-pkgs-levels-1
 pkgs_levels <- c(
   pkgs_ordered,
   setdiff(core_tidyverse, pkgs_ordered)
@@ -269,7 +270,7 @@ You might notice two things here:
 * alongside the plot, a (slightly confusing) warning message is returned;
 * the ordering of the plot doesn't look quite right.
 
-> You might also notice the large spike in the {ggplot2} facet which shows 141 uses of the {ggplot2} package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
+You might also notice the large spike in the {ggplot2} facet which shows 141 uses of the {ggplot2} package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
 
 Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the {stringr} package looks much larger than the area for the {readr} package - even though it should be smaller. It also looks as though there are no values in the {forcats} facet - but we know this isn't true for {forcats}, only for {tibble}. Why is this happening?
 
@@ -277,7 +278,7 @@ The problem is that 0 is not included in the data. The areas are being drawn bet
 
 In our data set, if a package isn't used in a script, there is no entry in the data. This makes sense since there are tens of thousands of packages and it would be much more difficult and time consuming to list every package that isn't used, rather than just those that are. But in our case, these missing, unobserved values aren't really missing values - they are 0 values. 
 
-> The warning message returned from the plot is also trying to tell us about this problem (the warning just isn't very clear!)
+The warning message returned from the plot is also trying to tell us about this problem (the warning just isn't very clear!)
 
 ::: {#tip-packages-area .callout-tip}
 
@@ -328,11 +329,28 @@ base_plot <- base_plot %+% new_plot_data
 base_plot
 ```
 
-> Notice that the warning message has now disappeared.
+Notice that the warning message has now disappeared.
 
 ## Advanced styling
 
-Now that we have a first draft of the plot, it's time to work on polishing it. We'll make some adjustments to the colors, fonts, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like @fig-packages-sketch-2.
+Now that we have a first draft of the plot, it's time to work on polishing it. We'll make some adjustments to the fonts, colors, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like @fig-packages-sketch-2.
+
+### Fonts
+
+Similar to @sec-programming, since code is the subject of the visualisation, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
+
+In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+
+```{r}
+#| label: r-pkgs-fonts
+sysfonts::font_add_google(
+  name = "Source Code Pro",
+  family = "source"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "source"
+```
 
 ### colors
 
@@ -378,22 +396,6 @@ col_plot <- base_plot +
 col_plot
 ```
 
-### Fonts
-
-Similar to @sec-programming, since code is the subject of the visualisation, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
-
-In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
-
-```{r}
-#| label: r-pkgs-fonts
-sysfonts::font_add_google(
-  name = "Source Code Pro",
-  family = "source"
-)
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
-body_font <- "source"
-```
 
 ### Adding text
 
@@ -425,7 +427,7 @@ We also join together the subtitle text with the data and graphic source informa
 
 ```{r}
 #| label: r-pkgs-text-2
-cap <- paste0(st, "<br", source_cap)
+cap <- paste0(st, "<br>", source_cap)
 ```
 
 We can then pass this text into the `labs()` function to apply it to our plot. We also set `x = ""` to remove the x-axis text, and define a more informative y-axis title. \index{ggplot2!labs}
@@ -473,16 +475,24 @@ limits_plot <- text_plot +
 limits_plot
 ```
 
-\index{ggplot2!theme\_dark} \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
+Let's set the `base_size` \index{ggplot2!theme\_dark}
+
+```{r}
+#| label: r-pkgs-theme-plot
+init_theme_plot <- limits_plot +
+  theme_dark(
+    base_size = 6,
+    base_family = body_font
+  )
+```
+
+
+ \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-theme-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
-theme_plot <- limits_plot +
-  theme_dark(
-    base_size = 6,
-    base_family = body_font
-  ) +
+theme_plot <- init_theme_plot +
   theme(
     legend.position = "none",
     plot.margin = margin(5, 10, 5, 10),
@@ -559,7 +569,7 @@ new_levels <- glue::glue(
 )
 ```
 
-We can also control how the images appear within the `<img>` tag (to some extent). For example, we can set the width of the image (this will take a little bit of trial and error!). The images will be left-aligned by default within the facet label area and, unfortunately, the `hjust` arguments don't seem to affect the image. Instead, we can use a slightly *hacky* solution and add some blank space to the left hand side. In HTML, `&nbsp;` can be used to add a (non-breaking) space. Again, a little bit of trial and error is needed to figure out how many spaces we need to add.
+We can also control how the images appear within the `<img>` tag (to some extent). For example, we can set the width of the image (this will take a little bit of trial and error!). Unfortunately, the `hjust` and `halign` arguments don't seem to fully center the image within the facet label area. Instead, we can use a slightly *hacky* solution and add some blank space to the left hand side. In HTML, `&nbsp;` can be used to add a (non-breaking) space. Again, a little bit of trial and error is needed to figure out how many spaces we need to add.
 
 ```{r}
 #| label: r-pkgs-new-levels-2
@@ -588,14 +598,17 @@ As we did earlier, let's update the data to use our new `plot_img_data` using th
 img_plot <- theme_plot %+% plot_img_data
 ```
 
-We also need to tell {ggplot2} that the facet labels are using HTML tags, just as we've done with the caption. We edit the `theme()` function further and update the styling for `strip.text.x`. We again use `element_textbox_simple()` from {ggtext}, but don't need to pass in any further arguments since everything is controlled through the HTML tags. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
+We also need to tell {ggplot2} that the facet labels are using HTML tags, just as we've done with the caption. We edit the `theme()` function further and update the styling for `strip.text.x`. We again use `element_textbox_simple()` from {ggtext}, and set `hjust` and `halign` both to 0.5. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-final-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Hex stickers have replaced the text labels on the facets."
 img_plot +
   theme(
-    strip.text.x = ggtext::element_textbox_simple(),
+    strip.text.x = ggtext::element_textbox_simple(
+      hjust = 0.5,
+      halign = 0.5
+    )
   )
 ```
 
@@ -603,7 +616,34 @@ img_plot +
 
 ## Facet label images using {marquee}
 
-You can do a very similar thing using the {marquee} package [@marquee] instead of {ggtext}. 
+You can do a very similar thing using the {marquee} package [@marquee] instead of {ggtext}. The images can be added to `pkgs` using standard Markdown syntax instead of HTML tags: \index{dplyr!mutate} \index{glue!glue}
+
+```{r}
+#| label: r-pkgs-marquee-1
+#| eval: false
+#| echo: true
+plot_img_data <- new_plot_data |>
+  dplyr::mutate(
+    pkgs = glue::glue("![](images/hex/{pkgs}.png)")
+  )
+```
+
+Remember that you'd also need to update the factor levels and the data used in the plot. You'd then adjust the theme to use `element_marquee()` to process the Markdown syntax: \index{marquee!element\_marquee} \index{ggplot2!theme}
+
+```{r}
+#| label: r-pkgs-marquee-2
+#| eval: false
+#| echo: true
+img_plot +
+  theme(
+    strip.text.x = marquee::element_marquee(
+      hjust = 0.5,
+      width = 1
+    )
+  )
+```
+
+However, controlling the sizing and placement of the images is (at the time of writing) a little bit more difficult with {marquee}.
 
 :::
 
