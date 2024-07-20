@@ -13,7 +13,7 @@ gg_record(
   dir = file.path("recording"),
   device = "png",
   width = 5,
-  height = 2.5,
+  height = 0.75*5,
   units = "in",
   dpi = 300
 )
