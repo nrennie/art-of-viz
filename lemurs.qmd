@@ -3,7 +3,15 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 1
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/options.R
+```
 
 # Lemurs: combining plots with {patchwork} {#sec-lemurs}
 
@@ -44,7 +52,7 @@ cb_lemurs <- lemurs |>
 
 ```{r}
 #| label: lemurs-wrangling-2
-oldest_cb_lemurs <- cb_lemurs |> 
+oldest_cb_lemurs <- cb_lemurs |>
   dplyr::select(name, sex, dob, dod, age_max_live_or_dead_y) |>
   dplyr::distinct() |>
   dplyr::slice_max(age_max_live_or_dead_y, n = 10)
@@ -65,118 +73,53 @@ plot_data <- oldest_cb_lemurs |>
 
 maybe pivot longer
 
-### The first plot
+## Creating multiple plots
 
-#### Dumbbell plot
+### Dumbbell plot
 
 
 ```{r}
-#| label: fig-lemurs-dumbbel
-#| fig-cap: ""
-#| fig-width: 5
-#| fig-asp: 4
+#| label: fig-lemurs-dumbbell-1
+#| fig-cap: "Plot"
+#| fig-asp: 0.8
 library(ggplot2)
 p1 <- ggplot(data = plot_data) +
   geom_point(
     mapping = aes(
       x = dob,
       y = name,
-      colour = sex
+      color = sex
     )
   ) +
   geom_point(
     mapping = aes(
       x = dod,
-      y = name, colour = sex
+      y = name, color = sex
     )
   ) +
   geom_segment(
     mapping = aes(
       x = dob, xend = dod2,
       y = name, yend = name,
-      colour = sex)
+      color = sex
+    )
   ) +
   geom_text(
     mapping = aes(
       x = mid_date, y = name,
-      label = age_text, 
-      colour = sex
+      label = age_text,
+      color = sex
     ),
     vjust = -0.5
   )
-
-
-
-# scale_colour_manual("", values = c("F" = "#b13173", "M" = "#21ADA8"), labels = c("Female", "Male")) +
-#   labs(x = "", y = "")
-# 
-# 
-# theme(
-#   plot.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-#   panel.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-#   legend.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-#   legend.position = "none",
-#   legend.key = element_rect(fill = "#F5F5DC"),
-#   legend.text = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-#   axis.text = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-#   axis.title = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-#   plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), # top, right, bottom, left
-#   panel.grid.major.y = element_line(colour = alpha("#4e2e12", 0.3)),
-#   panel.grid.major.x = element_blank(),
-#   panel.grid.minor = element_blank()
-# )
 p1
 ```
 
 will get missing value warning and this is fine
 
-#### Scatter plot
+### Styling dumbbell plots
 
-```{r}
-#| label: fig-lemurs-scatter
-#| fig-cap: ""
-#| fig-width: 5
-#| fig-asp: 4
-p2 <- ggplot() +
-  geom_point(data = cb_lemurs,
-             mapping = aes(x = age_at_wt_mo, y = weight_g, colour = sex),
-             size = 0.5) +
-  labs(x = "Age (months)", y = "Weight (g)")
-  # theme(
-  #   plot.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-  #   panel.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-  #   legend.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-  #   legend.position = "bottom",
-  #   legend.key = element_rect(fill = "#F5F5DC"),
-  #   legend.text = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-  #   axis.text = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-  #   axis.title = element_text(colour = "#4e2e12", size = 12, hjust = 0.5, family = "Gill Sans MT Condensed"),
-  #   plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), # top, right, bottom, left
-  #   panel.grid.major = element_line(colour = alpha("#4e2e12", 0.3)),
-  #   panel.grid.minor = element_blank()
-  #)
-p2
-```
-
-
-```{r}
-#| label: fig-lemurs-blank
-p3 <- ggplot() +
-  theme(
-    plot.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-    panel.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-    legend.background = element_rect(fill = "#F5F5DC", colour = "#F5F5DC"),
-    legend.position = "bottom",
-    legend.key = element_rect(fill = "#F5F5DC"),
-    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), # top, right, bottom, left
-    panel.grid.major = element_line(colour = alpha("#b13173", 0.3)),
-    panel.grid.minor = element_blank()
-  )
-```
-
-## Advanced styling
-
-### Colours
+#### Colors
 
 ```{r}
 #| label: lemurs-colors
@@ -186,71 +129,189 @@ f_col <- "#b13173"
 m_col <- "#21ADA8"
 ```
 
-
-### Text and fonts
-
-### Adjusting themes
+still need to edit grid lines and axis text labels formatting
 
 ```{r}
-#| label: lemurs-style-theme
-lemur_theme <- 
-  theme_void(base_size = 7) +
+#| label: fig-lemurs-dumbbell-2
+#| fig-cap: "Plot"
+#| fig-asp: 0.8
+p1_theme <- p1 +
+  scale_color_manual(
+    values = c("F" = f_col, "M" = m_col),
+    guide = "none"
+  ) +
+  theme_minimal(base_size = 6) +
   theme(
     plot.background = element_rect(
-      fill = bg_col, colour = bg_col),
-    panel.background = element_rect(
-      fill = bg_col, colour = bg_col),
-    legend.background = element_rect(
-      fill = bg_col, colour = bg_col),
-    legend.position = "bottom",
-    legend.key = element_rect(fill = bg_col),
-    plot.margin = margin(5, 5, 5, 5),
-    panel.grid.major = element_line(
-      colour = alpha(f_col, 0.3)),
-    panel.grid.minor = element_blank()
+      fill = bg_col, color = bg_col
+    ),
+    axis.title = element_blank(),
+    axis.text = element_text(color = text_col)
   )
+p1_theme
 ```
 
+### Scatter plot
+
 ```{r}
-#| label: fig-lemurs-style-scatter
-#| fig-cap: ""
-p1 + 
-  scale_color_manual(
-  values = c(m_col, f_col),
-  breaks = c("M", "F"),
-  labels = c("Male", "Female")
-) + 
-  lemur_theme
+#| label: fig-lemurs-scatter-1
+#| fig-cap: "Plot"
+#| fig-width: 5
+#| fig-asp: 0.8
+p2 <- ggplot() +
+  geom_point(
+    data = cb_lemurs,
+    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex),
+    size = 0.5
+  ) +
+  labs(x = "Age (months)", y = "Weight (g)")
+p2
 ```
+
+### Styling scatter plots
+
+```{r}
+#| label: fig-lemurs-scatter-1
+#| fig-cap: "Plot"
+#| fig-width: 5
+#| fig-asp: 0.8
+p2_theme <- p2 +
+  scale_color_manual(
+    values = c("F" = f_col, "M" = m_col),
+    breaks = c("F", "M"),
+    labels = c("Female", "Male"),
+    name = ""
+  ) +
+  theme_minimal(base_size = 6) +
+  theme(
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    legend.position = "bottom"
+  )
+p2_theme
+```
+
+
 
 
 
 ## Combining plots with {patchwork}
 
 ```{r}
-#| label: fig-lemurs-join
+#| label: fig-lemurs-patchwork
 library(patchwork)
-p0 <- p2 + p3 + plot_layout(nrow = 2, ncol = 1)
-p <- p1 + p0 +
-  plot_annotation(
-    title = "\nCollared Brown Lemur",
-    caption = "N. Rennie | Data:  Duke Lemur Center | Image:  Duke Lemur Center",
-    subtitle = "\nAt Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest\ncollared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived\nto the age of 32.6 years. \n\nCollared brown lemurs mature at about 3 years old. Once fully-grown, females tend to\nweigh more than males."
-  ) 
-# add theme back in
+p1_theme + p2_theme
+```
+
+```{r}
+p3 <- patchwork::plot_spacer()
+p3_theme <- p3 + theme(
+  plot.background = element_rect(
+    fill = bg_col, color = bg_col
+  )
+)
+```
+
+
+```{r}
+#| label: fig-lemurs-join
+p <- (p1_theme | (p2_theme / p3_theme))
 p
 ```
 
-## Image
+### Adding text
+
+```{r}
+#| label: r-pkgs-fonts
+sysfonts::font_add_google(
+  name = "Lato",
+  family = "Lato"
+)
+sysfonts::font_add_google(
+  name = "Passion One",
+  family = "Passion"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "Lato"
+title_font <- "Passion"
+```
+
+```{r}
+#| label: lemurs-text
+title <- "Collared Brown Lemurs"
+subtitle <- "At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Once fully-grown, females tend to weigh more than males."
+cap <- "N. Rennie | Data:  Duke Lemur Center | Image:  Jax (Unsplash: @lysrix)"
+```
+
+@img_jax
+
+```{r}
+#| label: fig-lemurs-text
+#| fig-cap: "Plot"
+p_text <- p + plot_annotation(
+  title = title,
+  subtitle = subtitle,
+  caption = cap
+)
+p_text
+```
+
+### Editing theme
+
+```{r}
+#| label: fig-lemurs-theme
+#| fig-cap: "Plot"
+theme_plot <- p_text +
+  plot_annotation(
+    theme =
+      ggplot2::theme(
+        text = element_text(
+          size = 7, family = body_font, color = text_col
+        ),
+        plot.background = element_rect(
+          color = bg_col, fill = bg_col
+        ),
+        plot.title = element_text(
+          family = title_font,
+          size = rel(1.6),
+          margin = margin(b = 5)
+        ),
+        plot.subtitle = ggtext::element_textbox_simple(),
+        plot.caption = element_text(hjust = 0)
+      )
+  )
+theme_plot
+```
+
+needs further theming
+
+## Working with images
+
+### How to remove background and flip in R
+
+maybe choose a different image
+
+### adding on top of patchwork
 
 ```{r}
 # add lemur image
 lemur <- "images/lemur-nobg.png"
-q <- cowplot::ggdraw() +
-  cowplot::draw_plot(p) +
-  cowplot::draw_image(lemur, x = 0.78, y = 0.27, hjust = 0.5, vjust = 1, halign = 1, valign = 1, width = 0.6)
-q
+final_plot <- cowplot::ggdraw() +
+  cowplot::draw_plot(theme_plot) +
+  cowplot::draw_image(
+    lemur,
+    x = 1, y = 0,
+    hjust = 1, vjust = 0,
+    halign = 1, valign = 0,
+    width = 0.5
+  )
+final_plot
 ```
 
+add tip for ggimage
+
+make text labels and points a little bit smaller (see aes mapping?)
 
 ## Reflection
