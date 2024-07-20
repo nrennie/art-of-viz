@@ -37,11 +37,11 @@ In this chapter, we'll learn about how to collect data on which packages and fun
 
 ## Data
 
-In July 2024, TidyTuesday [@TidyTuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
+In July 2024, TidyTuesday [@tidytuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
 
-Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from {funspotr} to get this list of files: specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
+Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from {funspotr} to get this list of files - specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to the root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
 
-All of the files in this repository, that contain code for visualisations, are in named and organised in the following structure based on dates: `yyyy/yyyy-mm-dd/yyyymmdd.R` [@streamline]. Since the code to extract used functions takes a while to run, let's filter this list of files to only visualisations created in `2023`. We can use `str_detect()` from {stringr} to find any values in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect} \index{dplyr!filter}
+All of the files in this repository are named and organised based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R` [@streamline]. Since the code to extract used functions takes a while to run, let's filter this list of files to only include files dated `2023`. We can use `str_detect()` from {stringr} to find any values in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect} \index{dplyr!filter}
 
 ```{r}
 #| label: r-pkgs-load-data-1
@@ -54,7 +54,7 @@ files_to_check <- funspotr::list_files_github_repo(
   dplyr::filter(stringr::str_detect(relative_paths, "2023"))
 ```
 
-We then pass this data frame into `spot_funs_files()` from {funspotr} to get the list of function and packages uses in each file listed in `files_to_check`. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
+We then pass the `files_to_check` data frame into `spot_funs_files()` from {funspotr} to get the list of functions and packages uses in each file. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
 
 ```{r}
 #| label: r-pkgs-load-data-2
@@ -85,7 +85,7 @@ We can then read the CSV back in using `read_csv()` from {readr} (or `read.csv()
 r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ```
 
-The `r_pkgs` data has `r nrow(r_pkgs)` rows and `r ncol(r_pkgs)` columns. The `funs` column contains names of each function used, `pkgs` has the name of the package that function comes from. The remaining two columns are the `relative_paths` and `absolute_paths` columns that identify which file the function was found in. Let's have a quick look at the data using `head()`: \index{utils!head}
+The `r_pkgs` data has `r nrow(r_pkgs)` rows and `r ncol(r_pkgs)` columns. The `funs` column contains names of each function used, and `pkgs` has the name of the package that function comes from. The remaining two columns are the `relative_paths` and `absolute_paths` columns that identify which file the function was found in. Let's have a quick look at the data using `head()`: \index{utils!head}
 
 ```{r}
 #| label: r-pkgs-head
@@ -94,7 +94,7 @@ head(r_pkgs)
 
 ## Exploratory work
 
-The obvious questions to start with here are: which packages are used most often? Which functions are used most often?
+The obvious question to start with here is: which packages are used most often?
 
 ### Data exploration
 
@@ -118,7 +118,7 @@ barplot(
 )
 ```
 
-One thing that you may have noticed is that, for some reason, in the data, the package is given as `"ggplot"` rather than `"ggplot2"`. So let's fix that using `mutate()` and the `if_else()` function from {dplyr}. We can overwrite the existing `pkgs` column, where (i) if the value is currently `"ggplot"`, we replace it with `"ggplot2"`; (ii) otherwise, we leave the existing value in the `pkgs` column. \index{dplyr!mutate} \index{dplyr!if\_else}
+One thing that you may have noticed is that, for some reason, in the data the package is listed as `"ggplot"` rather than `"ggplot2"`. So let's fix that using `mutate()` and the `if_else()` function from {dplyr}. We can overwrite the existing `pkgs` column, where (i) if the value is currently `"ggplot"`, we replace it with `"ggplot2"`; (ii) otherwise, we leave the existing value in the `pkgs` column. \index{dplyr!mutate} \index{dplyr!if\_else}
 
 ```{r}
 #| label: r-pkgs-pkgs
@@ -169,7 +169,7 @@ One of the most incredible things about the R community, is our adoration of hex
 To prepare an initial draft of the plot in @fig-packages-sketch-1, we need to wrangle the following information from the data:
 
 * The date each package use relates to (currently embedded in a file name);
-* The number of package uses per day for each core {tidyverse} packages; and 
+* The number of package uses per day for each core {tidyverse} package; and 
 * Which package was used the most often?
 
 ### Data wrangling
@@ -214,7 +214,7 @@ pkgs_ordered <- r_pkgs_date |>
 pkgs_ordered
 ```
 
-What might strike you about this vector of ordered packages is that there are only 7 packages listed. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other {tidyverse} packages. The question now is, should it still be included in the chart? Sometimes, it's important to visualise zeroes. So how do we add it `tibble` into the data. 
+What might strike you about this vector of ordered packages is that there are only 7 packages listed. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other {tidyverse} packages. The question now is, should it still be included in the chart? Sometimes, it's important to visualise zeroes. So how do we add it `tibble` into the data?
 
 The first thing we want to do is include it in the ordered list of packages that we'll later use to define a factor level. Since it's only one package, we *could* just manually add it to the end of the vector with `c(pkgs_ordered, "tibble")`. However, this isn't a very robust solution. If we had data for a different year and wanted to repeat this analysis, this code wouldn't work if `"tibble"` wasn't missing, or if another package was missing. 
 
@@ -333,26 +333,9 @@ Notice that the warning message has now disappeared.
 
 ## Advanced styling
 
-Now that we have a first draft of the plot, it's time to work on polishing it. We'll make some adjustments to the fonts, colors, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like @fig-packages-sketch-2.
+Now that we have a first draft of the plot, it's time to work on polishing it. We'll make some adjustments to the colors, fonts, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like @fig-packages-sketch-2.
 
-### Fonts
-
-Similar to @sec-programming, since code is the subject of the visualisation, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
-
-In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
-
-```{r}
-#| label: r-pkgs-fonts
-sysfonts::font_add_google(
-  name = "Source Code Pro",
-  family = "source"
-)
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
-body_font <- "source"
-```
-
-### colors
+### Colors
 
 Let's go for a dark theme for our plot this time. We'll choose a dark grey for the background color, and white for the text to ensure sufficient contrast.
 
@@ -369,6 +352,7 @@ In the {rcartocolor} package, categorical palettes are referred to as *qualitati
 ```{r}
 #| label: fig-r-pkgs-rcarto
 #| fig-cap: "All qualitative color palettes with at least 8 colors in the {rcartocolor} package."
+#| fig-asp: 0.8
 rcartocolor::display_carto_all(
   n = 8, type = "qualitative"
 )
@@ -396,6 +380,22 @@ col_plot <- base_plot +
 col_plot
 ```
 
+### Fonts
+
+Similar to @sec-programming, since code is the subject of the visualisation, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
+
+In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+
+```{r}
+#| label: r-pkgs-fonts
+sysfonts::font_add_google(
+  name = "Source Code Pro",
+  family = "source"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+body_font <- "source"
+```
 
 ### Adding text
 
@@ -479,15 +479,10 @@ Let's edit the arguments of `theme()` to finalist out plot. There's a fairly lar
 
 We'll start by setting the default font family and base font size in the `text` argument through `element_text()`. We also remove the legend and add a little bit of space around the edges of the plot using the `margin()` function. \index{ggplot2!element\_text} \index{ggplot2!margin} \index{grid!unit}
 
-We then edit the `plot.background` and `panel.background` to have the background color we defined earlier (as `bg_col`) by using the `fill` and `color` arguments in `element_rect()`.
-
-bit more here on facet styling
-
- \index{ggplot2!element\_rect}   \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
-
+We then edit the `plot.background` and `panel.background` to have the background color we defined earlier (as `bg_col`) by using the `fill` and `color` arguments in `element_rect()`. We also do the same for the facet label background which is controlled by the `strip.background` argument. Although we're planning to replace the facet labels with images, for now we'll format them with bold text in our preferred color. The spacing between the facets is controlled by the `panel.spacing` argument. \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{ggplot2!unit}
 
 ```{r}
-#| label: fig-r-pkgs-theme-plot
+#| label: r-pkgs-theme-plot-1
 init_theme_plot <- limits_plot +
   theme(
     text = element_text(family = body_font, size = 6),
@@ -512,12 +507,12 @@ init_theme_plot <- limits_plot +
   )
 ```
 
-bit here on text 
-axis styling
- \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
+Our final adjustments include specifying that we're using {ggtext} for the title and subtitle to allow the HTML and Markdown text to be processed correctly. We do this by using `element_textbox_simple()` from {ggtext} in the `plot.title` and `plot.subtitle` arguments, where we also set the font `color`, left-align it, and add a little padding around the edges. The title text is made slightly larger than normal by using the `rel()` function in size. Setting `plot.title.position = "plot"` means that the title and subtitle text is aligned with the edge of the whole plot, rather than the edge of the first facet plot. This gives a cleaner looker and avoids extra white created due to the width of the y-axis text. \index{ggplot2!rel} \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
+
+We also make sure that the x- and y-axes labels and title are the correct color using `element_text()`. Finally, the grid lines are made thinner and semi-transparent using the `color` and `linewidth` arguments in `element_line()`. The minor grid lines are made a little bit more transparent than the major grid lines. \index{ggplot2!element\_line} 
 
 ```{r}
-#| label: fig-r-pkgs-theme-plot
+#| label: fig-r-pkgs-theme-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
 theme_plot <- init_theme_plot +
   theme(
@@ -546,11 +541,11 @@ theme_plot <- init_theme_plot +
     ),
     axis.ticks = element_blank(),
     panel.grid.major = element_line(
-      color = alpha(text_col, 0.2),
+      color = alpha(text_col, 0.3),
       linewidth = 0.2
     ),
     panel.grid.minor = element_line(
-      color = alpha(text_col, 0.3),
+      color = alpha(text_col, 0.1),
       linewidth = 0.2
     )
   )
