@@ -475,25 +475,22 @@ limits_plot <- text_plot +
 limits_plot
 ```
 
-Let's set the `base_size` \index{ggplot2!theme\_dark}
+Let's edit the arguments of `theme()` to finalist out plot. There's a fairly large number of adjustments to make, so we'll do them in two stages.  \index{ggplot2!theme}
 
-```{r}
-#| label: r-pkgs-theme-plot
-init_theme_plot <- limits_plot +
-  theme_dark(
-    base_size = 6,
-    base_family = body_font
-  )
-```
+We'll start by setting the default font family and base font size in the `text` argument through `element_text()`. We also remove the legend and add a little bit of space around the edges of the plot using the `margin()` function. \index{ggplot2!element\_text} \index{ggplot2!margin} \index{grid!unit}
 
+We then edit the `plot.background` and `panel.background` to have the background color we defined earlier (as `bg_col`) by using the `fill` and `color` arguments in `element_rect()`.
 
- \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
+bit more here on facet styling
+
+ \index{ggplot2!element\_rect}   \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
+
 
 ```{r}
 #| label: fig-r-pkgs-theme-plot
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
-theme_plot <- init_theme_plot +
+init_theme_plot <- limits_plot +
   theme(
+    text = element_text(family = body_font, size = 6),
     legend.position = "none",
     plot.margin = margin(5, 10, 5, 10),
     # plot background
@@ -508,9 +505,22 @@ theme_plot <- init_theme_plot +
       fill = bg_col, color = bg_col
     ),
     strip.text = element_text(
-      face = "bold"
+      face = "bold",
+      color = text_col
     ),
-    panel.spacing = unit(0.5, "lines"),
+    panel.spacing = unit(0.5, "lines")
+  )
+```
+
+bit here on text 
+axis styling
+ \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{grid!unit} \index{ggplot2!element\_blank} \index{ggplot2!element\_line} \index{ggtext!element\_textbox\_simple}
+
+```{r}
+#| label: fig-r-pkgs-theme-plot
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
+theme_plot <- init_theme_plot +
+  theme(
     # title and subtitle text
     plot.title.position = "plot",
     plot.title = ggtext::element_textbox_simple(
@@ -547,9 +557,11 @@ theme_plot <- init_theme_plot +
 theme_plot
 ```
 
+This visualisation is perfectly fine as it is, but we can still edit the facet labels to use hex stickers instead of text labels, as we proposed in @fig-packages-sketch-2.
+
 ## Using images as facet labels
 
-As we saw in @sec-lemurs, packages such as {ggimage} [@ggimage] or {ggtextures} [@ggtextures] can be used to plot images within the plotting area. Here, we want to use images outside of the plotting area in the facet labels. There are several options for overlaying images on existing plots (including outside of the main plot area). The `inset_element()` function from {patchwork} [@patchwork] can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly, `draw_image()` function from {cowplot} [@cowplot] simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. 
+As we saw in @sec-lemurs, packages such as {ggimage} [@ggimage] can be used to plot images within the plotting area. Here, we want to use images outside of the plotting area in the facet labels. There are several options for overlaying images on existing plots (including outside of the main plot area). The `inset_element()` function from {patchwork} [@patchwork] can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly, `draw_image()` function from {cowplot} [@cowplot] simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. 
 
 We've used the {ggtext} package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with {ggtext} to format the facet labels!
 
