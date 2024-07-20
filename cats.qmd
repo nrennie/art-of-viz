@@ -3,26 +3,36 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.75
 ---
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/options.R
+```
 
 # Cats: data-driven annotations with {ggtext} {#sec-cats}
 
 ## Data
 
 ```{r}
-#| label: load-cats-data-show
+#| label: cats-data-show
 #| eval: false
 #| echo: true
 tuesdata <- tidytuesdayR::tt_load("2023-01-31")
 cats <- tuesdata$cats_uk
+cats_reference <- tuesdata$cats_uk_reference
 ```
 
 ```{r}
-#| label: load-cats-data-hide
+#| label: cats-data-hide
 #| output: false
 #| echo: false
 #| eval: true
 cats <- readr::read_csv("data/cats_uk.csv")
+cats_reference <- readr::read_csv("data/cats_uk_reference.csv")
 ```
 
 ## Exploratory work
@@ -35,17 +45,319 @@ cats <- readr::read_csv("data/cats_uk.csv")
 
 ### Data wrangling
 
-### Packages and functions
+```{r}
+#| label: cats-wrangling-1
+cats_data <- cats |>
+  dplyr::select(tag_id, ground_speed) |>
+  dplyr::group_by(tag_id) |>
+  dplyr::summarise(avg_speed = mean(ground_speed, na.rm = TRUE))
+```
+
+```{r}
+#| label: cats-wrangling-2
+plot_data <- cats_data |>
+  dplyr::left_join(
+    dplyr::select(cats_reference, c(tag_id, animal_id, hrs_indoors, age_years)),
+    by = "tag_id"
+  ) |>
+  dplyr::select(-tag_id) |>
+  dplyr::mutate(
+    hrs_indoors = as.character(hrs_indoors <= 17.5),
+    hrs_indoors = dplyr::recode(hrs_indoors,
+      "TRUE" = "Mostly outdoors or mixed",
+      "FALSE" = "Mostly indoors"
+    )
+  ) |>
+  tidyr::drop_na()
+```
 
 ### The first plot
 
+```{r}
+#| label: fig-cats-base-plot
+library(ggplot2)
+base_plot <- ggplot() +
+  geom_point(
+    data = plot_data,
+    mapping = aes(
+      x = age_years,
+      y = avg_speed,
+      color = hrs_indoors
+    )
+  )
+base_plot
+```
+
+
 ## Advanced styling
 
-### Colours
+### Colors
 
-### Text and fonts
+```{r}
+#| label: cats-colors
+cats_palette <- list(
+  "Mostly outdoors or mixed" = "#95B2B8",
+  "Mostly indoors" = "#914D76",
+  "dark_text" = "#2F4F4F",
+  "light_text" = "#546666",
+  "bg_col" = "white"
+)
+```
+
+```{r}
+#| label: cats-colors-plot
+col_plot <- base_plot +
+  scale_color_manual(values = cats_palette, guide = "none")
+```
+
+
+
+### Fonts
+
+```{r}
+#| label: cats-fonts
+sysfonts::font_add_google(
+  name = "Fraunces",
+  family = "fraunces"
+)
+sysfonts::font_add_google(
+  name = "Commissioner",
+  family = "commissioner"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+title_font <- "fraunces"
+body_font <- "commissioner"
+```
+
+
+### Adding annotations
+
+```{r}
+#| label: cats-summaries
+p_summaries <- plot_data |>
+  dplyr::group_by(hrs_indoors) |>
+  dplyr::summarise(
+    avg_speed = mean(avg_speed),
+    avg_age = mean(age_years)
+  ) |>
+  dplyr::mutate(avg_speed = round(avg_speed))
+```
+
+
+```{r}
+#| label: cats-outliers
+p_outlier <- plot_data |>
+  dplyr::filter(avg_speed > 4000)
+
+p_outlier2 <- plot_data |>
+  dplyr::filter(age_years > 15)
+```
+
+
+```{r}
+#| label: fig-cats-annot-1
+#| fig-cap: "Plot"
+annotated_plot <- col_plot +
+  # Summary
+  ggtext::geom_textbox(
+    data = p_summaries,
+    mapping = aes(
+      x = avg_age, y = avg_speed,
+      label = glue::glue(
+        "{hrs_indoors}<span style='color:{cats_palette$light_text};
+  font-size:6pt'><br>Average speed: {avg_speed} m/s"
+      )
+    ),
+    halign = 0.5, hjust = 0.5,
+    size = 2.5,
+    lineheight = 0.5,
+    family = body_font,
+    box.color = cats_palette$dark_text,
+    alpha = 0.6,
+    maxheight = unit(4, "lines"),
+    minwidth = unit(6, "lines"),
+    maxwidth = unit(8, "lines")
+  ) +
+  # Outlier
+  ggtext::geom_textbox(
+    data = p_outlier,
+    mapping = aes(
+      x = age_years, y = avg_speed - 750,
+      label = glue::glue("<span style='color:{cats_palette$`Mostly outdoors or mixed`}'>{animal_id}</span>
+     <span style='color:{cats_palette$light_text}; font-size:6pt'><br>by name, magic by nature!
+     One speedy cat has an average speed of {avg_speed} m/s!</span>")
+    ),
+    halign = 0, hjust = 0.5,
+    size = 2.5,
+    lineheight = 0.4,
+    family = body_font,
+    box.size = 2,
+    box.color = NA,
+    fill = cats_palette$light_text,
+    alpha = 0.1,
+    minwidth = unit(6, "lines"),
+    maxwidth = unit(8, "lines")
+  ) +
+  # Outlier 2
+  ggtext::geom_textbox(
+    data = p_outlier2,
+    mapping = aes(
+      x = age_years, y = avg_speed,
+      label = glue::glue("<span style='color:{cats_palette$`Mostly indoors`}'>{animal_id}</span>
+     <span style='color:{cats_palette$light_text}; font-size:6pt'><br>was the oldest cat in the study, with an age of {age_years} years.</span>")
+    ),
+    halign = 1, hjust = 0.95,
+    vjust = -0.5,
+    size = 2.5,
+    lineheight = 0.4,
+    family = body_font,
+    box.color = NA,
+    fill = cats_palette$light_text,
+    alpha = 0.1,
+    minwidth = unit(6, "lines"),
+    maxwidth = unit(8, "lines")
+  )
+annotated_plot
+```
+
+```{r}
+#| label: fig-cats-arrow
+#| fig-cap: "Plot"
+arrow_plot <- annotated_plot +
+  annotate(
+    geom = "curve",
+    x = 2,
+    y = 4500,
+    xend = 3,
+    yend = 4900,
+    linewidth = 0.3,
+    colour = cats_palette$`Mostly outdoors or mixed`,
+    curvature = 0.5,
+    arrow = arrow(length = unit(1.5, "mm"), type = "closed")
+  ) +
+  annotate(
+    geom = "curve",
+    x = 14.8,
+    y = 3200,
+    xend = 15.6,
+    yend = 2800,
+    linewidth = 0.3,
+    colour = cats_palette$`Mostly indoors`,
+    curvature = 0.5,
+    arrow = arrow(length = unit(1.5, "mm"), type = "closed")
+  )
+arrow_plot
+```
+
+### Adding text
+
+```{r}
+#| label: cats-text-1
+title <- "Indoor cats are fast - and they don't slow down!"
+st <- glue::glue(
+  "Only 7% of cats in the study spend more than 17.5 hours per day indoors. <span style='color:{cats_palette$`Mostly indoors`}'>Cats who spend more than 17.5 hours a day indoors</span> tend to be among the faster cats, having higher average ground speed compared to <span style='color:{cats_palette$`Mostly outdoors or mixed`}'>cats who spend less time indoors</span>! Age seems to have minimal impact on speed."
+)
+```
+
+### Custom caption functions
+
+[@ggtext]
+
+```{r}
+#| echo: true
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| file: R/social_caption.R
+```
+
+```{r}
+#| label: cats-social
+social <- social_caption(
+  bg_color = cats_palette$bg_col,
+  icon_color = cats_palette$`Mostly indoors`,
+  font_color = cats_palette$dark_text,
+  font_family = body_font
+)
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| file: R/source_caption.R
+```
+
+```{r}
+#| label: cats-souce-cap
+source_cap <- source_caption(
+  source = "McDonald JL, Cole H. 2020. doi.org/10.5441/001/1.pf315732.",
+  graphic = social
+)
+```
+
+
+```{r}
+#| label: fig-cats-text-plot
+#| fig-cap: "Plot"
+text_plot <- arrow_plot +
+  labs(
+    title = title,
+    subtitle = st,
+    caption = source_cap,
+    x = "Age of cat (years)",
+    y = "Average ground speed (m/s)"
+  )
+text_plot
+```
 
 ### Adjusting themes
+
+```{r}
+text_plot +
+  theme_minimal(base_family = body_font, base_size = 6.5) +
+  theme(
+    # text formatting
+    text = element_text(color = cats_palette$light_text),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.margin = margin(5, 5, 5, 5),
+    plot.title = ggtext::element_textbox_simple(
+      family = title_font,
+      color = cats_palette$dark_text
+    ),
+    plot.subtitle = ggtext::element_textbox_simple(
+      margin = margin(t = 5)
+    ),
+    plot.caption = ggtext::element_textbox_simple(
+      margin = margin(t = 5)
+    ),
+    axis.text = element_text(
+      color = cats_palette$light_text
+    ),
+    axis.title = element_text(
+      color = cats_palette$dark_text
+    ),
+    axis.title.y = element_text(
+      margin = margin(r = 10)
+    ),
+    legend.position = "none",
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect(
+      fill = cats_palette$bg_col,
+      color = cats_palette$bg_col
+    ),
+    panel.background = element_rect(
+      fill = cats_palette$bg_col,
+      color = cats_palette$bg_col
+    )
+  )
+```
+
 
 ## Reflection
 
