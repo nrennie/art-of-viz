@@ -23,6 +23,10 @@ In this chapter, we'll learn how
 
 [@readxl] [@openxlsx]
 
+\index{readxl!read\_xlsx}
+
+\index{openxlsx!read.xlsx} \index{utils!write.csv}
+
 ```{r}
 #| label: turbines-download
 #| eval: false
@@ -31,6 +35,7 @@ wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rnc
 write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
 ```
 
+\index{readr!read\_csv}
 
 ```{r}
 #| label: turbines-data
@@ -49,6 +54,9 @@ wind_turbines <- readr::read_csv("data/wind_turbines.csv")
 
 ### Data wrangling
 
+
+\index{dplyr!if\_else} \index{stringr!str\_detect} \index{stringr!str\_match}
+
 ```{r}
 #| label: turbines-extract
 extract_after_last_slash <- function(texts) {
@@ -59,6 +67,8 @@ extract_after_last_slash <- function(texts) {
 }
 ```
 
+\index{dplyr!select} \index{base!as.numeric}
+
 ```{r}
 #| label: turbines-year-data
 turbines_year <- wind_turbines |>
@@ -68,6 +78,8 @@ turbines_year <- wind_turbines |>
     Year = as.numeric(Year)
   )
 ```
+
+\index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor}
 
 ```{r}
 #| label: turbines-data-wrangling-1
@@ -87,6 +99,8 @@ turbines_year_group <- turbines_year |>
     ))
   )
 ```
+
+\index{dplyr!rename} \index{dplyr!mutate} \index{dplyr!case\_when} \index{dplyr!count} \index{dplyr!filter}
   
 ```{r}
 #| label: turbines-data-wrangling-1
@@ -110,6 +124,8 @@ plot_data <- turbines_year_group |>
   dplyr::filter(n != 0)
 ```
 
+\index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} \index{base!factor}
+
 ```{r}
 #| label: turbines-fct-levels
 area_levels <- c(plot_data |>
@@ -126,6 +142,8 @@ font awesome ref
 
 add instructions about installing system through waffle, where to download
 
+\index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+
 ```{r}
 #| label: turbines-font-awesome
 sysfonts::font_add(
@@ -140,6 +158,9 @@ showtext::showtext_opts(dpi = 300)
 ### The first plot
 
 [@waffle]
+
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
+\index{waffle!geom\_pictogram}
 
 ```{r}
 #| label: fig-turbines-base-plot
@@ -162,6 +183,8 @@ base_plot
 ```
 
 turbine icons not free
+
+\index{waffle!scale\_label\_pictogram}
 
 ```{r}
 #| label: fig-turbines-icons-plot
@@ -208,6 +231,8 @@ names(col_palette) <- levels(plot_data$Area)
 highlight_col <- col_palette[1]
 ```
 
+\index{ggplot2!scale\_color\_manual}
+
 ```{r}
 #| label: turbines-col-plot
 col_plot <- icons_plot +
@@ -218,9 +243,11 @@ col_plot <- icons_plot +
 ```
 
 
-### Text and fonts
+### Adding styled text
 
-[@marquee]
+We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument in `theme()`. But what if we want to make only *part* of the text bold? We can use the {marquee} package [@marquee] to add styling to text within in a string. The {marquee} package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with {ggplot2} or other graphics built on {grid}. \index{marquee}
+
+In Markdown, to make text bold, you enclose it inside two pairs of asterisks e.g. `**bold text**`. For example, if we wanted to put the entire title in bold font, we could write the title inside `**`. In the caption, we might want to embolden the words `Data` and `Graphic` to highlight that there are two different fields of information:
 
 ```{r}
 #| label: turbines-text-1
@@ -230,7 +257,25 @@ cap <- "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
 
 
 ```{r}
+#| echo: true
+#| eval: true
+#| file: R/source_caption.R
+```
+
+
+```{r}
 #| label: turbines-text-2
+cap <- source_caption(
+  source = "Natural Resources Canada",
+  graphic = "N. Rennie"
+)
+```
+
+
+adding colored text
+
+```{r}
+#| label: turbines-text-3
 st <- glue::glue(
   "The Canadian Wind Turbine Database contains the geographic location
   and key technology details for wind turbines installed in Canada. It includes
@@ -242,6 +287,8 @@ st <- glue::glue(
   .close = "]"
 )
 ```
+
+We add this ... in the normal way, by passing them into the `labs()` function: \index{ggplot2!labs}
 
 ```{r}
 #| label: fig-turbines-text-plot
@@ -255,8 +302,12 @@ text_plot <- col_plot +
 text_plot
 ```
 
+You'll notice that ... . (we'll deal with this is a second - we haven't actually used {marquee} yet )
 
 ### Adjusting scales and themes
+
+\index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous}
+\index{ggplot2!coord\_fixed}
 
 ```{r}
 #| label: turbines-scale-plot
@@ -273,6 +324,9 @@ scale_plot <- text_plot +
   ) +
   coord_fixed()
 ```
+
+\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_rect}
+\index{marquee!element\_marquee} \index{ggplot2!element\_line} \index{ggplot2!margin}
 
 ```{r}
 #| label: fig-turbines-theme-plot
