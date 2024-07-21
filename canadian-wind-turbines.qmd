@@ -3,6 +3,8 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-width: 5
+fig-asp: 0.75
 ---
 
 ```{r}
@@ -25,7 +27,7 @@ In this chapter, we'll learn how
 #| label: turbines-download
 #| eval: false
 #| echo: true
-wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx",sheet=1)
+wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx", sheet = 1)
 write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
 ```
 
@@ -50,15 +52,15 @@ wind_turbines <- readr::read_csv("data/wind_turbines.csv")
 ```{r}
 extract_after_last_slash <- function(texts) {
   has_slash <- stringr::str_detect(texts, "/")
-  extracted <- stringr::str_match(texts, ".*/(.*)$")[,2]
+  extracted <- stringr::str_match(texts, ".*/(.*)$")[, 2]
   output <- dplyr::if_else(has_slash, extracted, texts)
   return(output)
 }
 ```
 
 ```{r}
-turbines_year <- wind_turbines |> 
-  dplyr::select(`Province/Territory`, Commissioning.date) |> 
+turbines_year <- wind_turbines |>
+  dplyr::select(`Province/Territory`, Commissioning.date) |>
   dplyr::mutate(
     Year = extract_after_last_slash(Commissioning.date),
     Year = as.numeric(Year)
@@ -66,8 +68,8 @@ turbines_year <- wind_turbines |>
 ```
 
 ```{r}
-plot_data <- turbines_year |> 
-  dplyr::filter(Year >= 2001 & Year <= 2020) |> 
+plot_data <- turbines_year |>
+  dplyr::filter(Year >= 2001 & Year <= 2020) |>
   dplyr::mutate(
     Year_Group = dplyr::case_when(
       Year %in% seq(2001, 2005) ~ "2001 - 2005",
@@ -75,35 +77,195 @@ plot_data <- turbines_year |>
       Year %in% seq(2011, 2015) ~ "2011 - 2015",
       Year %in% seq(2016, 2020) ~ "2016 - 2020"
     )
-  ) |> 
-  dplyr::count(`Province/Territory`, Year_Group)
+  ) |>
+  dplyr::mutate(
+    Year_Group = factor(Year_Group, levels = c(
+      "2001 - 2005", "2006 - 2010", "2011 - 2015", "2016 - 2020"
+    ))
+  ) |>
+  dplyr::rename(Area = `Province/Territory`) |>
+  dplyr::mutate(
+    Area = dplyr::case_when(
+      Area %in% c(
+        "Northwest Territories",
+        "Newfoundland and Labrador",
+        "Prince Edward Island",
+        "New Brunswick",
+        "Manitoba",
+        "Saskatchewan"
+      ) ~ "other",
+      TRUE ~ Area
+    )
+  ) |>
+  dplyr::count(Area, Year_Group) |>
+  dplyr::mutate(n = round(n / 20)) |>
+  dplyr::filter(n != 0)
+
+area_levels <- c(plot_data |>
+  dplyr::summarise(n = sum(n), .by = Area) |>
+  dplyr::arrange(-n) |>
+  dplyr::filter(Area != "other") |>
+  dplyr::pull(Area), "other")
+plot_data$Area <- factor(plot_data$Area, levels = area_levels)
 ```
 
 ### Packages and functions
 
+font awesome ref
+
+add instructions about installing system through waffle, where to download
+
+```{r}
+sysfonts::font_add(
+  family = "Font Awesome 6",
+  regular = "fonts/Font-Awesome-6-Free-Solid-900.otf"
+)
+showtext::showtext_auto()
+showtext::showtext_opts(dpi = 300)
+```
+
+
 ### The first plot
+
+[@waffle]
+
+```{r}
+library(ggplot2)
+base_plot <- ggplot(data = plot_data) +
+  waffle::geom_pictogram(
+    mapping = aes(
+      label = Area,
+      colour = Area,
+      values = n
+    ),
+    flip = TRUE,
+    n_rows = 10,
+    size = 3,
+    family = "Font Awesome 6"
+  ) +
+  facet_wrap(~Year_Group, nrow = 1, strip.position = "bottom")
+base_plot
+```
+
+turbine icons not free
+
+```{r}
+icons_plot <- base_plot +
+  waffle::scale_label_pictogram(
+    name = NULL,
+    values = c("fan", "fan", "fan", "fan", "fan", "fan"),
+    guide = "none"
+  )
+icons_plot
+```
+
 
 ## Advanced styling
 
-### Colours
+### Colors
+
+copy bit from r-packages section on racrtocolor
+
+```{r}
+bg_col <- "#fafafa"
+text_col <- "black"
+col_palette <- rcartocolor::carto_pal(length(unique(plot_data$Area)) + 1, "Vivid")[1:length(unique(plot_data$Area))]
+names(col_palette) <- levels(plot_data$Area)
+highlight_col <- col_palette[1]
+```
+
+```{r}
+col_plot <- icons_plot +
+  scale_color_manual(
+    values = col_palette,
+    guide = "none"
+  )
+```
+
 
 ### Text and fonts
 
-### Using Font Awesome icons
+[@marquee]
 
 ```{r}
-#| echo: true
-#| eval: true
-#| file: R/load_font_awesome.R
+title <- "**Canadian wind turbines are mostly found in Ontario**"
+st <- glue::glue(
+  "The Canadian Wind Turbine Database contains the geographic location
+  and key technology details for wind turbines installed in Canada. It includes
+  information about turbines installed in {.[col_palette[[1]]] [names(col_palette)[[1]]]},
+  {.[col_palette[[2]]] [names(col_palette)[[2]]]}, {.[col_palette[[3]]] [names(col_palette)[[3]]]},
+  {.[col_palette[[4]]] [names(col_palette)[[4]]]}, {.[col_palette[[5]]] [names(col_palette)[[5]]]},
+  and {.[col_palette[[6]]] [names(col_palette)[[6]]]} regions.",
+  .open = "[",
+  .close = "]"
+)
+cap <- "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
 ```
 
 ```{r}
-#| echo: true
-#| eval: true
-#| file: R/social_caption.R
+text_plot <- col_plot +
+  labs(
+    title = title,
+    subtitle = st,
+    caption = cap
+  )
+text_plot
 ```
 
 
-### Adjusting themes
+### Adjusting scales and themes
+
+```{r}
+scale_plot <- text_plot +
+  scale_x_discrete(
+    expand = c(0, 0, 0, 0)
+  ) +
+  scale_y_continuous(
+    labels = function(x) format(x * 10 * 20, big.mark = ","),
+    expand = c(0, 0),
+    breaks = c(0, 5, 10, 15, 20),
+    limits = c(0, 20),
+    minor_breaks = NULL
+  ) +
+  coord_fixed()
+```
+
+```{r}
+scale_plot +
+  theme_minimal(
+    base_size = 8
+  ) +
+  theme(
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.margin = margin(5, 10, 5, 10),
+    plot.background = element_rect(fill = bg_col, colour = bg_col),
+    panel.background = element_rect(fill = bg_col, colour = bg_col),
+    panel.grid.major = element_line(
+      linewidth = 0.4
+    ),
+    plot.title = marquee::element_marquee(
+      colour = text_col,
+      width = 1,
+      size = 12,
+      margin = margin(b = -10)
+    ),
+    plot.subtitle = marquee::element_marquee(
+      colour = text_col,
+      width = 1,
+      size = 9
+    ),
+    plot.caption = marquee::element_marquee(
+      hjust = 0,
+      lineheight = 0.5,
+      size = 8,
+      margin = margin(t = 5)
+    )
+  )
+```
+
+fix order colors are plotted in
 
 ## Reflection
+
+* turbines icon
