@@ -345,26 +345,15 @@ bg_col <- "#3A3B3C"
 text_col <- "white"
 ```
 
-Let's also define a color palette that we'll use for the fill color of the area charts. We're looking for 8 different colors - one for each core {tidyverse} package. The {rcartocolor} [@rcartocolor] package provides access to the [CARTOColors](https://carto.com/carto-colors/) color palettes for maps designed by [CARTO](https://carto.com/) [@cartocolors]. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics. 
-
-In the {rcartocolor} package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using `display_carto_all()`: \index{rcartocolor!display\_carto\_all}
-
-```{r}
-#| label: fig-r-pkgs-rcarto
-#| fig-cap: "All qualitative color palettes with at least 8 colors in the {rcartocolor} package."
-#| fig-asp: 0.8
-rcartocolor::display_carto_all(
-  n = 8, type = "qualitative"
-)
-```
-
-Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-r-pkgs-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. \index{rcartocolor!carto\_pal}
+Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of th palettes in {rcartocolor} [@rcartocolor]. As we did in @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
 
 To keep a more consistent color theme in the plot, we define our highlight color variable, `highlight_col`, to be the first color in our chosen color palette.
 
 ```{r}
 #| label: r-pkgs-cols-2
-col_palette <- rcartocolor::carto_pal(9, "Bold")[1:8]
+col_palette <- rcartocolor::carto_pal(
+  length(core_tidyverse) + 1, "Bold"
+)[1:length(core_tidyverse)]
 highlight_col <- col_palette[1]
 ```
 

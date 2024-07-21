@@ -50,6 +50,7 @@ wind_turbines <- readr::read_csv("data/wind_turbines.csv")
 ### Data wrangling
 
 ```{r}
+#| label: turbines-extract
 extract_after_last_slash <- function(texts) {
   has_slash <- stringr::str_detect(texts, "/")
   extracted <- stringr::str_match(texts, ".*/(.*)$")[, 2]
@@ -59,6 +60,7 @@ extract_after_last_slash <- function(texts) {
 ```
 
 ```{r}
+#| label: turbines-year-data
 turbines_year <- wind_turbines |>
   dplyr::select(`Province/Territory`, Commissioning.date) |>
   dplyr::mutate(
@@ -68,7 +70,8 @@ turbines_year <- wind_turbines |>
 ```
 
 ```{r}
-plot_data <- turbines_year |>
+#| label: turbines-data-wrangling-1
+turbines_year_group <- turbines_year |>
   dplyr::filter(Year >= 2001 & Year <= 2020) |>
   dplyr::mutate(
     Year_Group = dplyr::case_when(
@@ -82,7 +85,12 @@ plot_data <- turbines_year |>
     Year_Group = factor(Year_Group, levels = c(
       "2001 - 2005", "2006 - 2010", "2011 - 2015", "2016 - 2020"
     ))
-  ) |>
+  )
+```
+  
+```{r}
+#| label: turbines-data-wrangling-1
+plot_data <- turbines_year_group |> 
   dplyr::rename(Area = `Province/Territory`) |>
   dplyr::mutate(
     Area = dplyr::case_when(
@@ -100,7 +108,10 @@ plot_data <- turbines_year |>
   dplyr::count(Area, Year_Group) |>
   dplyr::mutate(n = round(n / 20)) |>
   dplyr::filter(n != 0)
+```
 
+```{r}
+#| label: turbines-fct-levels
 area_levels <- c(plot_data |>
   dplyr::summarise(n = sum(n), .by = Area) |>
   dplyr::arrange(-n) |>
@@ -116,6 +127,7 @@ font awesome ref
 add instructions about installing system through waffle, where to download
 
 ```{r}
+#| label: turbines-font-awesome
 sysfonts::font_add(
   family = "Font Awesome 6",
   regular = "fonts/Font-Awesome-6-Free-Solid-900.otf"
@@ -130,6 +142,8 @@ showtext::showtext_opts(dpi = 300)
 [@waffle]
 
 ```{r}
+#| label: fig-turbines-base-plot
+#| fig-cap: "Plot"
 library(ggplot2)
 base_plot <- ggplot(data = plot_data) +
   waffle::geom_pictogram(
@@ -150,6 +164,8 @@ base_plot
 turbine icons not free
 
 ```{r}
+#| label: fig-turbines-icons-plot
+#| fig-cap: "Plot"
 icons_plot <- base_plot +
   waffle::scale_label_pictogram(
     name = NULL,
@@ -164,17 +180,36 @@ icons_plot
 
 ### Colors
 
-copy bit from r-packages section on racrtocolor
-
 ```{r}
+#| label: turbines-cols
 bg_col <- "#fafafa"
 text_col <- "black"
+```
+
+Let's also define a color palette that we'll use for the color of the icons. We're looking for 6 different colors - one for area. The {rcartocolor} [@rcartocolor] package provides access to the [CARTOColors](https://carto.com/carto-colors/) color palettes for maps designed by [CARTO](https://carto.com/) [@cartocolors]. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics. 
+
+In the {rcartocolor} package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using `display_carto_all()`: \index{rcartocolor!display\_carto\_all}
+
+```{r}
+#| label: fig-turbines-rcarto
+#| fig-cap: "All qualitative color palettes with at least 6 colors in the {rcartocolor} package."
+#| fig-asp: 0.8
+rcartocolor::display_carto_all(
+  n = 6, type = "qualitative"
+)
+```
+
+Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal}
+
+```{r}
+#| label: turbines-col-palette
 col_palette <- rcartocolor::carto_pal(length(unique(plot_data$Area)) + 1, "Vivid")[1:length(unique(plot_data$Area))]
 names(col_palette) <- levels(plot_data$Area)
 highlight_col <- col_palette[1]
 ```
 
 ```{r}
+#| label: turbines-col-plot
 col_plot <- icons_plot +
   scale_color_manual(
     values = col_palette,
@@ -188,7 +223,14 @@ col_plot <- icons_plot +
 [@marquee]
 
 ```{r}
+#| label: turbines-text-1
 title <- "**Canadian wind turbines are mostly found in Ontario**"
+cap <- "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
+```
+
+
+```{r}
+#| label: turbines-text-2
 st <- glue::glue(
   "The Canadian Wind Turbine Database contains the geographic location
   and key technology details for wind turbines installed in Canada. It includes
@@ -199,10 +241,11 @@ st <- glue::glue(
   .open = "[",
   .close = "]"
 )
-cap <- "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
 ```
 
 ```{r}
+#| label: fig-turbines-text-plot
+#| fig-cap: "Plot"
 text_plot <- col_plot +
   labs(
     title = title,
@@ -216,6 +259,7 @@ text_plot
 ### Adjusting scales and themes
 
 ```{r}
+#| label: turbines-scale-plot
 scale_plot <- text_plot +
   scale_x_discrete(
     expand = c(0, 0, 0, 0)
@@ -231,6 +275,8 @@ scale_plot <- text_plot +
 ```
 
 ```{r}
+#| label: fig-turbines-theme-plot
+#| fig-cap: "Plot"
 scale_plot +
   theme_minimal(
     base_size = 8
