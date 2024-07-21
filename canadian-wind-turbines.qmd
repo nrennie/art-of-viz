@@ -15,9 +15,13 @@ fig-asp: 0.75
 
 # Canadian Wind Turbines: waffle plots, pictograms, and icons {#sec-turbines}
 
-In this chapter, we'll learn how 
+In this chapter, we'll learn how to read in data from an Excel file via a URL, create waffle plots using the {waffle} package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
 
 ## Data
+
+You can search for [search.open.canada.ca/opendata](https://search.open.canada.ca/opendata/)
+
+### Reading data with {openxlsx}
 
 [https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)
 
@@ -25,15 +29,26 @@ In this chapter, we'll learn how
 
 \index{readxl!read\_xlsx}
 
-\index{openxlsx!read.xlsx} \index{utils!write.csv}
+\index{openxlsx!read.xlsx} 
 
 ```{r}
-#| label: turbines-download
+#| label: turbines-download-1
 #| eval: false
 #| echo: true
-wind_turbines <- openxlsx::read.xlsx("https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx", sheet = 1)
+url <- "https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
+wind_turbines <- openxlsx::read.xlsx(xlsxFile = url, sheet = 1)
+```
+
+There are no merged cells
+\index{utils!write.csv}
+
+```{r}
+#| label: turbines-download-2
+#| eval: false
+#| echo: true
 write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
 ```
+
 
 \index{readr!read\_csv}
 
@@ -48,7 +63,36 @@ wind_turbines <- readr::read_csv("data/wind_turbines.csv")
 
 ### Data exploration
 
+```{r}
+#| label: fig-turbines-scatter
+#| fig-cap: "Plot"
+plot(
+  wind_turbines$`Rotor.diameter.(m)`,
+  as.numeric(wind_turbines$`Turbine.rated.capacity.(kW)`),
+  xlab = "Rotor diameter (m)",
+  ylab = "Turbine rated capacity (kW)"
+)
+```
+
+Some of the `"1903/2126/2221"`. many of the same value hard to see on this plot
+
+
+```{r}
+#| label: fig-turbines-barplot
+#| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
+barplot(
+  sort(table(wind_turbines$`Province/Territory`)),
+  # make labels smaller so they fit on the page
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
+  horiz = TRUE
+)
+```
+
 ### Exploratory sketches
+
+![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-packages-sketch-1 fig-align="center"}
 
 ## Preparing a plot
 
@@ -81,21 +125,24 @@ turbines_year <- wind_turbines |>
 
 \index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor}
 
+We're going to make four categories
+We start by filtering out any years that fall outside 
+
 ```{r}
 #| label: turbines-data-wrangling-1
 turbines_year_group <- turbines_year |>
-  dplyr::filter(Year >= 2001 & Year <= 2020) |>
+  dplyr::filter(Year >= 2000 & Year <= 2019) |>
   dplyr::mutate(
     Year_Group = dplyr::case_when(
-      Year %in% seq(2001, 2005) ~ "2001 - 2005",
-      Year %in% seq(2006, 2010) ~ "2006 - 2010",
-      Year %in% seq(2011, 2015) ~ "2011 - 2015",
-      Year %in% seq(2016, 2020) ~ "2016 - 2020"
+      Year %in% seq(2000, 2004) ~ "2000 - 2004",
+      Year %in% seq(2005, 2009) ~ "2005 - 2009",
+      Year %in% seq(2010, 2014) ~ "2010 - 2014",
+      Year %in% seq(2015, 2019) ~ "2015 - 2019"
     )
   ) |>
   dplyr::mutate(
     Year_Group = factor(Year_Group, levels = c(
-      "2001 - 2005", "2006 - 2010", "2011 - 2015", "2016 - 2020"
+      "2000 - 2004", "2005 - 2009", "2010 - 2014", "2015 - 2019"
     ))
   )
 ```
@@ -104,7 +151,7 @@ turbines_year_group <- turbines_year |>
   
 ```{r}
 #| label: turbines-data-wrangling-2
-plot_data <- turbines_year_group |>
+turbines_area <- turbines_year_group |>
   dplyr::rename(Area = `Province/Territory`) |>
   dplyr::mutate(
     Area = dplyr::case_when(
@@ -124,19 +171,29 @@ plot_data <- turbines_year_group |>
   dplyr::filter(n != 0)
 ```
 
-\index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} \index{base!factor}
+\index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} 
 
 ```{r}
 #| label: turbines-fct-levels
-area_levels <- c(plot_data |>
+area_levels <- c(turbines_area |>
   dplyr::summarise(n = sum(n), .by = Area) |>
   dplyr::arrange(-n) |>
   dplyr::filter(Area != "other") |>
   dplyr::pull(Area), "other")
-plot_data$Area <- factor(plot_data$Area, levels = area_levels)
 ```
 
-### Packages and functions
+waffle order based on order in data
+
+\index{base!factor}
+
+```{r}
+#| label: turbines-fct-levels
+plot_data <- turbines_area |> 
+  dplyr::mutate(Area = factor(Area, levels = area_levels)) |> 
+  dplyr::arrange(Area)
+```
+
+### Installing Font Awesome fonts
 
 font awesome ref
 
@@ -155,12 +212,15 @@ showtext::showtext_opts(dpi = 300)
 ```
 
 
-### The first plot
+### The first plot with {waffle}
 
 [@waffle]
 
 \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
 \index{waffle!geom\_pictogram}
+
+although usually horizontal usually esaier to read,
+also most common to put date on x-axis
 
 ```{r}
 #| label: fig-turbines-base-plot
@@ -202,7 +262,7 @@ icons_plot
 
 ## Advanced styling
 
-### Colors
+### Colors with {rcartocolor}
 
 ```{r}
 #| label: turbines-cols
@@ -247,7 +307,7 @@ col_plot <- icons_plot +
   )
 ```
 
-### Adding styled text
+### Adding styled text with {marquee}
 
 We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument inside `theme()` elements. But what if we want to make only *part* of the text bold? We can use the {marquee} package [@marquee] to add styling to text within in a string. The {marquee} package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with {ggplot2} or other graphics built on {grid}. \index{marquee}
 
@@ -393,3 +453,60 @@ fix order colors are plotted in
 ## Reflection
 
 * turbines icon
+
+* ggpattern, geom_tile_pattern, flaticon, 
+
+[@ggpattern]
+
+flaticon needs attrubtion
+
+[www.flaticon.com/free-icon/wind-power_5670189](https://www.flaticon.com/free-icon/wind-power_5670189)
+
+```{r}
+# Extract data
+base_build <- ggplot_build(base_plot)
+new_data <- base_build$data[[1]] |>
+  dplyr::rename(Area = PANEL) |> 
+  dplyr::mutate(
+    Area = factor(Area, labels = levels(plot_data$Year_Group))
+  )
+```
+
+```{r}
+# Check locations
+base_plot2 <- ggplot(data = new_data) +
+  geom_point(
+    mapping = aes(
+      x = x, y = y, color = colour
+    )
+  ) +
+  facet_wrap(~Area, nrow = 1)
+base_plot2
+```
+
+```{r}
+ggplot(
+  data = new_data,
+  mapping = aes(
+    x = x, y = y
+  )
+) +
+  ggpattern::geom_tile_pattern(
+    linewidth = 1,
+    fill = "white",
+    pattern = "image",
+    pattern_filename = "images/wind-power.png"
+  ) +
+  facet_wrap(~Area, nrow = 1) +
+  theme_void()
+```
+
+learn more about image manipulation and recoloring in seafood, images paths based on data in r-pkgs
+
+::: {.content-visible when-format="html"}
+
+Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
+
+![](images/turbines.gif){fig-align="center"}
+
+:::
