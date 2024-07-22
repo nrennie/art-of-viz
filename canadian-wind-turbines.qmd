@@ -19,28 +19,49 @@ In this chapter, we'll learn how to read in data from an Excel file via a URL, c
 
 ## Data
 
-You can search for [search.open.canada.ca/opendata](https://search.open.canada.ca/opendata/)
+Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a TidyTuesday dataset [@tidytuesday]. The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location [@turbines_data]. Rather than reading in the data using the {tidytuesdayR} package as we've done in previous chapters, let's read in the data directly from the [open.canada.ca](https://open.canada.ca/en) website.
+
+::: {#tip-turbines-open .callout-tip}
+
+## Open Government data in Canada
+
+The Canadian Wind Turbine data contains information licensed under the [Open Government Licence - Canada](https://open.canada.ca/en/open-government-licence-canada).
+
+You can search for more open data at [search.open.canada.ca/opendata](https://search.open.canada.ca/opendata/). 
+
+:::
 
 ### Reading data with {openxlsx}
 
-[https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)
+Though the {readxl} package [@readxl] package can be used to read Excel files stored locally, it doesn't work for reading in Excel files directly from a URL. We could visit the relevant [open.canada.ca/data/dataset](https://open.canada.ca/data/dataset/) website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package [@openxlsx] which allows us to pass in a URL.
 
-[@readxl] [@openxlsx]
+Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ([open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called `url`.
 
-\index{readxl!read\_xlsx}
-
-\index{openxlsx!read.xlsx} 
+We then use the `read.xlsx()` function from {openxlsx}, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
 
 ```{r}
 #| label: turbines-download-1
 #| eval: false
 #| echo: true
 url <- "https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
-wind_turbines <- openxlsx::read.xlsx(xlsxFile = url, sheet = 1)
+wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
 ```
 
-There are no merged cells
-\index{utils!write.csv}
+::: {#tip-turbines-excel .callout-tip}
+
+## Processing Excel files
+
+There are some features of Excel files that can make them more human-friendly but less computer-friendly:
+
+* **Multiple sheets**: Excel files may contain multiple sheets of data. You can use the `sheet` argument in `read.xlsx()` to specify the name or index of the sheet you want to read in. Using the sheet name is usually a little bit more robust, as it means your code can withstand (accidental) changes to the order of sheets.
+
+* **Empty rows**: The `read.xlsx()` function always skips empty rows at the start of the file. However, sometimes the author of the spreadsheet may add a title row then a few empty rows before the *real* data begins. You can use the `startRow` argument to specify which rows the data actually starts on.
+
+* **Merged cells**: Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they're at the top of the file (e.g. with the title information) then using `startRow` might be enough. Otherwise, setting `fillMergedCells = TRUE` in `read.xlsx()` means that *the value in a merged cell is given to all cells within the merge* [@openxlsx].
+
+:::
+
+We don't want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let's save a copy locally. We could simply save the Excel file (or we could have used `download.file()` instead of `read_csv()`). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the `wind_turbines` data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using `write.csv()` using an appropriate file name (and setting `row.names = FALSE` to avoid adding an additional column of row names). \index{utils!write.csv}
 
 ```{r}
 #| label: turbines-download-2
@@ -49,8 +70,7 @@ There are no merged cells
 write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
 ```
 
-
-\index{readr!read\_csv}
+We can then use either `read.csv()` or `read_csv()` from {readr} to read the CSV file back in: \index{readr!read\_csv}
 
 ```{r}
 #| label: turbines-data
@@ -58,8 +78,24 @@ write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
 wind_turbines <- readr::read_csv("data/wind_turbines.csv")
 ```
 
+The `wind_turbines` data has `r nrow(wind_turbines)` rows and `r ncol(wind_turbines)` columns. The first few rows of the data are as follows:
+
+```{r}
+#| label: turbines-head
+head(wind_turbines)
+```
+
+The `OBJECTID` column is a unique row identifier. The data has a row for each wind turbine - with some of the data given on the turbine level and some data on the project level. For the variables related to project level data, this means values can be repeated multiple times within a column for turbines in the same project.
+
+The `Province/Territory` column specifies which geographic region the turbine is in, with the `Latitude` and `Longitude` column giving the exact coordinates. The `Project.name` gives the name of the project that each wind turbine is associated with, and `Total.project.capacity.(MW)` the total power capacity of the project in megawatts. The `Turbine.identifier` column gives a unique ID for each turbine - it is a combination of an abbreviation of the project name, and a number identifying the number of the turbine within the project (also listed in the `Turbine.number.in.project` as a fraction of the total number of turbines per project). The capacity (in kilowatts) of each individual turbine is given in `Turbine.rated.capacity.(kW)` (adding up the individual capacities for all turbines in a project gives the value in `Total.project.capacity.(MW)` multiplied by 100).
+
+The rotor diameter and hub height of each turbine are given by `Rotor.diameter.(m)` and `Hub.height.(m)`, respectively. The manufacturer and model are also given by the `Manufacturer` and `Model` columns. The commissioning date is given in the `Commissioning.date` column - it appears that some may be given on the project level, whereas others vary for turbines within a project. The `Notes` column contains free text data with additional information for some turbines. Most of these values are empty, but the column may provide information about whether the capacity of turbines have changed or assumptions about how values were calculated.
 
 ## Exploratory work
+
+What are we looking at?
+
+We might also want to look at the spatial distribution of turbines across Canada since we have the geographic coordinates - we'll look at plotting spatial data a little bit later in @sec-doctors, @sec-time-zones, and @sec-house.
 
 ### Data exploration
 
