@@ -169,7 +169,7 @@ We can make two slight variations to this basic version of the chart:
 
 * We have `r nrow(wind_turbines)` observations to plot which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.
 
-* Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a *pictogram*.
+* Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a *pictogram*. The icons can be colored based on the region in the `Province/Territory` column. Instead of using a traditional legend that takes up lots of space, we could use colored text within the subtitle as an alternative.
 
 \index{pictogram} 
 
@@ -354,13 +354,13 @@ Now we're ready to plot!
 
 ### The first plot with {waffle}
 
-[@waffle]
+We're going to use the {waffle} package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with {ggplot2}. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons i.e. pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
 
-\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!facet\_wrap}
-\index{waffle!geom\_pictogram}
+We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want to icon to vary with region - want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region and we'll later use `scale_label_pictogram()` to make them all the same icon. `values` is also a required aesthetic - we use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the `geom_pictogram()` function so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
 
-although usually horizontal usually esaier to read,
-also most common to put date on x-axis
+We also edit a few other parameters of the `geom_pictogram()` function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it's also very common to put date variables on the x-axis. Setting `flip = TRUE` will stack the pictogram categories upwards, and allow the date categories to go on the x-axis. Setting `n_rows = 10` means that each row of the pictogram will contain 10 icons (remember that we've flipped rows and columns here). We can edit the `size` of the icons in the same way we would edit the font size in `geom_text()`, for example. It might take a little bit of trial and error to find the right size to make sure icons are large enough to see, but don't overlap. We also need to state that the icons come from the Font Awesome 6 font by setting `family = "Font Awesome 6"` (the same name as the `family` argument used in `font_add()`). \index{waffle!geom\_pictogram}
+
+Finally, we add `facet_wrap()` to create a pictogram for each date range, placing them in a single row, and moving the facet label to the bottom of the chart. \index{ggplot2!facet\_wrap}
 
 ```{r}
 #| label: fig-turbines-base-plot
@@ -370,7 +370,7 @@ base_plot <- ggplot(data = plot_data) +
   waffle::geom_pictogram(
     mapping = aes(
       label = Region,
-      colour = Region,
+      color = Region,
       values = n
     ),
     flip = TRUE,
@@ -382,29 +382,34 @@ base_plot <- ggplot(data = plot_data) +
 base_plot
 ```
 
-turbine icons not free
+::: {#tip-turbines-waffle-prop .callout-tip}
 
-\index{waffle!scale\_label\_pictogram}
+## Proportional waffle charts
 
-values re-used
+By default, `geom_pictogram()` and `geom_waffle()` both assume that the column mapped to `values` should be plotted as counts. If you'd prefer to plot the values as percentages, set `make_proportional = TRUE`. 
 
+:::
 
+What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at [fontawesome.com/search](https://fontawesome.com/search) and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan` to name a few. We'll use `fan` [@fontawesome]. 
+
+We can add `scale_label_pictogram()` from {waffle} to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set `guide = "none"` to remove the legend for icons as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
 
 ```{r}
 #| label: fig-turbines-icons-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded."
 icons_plot <- base_plot +
   waffle::scale_label_pictogram(
-    name = NULL,
     values = "fan",
     guide = "none"
   )
 icons_plot
 ```
 
-(alternatively, you can later set `theme(legend.position = "none")` as we did )
+You might also have noticed that the values on the y-axis are incorrect - there definitely more than 15 turbines in the 2010 - 2014 time frame! We'll deal with the axis in the next section.
 
 ## Advanced styling
+
+Now we still need to edit the colors used in the plot, add a title and subtitle (including colored text to replace the legend), and edit the axis labels.
 
 ### Colors with {rcartocolor}
 
@@ -566,9 +571,11 @@ scale_plot +
     base_size = 8
   ) +
   theme(
+    # spacing around text and plot
     plot.title.position = "plot",
     plot.caption.position = "plot",
     plot.margin = margin(5, 10, 5, 10),
+    # background and grid lines
     plot.background = element_rect(
       fill = bg_col, colour = bg_col
     ),
@@ -578,6 +585,7 @@ scale_plot +
     panel.grid.major = element_line(
       linewidth = 0.4
     ),
+    # format text with {marquee}
     plot.title = marquee::element_marquee(
       colour = text_col,
       width = 1,
