@@ -101,7 +101,7 @@ Let's start by exploring the hypothesis that wind turbines with a larger rotor d
 
 ```{r}
 #| label: fig-turbines-scatter
-#| fig-cap: "Plot"
+#| fig-cap: "Scatter plot showing the relationship between rotor diameter and turbine capacity."
 plot(
   wind_turbines$`Rotor.diameter.(m)`,
   as.numeric(wind_turbines$`Turbine.rated.capacity.(kW)`),
@@ -125,6 +125,9 @@ Let's instead look at the number of turbines in each region, by creating an orde
 ```{r}
 #| label: fig-turbines-barplot
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
+# Add space for labels
+# (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)
+par(mar=c(5.1, 5.1, 4.1, 2.1))
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
   # make labels smaller so they fit on the page
@@ -172,7 +175,7 @@ We can make two slight variations to this basic version of the chart:
 
 ## Preparing a plot
 
-In order to make a draft of @sketch-turbines.png, there are a few things we need to prepare:
+In order to make a draft of @fig-sketch-turbines using {ggplot2}, there are a few things we need to prepare:
 
 * The `Commissioning.date` column needs processed to deal with the multi-year labels, and grouped into 5-year categories.
 * We need to decide how many wind turbines each icon will represent.
@@ -260,8 +263,8 @@ Let's look at the `Province/Territory` categories. Using `count()` and `arrange(
 
 ```{r}
 #| label: turbines-data-counts
-turbines_year_group |> 
-  dplyr::count(`Province/Territory`) |> 
+turbines_year_group |>
+  dplyr::count(`Province/Territory`) |>
   dplyr::arrange(-n)
 ```
 
@@ -289,7 +292,7 @@ turbines_region <- turbines_year_group |>
     )
   ) |>
   dplyr::count(Region, Year_Group) |>
-  dplyr::mutate(n = round(n / 20)) |> 
+  dplyr::mutate(n = round(n / 20)) |>
   dplyr::filter(n != 0)
 ```
 
@@ -310,8 +313,10 @@ Now, let's apply these new factor levels to the `Region` column using `mutate()`
 
 ```{r}
 #| label: turbines-fct-levels-2
-plot_data <- turbines_region |> 
-  dplyr::mutate(Region = factor(Region, levels = region_levels)) |> 
+plot_data <- turbines_region |>
+  dplyr::mutate(
+    Region = factor(Region, levels = region_levels)
+  ) |>
   dplyr::arrange(Region)
 ```
 
@@ -319,9 +324,9 @@ Our data is now ready for us to plot!
 
 ### Installing Font Awesome fonts
 
-Before we jump into plotting, we need to do one more thing. In @fig-sketch-turbines, we decided we would use icons in the waffle chart instead of just colored grid squares. So we need to fid a way of using icons in R. 
+Before we jump into plotting, we need to do one more thing. In @fig-sketch-turbines, we decided we would use icons in the waffle chart instead of just colored grid squares. So we need to find a way of using icons in R. 
 
-In #sec-programming, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
+In @sec-programming, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
 
 Then, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use {showtext} to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
@@ -359,7 +364,7 @@ also most common to put date on x-axis
 
 ```{r}
 #| label: fig-turbines-base-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Pictogram showing the number of turbines per time period in each region, where the region name is showing instead of the icons."
 library(ggplot2)
 base_plot <- ggplot(data = plot_data) +
   waffle::geom_pictogram(
@@ -370,7 +375,7 @@ base_plot <- ggplot(data = plot_data) +
     ),
     flip = TRUE,
     n_rows = 10,
-    size = 3,
+    size = 2.5,
     family = "Font Awesome 6"
   ) +
   facet_wrap(~Year_Group, nrow = 1, strip.position = "bottom")
@@ -381,13 +386,17 @@ turbine icons not free
 
 \index{waffle!scale\_label\_pictogram}
 
+values re-used
+
+
+
 ```{r}
 #| label: fig-turbines-icons-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded."
 icons_plot <- base_plot +
   waffle::scale_label_pictogram(
     name = NULL,
-    values = c("fan", "fan", "fan", "fan", "fan", "fan"),
+    values = "fan",
     guide = "none"
   )
 icons_plot
@@ -507,7 +516,7 @@ We add these text elements to out plot in the normal way, by passing them into t
 
 ```{r}
 #| label: fig-turbines-text-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Pictogram showing the number of turbines per time period in each region, with title and caption text showing asterisks that indicate bold text."
 text_plot <- col_plot +
   labs(
     title = title,
@@ -521,21 +530,21 @@ You'll notice that the formatting hasn't been applied, and that the `**` have be
 
 ### Adjusting scales and themes
 
-\index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous}
-\index{ggplot2!coord\_fixed}
+We can make a final few tweaks to our plot, to apply the formatting with {marquee} and make it look a little bit cleaner. Let's start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn't correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:
+
+* Each icon represents 20 turbines, so the y-axis labels are currently showing as 20 times smaller than they should be.
+* Within each facet, we row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be. 
+
+Let's fix that by passing a function into the `labels` argument of `scale_y_continuous()`. The function takes the existing y-axis label, multiplies it by `10`, multiplies it by `20`, and formats it using a thousand separator comma. We set `expand = c(0, 0)` to remove the extra space at the top and bottom of the y-axis. Let's also choose slightly nicer break points for the y-axis - ranging from 0 to 4,000 with breaks every 1,000. Unfortunately, we need to specify the limits and the breaks on the original scale rather than on the label scale e.g. an break point of `15` is actually a break point of `15 * 20 * 10 = 3000`. Adding `coord_fixed()` helps to deal with the overlapping icons issue, by making each icon area square. \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
 
 ```{r}
 #| label: turbines-scale-plot
 scale_plot <- text_plot +
-  scale_x_discrete(
-    expand = c(0, 0, 0, 0)
-  ) +
   scale_y_continuous(
     labels = function(x) format(x * 10 * 20, big.mark = ","),
     expand = c(0, 0),
     breaks = c(0, 5, 10, 15, 20),
-    limits = c(0, 20),
-    minor_breaks = NULL
+    limits = c(0, 20)
   ) +
   coord_fixed()
 ```
@@ -544,13 +553,14 @@ scale_plot <- text_plot +
 \index{marquee!element\_marquee} \index{ggplot2!element\_line} \index{ggplot2!margin}
 
 ```{r}
+#| label: turbines-ragg-png
 #| echo: false
 knitr::opts_chunk$set(dev = "ragg_png")
 ```
 
 ```{r}
 #| label: fig-turbines-theme-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Pictogram showing the number of turbines per time period in each region, with colored text in the subtitle indicating which color maps to each region."
 scale_plot +
   theme_minimal(
     base_size = 8
@@ -559,8 +569,12 @@ scale_plot +
     plot.title.position = "plot",
     plot.caption.position = "plot",
     plot.margin = margin(5, 10, 5, 10),
-    plot.background = element_rect(fill = bg_col, colour = bg_col),
-    panel.background = element_rect(fill = bg_col, colour = bg_col),
+    plot.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, colour = bg_col
+    ),
     panel.grid.major = element_line(
       linewidth = 0.4
     ),
@@ -584,7 +598,7 @@ scale_plot +
   )
 ```
 
-fix order colors are plotted in
+And we're done!
 
 ## Reflection
 
@@ -603,17 +617,18 @@ flaticon needs attrubtion
 [www.flaticon.com/free-icon/wind-power_5670189](https://www.flaticon.com/free-icon/wind-power_5670189)
 
 ```{r}
-# Extract data
+#| label: turbines-build-gg
 base_build <- ggplot_build(base_plot)
 new_data <- base_build$data[[1]] |>
-  dplyr::rename(Region = PANEL) |> 
+  dplyr::rename(Region = PANEL) |>
   dplyr::mutate(
     Region = factor(Region, labels = levels(plot_data$Year_Group))
   )
 ```
 
 ```{r}
-# Check locations
+#| label: fig-turbines-rebuild
+#| fig-cap: "Plot"
 base_plot2 <- ggplot(data = new_data) +
   geom_point(
     mapping = aes(
@@ -625,6 +640,8 @@ base_plot2
 ```
 
 ```{r}
+#| label: fig-turbines-flaticon
+#| fig-cap: "Plot"
 ggplot(
   data = new_data,
   mapping = aes(
