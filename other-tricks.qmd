@@ -14,6 +14,7 @@ There are many functions within {ggplot2}, and many more within the wider commun
 {camcorder} [@camcorder] is an R package to track and automatically save graphics generated with {ggplot2}. You can set up your R session to use {camcorder} by running `gg_record()`. If you're using RStudio, you'll notice that your plots now appear in the *Viewer* tab rather than the *Plots* tab. \index{camcorder} \index{camcorder!gg\_record}
 
 ```{r}
+#| label: other-record
 #| eval: false
 library(camcorder)
 gg_record(
@@ -43,6 +44,7 @@ Some of the built-in themes in {ggplot2} have a transparent background. If you'v
 :::
 
 ```{r}
+#| label: other-playback
 #| eval: false
 gg_playback(
   name = "data-viz.gif",
@@ -52,6 +54,84 @@ gg_playback(
   background = bg_col
 )
 ```
+
+## Extracting information from plots {#sec-ggbuild}
+
+```{r}
+#| label: other-base-plot
+#| echo: false
+base_plot <- readRDS("data/base_plot.rds")
+```
+
+In @sec-turbines, we reflected that it would be better to use a wind turbine icons instead of the fan icon - since the data is about wind turbines! An alternative to the Font Awesome icons we used in @sec-turbines are icons from [Flaticon](https://www.flaticon.com/). You can download Flaticon icons as PNG images for free, as long as you provide attribution. More specifically, you can download a **Wind Power** icon from [www.flaticon.com/free-icon/wind-power_5670189](https://www.flaticon.com/free-icon/wind-power_5670189) [@flaticon]. Let's save it in an `images/` project directory. 
+
+Now instead of plotting icons as fonts, we want to plot icons as images. The problem is that:
+
+* we want to use the x- and y- coordinates for the icons provided by `geom_pictogram()`
+* we want to use an image instead of a font icon.
+
+These two things aren't currently compatible. We've already built the plot with `geom_pictogram()` so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `base_plot` we created in @sec-turbines. \index{ggplot2!ggplot\_build}
+
+```{r}
+#| label: other-build-gg-1
+library(ggplot2)
+base_build <- ggplot_build(base_plot)
+```
+
+You can save an `ggplot` plot as a variable, and then pass it into `ggplot_build()` to access the data associated with the plot (including data that was calculated by `geom` functions). The data is stored in the `base_build$data[[1]]` element. The `x`, `y`, and `colour` variables are all stored in their respective columns. The variable used to define the facets, `Year_Group`, is stored in the `PANEL` column and is given by numbers rather than the original category names. 
+
+Unfortunately, `PANEL` is a forbidden column name for a faceting variable, so we need to start by renaming this column. We also convert this renamed column into a factor, and pass in the `Year_Group` categories from @sec-turbines as labels. \index{dplyr!rename} \index{dplyr!mutate} \index{base!factor}
+
+```{r}
+#| label: other-build-gg-2
+new_data <- base_build$data[[1]] |>
+  dplyr::rename(Year_Group = PANEL) |>
+  dplyr::mutate(
+    Year_Group = factor(
+      Year_Group,
+      labels = c("2000 - 2004", "2005 - 2009", "2010 - 2014", "2015 - 2019")
+    )
+  )
+```
+
+Let's use `geom_point()` as a quick sense check that the x- and y- coordinates are the values that we're expecting, faceting by our `Year_Group` column. You can see the similarity with @fig-turbines-base-plot.
+
+```{r}
+#| label: fig-other-rebuild
+#| fig-cap: "Waffle plot of the number of wind turbines commissioned in different time periods."
+ggplot(
+  data = new_data,
+  mapping = aes(
+    x = x, y = y
+  )
+) +
+  geom_point() +
+  facet_wrap(~Year_Group, nrow = 1)
+```
+
+Now instead of using `geom_point()` we want to plot images. We could use {ggimage} [@ggimage], or alternatively {ggpattern} [@ggpattern]. The {ggpattern} package provides more {ggplot2} `geom` functions which support filled areas with geometric or image patterns. We can use the `geom_tile_pattern()` function, and specify that we want to use an `"image"` pattern and supply the file name of the Flaticon image to `pattern_filename`. Setting `fill = "white"` gives a white background to the icons. We can also set `theme_void()` to remove all of the distracting background elements.
+
+```{r}
+#| label: fig-other-flaticon
+#| fig-cap: "Pictogram of the number of wind turbines commissioned in different time periods, using the Flaticon.com wind power icon."
+ggplot(
+  data = new_data,
+  mapping = aes(
+    x = x, y = y
+  )
+) +
+  ggpattern::geom_tile_pattern(
+    fill = "white",
+    pattern = "image",
+    pattern_filename = "images/wind-power.png"
+  ) +
+  facet_wrap(~Year_Group, nrow = 1) +
+  theme_void()
+```
+
+If we wanted to color the icons based on the `Region` variable, we would need to have multiple copies of the image in different colors. We could combine the information in @sec-seafood about manipulating and re-coloring images, along with the information in @sec-r-pkgs about defining image paths based on data values to do this programmatically.
+
+One of the benefits of using {ggplot2} is that they are stored as lists, and all of the information about that plot is stored with it - even information you didn't pass in! This allows you to use `ggplot_build()` to take a layout created by one {ggplot2} extension package and use it in an entirely different extension - meaning you can create custom plots by mixing and matching features of different extensions.
 
 ## Code formatting with {lintr} and {styler} {#sec-code-style}
 
