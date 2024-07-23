@@ -132,26 +132,6 @@ r_pkgs <- r_pkgs |>
   )
 ```
 
-::: {#tip-packages-ifelse .callout-tip}
-
-## Comparing `if_else()` and `ifelse()`
-
-If you've used the `ifelse()` function in base R before, you might be wondering why there's a very similarly named function in {dplyr} and what's different about it. 
-
-The main difference is that `if_else()` is a bit more strict about checking whether you're doing what you think you're doing. For example, let's say we have a vector `x` of length 4 and we want to replace the values in `x` that are equal to 0 with something else. If that replacement is of length 3, that doesn't really make sense. Which value in the vector of length 3 should it use? The `if_else()` function highlights this issue with an error, the `ifelse()` function quietly uses the value in the same position. 
-
-```{r}
-#| label: r-pkgs-ifelse
-#| error: true
-x <- c(1, 0, 2, 3)
-dplyr::if_else(x == 0, c(4, 5, 3), x)
-ifelse(x == 0, c(4, 5, 3), x)
-```
-
-The `if_else()` function from {dplyr} also preserves types. If you put a `Date` into `if_else()`, then a `Date` is what comes out. That's not always true with `ifelse()`. \index{base!ifelse} \index{dplyr!if\_else}
-
-:::
-
 ### Exploratory sketches
 
 There are currently `r length(unique(r_pkgs$pkgs))` packages listed in the data, many of them with one or two uses. That's quite a lot of categories to visualize at once, so let's narrow it down to only the [core {tidyverse}](https://www.tidyverse.org/packages/#core-tidyverse) packages [@tidyverse]. We could visualise a simple bar chart (or variation of a bar chart) showing how often each core {tidyverse} package was used. But due to the structure of the file names, we also have information about *when* each package was used. So we could visualize usage over time, for each package. 
