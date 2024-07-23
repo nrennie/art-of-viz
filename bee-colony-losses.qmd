@@ -33,6 +33,8 @@ fig-asp: 0.5
 
 # Bee Colony Losses: visualising density with Poisson disk sampling {#sec-bees}
 
+In this chapter, we'll learn how install R package that aren't available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.
+
 ## Data
 
 ```{r}
@@ -54,6 +56,28 @@ colony <- readr::read_csv("data/colony.csv")
 
 ## Exploratory work
 
+```{r}
+#| label: bees-boxplot
+boxplot(
+  colony_n ~ year,
+  data = colony,
+  horizontal = TRUE,
+  xlab = "Colony size"
+)
+```
+
+```{r}
+#| label: bees-boxplot
+lattice::densityplot(~ log(colony_n)|factor(year),
+  data = colony, layout = c(4, 2),
+  na.rm = TRUE,
+  xlab = "Colony size"
+)
+```
+
+
+
+
 ### Data exploration
 
 ### Exploratory sketches
@@ -63,6 +87,8 @@ colony <- readr::read_csv("data/colony.csv")
 ## Preparing a plot
 
 ### Data wrangling
+
+Let's start by selecting a subset of states to visualize:
 
 ```{r}
 #| label: bees-states
@@ -104,7 +130,7 @@ state_levels <- plot_data |>
 
 ### Packages and functions
 
-@poissoned
+[@poissoned]
 
 ```{r}
 bees_grid <- plot_data |>
