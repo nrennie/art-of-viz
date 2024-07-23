@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
-
+<meta name="generator" content="quarto-1.4.554">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-<meta name="description" content="Learn how to create data visualisations in R.">
-
-<title>The #TidyTuesday Cookbook – 4&nbsp; Canadian Wind Turbines: waffle plots, pictograms, and icons</title>
+<title>The Art of Data Visualization with {ggplot2} - 5&nbsp; Canadian Wind Turbines: waffle plots, pictograms, and icons</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +16,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -43,7 +73,6 @@ div.csl-indent {
   margin-left: 2em;
 }</style>
 
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
@@ -62,8 +91,7 @@ div.csl-indent {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet">
-<script id="quarto-search-options" type="application/json">{
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -90,35 +118,26 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-
-
 </head>
-
 <body class="nav-sidebar floating">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./icons-images.html">Making use of icons, fonts, and text</a></li><li class="breadcrumb-item"><a href="./canadian-wind-turbines.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./icons-images.html">Making use of icons, fonts, and text</a></li><li class="breadcrumb-item"><a href="./canadian-wind-turbines.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The #TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -128,7 +147,7 @@ div.csl-indent {
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
@@ -140,132 +159,138 @@ div.csl-indent {
  <span class="menu-text">Author</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Common charts don't need to be boring!</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./programming-languages.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Programming Languages: dumbbell charts with {ggplot2}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Programming Languages: dumbbell charts with {ggplot2}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./uk-museums.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./icons-images.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Making use of icons, fonts, and text</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./canadian-wind-turbines.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./cats.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./global-seafood.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./spatial.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visualising spatial data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./us-house-elections.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="./weird-wonderful.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weird and wonderful: completely custom charts</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./bee-colony-losses.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nobel-prize-laureates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -281,19 +306,48 @@ div.csl-indent {
   </div>
 </li>
     </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li>
+<a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">5.1</span> Data</a>
+  <ul class="collapse">
+<li><a href="#reading-data-with-openxlsx" id="toc-reading-data-with-openxlsx" class="nav-link" data-scroll-target="#reading-data-with-openxlsx"><span class="header-section-number">5.1.1</span> Reading data with {openxlsx}</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#exploratory-work" id="toc-exploratory-work" class="nav-link" data-scroll-target="#exploratory-work"><span class="header-section-number">5.2</span> Exploratory work</a>
+  <ul class="collapse">
+<li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">5.2.1</span> Data exploration</a></li>
+  <li><a href="#exploratory-sketches" id="toc-exploratory-sketches" class="nav-link" data-scroll-target="#exploratory-sketches"><span class="header-section-number">5.2.2</span> Exploratory sketches</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">5.3</span> Preparing a plot</a>
+  <ul class="collapse">
+<li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">5.3.1</span> Data wrangling</a></li>
+  <li><a href="#installing-font-awesome-fonts" id="toc-installing-font-awesome-fonts" class="nav-link" data-scroll-target="#installing-font-awesome-fonts"><span class="header-section-number">5.3.2</span> Installing Font Awesome fonts</a></li>
+  <li><a href="#the-first-plot-with-waffle" id="toc-the-first-plot-with-waffle" class="nav-link" data-scroll-target="#the-first-plot-with-waffle"><span class="header-section-number">5.3.3</span> The first plot with {waffle}</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#advanced-styling" id="toc-advanced-styling" class="nav-link" data-scroll-target="#advanced-styling"><span class="header-section-number">5.4</span> Advanced styling</a>
+  <ul class="collapse">
+<li><a href="#colors-with-rcartocolor" id="toc-colors-with-rcartocolor" class="nav-link" data-scroll-target="#colors-with-rcartocolor"><span class="header-section-number">5.4.1</span> Colors with {rcartocolor}</a></li>
+  <li><a href="#adding-styled-text-with-marquee" id="toc-adding-styled-text-with-marquee" class="nav-link" data-scroll-target="#adding-styled-text-with-marquee"><span class="header-section-number">5.4.2</span> Adding styled text with {marquee}</a></li>
+  <li><a href="#adjusting-scales-and-themes" id="toc-adjusting-scales-and-themes" class="nav-link" data-scroll-target="#adjusting-scales-and-themes"><span class="header-section-number">5.4.3</span> Adjusting scales and themes</a></li>
+  </ul>
+</li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">5.5</span> Reflection</a></li>
+  </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./icons-images.html">Making use of icons, fonts, and text</a></li><li class="breadcrumb-item"><a href="./canadian-wind-turbines.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title"><span id="sec-turbines" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./icons-images.html">Making use of icons, fonts, and text</a></li><li class="breadcrumb-item"><a href="./canadian-wind-turbines.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="sec-turbines" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></h1>
 </div>
 
 
@@ -307,27 +361,653 @@ div.csl-indent {
   
 
 
-</header>
-
-
-<div class="callout callout-style-default callout-caution callout-titled">
+</header><p>In this chapter, we’ll learn how to read in data from an Excel file via a URL, create waffle plots using the {waffle} package, and write a subtitle with colored text to be used as an alternative to a traditional legend.</p>
+<section id="data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">5.1</span> Data</h2>
+<p>Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27">TidyTuesday dataset</a> <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>. The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location <span class="citation" data-cites="turbines_data">(<a href="references.html#ref-turbines_data" role="doc-biblioref">Natural Resources Canada 2021</a>)</span>. Rather than reading in the data using the {tidytuesdayR} package as we’ve done in previous chapters, let’s read in the data directly from the <a href="https://open.canada.ca/en">open.canada.ca</a> website.</p>
+<div id="tip-turbines-open" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Caution
+Tip&nbsp;5.1: Open Government data in Canada
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This chapter is coming soon!</p>
+<p>The Canadian Wind Turbine data contains information licensed under the <a href="https://open.canada.ca/en/open-government-licence-canada">Open Government Licence - Canada</a>.</p>
+<p>You can search for more open data at <a href="https://search.open.canada.ca/opendata/">search.open.canada.ca/opendata</a>.</p>
 </div>
+</div>
+<section id="reading-data-with-openxlsx" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="reading-data-with-openxlsx">
+<span class="header-section-number">5.1.1</span> Reading data with {openxlsx}</h3>
+<p>Though the {readxl} package <span class="citation" data-cites="readxl">(<a href="references.html#ref-readxl" role="doc-biblioref">Wickham and Bryan 2023</a>)</span> package can be used to read Excel files stored locally, it doesn’t work for reading in Excel files directly from a URL. We could visit the relevant <a href="https://open.canada.ca/data/dataset/">open.canada.ca/data/dataset</a> website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package <span class="citation" data-cites="openxlsx">(<a href="references.html#ref-openxlsx" role="doc-biblioref">Schauberger and Walker 2023</a>)</span> which allows us to pass in a URL.</p>
+<p>Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data (<a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called <code>url</code>.</p>
+<p>We then use the <code>read.xlsx()</code> function from {openxlsx}, where we pass in the <code>url</code> variable to the <code>xlsxFile</code> argument: </p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"</span></span>
+<span><span class="va">wind_turbines</span> <span class="op">&lt;-</span> <span class="fu">openxlsx</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/openxlsx/man/read.xlsx.html">read.xlsx</a></span><span class="op">(</span>xlsxFile <span class="op">=</span> <span class="va">url</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-turbines-excel" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;5.2: Processing Excel files
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There are some features of Excel files that can make them more human-friendly but less computer-friendly:</p>
+<ul>
+<li><p><strong>Multiple sheets</strong>: Excel files may contain multiple sheets of data. You can use the <code>sheet</code> argument in <code>read.xlsx()</code> to specify the name or index of the sheet you want to read in. Using the sheet name is usually a little bit more robust, as it means your code can withstand (accidental) changes to the order of sheets.</p></li>
+<li><p><strong>Empty rows</strong>: The <code>read.xlsx()</code> function always skips empty rows at the start of the file. However, sometimes the author of the spreadsheet may add a title row then a few empty rows before the <em>real</em> data begins. You can use the <code>startRow</code> argument to specify which rows the data actually starts on.</p></li>
+<li><p><strong>Merged cells</strong>: Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they’re at the top of the file (e.g.&nbsp;with the title information) then using <code>startRow</code> might be enough. Otherwise, setting <code>fillMergedCells = TRUE</code> in <code>read.xlsx()</code> means that <em>the value in a merged cell is given to all cells within the merge</em> <span class="citation" data-cites="openxlsx">(<a href="references.html#ref-openxlsx" role="doc-biblioref">Schauberger and Walker 2023</a>)</span>.</p></li>
+</ul>
+</div>
+</div>
+<p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> using an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
+<div class="cell">
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">wind_turbines</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"data/wind_turbines.csv"</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then use either <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> or <code>read_csv()</code> from {readr} to read the CSV file back in: </p>
+<div class="cell">
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">wind_turbines</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/wind_turbines.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>wind_turbines</code> data has 6698 rows and 15 columns. The first few rows of the data are as follows:</p>
+<div class="cell">
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 6 × 15
+  OBJECTID `Province/Territory`
+     &lt;dbl&gt; &lt;chr&gt;               
+1        1 Alberta             
+2        2 Alberta             
+3        3 Alberta             
+4        4 Alberta             
+5        5 Alberta             
+6        6 Alberta             
+# ℹ 13 more variables:
+#   Project.name &lt;chr&gt;,
+#   `Total.project.capacity.(MW)` &lt;dbl&gt;,
+#   Turbine.identifier &lt;chr&gt;,
+#   Turbine.number.in.project &lt;chr&gt;,
+#   `Turbine.rated.capacity.(kW)` &lt;chr&gt;,
+#   `Rotor.diameter.(m)` &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<p>The <code>OBJECTID</code> column is a unique row identifier. The data has a row for each wind turbine - with some of the data given on the turbine level and some data on the project level. For the variables related to project level data, this means values can be repeated multiple times within a column for turbines in the same project.</p>
+<p>The <code>Province/Territory</code> column specifies which geographic region the turbine is in, with the <code>Latitude</code> and <code>Longitude</code> column giving the exact coordinates. The <code>Project.name</code> gives the name of the project that each wind turbine is associated with, and <code>Total.project.capacity.(MW)</code> the total power capacity of the project in megawatts. The <code>Turbine.identifier</code> column gives a unique ID for each turbine - it is a combination of an abbreviation of the project name, and a number identifying the number of the turbine within the project (also listed in the <code>Turbine.number.in.project</code> as a fraction of the total number of turbines per project). The capacity (in kilowatts) of each individual turbine is given in <code>Turbine.rated.capacity.(kW)</code> (adding up the individual capacities for all turbines in a project gives the value in <code>Total.project.capacity.(MW)</code> multiplied by 100).</p>
+<p>The rotor diameter and hub height of each turbine are given by <code>Rotor.diameter.(m)</code> and <code>Hub.height.(m)</code>, respectively. The manufacturer and model are also given by the <code>Manufacturer</code> and <code>Model</code> columns. The commissioning date is given in the <code>Commissioning.date</code> column - it appears that some may be given on the project level, whereas others vary for turbines within a project. The <code>Notes</code> column contains free text data with additional information for some turbines. Most of these values are empty, but the column may provide information about whether the capacity of turbines have changed or assumptions about how values were calculated.</p>
+</section></section><section id="exploratory-work" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="exploratory-work">
+<span class="header-section-number">5.2</span> Exploratory work</h2>
+<p>There are quite a few variables that we might be interested in looking at here - particularly since there are several variables about individual turbines that might be related to each other. For example, do turbines with a larger rotor diameter have a higher capacity? What is the relationship between rotor diameter and hub height? Which manufacturers are most common? Which regions have the most turbines? We might also want to look at the spatial distribution of turbines across Canada since we have the geographic coordinates - we’ll look at plotting spatial data a little bit later in <a href="doctors-ageing-population.html" class="quarto-xref"><span>Chapter 9</span></a>, <a href="time-zones.html" class="quarto-xref"><span>Chapter 10</span></a>, and <a href="us-house-elections.html" class="quarto-xref"><span>Chapter 11</span></a>.</p>
+<section id="data-exploration" class="level3" data-number="5.2.1"><h3 data-number="5.2.1" class="anchored" data-anchor-id="data-exploration">
+<span class="header-section-number">5.2.1</span> Data exploration</h3>
+<p>Let’s start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step. The <code>Turbine.rated.capacity.(kW)</code> column is currently a character column even though it contains numeric values, so we wrap the column in <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> before plotting it:</p>
+<div class="cell">
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Rotor.diameter.(m)`</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Turbine.rated.capacity.(kW)`</span><span class="op">)</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Rotor diameter (m)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Turbine rated capacity (kW)"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-scatter" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-scatter-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Scatter plot showing the relationship between rotor diameter and turbine capacity.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>This scatter plot highlights a few issues:</p>
+<ul>
+<li>
+<p>We get a warning message about <code>NA</code> values.</p>
+<blockquote class="blockquote">
+<p><code>Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion</code></p>
+</blockquote>
+<p>This comes from the <code>as.numeric</code> transformation of the <code>Turbine.rated.capacity.(kW)</code> column. If we inspect this column more closely, you’ll see that there are a few unusual values such as <code>"1903/2126/2221"</code>. If we look at the <code>Notes</code> column for an explanation, we can see that these values exist because <code>"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"</code>. Unfortunately, we don’t know which individual turbines this derating applies to which makes it difficult to create a scatter plot.</p>
+</li>
+<li><p>The other issue with this scatter plot is that many of the observations are the same, but it’s not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That’s not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualised as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.</p></li>
+</ul>
+<p>Let’s instead look at the number of turbines in each region, by creating an ordered bar chart. We use the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function to get a count of the number per region, and <code><a href="https://rdrr.io/r/base/sort.html">sort()</a></code> to order the counts from smallest to largest. We then use the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function to make the chart, setting <code>horiz = TRUE</code> to make the bars horizontal for easier reading.</p>
+<div class="cell">
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Add space for labels</span></span>
+<span><span class="co"># (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5.1</span>, <span class="fl">6.6</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="co"># make labels smaller so they fit on the page</span></span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  horiz <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-barplot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-barplot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Ordered bar chart showing the number of wind turbines commissioned in each province or territory.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Most of the turbines are located in Ontario, but has this always been the case? We also have information on the commissioning date of each turbine. We could recreate this bar chart for different time periods to see how the geographic spread of turbines has changed over time. We can add <code>wind_turbines$Commissioning.date</code> into the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function to create a stacked bar chart for each year:</p>
+<div class="cell">
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span></span>
+<span>    <span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span>,</span>
+<span>    <span class="va">wind_turbines</span><span class="op">$</span><span class="va">Commissioning.date</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  <span class="co"># make labels smaller so they fit on the page</span></span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  horiz <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-barplot-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-barplot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-barplot-2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-barplot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>As you can see from the y-axis of <a href="#fig-turbines-barplot-2" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>, the <code>Commissioning.date</code> isn’t always given as a year. Instead it’s sometimes given as a year range. Let’s start drafting out a more aesthetically pleasing version of this plot before we deal with processing the <code>Commissioning.date</code> data.</p>
+</section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
+<span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
+<p>There are some years for which we have very few observations, and some turbines for which we don’t know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let’s plot the number of turbines. in different multi-year time periods. The choice of these time periods is open to designer choice. For this visualization, let’s start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.</p>
+<p>Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let’s look at an alternative: a <em>waffle chart</em>. Waffle charts are sometimes referred to as <em>square pie charts</em>. Most commonly, they are visualised on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it’s easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there’s no easy way to visualise this (although partially colored squares are an option). </p>
+<p>Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like <a href="#fig-sketch-turbines" class="quarto-xref">Figure&nbsp;<span>5.4</span></a>.</p>
+<div id="fig-sketch-turbines" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-sketch-turbines-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-turbines.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sketch-turbines-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.4: Initial sketch of a faceted area charts showing packages use over time
+</figcaption></figure>
+</div>
+<p>We can make two slight variations to this basic version of the chart:</p>
+<ul>
+<li><p>We have 6698 observations to plot which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.</p></li>
+<li><p>Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a <em>pictogram</em>. The icons can be colored based on the region in the <code>Province/Territory</code> column. Instead of using a traditional legend that takes up lots of space, we could use colored text within the subtitle as an alternative.</p></li>
+</ul>
+<p></p>
+</section></section><section id="preparing-a-plot" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="preparing-a-plot">
+<span class="header-section-number">5.3</span> Preparing a plot</h2>
+<p>In order to make a draft of <a href="#fig-sketch-turbines" class="quarto-xref">Figure&nbsp;<span>5.4</span></a> using {ggplot2}, there are a few things we need to prepare:</p>
+<ul>
+<li>The <code>Commissioning.date</code> column needs processed to deal with the multi-year labels, and grouped into 5-year categories.</li>
+<li>We need to decide how many wind turbines each icon will represent.</li>
+<li>Some of the categories in the <code>Province/Territory</code> column may need grouped together because they have very small numbers, and might have less than the number of turbines represented by each icon.</li>
+</ul>
+<section id="data-wrangling" class="level3" data-number="5.3.1"><h3 data-number="5.3.1" class="anchored" data-anchor-id="data-wrangling">
+<span class="header-section-number">5.3.1</span> Data wrangling</h3>
+<p>Let’s start by dealing with the <code>Commissioning.date</code> column. There are three types of values in here:</p>
+<ul>
+<li>Single year e.g.&nbsp;<code>"2019"</code>: this is the ideal scenario and we don’t need to do anything.</li>
+<li>Two years separated by a <code>/</code> e.g.&nbsp;<code>"2001/2003"</code>: there are several options for dealing with this. We could either take the first year, the last year, or (if they are non-consecutive years) a mid-point of the year range. Here, we’ll take the last year since this means that all wind turbines with that <code>Commissioning.date</code> will definitely have been commissioned by that date.</li>
+<li>Three years separated by a <code>"/"</code> e.g.&nbsp;<code>"2005/2006/2012"</code>: this is more again more complex, but we’ll take the last year for the same reasons as above.</li>
+</ul>
+<p>Essentially, this means that:</p>
+<ul>
+<li>If there is no <code>"/"</code> in the <code>Commissioning.date</code>, we do nothing.</li>
+<li>If there is one or more <code>"/"</code> in the <code>Commissioning.date</code>, we extract whatever comes after the last one.</li>
+</ul>
+<p>Let’s make a function that does exactly that, called <code>extract_after_last_slash()</code>. The input this function is a vector of character strings. We start by checking which elements of the input contain a <code>"/"</code> using <code>str_detect()</code> from the {stringr} package <span class="citation" data-cites="stringr">(<a href="references.html#ref-stringr" role="doc-biblioref">Wickham 2023</a>)</span>. We then use <code>str_match()</code> from {stringr} in combination with a regular expression to extract the element after the last <code>"/"</code>. If there is no <code>"/"</code>, the output will be <code>NA</code>. The <code>str_match()</code> function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e.&nbsp;the input. The second column contains the output we want so we use <code>[, 2]</code> to extract it. Finally, we use <code>if_else()</code> from {dplyr}, to if there was a <code>"/"</code> then use the output from <code>str_match()</code>, otherwise keep the original value. </p>
+<div class="cell">
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">extract_after_last_slash</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">texts</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">has_slash</span> <span class="op">&lt;-</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html">str_detect</a></span><span class="op">(</span><span class="va">texts</span>, <span class="st">"/"</span><span class="op">)</span></span>
+<span>  <span class="va">extracted</span> <span class="op">&lt;-</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_match.html">str_match</a></span><span class="op">(</span><span class="va">texts</span>, <span class="st">".*/(.*)$"</span><span class="op">)</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else</a></span><span class="op">(</span><span class="va">has_slash</span>, <span class="va">extracted</span>, <span class="va">texts</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-turbines-ifelse" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;5.3: Comparing <code>if_else()</code> and <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you’ve used the <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> function in base R before, you might be wondering why there’s a very similarly named function in {dplyr} and what’s different about it.</p>
+<p>The main difference is that <code>if_else()</code> is a bit more strict about checking whether you’re doing what you think you’re doing. For example, let’s say we have a vector <code>x</code> of length 4 and we want to replace the values in <code>x</code> that are equal to 0 with something else. If that replacement is of length 3, that doesn’t really make sense. Which value in the vector of length 3 should it use? The <code>if_else()</code> function highlights this issue with an error, the <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> function quietly uses the value in the same position.</p>
+<div class="cell">
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span>, <span class="va">x</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre data-code-line-numbers=""><code>Error in `dplyr::if_else()`:
+! `true` must have size 4, not size 3.</code></pre>
+</div>
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span>, <span class="va">x</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>[1] 1 5 2 3</code></pre>
+</div>
+</div>
+<p>The <code>if_else()</code> function from {dplyr} also preserves types. If you put a <code>Date</code> into <code>if_else()</code>, then a <code>Date</code> is what comes out. That’s not always true with <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>. </p>
+</div>
+</div>
+<p>Now, let’s use our new <code>extract_after_last_slash()</code> function! Let’s start by using <code>select()</code> to keep only the columns we actually need: <code>Province/Territory</code>, and <code>Commissioning.date</code>. We then create a new column called <code>Year</code> which is the output of applying the <code>extract_after_last_slash()</code> to the <code>Commissioning.date</code> column. Initally, this column is still a character string so we convert is to a number using <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">turbines_year</span> <span class="op">&lt;-</span> <span class="va">wind_turbines</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">`Province/Territory`</span>, <span class="va">Commissioning.date</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    Year <span class="op">=</span> <span class="fu">extract_after_last_slash</span><span class="op">(</span><span class="va">Commissioning.date</span><span class="op">)</span>,</span>
+<span>    Year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">Year</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s group the new <code>Year</code> column into categories. Our categories span 2000 to 2019, so we start by filtering out any rows that don’t fit into this time frame using <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> from {dplyr}. We then use <code>case_when()</code> from {dplyr} to actually construct the categories. Here, we make use of the <code><a href="https://rdrr.io/r/base/seq.html">seq()</a></code> function. The <code>seq(2000, 2004)</code> code creates a vector <code>2000 2001 2002 2003 2004</code>. If any the <code>Year</code> is equal to any of those values, then it goes into the <code>"2000 - 2004"</code> category. And so on. Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it’s good practice to be explicit about what order the categories should have, so we can also set <code>Year_Group</code> to be a factor and specify the correct order. </p>
+<div class="cell">
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">turbines_year_group</span> <span class="op">&lt;-</span> <span class="va">turbines_year</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Year</span> <span class="op">&gt;=</span> <span class="fl">2000</span> <span class="op">&amp;</span> <span class="va">Year</span> <span class="op">&lt;=</span> <span class="fl">2019</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    Year_Group <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>      <span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">2004</span><span class="op">)</span> <span class="op">~</span> <span class="st">"2000 - 2004"</span>,</span>
+<span>      <span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2005</span>, <span class="fl">2009</span><span class="op">)</span> <span class="op">~</span> <span class="st">"2005 - 2009"</span>,</span>
+<span>      <span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2010</span>, <span class="fl">2014</span><span class="op">)</span> <span class="op">~</span> <span class="st">"2010 - 2014"</span>,</span>
+<span>      <span class="va">Year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">2015</span>, <span class="fl">2019</span><span class="op">)</span> <span class="op">~</span> <span class="st">"2015 - 2019"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    Year_Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Year_Group</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"2000 - 2004"</span>, <span class="st">"2005 - 2009"</span>, <span class="st">"2010 - 2014"</span>, <span class="st">"2015 - 2019"</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s look at the <code>Province/Territory</code> categories. Using <code>count()</code> and <code>arrange()</code> from {dplyr}, shows us that there is a big imbalance between the categories: </p>
+<div class="cell">
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">turbines_year_group</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">`Province/Territory`</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">n</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 12 × 2
+   `Province/Territory`          n
+   &lt;chr&gt;                     &lt;int&gt;
+ 1 Ontario                    2662
+ 2 Quebec                     1859
+ 3 Alberta                     895
+ 4 Nova Scotia                 310
+ 5 British Columbia            292
+ 6 Saskatchewan                153
+ 7 Manitoba                    133
+ 8 New Brunswick               119
+ 9 Prince Edward Island        104
+10 Newfoundland and Labrador    27
+11 Northwest Territories         4
+12 Yukon                         1</code></pre>
+</div>
+</div>
+<p>First, let’s rename the <code>Province/Territory</code> column to <code>Region</code> - a shorter name that will make it a little bit easier to work with. As well as the issue posed by small numbers in categories, twelve categories is also a fairly large number to visualize. We might choose to group together the six smallest categories. The choice of six is fairly arbitrary - but we want a balance between lots of categories with small numbers and few categories with very high numbers. We use <code>mutate()</code> and <code>case_when()</code> again, to change the value in <code>Region</code> to <code>"other"</code> when the region is one of the six specified values. </p>
+<p>Then, we count up how many turbines were commissioned in each <code>Year_Group</code> and <code>Region</code> combination using <code>count()</code>. We also need to decide how many turbines each icon will represent. It will take a little bit of trial and error to decide on this value - depending on what resolution you want, and how big your final plot will be. Here, we used <code>20</code>. This means we divide the turbine count by <code>20</code> to obtain the number of icons required, rounding the values as we can only have whole icons. </p>
+<p>We filter out any rows where the rounded count is <code>0</code> since these won’t be plotted. As an aside, it’s important to think about these values before we simply throw them away. For example, a region which had 9 turbines in a particular time period won’t show up on this plot - since <code>9/20</code> is less than 0.5 and so is rounded to <code>0</code>. This is an unfortunate limitation of this type of waffle plot variation. </p>
+<div class="cell">
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">turbines_region</span> <span class="op">&lt;-</span> <span class="va">turbines_year_group</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>Region <span class="op">=</span> <span class="va">`Province/Territory`</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    Region <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>      <span class="va">Region</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>        <span class="st">"Northwest Territories"</span>,</span>
+<span>        <span class="st">"Newfoundland and Labrador"</span>,</span>
+<span>        <span class="st">"Prince Edward Island"</span>,</span>
+<span>        <span class="st">"New Brunswick"</span>,</span>
+<span>        <span class="st">"Manitoba"</span>,</span>
+<span>        <span class="st">"Saskatchewan"</span></span>
+<span>      <span class="op">)</span> <span class="op">~</span> <span class="st">"other"</span>,</span>
+<span>      <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">Region</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">Region</span>, <span class="va">Year_Group</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>Region</code> variable will be plotted alphabetically be default, but this is rarely the most useful ordering. Instead, let’s order by magnitude - with the exception of putting the <code>"other"</code> category last.</p>
+<p>We start by using the <code>summarise()</code> function to add up the number of turbines across the different time periods, getting a total per <code>Region</code>. We then <code>arrange()</code> them in a descending order (not the <code>-</code> in front of the <code>n</code>). We then <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> out the <code>"other"</code> category and stick it on the end after extracting the <code>Region</code> column using <code>pull()</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">region_levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">turbines_region</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">Region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="op">-</span><span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Region</span> <span class="op">!=</span> <span class="st">"other"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">Region</span><span class="op">)</span>, <span class="st">"other"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, let’s apply these new factor levels to the <code>Region</code> column using <code>mutate()</code>. Due to a <em>quirk</em> of the {waffle} package <span class="citation" data-cites="waffle">(<a href="references.html#ref-waffle" role="doc-biblioref">Rudis and Gandy 2023</a>)</span> that we’ll be using to make our plot (it plots data in the order it appears in the dataset, rather than according to the factor levels), we also sort the data using <code>arrange()</code> from {dplyr}. </p>
+<div class="cell">
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">turbines_region</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    Region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Region</span>, levels <span class="op">=</span> <span class="va">region_levels</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">Region</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our data is now ready for us to plot!</p>
+</section><section id="installing-font-awesome-fonts" class="level3" data-number="5.3.2"><h3 data-number="5.3.2" class="anchored" data-anchor-id="installing-font-awesome-fonts">
+<span class="header-section-number">5.3.2</span> Installing Font Awesome fonts</h3>
+<p>Before we jump into plotting, we need to do one more thing. In <a href="#fig-sketch-turbines" class="quarto-xref">Figure&nbsp;<span>5.4</span></a>, we decided we would use icons in the waffle chart instead of just colored grid squares. So we need to find a way of using icons in R.</p>
+<p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. <a href="https://fontawesome.com/">Font Awesome</a> is a popular icon toolkit that provides scalable vector icons and social logos (more on this in <a href="cats.html" class="quarto-xref"><span>Chapter 6</span></a>) <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>. You can download font files containing the freely available icons at <a href="https://fontawesome.com/download">fontawesome.com/download</a>, selecting the <strong>Free for Desktop</strong> option. This will download a zip file containing several font files. For this chart, we only need one of those files <code>Font-Awesome-6-Free-Solid-900.otf</code>. Save this <code>.otf</code> file somewhere you can find it again - such as in a project folder called <code>fonts</code>.</p>
+<p>Then, we’ll use <code>font_add()</code> from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu and See file AUTHORS for details. 2022</a>)</span> to load the font into R. The <code>family</code> argument is what we want to refer to the font as in R. The <code>regular</code> argument is the file path to the <code>.otf</code> file. We then use <code>showtext_auto()</code> and <code>showtext_opts()</code> in exactly the same way as we did for <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, to use {showtext} to render the text. </p>
+<div class="cell">
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add.html">font_add</a></span><span class="op">(</span></span>
+<span>  family <span class="op">=</span> <span class="st">"Font Awesome 6"</span>,</span>
+<span>  regular <span class="op">=</span> <span class="st">"fonts/Font-Awesome-6-Free-Solid-900.otf"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-turbines-open" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;5.4: Installing Font Awesome icons with {waffle}
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The {waffle} package comes bundled with Font Awesome 5, and you can use the <code>install_fa_fonts()</code> function to help you install the font, as an alternative to approach described here. </p>
+<p>Downloading and installing using the <code>font_add()</code> approach will give you access to a wider range of icons since it used the more recent <strong>Font Awesome 6</strong> fonts, and means you don’t have to install the font system wide - you only need to load it into R.</p>
+</div>
+</div>
+<p>Now we’re ready to plot!</p>
+</section><section id="the-first-plot-with-waffle" class="level3" data-number="5.3.3"><h3 data-number="5.3.3" class="anchored" data-anchor-id="the-first-plot-with-waffle">
+<span class="header-section-number">5.3.3</span> The first plot with {waffle}</h3>
+<p>We’re going to use the {waffle} package <span class="citation" data-cites="waffle">(<a href="references.html#ref-waffle" role="doc-biblioref">Rudis and Gandy 2023</a>)</span> to create our plot. Though the package includes the <code>waffle()</code> function which allows you to create a waffle chart directly from a <code>data.frame</code>, it also include <code>geom</code> functions to allow you to build charts in the way you normally would with {ggplot2}. The <code>geom_waffle()</code> function can be used to build traditional waffle charts with grid squares, and the <code>geom_pictogram()</code> function is used for waffle charts with icons i.e.&nbsp;pictograms. We’ll use <code>geom_pictogram()</code>. This means we start our plot as we normally do, by passing our data into <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>. </p>
+<p>We then edit the aesthetic mapping in the <code>geom_pictogram()</code> function, where we specify the <code>label</code> and <code>color</code> - both mapped to the <code>Region</code> column. This might seem slightly unusual because we don’t want to icon to vary with region - want to use the same icon for all categories. However, <code>geom_pictogram()</code> expects <code>label</code> to vary by category, so we map it to region and we’ll later use <code>scale_label_pictogram()</code> to make them all the same icon. <code>values</code> is also a required aesthetic - we use the <code>n</code> column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the <code>geom_pictogram()</code> function so we don’t need to map these out in the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. </p>
+<p>We also edit a few other parameters of the <code>geom_pictogram()</code> function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it’s also very common to put date variables on the x-axis. Setting <code>flip = TRUE</code> will stack the pictogram categories upwards, and allow the date categories to go on the x-axis. Setting <code>n_rows = 10</code> means that each row of the pictogram will contain 10 icons (remember that we’ve flipped rows and columns here). We can edit the <code>size</code> of the icons in the same way we would edit the font size in <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, for example. It might take a little bit of trial and error to find the right size to make sure icons are large enough to see, but don’t overlap. We also need to state that the icons come from the Font Awesome 6 font by setting <code>family = "Font Awesome 6"</code> (the same name as the <code>family</code> argument used in <code>font_add()</code>). </p>
+<p>Finally, we add <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create a pictogram for each date range, placing them in a single row, and moving the facet label to the bottom of the chart. </p>
+<div class="cell">
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">waffle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/waffle/man/geom_pictogram.html">geom_pictogram</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      label <span class="op">=</span> <span class="va">Region</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">Region</span>,</span>
+<span>      values <span class="op">=</span> <span class="va">n</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    flip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    n_rows <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>    family <span class="op">=</span> <span class="st">"Font Awesome 6"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Year_Group</span>, nrow <span class="op">=</span> <span class="fl">1</span>, strip.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span>
+<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-base-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-base-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.5: Pictogram showing the number of turbines per time period in each region, where the region name is showing instead of the icons.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<div id="tip-turbines-waffle-prop" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;5.5: Proportional waffle charts
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>By default, <code>geom_pictogram()</code> and <code>geom_waffle()</code> both assume that the column mapped to <code>values</code> should be plotted as counts. If you’d prefer to plot the values as percentages, set <code>make_proportional = TRUE</code>.</p>
+</div>
+</div>
+<p>What you might immediately notice about <a href="#fig-turbines-base-plot" class="quarto-xref">Figure&nbsp;<span>5.5</span></a> is that there are no icons. Instead, the plot has printed the <code>Region</code> names (even though we’ve set <code>family = "Font Awesome 6"</code>). This is because we haven’t defined which icons we want to use. To find an appropriate icon and what it’s called, we can browse the Font Awesome website at <a href="https://fontawesome.com/search">fontawesome.com/search</a> and search for related icons. For example, we might search for a <em>wind turbine</em> icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: <code>wind</code>, <code>bolt</code> (to represent energy), or <code>fan</code> to name a few. We’ll use <code>fan</code> <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>.</p>
+<p>We can add <code>scale_label_pictogram()</code> from {waffle} to our plot to specify the icons. We would normally pass in a vector of icon names to the <code>values</code> argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set <code>guide = "none"</code> to remove the legend for icons as they are all the same. Alternatively, you can later set <code>theme(legend.position = "none")</code> as we did in previous chapters to remove the legend. </p>
+<div class="cell">
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">icons_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu">waffle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/waffle/man/scale_label_pictogram.html">scale_label_pictogram</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="st">"fan"</span>,</span>
+<span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">icons_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-icons-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-icons-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-icons-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-icons-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.6: Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>You might also have noticed that the values on the y-axis are incorrect - there definitely more than 15 turbines in the 2010 - 2014 time frame! We’ll deal with the axis in the next section.</p>
+</section></section><section id="advanced-styling" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="advanced-styling">
+<span class="header-section-number">5.4</span> Advanced styling</h2>
+<p>Now we still need to edit the colors used in the plot, add a title and subtitle (including colored text to replace the legend), and edit the axis labels.</p>
+<section id="colors-with-rcartocolor" class="level3" data-number="5.4.1"><h3 data-number="5.4.1" class="anchored" data-anchor-id="colors-with-rcartocolor">
+<span class="header-section-number">5.4.1</span> Colors with {rcartocolor}</h3>
+<div class="cell">
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#fafafa"</span></span>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s also define a color palette that we’ll use for the color of the icons. We’re looking for 6 different colors - one for area. The {rcartocolor} <span class="citation" data-cites="rcartocolor">(<a href="references.html#ref-rcartocolor" role="doc-biblioref">Nowosad 2018</a>)</span> package provides access to the <a href="https://carto.com/carto-colors/">CARTOColors</a> color palettes for maps designed by <a href="https://carto.com/">CARTO</a> <span class="citation" data-cites="cartocolors">(<a href="references.html#ref-cartocolors" role="doc-biblioref">CARTO 2016</a>)</span>. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics.</p>
+<p>In the {rcartocolor} package, categorical palettes are referred to as <em>qualitative</em> palettes. We can see all available qualitative palettes with a sufficient number of colors using <code>display_carto_all()</code>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">rcartocolor</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rcartocolor/man/display_carto_all.html">display_carto_all</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fl">6</span>, type <span class="op">=</span> <span class="st">"qualitative"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-rcarto" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-rcarto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-rcarto-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-rcarto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.7: All qualitative color palettes with at least 6 colors in the {rcartocolor} package.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Although the {rcartocolor} package has the <code>scale_fill_carto_d()</code> which we could use directly in our plots, we’ll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in <a href="#fig-turbines-rcarto" class="quarto-xref">Figure&nbsp;<span>5.7</span></a>, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That’s a great choice for representing missing data, but when we want different colors for categories it doesn’t work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the <code>carto_pal()</code> function and then extract only the first 6. We’ll use the <code>"Vivid"</code> palette here. </p>
+<p>We also make the <code>col_palette</code> vector a named vector by using the <code><a href="https://rdrr.io/r/base/names.html">names()</a></code> function, and using <code>region_levels</code> as the names. Although this isn’t necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.</p>
+<div class="cell">
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_palette</span> <span class="op">&lt;-</span> <span class="fu">rcartocolor</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rcartocolor/man/carto_pal.html">carto_pal</a></span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">$</span><span class="va">Region</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"Vivid"</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">$</span><span class="va">Region</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">col_palette</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">region_levels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then pass this <code>col_palette</code> vector into <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code> to apply the colors to our plot. Since we’ll be using colored text instead of a traditional legend, we set <code>guide = "none"</code> to remove the legend again. </p>
+<div class="cell">
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">icons_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="va">col_palette</span>,</span>
+<span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="adding-styled-text-with-marquee" class="level3" data-number="5.4.2"><h3 data-number="5.4.2" class="anchored" data-anchor-id="adding-styled-text-with-marquee">
+<span class="header-section-number">5.4.2</span> Adding styled text with {marquee}</h3>
+<p>We’ve already seen in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> and <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a> how to format the title or subtitle text to be bold using the <code>face = "bold"</code> argument inside <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> elements. But what if we want to make only <em>part</em> of the text bold? We can use the {marquee} package <span class="citation" data-cites="marquee">(<a href="references.html#ref-marquee" role="doc-biblioref">Pedersen and Mitáš 2024</a>)</span> to add styling to text within in a string. The {marquee} package allows you to use Markdown syntax in text when you’re making graphics in R, including in plots built with {ggplot2} or other graphics built on {grid}. </p>
+<p>In Markdown, to make text bold, you enclose it inside two pairs of asterisks e.g.&nbsp;<code>**bold text**</code>. For example, if we wanted to put the entire title in bold font, we could write the title inside <code>**</code>. In the caption, we might want to embolden the words <code>Data</code> and <code>Graphic</code> to highlight that there are two different fields of information:</p>
+<div class="cell">
+<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"**Canadian wind turbines are mostly found in Ontario**"</span></span>
+<span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="st">"**Data**: Natural Resources Canada | **Graphic**: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This type of formatting for the plot caption is something that we might like to re-use across multiple plots. And when we want to re-use code, it’s almost always useful to make it into a function. Let’s define a function called <code>source_caption()</code> which has three arguments:</p>
+<ul>
+<li>
+<code>source</code>: a character string for the source of the data</li>
+<li>
+<code>graphic</code>: a character string for the attribution of the visualization</li>
+<li>
+<code>sep</code>: a character string for what should separate the two pieces of text, which has <code>" | "</code> as a default.</li>
+</ul>
+<p>We then use <code>glue()</code> from {glue} to stick these three arguments together, and include the bold formatting using <code>**</code>.</p>
+<div class="cell">
+<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">source_caption</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">source</span>, <span class="va">graphic</span>, <span class="va">sep</span> <span class="op">=</span> <span class="st">" | "</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
+<span>    <span class="st">"**Data**: {source}{sep}**Graphic**: {graphic}"</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">caption</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can construct the caption using our new <code>source_caption()</code> function:</p>
+<div class="cell">
+<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
+<span>  source <span class="op">=</span> <span class="st">"Natural Resources Canada"</span>,</span>
+<span>  graphic <span class="op">=</span> <span class="st">"N. Rennie"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">cap</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>**Data**: Natural Resources Canada | **Graphic**: N. Rennie</code></pre>
+</div>
+</div>
+<p>You can see that it’s identical to the one we manually created earlier. We’ll also re-use the <code>source_caption()</code> function in later chapters.</p>
+<p>Let’s move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we’ll use colored text to denote the different categories. In {marquee}, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text i.e.&nbsp;<code>{.color text to color}</code>. For example, <code>{.red This is red text.}</code>.</p>
+<p>We want to add the colors and the text to be colored in a programmatic way. We’ll use square brackets to subset the values and names stored in the <code>col_palette</code> vector. Here, <code>col_palette[[1]]</code> extracts the hex code for the color of the first category, and <code>names(col_palette)[[1]]</code> extracts the name of the first category.</p>
+<p>Normally, when we want to write character strings and insert variables into the string, we’d use <code>glue()</code> to combine them. However, the <code><a href="https://rdrr.io/r/base/Paren.html">{}</a></code> that we normally use for variables in <code>glue()</code> will get mixed up with the <code><a href="https://rdrr.io/r/base/Paren.html">{}</a></code> we’ll use for text formatting with {marquee}. There are a couple of different ways we can get around this problem. One way is changing the delimiters used in <code>glue()</code>. For example, by setting <code>.open = "["</code> and <code>.close = "]"</code> inside the <code>glue()</code> function. Alternatively, we can use <code>marquee_glue()</code> from the {marquee} package - an equivalent version of <code>glue()</code> that was built to deal with this problem.</p>
+<div class="cell">
+<div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu">marquee</span><span class="fu">::</span><span class="fu"><a href="https://marquee.r-lib.org/reference/marquee_glue.html">marquee_glue</a></span><span class="op">(</span></span>
+<span>  <span class="st">"The Canadian Wind Turbine Database contains the geographic location and key technology details for wind turbines installed in Canada. It includes information about turbines installed in {.{col_palette[[1]]} {names(col_palette)[[1]]}}, {.{col_palette[[2]]} {names(col_palette)[[2]]}}, {.{col_palette[[3]]} {names(col_palette)[[3]]}}, {.{col_palette[[4]]} {names(col_palette)[[4]]}}, {.{col_palette[[5]]} {names(col_palette)[[5]]}}, and {.{col_palette[[6]]} {names(col_palette)[[6]]}} regions."</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s see what our subtitle looks like when the variables have been evaluated:</p>
+<div class="cell">
+<div class="sourceCode" id="cb33" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">st</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>The Canadian Wind Turbine Database contains the geographic location and key technology details for wind turbines installed in Canada. It includes information about turbines installed in {.#E58606 Ontario}, {.#5D69B1 Quebec}, {.#52BCA3 Alberta}, {.#99C945 Nova Scotia}, {.#CC61B0 British Columbia}, and {.#24796C other} regions.</code></pre>
+</div>
+</div>
+<p>This is the reason that we wanted the <code>"other"</code> category to be in lower case and in last position when constructing <code>region_levels</code> - to make the sentence read better.</p>
+<p>We add these text elements to out plot in the normal way, by passing them into the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function: </p>
+<div class="cell">
+<div class="sourceCode" id="cb35" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="va">title</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
+<span>    caption <span class="op">=</span> <span class="va">cap</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-text-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-text-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.8: Pictogram showing the number of turbines per time period in each region, with title and caption text showing asterisks that indicate bold text.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>You’ll notice that the formatting hasn’t been applied, and that the <code>**</code> have been rendered literally. We’ll deal with this when we edit the arguments in <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> - we haven’t actually used {marquee} yet to format the title text!</p>
+</section><section id="adjusting-scales-and-themes" class="level3" data-number="5.4.3"><h3 data-number="5.4.3" class="anchored" data-anchor-id="adjusting-scales-and-themes">
+<span class="header-section-number">5.4.3</span> Adjusting scales and themes</h3>
+<p>We can make a final few tweaks to our plot, to apply the formatting with {marquee} and make it look a little bit cleaner. Let’s start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn’t correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:</p>
+<ul>
+<li>Each icon represents 20 turbines, so the y-axis labels are currently showing as 20 times smaller than they should be.</li>
+<li>Within each facet, we row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be.</li>
+</ul>
+<p>Let’s fix that by passing a function into the <code>labels</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous()</a></code>. The function takes the existing y-axis label, multiplies it by <code>10</code>, multiplies it by <code>20</code>, and formats it using a thousand separator comma. We set <code>expand = c(0, 0)</code> to remove the extra space at the top and bottom of the y-axis. Let’s also choose slightly nicer break points for the y-axis - ranging from 0 to 4,000 with breaks every 1,000. Unfortunately, we need to specify the limits and the breaks on the original scale rather than on the label scale e.g.&nbsp;an break point of <code>15</code> is actually a break point of <code>15 * 20 * 10 = 3000</code>. Adding <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> helps to deal with the overlapping icons issue, by making each icon area square. </p>
+<div class="cell">
+<div class="sourceCode" id="cb36" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">scale_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span></span>
+<span>    labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">10</span> <span class="op">*</span> <span class="fl">20</span>, big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span>,</span>
+<span>    expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">15</span>, <span class="fl">20</span><span class="op">)</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s make a few final edits to tidy up our plot by editing the theme. We’ll use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code> as a base theme (making the font size a little bit smaller), and then make a few further edits using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> arguments. </p>
+<p>Within <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>, we start by setting <code>plot.title.position</code> and <code>plot.caption.position</code> to <code>"plot"</code> to align the title, subtitle, and caption text with the edge of the whole plot, rather than the start of the first panel. Some additional spacing around the edge of the plot is added using <code>plot.margin</code> and the background color is edited by using the <code>fill</code> and <code>color</code> arguments in <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect()</a></code> for the <code>plot.background</code> argument. The gridlines are also made slightly thinner by adjusting <code>panel.grid.major</code>. </p>
+<p>Finally, we edit the plot, subtitle, and caption elements and specify them all using <code>element_marquee()</code>. By using <code>element_marquee()</code>, the Markdown syntax we’ve applied, such as the bold and colored text, will be rendered correctly. You can adjust the <code>color</code>, <code>size</code>, <code>margin</code> and <code>hjust</code> of {marquee} text in the same way you would with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. If you have some elements of the text rendered with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code> and some rendered with <code>element_marquee()</code>, you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the <code>size</code> argument. </p>
+<p>The <code>width</code> argument applies text wrapping, where <code>width = 1</code> means the text wraps to the full width of the plot. This is similar to the way that <code>element_textbox_simple()</code> from {ggtext} works. However, the <code>width</code> is not set by default, so if you want the text to wrap it’s important to specify the width.</p>
+<div id="tip-turbines-marquee-req" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;5.6: Requirements for using {marquee}
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The {marquee} package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for {marquee} text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the {ragg} package <span class="citation" data-cites="ragg">(<a href="references.html#ref-ragg" role="doc-biblioref">Pedersen and Shemanarev 2023</a>)</span> are a good choice.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb37" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">scale_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span></span>
+<span>    base_size <span class="op">=</span> <span class="fl">8</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># spacing around text and plot</span></span>
+<span>    plot.title.position <span class="op">=</span> <span class="st">"plot"</span>,</span>
+<span>    plot.caption.position <span class="op">=</span> <span class="st">"plot"</span>,</span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    <span class="co"># background and grid lines</span></span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op">(</span></span>
+<span>      linewidth <span class="op">=</span> <span class="fl">0.4</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># format text with {marquee}</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu">marquee</span><span class="fu">::</span><span class="fu"><a href="https://marquee.r-lib.org/reference/element_marquee.html">element_marquee</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      width <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>b <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu">marquee</span><span class="fu">::</span><span class="fu"><a href="https://marquee.r-lib.org/reference/element_marquee.html">element_marquee</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      width <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      size <span class="op">=</span> <span class="fl">9</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu">marquee</span><span class="fu">::</span><span class="fu"><a href="https://marquee.r-lib.org/reference/element_marquee.html">element_marquee</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>      size <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-turbines-theme-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-theme-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="canadian-wind-turbines_files/figure-html/fig-turbines-theme-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-turbines-theme-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.9: Pictogram showing the number of turbines per time period in each region, with colored text in the subtitle indicating which color maps to each region.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>And we’re done!</p>
+</section></section><section id="reflection" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="reflection">
+<span class="header-section-number">5.5</span> Reflection</h2>
+<p>The colored subtitle as an alternative to a legend is effective because it uses much less space than a traditional legend - leaving more room for the data. However, there are some elements of the subtitle that could still be improved. We’ve discussed already the limitations of waffle plots and pictograms in terms of the lack of representation of categories with small numbers. This means that we had to group some regions together, and so regions with fewer turbines have less information included in the chart. Perhaps the subtitle could be updated to explain to users that each icon represents 20 turbines, and that this means regions with 10 or fewer turbines are not represented.</p>
+<p>There’s also some uncertainty around the date used, which isn’t really explained in the chart. When processing the <code>Commissioning.date</code> column, we used the most recent date but that isn’t necessarily always the best choice. A limitation of the data is that we also only have commissioning date, not installation date or date of first operation. This means that perhaps there are some values in the data that suggest a turbine exists in one time period when it hasn’t yet been built.</p>
+<p>Finally, we’ve used a <code>fan</code> icon because the Font Awesome wind turbine icon is only available in the Pro version. Using a wind turbine icon would be much clearer, and more consistent with the theme of the plot. We could look at using an alternative icon font, or we could perhaps use images instead. See <a href="other-tricks.html#sec-ggbuild" class="quarto-xref"><span>Section 15.2</span></a> for a description of how we might replace the existing <code>fan</code> icons with a wind turbine icon from a different source.</p>
+<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 15.1</span></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="images/turbines.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
 </div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-img_anderson" class="csl-entry" role="listitem">
 Anderson, Lance. 2017. <span>“School of Gray Fish.”</span> <a href="https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg">https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg</a>.
+</div>
+<div id="ref-aphalo2024" class="csl-entry" role="listitem">
+Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
 </div>
 <div id="ref-geomtextpath" class="csl-entry" role="listitem">
 Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
@@ -349,6 +1029,15 @@ Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessmen
 </div>
 <div id="ref-img_dibbern" class="csl-entry" role="listitem">
 Dibbern, Lilian. 2019. <span>“Lemur Beside Tree.”</span> <a href="https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY">https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY</a>.
+</div>
+<div id="ref-ggpattern" class="csl-entry" role="listitem">
+FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
+</div>
+<div id="ref-flaticon" class="csl-entry" role="listitem">
+Flaticon.com. 2024. <span>“<span>Wind Power Flaticon</span>.”</span> <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">https://www.flaticon.com/free-icon/wind-power_5670189</a>.
+</div>
+<div id="ref-fontawesome" class="csl-entry" role="listitem">
+Font Awesome. 2024. <span>“<span>Font Awesome 6</span>.”</span> <a href="https://fontawesome.com/" class="uri">https://fontawesome.com/</a>.
 </div>
 <div id="ref-Hullman2021" class="csl-entry" role="listitem">
 Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
@@ -383,6 +1072,9 @@ Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz<
 <div id="ref-kays2020" class="csl-entry" role="listitem">
 Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
 </div>
+<div id="ref-r4rest" class="csl-entry" role="listitem">
+Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
 <div id="ref-museums_data" class="csl-entry" role="listitem">
 Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
 </div>
@@ -403,6 +1095,9 @@ Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</spa
 </div>
 <div id="ref-tibble" class="csl-entry" role="listitem">
 Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
+</div>
+<div id="ref-turbines_data" class="csl-entry" role="listitem">
+Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
 </div>
 <div id="ref-rcartocolor" class="csl-entry" role="listitem">
 Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
@@ -485,6 +1180,12 @@ RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</sp
 <div id="ref-ggalt" class="csl-entry" role="listitem">
 Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</span>: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’Ggplot2’</em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
 </div>
+<div id="ref-waffle" class="csl-entry" role="listitem">
+Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
+</div>
+<div id="ref-openxlsx" class="csl-entry" role="listitem">
+Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
 </div>
@@ -512,8 +1213,11 @@ Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics
 <div id="ref-tidyverse" class="csl-entry" role="listitem">
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
 </div>
+<div id="ref-readxl" class="csl-entry" role="listitem">
+Wickham, Hadley, and Jennifer Bryan. 2023. <em><span class="nocase">readxl: Read Excel Files</span></em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.
+</div>
 <div id="ref-r4ds" class="csl-entry" role="listitem">
-Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em><span>R</span> for Data Science</em>. O-Reilly. <a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>.
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em><span>R</span> for Data Science</em>. Second Edition. O-Reilly. <a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>.
 </div>
 <div id="ref-dplyr" class="csl-entry" role="listitem">
 Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis Vaughan. 2023. <em><span class="nocase">dplyr</span>: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.
@@ -555,9 +1259,7 @@ Yutani, Hiroaki. 2023. <em><span class="nocase">gghighlight</span>: Highlight Li
 Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, and Anne D. Yoder. 2014. <span>“<span class="nocase">Life history profiles for 27 strepsirrhine primate taxa generated using captive data from the Duke Lemur Center</span>.”</span> <em>Scientific Data</em> 1 (1). <a href="https://doi.org/10.1038/sdata.2014.19">https://doi.org/10.1038/sdata.2014.19</a>.
 </div>
 </div>
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -592,7 +1294,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const onCopySuccess = function(e) {
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -624,29 +1337,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
   });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
-    });
-    clipboardModal.on('success', onCopySuccess);
-  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -654,7 +1345,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -976,21 +1667,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
       <a href="./icons-images.html" class="pagination-link" aria-label="Making use of icons, fonts, and text">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Making use of icons, fonts, and text</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./cats.html" class="pagination-link" aria-label="Cats: data-driven annotations with {ggtext}">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 
