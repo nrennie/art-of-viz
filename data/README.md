@@ -41,6 +41,15 @@ Copyright info: [https://datadryad.org/stash/dataset/doi:10.5061/dryad.fj974](ht
 This work is licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication license. 
 
 
+## Chapter 4: Canadian Wind Turbines
+
+Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27)
+
+Original source: [https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)
+
+Copyright info: [https://open.canada.ca/en/open-government-licence-canada](https://open.canada.ca/en/open-government-licence-canada)
+
+
 ## Chapter 5: Cats
 
 Source: [https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31](https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-31)
