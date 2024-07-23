@@ -67,7 +67,11 @@ We don't want to have to re-download the data from the URL each time we want to 
 #| label: turbines-download-2
 #| eval: false
 #| echo: true
-write.csv(wind_turbines, "data/wind_turbines.csv", row.names = FALSE)
+write.csv(
+  x = wind_turbines,
+  file = "data/wind_turbines.csv",
+  row.names = FALSE
+)
 ```
 
 We can then use either `read.csv()` or `read_csv()` from {readr} to read the CSV file back in: \index{readr!read\_csv}
@@ -114,7 +118,7 @@ This scatter plot highlights a few issues:
 
 * We get a warning message about `NA` values.
   
-  > Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion
+  > `Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion`
   
   This comes from the `as.numeric` transformation of the `Turbine.rated.capacity.(kW)` column. If we inspect this column more closely, you'll see that there are a few unusual values such as `"1903/2126/2221"`. If we look at the `Notes` column for an explanation, we can see that these values exist because `"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"`. Unfortunately, we don't know which individual turbines this derating applies to which makes it difficult to create a scatter plot.
 
@@ -127,7 +131,7 @@ Let's instead look at the number of turbines in each region, by creating an orde
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
 # Add space for labels
 # (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)
-par(mar=c(5.1, 5.1, 4.1, 2.1))
+par(mar = c(5.1, 6.6, 4.1, 2.1))
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
   # make labels smaller so they fit on the page
@@ -144,7 +148,10 @@ Most of the turbines are located in Ontario, but has this always been the case? 
 #| label: fig-turbines-barplot-2
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
 barplot(
-  table(wind_turbines$`Province/Territory`, wind_turbines$Commissioning.date),
+  table(
+    wind_turbines$`Province/Territory`,
+    wind_turbines$Commissioning.date
+  ),
   # make labels smaller so they fit on the page
   cex.axis = 0.5,
   cex.names = 0.5,

@@ -408,7 +408,11 @@ Tip&nbsp;5.2: Processing Excel files
 </div>
 <p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> using an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span><span class="va">wind_turbines</span>, <span class="st">"data/wind_turbines.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">wind_turbines</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"data/wind_turbines.csv"</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can then use either <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> or <code>read_csv()</code> from {readr} to read the CSV file back in: </p>
 <div class="cell">
@@ -468,7 +472,7 @@ Figure&nbsp;5.1: Scatter plot showing the relationship between rotor diameter an
 <li>
 <p>We get a warning message about <code>NA</code> values.</p>
 <blockquote class="blockquote">
-<p>Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion</p>
+<p><code>Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion</code></p>
 </blockquote>
 <p>This comes from the <code>as.numeric</code> transformation of the <code>Turbine.rated.capacity.(kW)</code> column. If we inspect this column more closely, you’ll see that there are a few unusual values such as <code>"1903/2126/2221"</code>. If we look at the <code>Notes</code> column for an explanation, we can see that these values exist because <code>"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"</code>. Unfortunately, we don’t know which individual turbines this derating applies to which makes it difficult to create a scatter plot.</p>
 </li>
@@ -478,7 +482,7 @@ Figure&nbsp;5.1: Scatter plot showing the relationship between rotor diameter an
 <div class="cell">
 <div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Add space for labels</span></span>
 <span><span class="co"># (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5.1</span>, <span class="fl">5.1</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5.1</span>, <span class="fl">6.1</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="co"># make labels smaller so they fit on the page</span></span>
@@ -501,7 +505,10 @@ Figure&nbsp;5.2: Ordered bar chart showing the number of wind turbines commissio
 <p>Most of the turbines are located in Ontario, but has this always been the case? We also have information on the commissioning date of each turbine. We could recreate this bar chart for different time periods to see how the geographic spread of turbines has changed over time. We can add <code>wind_turbines$Commissioning.date</code> into the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function to create a stacked bar chart for each year:</p>
 <div class="cell">
 <div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span>, <span class="va">wind_turbines</span><span class="op">$</span><span class="va">Commissioning.date</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span></span>
+<span>    <span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span>,</span>
+<span>    <span class="va">wind_turbines</span><span class="op">$</span><span class="va">Commissioning.date</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  <span class="co"># make labels smaller so they fit on the page</span></span>
 <span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  cex.names <span class="op">=</span> <span class="fl">0.5</span>,</span>
