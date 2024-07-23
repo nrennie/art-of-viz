@@ -93,11 +93,11 @@ The rotor diameter and hub height of each turbine are given by `Rotor.diameter.(
 
 ## Exploratory work
 
-What are we looking at?
-
-We might also want to look at the spatial distribution of turbines across Canada since we have the geographic coordinates - we'll look at plotting spatial data a little bit later in @sec-doctors, @sec-time-zones, and @sec-house.
+There are quite a few variables that we might be interested in looking at here - particularly since there are several variables about individual turbines that might be related to each other. For example, do turbines with a larger rotor diameter have a higher capacity? What is the relationship between rotor diameter and hub height? Which manufacturers are most common? Which regions have the most turbines? We might also want to look at the spatial distribution of turbines across Canada since we have the geographic coordinates - we'll look at plotting spatial data a little bit later in @sec-doctors, @sec-time-zones, and @sec-house.
 
 ### Data exploration
+
+Let's start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step. The `Turbine.rated.capacity.(kW)` column is currently a character column even though it contains numeric values, so we wrap the column in `as.numeric()` before plotting it:
 
 ```{r}
 #| label: fig-turbines-scatter
@@ -110,8 +110,17 @@ plot(
 )
 ```
 
-Some of the `"1903/2126/2221"`. many of the same value hard to see on this plot
+This scatter plot highlights a few issues:
 
+* We get a warning message about `NA` values.
+  
+  > Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion
+  
+  This comes from the `as.numeric` transformation of the `Turbine.rated.capacity.(kW)` column. If we inspect this column more closely, you'll see that there are a few unusual values such as `"1903/2126/2221"`. If we look at the `Notes` column for an explanation, we can see that these values exist because `"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"`. Unfortunately, we don't know which individual turbines this derating applies to which makes it difficult to create a scatter plot.
+
+* The other issue with this scatter plot is that many of the observations are the same, but it's not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That's not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualised as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.
+
+Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
 
 ```{r}
 #| label: fig-turbines-barplot
@@ -126,9 +135,40 @@ barplot(
 )
 ```
 
+Most of the turbines are located in Ontario, but has this always been the case? We also have information on the commissioning date of each turbine. We could recreate this bar chart for different time periods to see how the geographic spread of turbines has changed over time. We can add `wind_turbines$Commissioning.date` into the `table()` function to create a stacked bar chart for each year:
+
+```{r}
+#| label: fig-turbines-barplot-2
+#| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
+barplot(
+  table(wind_turbines$`Province/Territory`, wind_turbines$Commissioning.date),
+  # make labels smaller so they fit on the page
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
+  horiz = TRUE
+)
+```
+
+As you can see from the y-axis of @fig-turbines-barplot-2, the `Commissioning.date` isn't always given as a year. Instead it's sometimes given as a year range. Let's start drafting out a more aesthetically pleasing version of this plot before we deal with processing the `Commissioning.date` data.
+
 ### Exploratory sketches
 
-![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-packages-sketch-1 fig-align="center"}
+There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines. in different multi-year time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
+
+Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualised on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart}
+
+Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
+
+![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-sketch-turbines fig-align="center"}
+
+We can make two slight variations to this basic version of the chart:
+
+* We have `r nrow(wind_turbines)` observations to plot which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.
+
+* Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a *pictogram*.
+
+\index{pictogram} 
 
 ## Preparing a plot
 
