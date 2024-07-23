@@ -554,14 +554,28 @@ scale_plot <- text_plot +
   coord_fixed()
 ```
 
-\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_rect}
-\index{marquee!element\_marquee} \index{ggplot2!element\_line} \index{ggplot2!margin}
+Let's make a few final edits to tidy up our plot by editing the theme. We'll use `theme_minimal()` as a base theme (making the font size a little bit smaller), and then make a few further edits using the `theme()` arguments. \index{ggplot2!theme\_minimal} \index{ggplot2!theme}
 
 ```{r}
 #| label: turbines-ragg-png
 #| echo: false
 knitr::opts_chunk$set(dev = "ragg_png")
 ```
+
+Within `theme()`, we start by setting `plot.title.position` and `plot.caption.position` to `"plot"` to align the title, subtitle, and caption text with the edge of the whole plot, rather than the start of the first panel. Some additional spacing around the edge of the plot is added using `plot.margin` and the background color is edited by using the `fill` and `color` arguments in `element_rect()` for the `plot.background` argument. The gridlines are also made slightly thinner by adjusting `panel.grid.major`. \index{ggplot2!element\_rect} \index{ggplot2!element\_line} \index{ggplot2!margin}
+
+Finally, we edit the plot, subtitle, and caption elements and specify them all using `element_marquee()`. By using `element_marquee()`, the Markdown syntax we've applied, such as the bold and colored text, will be rendered correctly. You can adjust the `color`, `size`, `margin` and `hjust` of {marquee} text in the same way you would with `element_text()`. If you have some elements of the text rendered with `element_text()` and some rendered with `element_marquee()`, you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the `size` argument. \index{marquee!element\_marquee}
+
+The `width` argument applies text wrapping, where `width = 1` means the text wraps to the full width of the plot. This is similar to the way that `element_textbox_simple()` from {ggtext} works. However, the `width` is not set by default, so if you want the text to wrap it's important to specify the width.
+
+
+::: {#tip-turbines-marquee-req .callout-tip}
+
+## Requirements for using {marquee}
+
+The {marquee} package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for {marquee} text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the {ragg} package [@ragg] are a good choice. 
+
+:::
 
 ```{r}
 #| label: fig-turbines-theme-plot
@@ -577,23 +591,20 @@ scale_plot +
     plot.margin = margin(5, 10, 5, 10),
     # background and grid lines
     plot.background = element_rect(
-      fill = bg_col, colour = bg_col
-    ),
-    panel.background = element_rect(
-      fill = bg_col, colour = bg_col
+      fill = bg_col, color = bg_col
     ),
     panel.grid.major = element_line(
       linewidth = 0.4
     ),
     # format text with {marquee}
     plot.title = marquee::element_marquee(
-      colour = text_col,
+      color = text_col,
       width = 1,
       size = 12,
       margin = margin(b = -10)
     ),
     plot.subtitle = marquee::element_marquee(
-      colour = text_col,
+      color = text_col,
       width = 1,
       size = 9
     ),
