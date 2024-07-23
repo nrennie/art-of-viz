@@ -602,63 +602,11 @@ And we're done!
 
 ## Reflection
 
-* doesn't account for size/population of area
+The colored subtitle as an alternative to a legend is effective because it uses much less space than a traditional legend - leaving more room for the data. However, there are some elements of the subtitle that could still be improved. We've discussed already the limitations of waffle plots and pictograms in terms of the lack of representation of categories with small numbers. This means that we had to group some regions together, and so regions with fewer turbines have less information included in the chart. Perhaps the subtitle could be updated to explain to users that each icon represents 20 turbines, and that this means regions with 10 or fewer turbines are not represented.
 
-* delay in commissioning date vs build insallation - limitation of data
+There's also some uncertainty around the date used, which isn't really explained in the chart. When processing the `Commissioning.date` column, we used the most recent date but that isn't necessarily always the best choice. A limitation of the data is that we also only have commissioning date, not installation date or date of first operation. This means that perhaps there are some values in the data that suggest a turbine exists in one time period when it hasn't yet been built. 
 
-* turbines icon
-
-* ggpattern, geom_tile_pattern, flaticon, 
-
-[@ggpattern]
-
-flaticon needs attrubtion
-
-[www.flaticon.com/free-icon/wind-power_5670189](https://www.flaticon.com/free-icon/wind-power_5670189)
-
-```{r}
-#| label: turbines-build-gg
-base_build <- ggplot_build(base_plot)
-new_data <- base_build$data[[1]] |>
-  dplyr::rename(Region = PANEL) |>
-  dplyr::mutate(
-    Region = factor(Region, labels = levels(plot_data$Year_Group))
-  )
-```
-
-```{r}
-#| label: fig-turbines-rebuild
-#| fig-cap: "Plot"
-base_plot2 <- ggplot(data = new_data) +
-  geom_point(
-    mapping = aes(
-      x = x, y = y, color = colour
-    )
-  ) +
-  facet_wrap(~Region, nrow = 1)
-base_plot2
-```
-
-```{r}
-#| label: fig-turbines-flaticon
-#| fig-cap: "Plot"
-ggplot(
-  data = new_data,
-  mapping = aes(
-    x = x, y = y
-  )
-) +
-  ggpattern::geom_tile_pattern(
-    linewidth = 1,
-    fill = "white",
-    pattern = "image",
-    pattern_filename = "images/wind-power.png"
-  ) +
-  facet_wrap(~Region, nrow = 1) +
-  theme_void()
-```
-
-learn more about image manipulation and recoloring in seafood, images paths based on data in r-pkgs
+Finally, we've used a `fan` icon because the Font Awesome wind turbine icon is only available in the Pro version. Using a wind turbine icon would be much clearer, and more consistent with the theme of the plot. We could look at using an alternative icon font, or we could perhaps use images instead. See @sec-ggbuild for a description of how we might replace the existing `fan` icons with a wind turbine icon from a different source.
 
 ::: {.content-visible when-format="html"}
 
