@@ -130,7 +130,7 @@ state_levels <- plot_data |>
 
 We're going to use the {poissoned} package [@poissoned] to ...
 
-The {poissoned} package isn't currently available on CRAN,. You may need to install the {remotes} package [@remotes] first 
+The {poissoned} package isn't currently available on CRAN, so we'll need to install it from GitHub instead. The {remotes} package [@remotes] can be used to install packages from remote repositories, such as GitHub. We can use the `install_github()` function, passing in a character string of the form `"user/repository"`: \index{remotes!install\_github}
 
 ```{r}
 #| label: bees-install
@@ -156,6 +156,8 @@ bees_grid <- plot_data |>
 
 ### The first plot
 
+We'll create our plot using `geom_point()` since we 
+
 ```{r}
 #| label: fig-bees-base-plot
 #| fig-cap: "Plot"
@@ -163,7 +165,7 @@ library(ggplot2)
 base_plot <- ggplot(data = bees_grid) +
   geom_point(
     mapping = aes(x = x, y = y),
-    size = 0.3
+    size = 0.2
   ) +
   facet_grid(state ~ year, switch = "both")
 base_plot
@@ -173,32 +175,15 @@ base_plot
 
 ### Colors
 
+Let's select some colors for our plot. We won't be mapping any colors to columns in the data, but we still need to define a background color and a color for highlighted elements. To keep the plot looking clean, we'll also use the same color for the text. Similar to @sec-programming, we can select these colors to match the topic of the data. What colors do you think of when you think of bees? Black and yellow. We'll use black for the background color, and yellow for the highlight color. 
+
 ```{r}
 #| label: bees-colors
 highlight_col <- "#fecc27"
 bg_col <- "black"
 ```
 
-```{r}
-#| label: fig-bees-base-plot-2
-#| fig-cap: "Plot"
-base_plot <- ggplot(data = bees_grid) +
-  annotate(
-    geom = "tile",
-    x = 0.5, y = 0.5,
-    width = 1.07, height = 1.07,
-    fill = highlight_col,
-    color = bg_col,
-    linewidth = 0.5
-  ) +
-  geom_point(
-    mapping = aes(x = x, y = y),
-    size = 0.2,
-    color = bg_col
-  ) +
-  facet_grid(state ~ year, switch = "both")
-base_plot
-```
+If we want to ... black points against a ayellow background. We *should* update out geom_point code to color = bg_col, but the points are already black for default. 
 
 ### Fonts
 
@@ -216,28 +201,10 @@ body_font <- "source"
 ### Adding text
 
 ```{r}
-#| label: bees-social
-social <- social_caption(
-  bg_color = bg_col,
-  icon_color = highlight_col,
-  font_color = highlight_col,
-  font_family = body_font
-)
-```
-
-```{r}
 #| label: bees-text
 title <- "Bee colony losses in the United States"
 st <- "Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors."
-```
-
-```{r}
-#| label: bees-cap
-source_cap <- source_caption(
-  source = "USDA",
-  graphic = social,
-  sep = " | "
-)
+cap <- "Data: USDA | Graphic: N. Rennie"
 ```
 
 ```{r}
@@ -247,7 +214,7 @@ text_plot <- base_plot +
   labs(
     title = title,
     subtitle = st,
-    caption = source_cap,
+    caption = cap,
     x = NULL, y = NULL
   )
 text_plot
@@ -260,6 +227,7 @@ text_plot
 ```{r}
 #| label: bees-theme-plot-1
 theme_plot <- text_plot +
+  coord_fixed(expand = FALSE) +
   theme_void(
     base_family = body_font,
     base_size = 7
@@ -274,6 +242,9 @@ theme_plot +
     # background colors
     plot.background = element_rect(
       fill = bg_col, color = bg_col
+    ),
+    panel.background = element_rect(
+      fill = highlight_col, color = highlight_col
     ),
     strip.background = element_rect(
       fill = bg_col
