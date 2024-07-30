@@ -13,29 +13,15 @@ fig-asp: 1
 #| file: R/options.R
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/load_font_awesome.R
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/social_caption.R
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/source_caption.R
-```
-
 # Bee Colony Losses: visualising density with Poisson disk sampling {#sec-bees}
 
-In this chapter, we'll learn how install R package that aren't available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.
+In this chapter, we'll learn how to explore missing data with {naniar}, install R packages that aren't available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.
 
 ## Data
+
+As a major pollinator, bees are a vitally important part of our planet's ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors [@bees_data].
+
+The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] data set in January 2022, and so can be loaded in using the {tidytuesdayR} package:
 
 ```{r}
 #| label: bees-data-show
@@ -54,7 +40,17 @@ stressor <- tuesdata$stressor
 colony <- readr::read_csv("data/colony.csv")
 ```
 
+Since this version of the data is based on the 2021 release, it includes data up to June 2021. If you want to work with a more recent publication of the data, it can be obtained from [usda.library.cornell.edu/concern/publications/rn301137d](https://usda.library.cornell.edu/concern/publications/rn301137d).
+
+Two different data sets are included. The first, `colony`, contains information about the number and size of bee colonies in each US state per year since 2015. The second, `stressor`, contains information about different sources of health stressors for bee colonies and what percentage of colonies are affected by these stressors, again for different states and time periods.
+
 ## Exploratory work
+
+In this chapter, we'll focus on the `colony` data, where we'll try to build a picture of how bee colony numbers are changing over time.
+
+### Data exploration
+
+Let's start by looking at the 
 
 ```{r}
 #| label: bees-boxplot
@@ -62,29 +58,90 @@ boxplot(
   colony_n ~ year,
   data = colony,
   horizontal = TRUE,
-  xlab = "Colony size"
+  xlab = "Colony size", 
+  ylab = NULL
 )
 ```
 
+what's causing those outliers? some states have a lots more bees
+
+```{r}
+#| fig-asp: 1.2
+colony_2020 <- subset(colony, year == 2020)
+boxplot(
+  colony_n ~ state,
+  data = colony_2020,
+  horizontal = TRUE,
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
+  xlab = "Colony size",
+  ylab = NULL
+)
+```
+
+There are a few "states" with a much - one is california, the other is in fact not a state - it's the sum "United States". You'll also see from this chart that not all states are included individually - an "Other States" is included instead which groups...
+
+https://bp-dc.org/assets/media/documents/pollinators/documents/ValueofHoneyBeesasPollinators-2000Report.pdf
+
+Box plots can hide stuff
+
+Instead, let's look at the density plot
+
 ```{r}
 #| label: bees-density
-lattice::densityplot(~ log(colony_n)|factor(year),
-  data = colony, layout = c(4, 2),
+colony_states <- subset(colony, state != "United States")
+lattice::densityplot(~ colony_n|factor(year),
+  data = colony_states,
+  layout = c(4, 2),
   na.rm = TRUE,
   xlab = "Colony size"
 )
 ```
 
+we also needed to set `na.rm = TRUE` ... let's have a look at those missing values.
 
+{naniar} [@naniar] vis_miss actually from {visdat} [@visdat]
 
+```{r}
+colony_AL <- subset(colony, state == "Alabama")
+visdat::vis_miss(
+  colony_AL
+)
+```
 
-### Data exploration
+if we inspect more closely, we see that . a similar pattern can be observed for all states
+
+when reporting happens
+
+Data unavailable for apr-jun 2019 - 
+average, smoothing seasonal?
+maybe only look at january
+similar problem for end of 2021. 
+could try to impute but so many values are missing
+try just jan - seasonal effects differ across the US
+
+https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/
+
+september to dec --> october december
+
+callout missing values
+assumes 
+naniar::replace_with_na
 
 ### Exploratory sketches
+
+for each state, we want to visualise the average number of colonies each year. There are multiple ways we could do this: line charts or area charts are obvious ... . Perhaps even a simple bar chart could be effective here.
+
+However, here we'll look at a less common. essentially how many bees are contained within a particular area. 
 
 ![Initial sketch.](images/sketch-bees.png){#fig-bees-sketch fig-align="center"}
 
 ## Preparing a plot
+
+we need to:
+
+* Calculate the average number of colonies per year, per state.
 
 ### Data wrangling
 
@@ -93,40 +150,43 @@ Let's start by selecting a subset of states to visualize:
 ```{r}
 #| label: bees-states
 states_to_plot <- c(
-  "California", "Texas", "Florida",
-  "New York", "Alabama", "Illinois"
+  "California", "North Dakota", "Florida",
+  "Texas", "Idaho", "South Dakota"
 )
 ```
 
+Data unavailable for apr-jun 2019. also for end of 2021
 
 ```{r}
 #| label: bees-prep-data
 plot_data <- colony |>
   dplyr::filter(
     state %in% states_to_plot,
-    year != "6/"
-  ) |>
-  dplyr::group_by(year, state) |>
-  dplyr::summarise(bees = mean(colony_n, na.rm = TRUE)) |>
-  dplyr::ungroup() |>
-  dplyr::mutate(year = as.numeric(year))
+    months == "October-December"
+  ) |> 
+  dplyr::select(
+    year, state, colony_n
+  )
 ```
 
-Data unavailable for apr-jun 2019, and for end of 2021
 
+Order by state with highest average in 2021
 
 ```{r}
 #| label: bees-state_order
 state_levels <- plot_data |>
-  dplyr::filter(year == 2021) |>
-  dplyr::arrange(-bees) |>
+  dplyr::filter(year == 2020) |>
+  dplyr::arrange(dplyr::desc(colony_n)) |>
   dplyr::pull(state)
 ```
 
+now we need to generate points
 
+we could do something simple, like generate lots of `runif()` uniform distribution, the number of samples from the distribution represents number of bees. However, this approach is likely to lead - since randomness doesn't usually look .. 
+
+Instead, we want to generate points that are don't overlap and are at least some minimum distance apart. To do this, we';ll use *Poisson disk sampling*. \index{Poisson disk sampling}
 
 ### Poisson disk sampling with {poissoned}
-
 
 We're going to use the {poissoned} package [@poissoned] to ...
 
@@ -138,14 +198,18 @@ The {poissoned} package isn't currently available on CRAN, so we'll need to inst
 remotes::install_github("coolbutuseless/poissoned")
 ```
 
+scale with area. each point represents sqrt of 1000 bees.
+
+
 
 ```{r}
+set.seed(1234)
 bees_grid <- plot_data |>
   dplyr::rowwise() |>
   dplyr::mutate(
-    t = sqrt(bees / 1000),
+    bees = colony_n / 20000,
     pnts = list(
-      poissoned::poisson_disc(ncols = t, nrows = t, cell_size = 1 / t)
+      poissoned::poisson_disc(ncols = bees, nrows = bees, cell_size = 1 / bees)
     )
   ) |>
   dplyr::ungroup() |>
@@ -153,10 +217,14 @@ bees_grid <- plot_data |>
   dplyr::mutate(state = factor(state, levels = state_levels))
 ```
 
+callout setting random seed
+
 
 ### The first plot
 
 We'll create our plot using `geom_point()` since we 
+
+need to make points very small - calif
 
 ```{r}
 #| label: fig-bees-base-plot
@@ -164,8 +232,7 @@ We'll create our plot using `geom_point()` since we
 library(ggplot2)
 base_plot <- ggplot(data = bees_grid) +
   geom_point(
-    mapping = aes(x = x, y = y),
-    size = 0.2
+    mapping = aes(x = x, y = y)
   ) +
   facet_grid(state ~ year, switch = "both")
 base_plot
@@ -179,11 +246,23 @@ Let's select some colors for our plot. We won't be mapping any colors to columns
 
 ```{r}
 #| label: bees-colors
-highlight_col <- "#fecc27"
-bg_col <- "black"
+bg_col <- "#fecc27"
+highlight_col <- "black"
 ```
 
-If we want to ... black points against a ayellow background. We *should* update out geom_point code to color = bg_col, but the points are already black for default. 
+If we want to ... black points against a ayellow background. We *should* update out geom_point code to
+
+```{r}
+base_plot <- ggplot(data = bees_grid) +
+  geom_point(
+    mapping = aes(x = x, y = y),
+    size = 0.1,
+    color = bg_col
+  ) +
+  facet_grid(state ~ year, switch = "both")
+base_plot
+```
+
 
 ### Fonts
 
@@ -203,7 +282,7 @@ body_font <- "source"
 ```{r}
 #| label: bees-text
 title <- "Bee colony losses in the United States"
-st <- "Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors."
+st <- "Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors. Each point represents 20,000 colonies that exist during the months of October - December each year."
 cap <- "Data: USDA | Graphic: N. Rennie"
 ```
 
@@ -230,7 +309,7 @@ theme_plot <- text_plot +
   coord_fixed(expand = FALSE) +
   theme_void(
     base_family = body_font,
-    base_size = 7
+    base_size = 7.5
   )
 ```
 
@@ -247,15 +326,18 @@ theme_plot +
       fill = highlight_col, color = highlight_col
     ),
     strip.background = element_rect(
-      fill = bg_col
+      fill = bg_col,
+      color = bg_col
     ),
     # facet labels
     strip.text.x = element_text(
-      color = highlight_col
+      color = highlight_col,
+      margin = margin(t = 5)
     ),
     strip.text.y = element_text(
       color = highlight_col,
-      angle = 90
+      angle = 90,
+      margin = margin(r = 5)
     ),
     # text formatting
     plot.title = ggtext::element_textbox_simple(
@@ -270,10 +352,16 @@ theme_plot +
       color = highlight_col,
       margin = margin(t = 5)
     ),
-    plot.margin = margin(5, 5, 5, 5)
+    plot.margin = margin(5, 10, 5, 5)
   )
 ```
 
 ## Reflection
 
 * wider range of states, difficult to see trend over time
+
+* might imply area are same size - california is a big state - there's just more room for bees.
+
+* only looks at one variable - if colony numbers are lower but colony sizes are larger that might mean equal numbers of bees. but we don't see that when we only look at the number of colonies.
+
+* not enough contrast
