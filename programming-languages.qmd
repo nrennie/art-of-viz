@@ -53,7 +53,7 @@ You can also use `View()` to open a new tab in RStudio to inspect the data in so
 
 There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the `github_` columns might be related to the fact that many programming languages precede GitHub's creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn't a statistics book, so for the purposes of visualization we'll focus on columns that are mostly complete. \index{missing data}
 
-So which columns should we explore first? Often when we're working with data, there is some *outcome* that we're interested in. Depending on your field, you might instead hear this called the *response* variable or the *dependent variable*. You might have multiple outcomes of interest. For example, in the PLDB data, we might be interested in what affects the ranking and/or the number of GitHub stars for a programming language. These are often the variables we want to tell a story about. However, it's also important to think about exploring relationships between other variables to make sure that the story you're telling is the correct one. It might seem obvious that there could be a relationship between `github_repo_stars` and `github_repo_forks`, but what exactly is that relationship? What about a less obvious connection between `last_activity` and `number_of_jobs` - is there a relationship there? 
+So which columns should we explore first? Often when we're working with data, there is some *outcome* that we're interested in. Depending on your field, you might instead hear this called the *response* variable or the *dependent variable*. You might have multiple outcomes of interest. For example, in the PLDB data, we might be interested in what affects the ranking and/or the number of GitHub stars for a programming language. These are often the variables we want to tell a story about. However, it's also important to think about exploring relationships between other variables to make sure that the story you're telling is the correct one. It might seem obvious that there could be a relationship between `github_repo_stars` and `github_repo_forks`, but what exactly is that relationship? What about a less obvious connection between `last_activity` and `number_of_jobs` - is there a relationship there?
 
 ## Exploratory work
 
@@ -68,9 +68,9 @@ We can't explore every column in this chapter, but I encourage you to do so at h
 ```{r}
 #| label: fig-languages-scatter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
-plot(
-  languages$last_activity, languages$language_rank
-)
+#| echo: -1
+par(mar = c(5.1, 4.1, 2.1, 2.1))
+plot(languages$last_activity, languages$language_rank)
 ```
 
 Straight away this highlights the role of data visualization in exploratory analysis. This scatter plot don't look quite right - the `last_activity` data ranges from around -1000 to just over 2000, with most of the values close to the 2000 mark. If this is supposed to be a date column, we need to think about whether these values are correct. 
@@ -93,9 +93,9 @@ Let's look at the balance between these different types of languages in the data
 ```{r}
 #| label: fig-languages-pl-barplot
 #| fig-cap: "A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right."
-barplot(
-  sort(table(languages$type))
-)
+#| echo: -1
+par(mar = c(4.1, 4.1, 2.1, 2.1))
+barplot(sort(table(languages$type)))
 ```
 
 Almost all of them are programming languages so let's focus on them only, and recreate our `last_activity` against `language_rank` scatter plot. We can use the `subset()` function to extract only rows of the data where the `type` is `"pl"` and save this to a new object called `pl_df`. \index{base!subset}
@@ -103,6 +103,8 @@ Almost all of them are programming languages so let's focus on them only, and re
 ```{r}
 #| label: fig-languages-scatter-filter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing clustering of languages with last activity before and after 2000."
+#| echo: -1
+par(mar = c(5.1, 4.1, 2.1, 2.1))
 pl_df <- subset(languages, type == "pl")
 plot(
   pl_df$last_activity, pl_df$language_rank
@@ -133,6 +135,8 @@ Which other columns might we explore? In R, we write comments using the `#` symb
 ```{r}
 #| label: fig-languages-comment-barplot
 #| fig-cap: "A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right."
+#| echo: -1
+par(mar = c(4.1, 4.1, 2.1, 2.1))
 barplot(
   sort(table(pl_df$line_comment_token))
 )
