@@ -423,21 +423,21 @@ Tip&nbsp;6.2: Processing Excel files
 <div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 15
-  OBJECTID `Province/Territory`
-     &lt;dbl&gt; &lt;chr&gt;               
-1        1 Alberta             
-2        2 Alberta             
-3        3 Alberta             
-4        4 Alberta             
-5        5 Alberta             
-6        6 Alberta             
-# ℹ 13 more variables:
-#   Project.name &lt;chr&gt;,
-#   `Total.project.capacity.(MW)` &lt;dbl&gt;,
+  OBJECTID `Province/Territory` Project.name          
+     &lt;dbl&gt; &lt;chr&gt;                &lt;chr&gt;                 
+1        1 Alberta              Optimist Wind Energy  
+2        2 Alberta              Castle River Wind Farm
+3        3 Alberta              Waterton Wind Turbines
+4        4 Alberta              Waterton Wind Turbines
+5        5 Alberta              Waterton Wind Turbines
+6        6 Alberta              Waterton Wind Turbines
+# ℹ 12 more variables: `Total.project.capacity.(MW)` &lt;dbl&gt;,
 #   Turbine.identifier &lt;chr&gt;,
 #   Turbine.number.in.project &lt;chr&gt;,
 #   `Turbine.rated.capacity.(kW)` &lt;chr&gt;,
-#   `Rotor.diameter.(m)` &lt;dbl&gt;, …</code></pre>
+#   `Rotor.diameter.(m)` &lt;dbl&gt;, `Hub.height.(m)` &lt;dbl&gt;,
+#   Manufacturer &lt;chr&gt;, Model &lt;chr&gt;,
+#   Commissioning.date &lt;chr&gt;, Latitude &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>The <code>OBJECTID</code> column is a unique row identifier. The data has a row for each wind turbine - with some of the data given on the turbine level and some data on the project level. For the variables related to project level data, this means values can be repeated multiple times within a column for turbines in the same project.</p>
@@ -480,10 +480,7 @@ Figure&nbsp;6.1: Scatter plot showing the relationship between rotor diameter an
 </ul>
 <p>Let’s instead look at the number of turbines in each region, by creating an ordered bar chart. We use the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function to get a count of the number per region, and <code><a href="https://rdrr.io/r/base/sort.html">sort()</a></code> to order the counts from smallest to largest. We then use the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function to make the chart, setting <code>horiz = TRUE</code> to make the bars horizontal for easier reading.</p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Add space for labels</span></span>
-<span><span class="co"># (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5.1</span>, <span class="fl">6.6</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">wind_turbines</span><span class="op">$</span><span class="va">`Province/Territory`</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="co"># make labels smaller so they fit on the page</span></span>
 <span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>

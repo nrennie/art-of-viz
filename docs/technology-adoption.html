@@ -398,16 +398,14 @@ window.Quarto = {
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">technology</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 7
-  variable label       iso3c  year group
-  &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;
-1 BCG      % children… AFG    1982 Cons…
-2 BCG      % children… AFG    1983 Cons…
-3 BCG      % children… AFG    1984 Cons…
-4 BCG      % children… AFG    1985 Cons…
-5 BCG      % children… AFG    1986 Cons…
-6 BCG      % children… AFG    1987 Cons…
-# ℹ 2 more variables: category &lt;chr&gt;,
-#   value &lt;dbl&gt;</code></pre>
+  variable label            iso3c  year group category value
+  &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;
+1 BCG      % children who … AFG    1982 Cons… Vaccines    10
+2 BCG      % children who … AFG    1983 Cons… Vaccines    10
+3 BCG      % children who … AFG    1984 Cons… Vaccines    11
+4 BCG      % children who … AFG    1985 Cons… Vaccines    17
+5 BCG      % children who … AFG    1986 Cons… Vaccines    18
+6 BCG      % children who … AFG    1987 Cons… Vaccines    27</code></pre>
 </div>
 </div>
 <p>The data is in long format with the <code>variable</code> (and <code>label</code>) columns containing information on what variable the row relates to e.g.&nbsp;<code>"% children who received a BCG immunization"</code> or <code>"Land naturally regenerating forest area 1000 ha"</code>. The <code>iso3c</code> column gives the ISO3 code for the country the row relates to, and similarly the <code>year</code> column relates to the relevant year. The <code>group</code> column details whether the variable is related to <code>"Consumption"</code>, <code>"Production"</code>, <code>"Non-Tech"</code> (such as GDP), or <code>"Creation"</code>. The <code>category</code> column contains information about which category the variable falls into e.g.&nbsp;<code>"Vaccines"</code> or <code>"Agriculture"</code>. Finally, the <code>value</code> column provides the value of the variable for the given year and country.</p>
@@ -418,9 +416,7 @@ window.Quarto = {
 <span class="header-section-number">5.2.1</span> Data exploration</h3>
 <p>As in other chapters in this book, we’ll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each <code>category</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function:</p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># increase left margin</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5.1</span>, <span class="fl">8.1</span>, <span class="fl">4.1</span>, <span class="fl">2.1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">technology</span><span class="op">$</span><span class="va">category</span><span class="op">)</span>,</span>
 <span>  <span class="co"># make labels smaller so they fit on the page</span></span>
 <span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
@@ -567,16 +563,14 @@ Figure&nbsp;5.4: Initial sketches of a ideas for visualising data for a single c
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 6
 # Groups:   iso3c [3]
-  iso3c YN       perc_1980 perc_2010
-  &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;
-1 BRA   value         0.57      0.99
-2 BRA   no_value      0.43      0.01
-3 GBR   value         0.53      0.89
-4 GBR   no_value      0.47      0.11
-5 NZL   value         0.8       0.91
-6 NZL   no_value      0.2       0.09
-# ℹ 2 more variables: ymax_1980 &lt;dbl&gt;,
-#   ymax_2010 &lt;dbl&gt;</code></pre>
+  iso3c YN       perc_1980 perc_2010 ymax_1980 ymax_2010
+  &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 BRA   value         0.57      0.99      0.57      0.99
+2 BRA   no_value      0.43      0.01      1         1   
+3 GBR   value         0.53      0.89      0.53      0.89
+4 GBR   no_value      0.47      0.11      1         1   
+5 NZL   value         0.8       0.91      0.8       0.91
+6 NZL   no_value      0.2       0.09      1         1   </code></pre>
 </div>
 </div>
 <p>You’ll notice that the <code>ymax_*</code> values are always <code>1</code> for the <code>no_value</code> rows - this is because the <code>no_value</code> is the last bar so we will always have plotted 100% of the data by the time we’ve finished that bar. Note that the data is currently still grouped by <code>iso3c</code> - this will be important later!</p>
@@ -668,17 +662,15 @@ Tip&nbsp;5.2: Older versions of <code>mutate()</code>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gauge_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 8
-  iso3c YN       perc_1980 perc_2010
-  &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;
-1 BRA   value         0.57      0.99
-2 BRA   no_value      0.43      0.01
-3 GBR   value         0.53      0.89
-4 GBR   no_value      0.47      0.11
-5 NZL   value         0.8       0.91
-6 NZL   no_value      0.2       0.09
-# ℹ 4 more variables: ymax_1980 &lt;dbl&gt;,
-#   ymax_2010 &lt;dbl&gt;, ymin_1980 &lt;dbl&gt;,
-#   ymin_2010 &lt;dbl&gt;</code></pre>
+  iso3c YN       perc_1980 perc_2010 ymax_1980 ymax_2010
+  &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 BRA   value         0.57      0.99    0.220       1.54
+2 BRA   no_value      0.43      0.01    1.57        1.57
+3 GBR   value         0.53      0.89    0.0942      1.23
+4 GBR   no_value      0.47      0.11    1.57        1.57
+5 NZL   value         0.8       0.91    0.942       1.29
+6 NZL   no_value      0.2       0.09    1.57        1.57
+# ℹ 2 more variables: ymin_1980 &lt;dbl&gt;, ymin_2010 &lt;dbl&gt;</code></pre>
 </div>
 </div>
 </section><section id="the-first-plot" class="level3" data-number="5.3.5"><h3 data-number="5.3.5" class="anchored" data-anchor-id="the-first-plot">
@@ -791,15 +783,7 @@ Figure&nbsp;5.6: Edited version of the previous plot with colors changed from de
 </div>
 <p>We also create a custom caption with Font Awesome icons, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. Remember to update the <code>caption</code> variable to include the source of the data for this visualisation.</p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
-<span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
-<span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
-<span>  bg_color <span class="op">=</span> <span class="va">bg_col</span>,</span>
-<span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
-<span>  <span class="st">"**Data**: data.nber.org (10.3386/w15319)&lt;br&gt;**Graphic**: {social}"</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since the axis labels do not make too much sense for <code>geom_arc_bar()</code> plots, we’ll remove them later when using the <code>theme</code> functions. Instead, we can add our own labels using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to the end of the gauges. To make it easier, we can construct a small <code>data.frame</code> specifically for adding text labels. This includes the <code>x</code>, and <code>y</code> coordinates where the text should be positioned (you can read these off from the graph we already have since we haven’t yet deleted the axis labels), as well as the <code>label</code> that should appear.</p>
 <div class="cell">
@@ -859,16 +843,15 @@ Figure&nbsp;5.8: Edited version of previous plot with fixed coordinate system to
 <ul>
 <li>The title text doesn’t stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a <strong>bold</strong> font would help?</li>
 <li>The subtitle text doesn’t fit onto the page but we can fix that with the help of the hopefully now familiar <code>element_textbox_simple()</code> function from {ggtext}.</li>
-<li>The caption text also hasn’t rendered correctly since {ggplot2} doesn’t know how to process HTML text on its own without the help of {ggtext}.</li>
 <li>Since we’re using <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.</li>
 <li>The legend takes up a lot of space and isn’t very informative.</li>
 </ul>
 <p> </p>
-<p>Let’s fix the first three of these issues by editing the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> elements:</p>
+<p>Let’s fix the first two of these issues by editing the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> elements:</p>
 <ul>
-<li>We use <code>element_textbox_simple()</code> for the plot title, subtitle, and caption, and left align all three.</li>
+<li>We use <code>element_textbox_simple()</code> for the plot title and subtitle, and left align both.</li>
 <li>We set <code>face = "bold"</code> for the title and facet <code>strip.text</code> and increase the font size using the <code><a href="https://ggplot2.tidyverse.org/reference/element.html">rel()</a></code> function.</li>
-<li>As we’ve done in previous visualisation, we also set the background colors to <code>bg_col</code> and add some padding around the edges by setting the <code>plot.margin</code> argument.</li>
+<li>As we’ve done in previous visualisations, we also set the background colors to <code>bg_col</code> and add some padding around the edges by setting the <code>plot.margin</code> argument.</li>
 </ul>
 <p></p>
 <div class="cell">
@@ -895,10 +878,9 @@ Figure&nbsp;5.8: Edited version of previous plot with fixed coordinate system to
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      halign <span class="op">=</span> <span class="fl">0</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>      halign <span class="op">=</span> <span class="fl">0</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -921,7 +903,7 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 <ul>
 <li>Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. We would also need to add a better title (or remove the title completely).</li>
 <li>We could design a custom legend, similar to the one created in <a href="us-house-elections.html" class="quarto-xref"><span>Chapter 14</span></a>. This might be a good option as double gauge charts are less common and readers might be less familiar with them. Adding additional information about how they work might prove helpful.</li>
-<li>We could instead use colored text in the subtitle to indicate what the categories are, as we did in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. For this visualisation, highlighting the <em>Immunized</em> would be enough as there are only two categories.</li>
+<li>We could instead use colored text in the subtitle to indicate what the categories are. For this visualisation, highlighting the <em>Immunized</em> would be enough as there are only two categories. We’ll look at ways to do this in R in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</li>
 </ul>
 <p>What might a custom legend look like? A custom legend could be a subset of the full plot with some additional annotations. For example, we could subset the data to only include one country (<code>"USA"</code> in this case) and recreate the plot we already have. Here, we also remove the built-in legend and add a <em>How do I read this plot?</em> title.</p>
 <div class="cell">
@@ -1029,36 +1011,14 @@ Figure&nbsp;5.10: Example of a custom legend with added annotations explaining t
 </div>
 </div>
 </div>
-<p>As with previous examples, don’t be fooled into thinking that the positioning and sizing of the text and arrows is something that happened perfectly the first time. The values are often picked through a series of trial and error, and with practice you’ll get better at choosing starting values.</p>
-<p>We could add this legend to the main plot, perhaps in the top right corner using {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> as we did in <a href="us-house-elections.html" class="quarto-xref"><span>Chapter 14</span></a>. However, let’s stop and think for a second. How much value does this custom legend add? Do we really need to use so much space to identify the two categories on the chart? The years are already labelled, and it’s reasonably obvious that the three letters at the top represent a country. Maybe we don’t need a full custom legend. Would some colored text in the subtitle not be just as effective?</p>
-<p>Here, we use the <code>glue()</code> function from the {glue} package <span class="citation" data-cites="glue">(<a href="references.html#ref-glue" role="doc-biblioref">Hester and Bryan 2024</a>)</span>, along with some HTML code to color part of the subtitle text using the <code>highlight_col</code>. We also remove the original legend by setting <code>legend.position = "none"</code>.</p>
-<div class="cell">
-<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Define a better subtitle</span></span>
-<span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
-<span>  <span class="st">"The inner bar represents the &lt;span style='color: {highlight_col};'&gt;percentage of children who received a measles immunization&lt;/span&gt; in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co"># Add the new subtitle and remove the legend</span></span>
-<span><span class="va">styled_plot</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>subtitle <span class="op">=</span> <span class="va">subtitle</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div id="fig-technology-style-3" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-style-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="technology-adoption_files/figure-html/fig-technology-style-3-1.png" class="img-fluid figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-style-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.11: Further styling of gauge chart to remove the legend, and add colored text in the subtitle as an alternative.
-</figcaption></figure>
-</div>
-</div>
-</div>
-<p>This gives almost as much information as the custom legend idea, without taking up nearly as much space or providing as much of a distraction.</p>
+<p>As with previous examples, don’t be fooled into thinking that the positioning and sizing of the text and arrows is something that happened perfectly the first time. The values are often picked through a series of trial and error, and with practice you’ll get better at choosing starting values. We can add this legend to the main plot, perhaps in the top right corner using {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>.</p>
 </section></section><section id="reflection" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">5.5</span> Reflection</h2>
 <p>Are gauge charts the most effective method of visualising this data? No.&nbsp;Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change on arc length between 1980 and 2010, you’ll get different answers to if you measured the proportional change in area for the two. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?</p>
 <ul>
 <li><p>There’s no reason to use country codes instead of country names in this situation, other than perhaps laziness. There is space available for the full names. Though many people could likely work out which countries are shown here by their country codes, there’s no need to make readers figure it out on their own. Providing the country names explicitly gives a reader less work to do, meaning they can focus on what you’re actually trying to show.</p></li>
 <li><p>Similarly, providing the exact percentages as labelled text would make it easier to see what the change in immunization coverage is. It’s pretty clear that there has been an increase across all six countries, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What’s the difference between Brazil and Sweden in 2010? It’s too difficult to tell here.</p></li>
+<li><p>How much value does this custom legend add? Do we really need to use so much space to identify the two categories on the chart? The years are already labelled, and it’s reasonably obvious that the three letters at the top represent a country. Maybe we don’t need a full custom legend. Would some colored text in the subtitle not be just as effective?</p></li>
 </ul>
 
 
