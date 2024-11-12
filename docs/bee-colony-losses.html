@@ -461,9 +461,9 @@ Tip&nbsp;4.2: Column names in <code>vis_miss()</code>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">colony_AL</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars</a></span><span class="op">(</span>min_length <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars</a></span><span class="op">(</span>min_length <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-bees-vismiss-tip" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-tip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -475,6 +475,11 @@ Tip&nbsp;4.2: Column names in <code>vis_miss()</code>
 </div>
 </div>
 </div>
+<p>{naniar} <span class="citation" data-cites="naniar">(<a href="references.html#ref-naniar" role="doc-biblioref">Tierney and Cook 2023</a>)</span></p>
+<p>if we inspect more closely, we see that . a similar pattern can be observed for all states</p>
+<p>when reporting happens</p>
+<p>Data unavailable for apr-jun 2019 - average, smoothing seasonal? maybe only look at january similar problem for end of 2021. could try to impute but so many values are missing try just jan - seasonal effects differ across the US https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</p>
+<p>september to dec –&gt; october december</p>
 <div id="tip-bees-missing" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -485,34 +490,31 @@ Tip&nbsp;4.3: Avoid missing patterns about missingness
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>These tip - how is missing encoded, patterns in data</p>
+<p>These tip - how is missing encoded, patterns in data callout missing values assumes naniar::replace_with_na</p>
 </div>
 </div>
-<p>{naniar} <span class="citation" data-cites="naniar">(<a href="references.html#ref-naniar" role="doc-biblioref">Tierney and Cook 2023</a>)</span></p>
-<p>if we inspect more closely, we see that . a similar pattern can be observed for all states</p>
-<p>when reporting happens</p>
-<p>Data unavailable for apr-jun 2019 - average, smoothing seasonal? maybe only look at january similar problem for end of 2021. could try to impute but so many values are missing try just jan - seasonal effects differ across the US</p>
-<p>https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</p>
-<p>september to dec –&gt; october december</p>
-<p>callout missing values assumes naniar::replace_with_na</p>
 </section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
-<p>for each state, we want to visualise the average number of colonies each year. There are multiple ways we could do this: line charts or area charts are obvious … . Perhaps even a simple bar chart could be effective here.</p>
-<p>However, here we’ll look at a less common. essentially how many bees are contained within a particular area.</p>
+<p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <span class="quarto-unresolved-ref">?fig-bees-sketch-blank</span>.</p>
+<p><img src="images/sketch-bees-blank.png" id="fig-bees-sketch-blank" class="img-fluid quarto-figure quarto-figure-center anchored" alt="Initial sketch showing a grid of squares, with each square representing a combination of year and US state."> Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
+<p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
 <div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.5: Initial sketch.
+Figure&nbsp;4.5: Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.
 </figcaption></figure>
 </div>
 </section></section><section id="preparing-a-plot" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="preparing-a-plot">
 <span class="header-section-number">4.3</span> Preparing a plot</h2>
-<p>we need to:</p>
+<p>To bring this plot to life, we need to complete several tasks:</p>
 <ul>
 <li>Calculate the average number of colonies per year, per state.</li>
+<li>Simulate x- and y- coordinates for the points that will represent the number of colonies.</li>
+<li>Plot the points.</li>
 </ul>
+<p>This is the type of chart that has a lot of (at times complex) preparation, but the plotting itself will be relatively straightforward.</p>
 <section id="data-wrangling" class="level3" data-number="4.3.1"><h3 data-number="4.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">4.3.1</span> Data wrangling</h3>
 <p>Let’s start by selecting a subset of states to visualize:</p>
@@ -711,12 +713,10 @@ Figure&nbsp;4.7: Plot
 </div>
 </section></section><section id="reflection" class="level2" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">4.5</span> Reflection</h2>
-<ul>
-<li><p>wider range of states, difficult to see trend over time</p></li>
-<li><p>might imply area are same size - california is a big state - there’s just more room for bees.</p></li>
-<li><p>only looks at one variable - if colony numbers are lower but colony sizes are larger that might mean equal numbers of bees. but we don’t see that when we only look at the number of colonies.</p></li>
-<li><p>not enough contrast</p></li>
-</ul>
+<p>The bee-themed colors alongside the non-standard nature of this chart make it visually intriguing and fun. However, it takes a little bit more time to understand how to interpret the chart. This is a visualization that would work better in a setting where the author has time to explain how it works. For example, in a presentation or in an article with a <em>how to read this chart</em> explainer included. It would work less well in a standalone leaflet without an explanation where a reader might struggle to understand what is being shown. It’s more difficult to see the trend over time with type of chart. A simple line chart could show the same data in a more <em>standard</em>, easy-to-interpret way. However, line charts don’t catch attention in quite the same way. It all comes down to the purpose of the chart. Is the main aim to draw attention to important data on bee colonies, and show overall trends? Or is the main aim to communicate the colony size in each year, within some accuracy range? The answers to those questions will determine whether this is an appropriate chart type.</p>
+<p>This version of the chart shows only data for six states, even though we know from our exploratory analysis that data is available for (almost) all states. Some explanation as to why these states have been chosen could be added in the subtitle, or data for all states could be shown - although this would result in a very long chart! The visualization also assigns each state equal chart area - perhaps implying that each state has an equal geographic area which is of course untrue. The chart shows there are a lot of bees in California. California is also the third largest state for area - maybe there’s just more room for bees? Perhaps standardizing the data by state area (or state agricultural area) would provide an easier comparison between states.</p>
+<p>Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger that might mean the numbers of bees isn’t changing very much. But we don’t see that when we only look at the number of colonies - we don’t get a full picture of the data by limiting the chart to only a single variable.</p>
+<p>Although this type of visualization has several disadvantages, and is far from perfect, hopefully it gives you an idea of how to think creatively about designing charts and how you might go about implementing them in R.</p>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
