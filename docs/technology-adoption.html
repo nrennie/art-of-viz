@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The TidyTuesday Cookbook – 5&nbsp; Technology Adoption: making gauge charts with {ggforce}</title>
+<title>5&nbsp; Technology Adoption: making gauge charts with {ggforce} – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -467,7 +467,7 @@ Figure&nbsp;5.2: Heatmap of number of observations (all countries and variables)
 <span>  x <span class="op">=</span> <span class="va">pctimmunizmeas_df</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">pctimmunizmeas_df</span><span class="op">$</span><span class="va">value</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  cex <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Percentage of children who received\na measles immunization"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -776,18 +776,15 @@ Figure&nbsp;5.6: Edited version of the previous plot with colors changed from de
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"ubuntu"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Let’s define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away.</p>
+<p>Let’s define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The <code>caption</code> variable identifies the source of the data for this visualisation, as well as the chart creator.</p>
 <div class="cell">
 <div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Measles Immunizations"</span></span>
-<span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>We also create a custom caption with Font Awesome icons, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. Remember to update the <code>caption</code> variable to include the source of the data for this visualisation.</p>
-<div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."</span></span>
+<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since the axis labels do not make too much sense for <code>geom_arc_bar()</code> plots, we’ll remove them later when using the <code>theme</code> functions. Instead, we can add our own labels using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to the end of the gauges. To make it easier, we can construct a small <code>data.frame</code> specifically for adding text labels. This includes the <code>x</code>, and <code>y</code> coordinates where the text should be positioned (you can read these off from the graph we already have since we haven’t yet deleted the axis labels), as well as the <code>label</code> that should appear.</p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">0.85</span><span class="op">)</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.1</span><span class="op">)</span>,</span>
 <span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1980</span>, <span class="fl">2010</span><span class="op">)</span></span>
@@ -795,7 +792,7 @@ Figure&nbsp;5.6: Edited version of the previous plot with colors changed from de
 </div>
 <p>We can then add this text to the existing plot by adding a layer with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, noting that we need to specify the <code>data</code> argument as using the text <code>data.frame</code> we just created. We also need to specify the font family and size directly within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, and can add the title and subtitle text created earlier using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from {ggplot2}.</p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">text_df</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
@@ -824,7 +821,7 @@ Figure&nbsp;5.7: Previous plot with additional labels indicating the year on eac
 <p>We’ll start by removing all of the theme elements such as the grey background, grid lines, and axis labels. The easiest way to do this is using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>. We can use the <code>base_family</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to set the font family that will be used by default for any non-geom text elements that remain.</p>
 <p>You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> which forces a 1:1 aspect ratio on the plot panel.</p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">8.5</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span></span>
 <span><span class="va">theme_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -841,7 +838,7 @@ Figure&nbsp;5.8: Edited version of previous plot with fixed coordinate system to
 </div>
 <p>This looks better but it’s still not great. What do we still need to improve with styling?</p>
 <ul>
-<li>The title text doesn’t stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a <strong>bold</strong> font would help?</li>
+<li>The title text doesn’t stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a <strong>bold</strong> font would help?</li>
 <li>The subtitle text doesn’t fit onto the page but we can fix that with the help of the hopefully now familiar <code>element_textbox_simple()</code> function from {ggtext}.</li>
 <li>Since we’re using <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.</li>
 <li>The legend takes up a lot of space and isn’t very informative.</li>
@@ -849,13 +846,13 @@ Figure&nbsp;5.8: Edited version of previous plot with fixed coordinate system to
 <p> </p>
 <p>Let’s fix the first two of these issues by editing the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> elements:</p>
 <ul>
-<li>We use <code>element_textbox_simple()</code> for the plot title and subtitle, and left align both.</li>
+<li>We use <code>element_textbox_simple()</code> for the subtitle, making sure to left align the text.</li>
 <li>We set <code>face = "bold"</code> for the title and facet <code>strip.text</code> and increase the font size using the <code><a href="https://ggplot2.tidyverse.org/reference/element.html">rel()</a></code> function.</li>
 <li>As we’ve done in previous visualisations, we also set the background colors to <code>bg_col</code> and add some padding around the edges by setting the <code>plot.margin</code> argument.</li>
 </ul>
 <p></p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
@@ -866,10 +863,9 @@ Figure&nbsp;5.8: Edited version of previous plot with fixed coordinate system to
 <span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
 <span>      face <span class="op">=</span> <span class="st">"bold"</span>, size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.2</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>b <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>      halign <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      face <span class="op">=</span> <span class="st">"bold"</span>,</span>
 <span>      size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
@@ -907,7 +903,7 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 </ul>
 <p>What might a custom legend look like? A custom legend could be a subset of the full plot with some additional annotations. For example, we could subset the data to only include one country (<code>"USA"</code> in this case) and recreate the plot we already have. Here, we also remove the built-in legend and add a <em>How do I read this plot?</em> title.</p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">gauge_data</span>, <span class="va">iso3c</span> <span class="op">==</span> <span class="st">"USA"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
@@ -933,7 +929,7 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"no_value"</span><span class="op">)</span>,</span>
 <span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Immunized"</span>, <span class="st">"Not Immunized"</span><span class="op">)</span>,</span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#990c58"</span>, <span class="st">"#949398"</span><span class="op">)</span></span>
+<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">highlight_col</span>, <span class="va">second_col</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"How do I read this plot?"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">iso3c</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
@@ -962,7 +958,7 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 </div>
 <p>We might also add some annotations: first define a <code>data.frame</code> containing the positions and labels for the text, then add it to the plot using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. Note that we also set <code>clip = "off"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to prevent the text getting cut off if it lies outside the range of the plot, and adjust the limits of the <code>x</code> and <code>y</code> axes. </p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Define the text and positions</span></span>
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Define the text and positions</span></span>
 <span><span class="va">legend_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="op">-</span><span class="fl">1.1</span>, <span class="op">-</span><span class="fl">0.7</span><span class="op">)</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.75</span>, <span class="fl">0.95</span><span class="op">)</span>,</span>
@@ -987,7 +983,7 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 </div>
 <p>And we could add some arrows using <code><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment()</a></code> to direct the text:</p>
 <div class="cell">
-<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_with_text</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_with_text</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"segment"</span>,</span>
 <span>    x <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, xend <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, y <span class="op">=</span> <span class="fl">0.99</span>, yend <span class="op">=</span> <span class="fl">1.05</span>,</span>
 <span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"mm"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>

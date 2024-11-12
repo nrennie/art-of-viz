@@ -55,13 +55,14 @@ Let's start by looking at a quick boxplot of how the number of colonies (`colony
 ```{r}
 #| label: fig-bees-boxplot
 #| fig-cap: "Simple boxplot of number of bee colonies per year, showing a highly skewed distribution."
+#| fig-asp: 0.66
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(2.1, 2.1, 1.1, 2.1))
 boxplot(
   colony_n ~ year,
   data = colony,
   horizontal = TRUE,
-  xlab = "Number of bee colonies", 
+  xlab = "Number of bee colonies",
   ylab = NULL
 )
 ```
@@ -75,7 +76,7 @@ Let's start by trying to understand what's causing these outliers. Are they real
 #| label: fig-bees-boxplot2
 #| fig-cap: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'."
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(4.1, 4.1, 1.1, 2.1))
 colony_2020 <- subset(colony, year == 2020)
 boxplot(
   colony_n ~ state,
@@ -104,9 +105,32 @@ The other aspect of our data that boxplots don't tell us about is the missingnes
 The {visdat} package [@visdat] is an excellent way quick look. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualisation of which values are missing. To avoid, ..., we'll start by visualising just the data for one state and use the .... \index{visdat!vis\_miss}
 
 ```{r}
+#| label: fig-bees-vismiss
+#| fig-cap: ""
 colony_AL <- subset(colony, state == "Alabama")
 visdat::vis_miss(colony_AL)
 ```
+
+
+::: {#tip-bees-vismiss .callout-tip}
+
+## Column names in `vis_miss()`
+
+The columns names hidden, abbreviate, add margin since it returns ggplto2 objet
+
+```{r}
+#| label: fig-bees-vismiss-tip
+#| fig-cap: ""
+#| message: false
+library(ggplot2)
+colony_AL |>
+  visdat::abbreviate_vars(min_length = 10) |>
+  visdat::vis_miss() +
+  theme(plot.margin = margin(r = 20))
+```
+
+:::
+
 
 ::: {#tip-bees-missing .callout-tip}
 
@@ -172,7 +196,7 @@ plot_data <- colony |>
   dplyr::filter(
     state %in% states_to_plot,
     months == "October-December"
-  ) |> 
+  ) |>
   dplyr::select(
     year, state, colony_n
   )
