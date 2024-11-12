@@ -50,23 +50,28 @@ In this chapter, we'll focus on the `colony` data, where we'll try to build a pi
 
 ### Data exploration
 
-Let's start by looking at the 
+Let's start by looking at a quick boxplot of how the number of colonies (`colony_n`) is changing over time, using the base R `boxplot()` function: \index{graphics!boxplot}
 
 ```{r}
-#| label: bees-boxplot
+#| label: fig-bees-boxplot
+#| fig-cap: "Simple boxplot of number of bee colonies per year, showing a highly skewed distribution."
 boxplot(
   colony_n ~ year,
   data = colony,
   horizontal = TRUE,
-  xlab = "Colony size", 
+  xlab = "Number of bee colonies", 
   ylab = NULL
 )
 ```
 
-what's causing those outliers? some states have a lots more bees
+@fig-bees-boxplot doesn't actually give us much information - except to suggest the distribution of the number of colonies is highly skewed and to suggest there are quite a few high values being classified as outliers. These outliers force the main section of the boxplots to be squashed on the left of the plot, making it difficult to tell if much is changing on average each year. This is also a more general problem with boxplots. There are many examples of data that illustrate the insufficiency of summary statistics, with Anscombe's quartet [@Anscombe1973] being perhaps the most famous example. Boxplots are essentially just summary statistics in disguise. Different data with identical boxplots can actually come from very different distributions [@Matejka2017].
+
+Let's start by trying to understand what's causing these outliers. Are they real values? Are they mistakes in the data? Or have we made an incorrect assumption about the data? To understand this a bit better, let's zoom in on one year, 2020, and look at the number of colonies in each state to understand which states the largest outliers relate to.
 
 ```{r}
 #| fig-asp: 1.2
+#| label: fig-bees-boxplot2
+#| fig-cap: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'."
 colony_2020 <- subset(colony, year == 2020)
 boxplot(
   colony_n ~ state,
@@ -75,40 +80,40 @@ boxplot(
   cex.axis = 0.5,
   cex.names = 0.5,
   las = 1,
-  xlab = "Colony size",
+  xlab = "Number of bee colonies",
   ylab = NULL
 )
 ```
 
-There are a few "states" with a much - one is california, the other is in fact not a state - it's the sum "United States". You'll also see from this chart that not all states are included individually - an "Other States" is included instead which groups...
+Though there are a few states (California, Florida, and North Dakota) with a much higher number of colonies, the main issue is that one of the *states* is the entirety of the United States i.e. the sum of all of the other values. You can also see from @fig-bees-boxplot2 that not all states are included individually - an `"Other States"` category is also included instead which groups some states (and perhaps regions).
 
-https://bp-dc.org/assets/media/documents/pollinators/documents/ValueofHoneyBeesasPollinators-2000Report.pdf
+::: {#tip-bees-names .callout-tip}
 
-Box plots can hide stuff
+## Choose appropriate column names
 
-Instead, let's look at the density plot
+It's unfortunately not uncommon for a column name to suggest one thing (e.g. each value relates to a state), but for that column to actually include other values as well (e.g. a country). If you're ever naming columns (especially for data you'll share with other people) choose appropriate column names to avoid confusion. For example, `region` would be a more appropriate column name here.
 
-```{r}
-#| label: bees-density
-colony_states <- subset(colony, state != "United States")
-lattice::densityplot(~ colony_n|factor(year),
-  data = colony_states,
-  layout = c(4, 2),
-  na.rm = TRUE,
-  xlab = "Colony size"
-)
-```
+:::
 
-we also needed to set `na.rm = TRUE` ... let's have a look at those missing values.
+The other aspect of our data that boxplots don't tell us about is the missingness. Boxplots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that {ggplot2} [@ggplot2] does. So how do we plot data that doesn't exist?
 
-{naniar} [@naniar] vis_miss actually from {visdat} [@visdat]
+The {visdat} package [@visdat] is an excellent way quick look. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualisation of which values are missing. To avoid, ..., we'll start by visualising just the data for one state and use the .... \index{visdat!vis\_miss}
 
 ```{r}
 colony_AL <- subset(colony, state == "Alabama")
-visdat::vis_miss(
-  colony_AL
-)
+visdat::vis_miss(colony_AL)
 ```
+
+::: {#tip-bees-missing .callout-tip}
+
+## Avoid missing patterns about missingness
+
+These 
+tip - how is missing encoded, patterns in data
+
+:::
+
+{naniar} [@naniar] 
 
 if we inspect more closely, we see that . a similar pattern can be observed for all states
 
