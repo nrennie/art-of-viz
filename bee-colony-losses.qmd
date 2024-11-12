@@ -124,20 +124,10 @@ The columns names hidden, abbreviate, add margin since it returns ggplto2 objet
 #| message: false
 library(ggplot2)
 colony_AL |>
-  visdat::abbreviate_vars(min_length = 10) |>
+  visdat::abbreviate_vars(min_length = 8) |>
   visdat::vis_miss() +
-  theme(plot.margin = margin(r = 20))
+  theme(plot.margin = margin(r = 25))
 ```
-
-:::
-
-
-::: {#tip-bees-missing .callout-tip}
-
-## Avoid missing patterns about missingness
-
-These 
-tip - how is missing encoded, patterns in data
 
 :::
 
@@ -153,28 +143,43 @@ maybe only look at january
 similar problem for end of 2021. 
 could try to impute but so many values are missing
 try just jan - seasonal effects differ across the US
-
 https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/
 
 september to dec --> october december
 
+::: {#tip-bees-missing .callout-tip}
+
+## Avoid missing patterns about missingness
+
+These 
+tip - how is missing encoded, patterns in data
 callout missing values
 assumes 
 naniar::replace_with_na
 
+:::
+
+
 ### Exploratory sketches
 
-for each state, we want to visualise the average number of colonies each year. There are multiple ways we could do this: line charts or area charts are obvious ... . Perhaps even a simple bar chart could be effective here.
+For each state, let's visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let's try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of *things* (bee colonies) in each *combination of two variables* (state and year). We have data available for every combination of state and year, so let's create a grid of states and years, as in @fig-bees-sketch-blank.
 
-However, here we'll look at a less common. essentially how many bees are contained within a particular area. 
+![Initial sketch showing a grid of squares, with each square representing a combination of year and US state.](images/sketch-bees-blank.png){#fig-bees-sketch-blank fig-align="center"}
+Now in each grid square, we're simply trying to show the number of *things*. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in @fig-bees-sketch.
 
-![Initial sketch.](images/sketch-bees.png){#fig-bees-sketch fig-align="center"}
+We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we're most interested in). 
+
+![Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.](images/sketch-bees.png){#fig-bees-sketch fig-align="center"}
 
 ## Preparing a plot
 
-we need to:
+To bring this plot to life, we need to complete several tasks:
 
 * Calculate the average number of colonies per year, per state.
+* Simulate x- and y- coordinates for the points that will represent the number of colonies.
+* Plot the points.
+
+This is the type of chart that has a lot of (at times complex) preparation, but the plotting itself will be relatively straightforward.
 
 ### Data wrangling
 
