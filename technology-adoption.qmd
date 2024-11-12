@@ -58,7 +58,7 @@ As in other chapters in this book, we'll start with some basic exploratory plots
 #| label: fig-technology-barplot
 #| fig-cap: "Bar chart of number of observations (all years, countries, and variables) in each category."
 #| echo: -1
-par(mar = c(4.1, 8.1, 2.1, 2.1))
+par(mar = c(2.1, 8.1, 1.1, 1.1))
 barplot(
   table(technology$category),
   # make labels smaller so they fit on the page
@@ -75,7 +75,7 @@ We have lots of observations relating to variables in the agriculture and transp
 #| label: fig-technology-heatmap
 #| fig-cap: "Heatmap of number of observations (all countries and variables) in each category, each year. An increasing number of observations are seen in recent years."
 #| echo: -1
-par(mar = c(4.1, 2.1, 2.1, 2.1))
+par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
   table(technology$category, technology$year),
   # prevent re-ordering
@@ -94,7 +94,7 @@ Let's look into a specific variable in more detail. We need to narrow down the d
 #| label: fig-technology-scatterplot
 #| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
 #| echo: -1
-par(mar = c(3.1, 4.1, 2.1, 2.1))
+par(mar = c(3.1, 2.1, 2.1, 2.1))
 pctimmunizmeas_df <- subset(
   technology, variable == "pctimmunizmeas"
 )
@@ -102,7 +102,7 @@ plot(
   x = pctimmunizmeas_df$year,
   y = pctimmunizmeas_df$value,
   xlab = "", ylab = "",
-  cex = 0.6,
+  cex = 0.5,
   main = "Percentage of children who received\na measles immunization"
 )
 ```
@@ -379,19 +379,13 @@ showtext::showtext_opts(dpi = 300)
 body_font <- "ubuntu"
 ```
 
-Let's define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away.
+Let's define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualisation, as well as the chart creator.
 
 ```{r}
 #| label: technology-text
 #| code-overflow: wrap
 title <- "Measles Immunizations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
-```
-
-We also create a custom caption with Font Awesome icons, as described in @sec-cats. Remember to update the `caption` variable to include the source of the data for this visualisation.
-
-```{r}
-#| label: technology-style-3
 caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
 ```
 
@@ -443,7 +437,7 @@ theme_plot
 
 This looks better but it's still not great. What do we still need to improve with styling?
 
-* The title text doesn't stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
+* The title text doesn't stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
 * The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from {ggtext}.
 * Since we're using `coord_fixed()` to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.
 * The legend takes up a lot of space and isn't very informative.
@@ -452,7 +446,7 @@ This looks better but it's still not great. What do we still need to improve wit
 
 Let's fix the first two of these issues by editing the `theme()` elements:
 
-* We use `element_textbox_simple()` for the plot title and subtitle, and left align both. 
+* We use `element_textbox_simple()` for the subtitle, making sure to left align the text. 
 * We set `face = "bold"` for the title and facet `strip.text` and increase the font size using the `rel()` function.
 * As we've done in previous visualisations, we also set the background colors to `bg_col` and add some padding around the edges by setting the `plot.margin` argument.
 
@@ -472,10 +466,9 @@ styled_plot <- theme_plot +
     strip.text = element_text(
       face = "bold", size = rel(1.2)
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_text(
       margin = margin(b = 5),
       hjust = 0,
-      halign = 0,
       face = "bold",
       size = rel(1.5)
     ),
@@ -532,7 +525,7 @@ legend_plot <- ggplot(
   scale_fill_manual(
     breaks = c("value", "no_value"),
     labels = c("Immunized", "Not Immunized"),
-    values = c("#990c58", "#949398")
+    values = c(highlight_col, second_col)
   ) +
   labs(title = "How do I read this plot?") +
   facet_wrap(~iso3c, nrow = 2) +
