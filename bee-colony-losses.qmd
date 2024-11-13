@@ -223,6 +223,8 @@ We're going to use the {poissoned} package [@poissoned] to ...
 
 ## Installing R packages from GitHub
 
+### Using {remotes}
+
 When this chapter was first written, the {poissoned} package wasn't available on CRAN, so we had to install it from GitHub instead. The {remotes} package [@remotes] can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the `install_github()` function, passing in a character string of the form `"user/repository"`: \index{remotes!install\_github}
 
 ```{r}
@@ -230,6 +232,18 @@ When this chapter was first written, the {poissoned} package wasn't available on
 #| eval: false
 remotes::install_github("coolbutuseless/poissoned")
 ```
+
+### Using {pak}
+
+An alternative to {remotes} is the {pak} package [@pak]. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, local files and directories. To install a package from GitHub using {pak}, use the `pkg_install()` function and again pass in the `"user/repository"` string:
+
+```{r}
+#| label: bees-pak-install
+#| eval: false
+pak::pkg_install("coolbutuseless/poissoned")
+```
+
+The same function can be used for installing packages from CRAN e.g. `pak::pkg_install("ggplot2")`.
 
 :::
 
@@ -260,12 +274,14 @@ bees_grid
 
 ## Compare uniform sampling with Poisson disk sampling
 
+To see the difference between Poisson disk sampling and Uniform sampling, we can simulate some data and plot it:
+
 ```{r}
 #| label: fig-bees-sampling
 #| fig-cap: "Poisson disk sampling and uniform sampling"
 #| fig-subcap:
 #|   - "Poisson disk sampling"
-#|   - "Uniform sampling" 
+#|   - "Uniform sampling"
 #| layout-ncol: 2
 set.seed(123)
 # Poisson disk sampling
@@ -281,33 +297,35 @@ plot(
 )
 ```
 
-You can see in @fig-bees-sampling
+You can see in @fig-bees-sampling that the location of the points for Poisson disk sampling is not actually completely random, and is much *nicer* in appearance.
 
 :::
 
-
 ### The first plot
 
-We'll create our plot using `geom_point()` since we 
+As we've done in all previous chapters, we start our plot using the `ggplot()` function and pass in the default data and aesthetic mappings we'll use for all of the layers in the plot. To add the points we use `geom_point()`, in the same way if we were making a traditional scatter plot. \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes}
 
-need to make points very small - calif
+In @sec-programming and @sec-museums, we used `facet_wrap()` to create small multiple plots based on the levels of a categorical variable. Here we want to do something similar, but split based on the combination of levels from two categorical variables. We add the `facet_grid()` function to create this grid of small multiple plots, with `state` being the rows and `year` being the columns of the grid. Setting `switch = "both"` places the facet labels on the opposite side of the grid from the default. This places labels on the left for the states, and on the bottom for the years. \index{ggplot2!facet\_wrap} \index{ggplot2!facet\_grid}
 
 ```{r}
 #| label: fig-bees-base-plot
 #| fig-cap: "Plot"
-base_plot <- ggplot(data = bees_grid) +
-  geom_point(
-    mapping = aes(x = x, y = y)
-  ) +
+base_plot <- ggplot(
+  data = bees_grid,
+  mapping = aes(x = x, y = y)
+) +
+  geom_point() +
   facet_grid(state ~ year, switch = "both")
 base_plot
 ```
+
+You'll notice that the points in @fig-bees-base-plot are slightly too large - the points for the California data are even distinguishable as points, it simply looks like a black square! We'll reduce the size of the points in the next iteration of the plot.
 
 ## Advanced styling
 
 ### Colors
 
-Let's select some colors for our plot. We won't be mapping any colors to columns in the data, but we still need to define a background color and a color for highlighted elements. To keep the plot looking clean, we'll also use the same color for the text. Similar to @sec-programming, we can select these colors to match the topic of the data. What colors do you think of when you think of bees? Black and yellow. We'll use black for the background color, and yellow for the highlight color. 
+Let's select some colors for our plot. We won't be mapping any colors to columns in the data, but we still need to define a background color and a color for highlighted elements. To keep the plot looking clean, we'll also use the same color for the text. Similar to @sec-programming, we can select these colors to match the topic of the data. What colors do you think of when you think of bees? Black and yellow. We'll use yellow for the background color, and black for the highlight color. 
 
 ```{r}
 #| label: bees-colors
@@ -315,9 +333,13 @@ bg_col <- "#fecc27"
 highlight_col <- "black"
 ```
 
-If we want to ... black points against a ayellow background. We *should* update out geom_point code to
+If we want to ... black points against a ayellow background.
+
+Let's remake the `base_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
 
 ```{r}
+#| label: fig-bees-base-plot2
+#| fig-cap: "Plot"
 base_plot <- ggplot(data = bees_grid) +
   geom_point(
     mapping = aes(x = x, y = y),
@@ -328,18 +350,19 @@ base_plot <- ggplot(data = bees_grid) +
 base_plot
 ```
 
-
 ### Fonts
+
+Since this is already quite a visually complex chart, we'll avoid further distractions and use the same font for all text elements in the chart. This means we define only a single font variable, `body_font`. We'll also use a simple, easy-to-read font. The *Red Hat* fonts, again available through Google Fonts, are sans serif fonts, with the *Red Hat Text* version designed for increased legibility, especially at smaller font sizes.
 
 ```{r}
 #| label: bees-fonts
 sysfonts::font_add_google(
-  name = "Source Code Pro",
-  family = "source"
+  name = "Red Hat Text",
+  family = "red_hat"
 )
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-body_font <- "source"
+body_font <- "red_hat"
 ```
 
 ### Adding text
@@ -350,6 +373,8 @@ title <- "Bee colony losses in the United States"
 st <- "Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors. Each point represents 20,000 colonies that exist during the months of October - December each year."
 cap <- "Data: USDA | Graphic: N. Rennie"
 ```
+
+We can then add this text using the `labs()` function, and setting the `title`, `subtitle`, and `caption`. The x- and y- axes are meaningless for this visualisation since the data is represented by the number of points rather than their locations. We remove the x- and y- axis labels by setting them both to `NULL` in @fig-bees-text-plot.
 
 ```{r}
 #| label: fig-bees-text-plot
@@ -363,7 +388,6 @@ text_plot <- base_plot +
   )
 text_plot
 ```
-
 
 ### Adjusting themes
 
