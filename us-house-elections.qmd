@@ -88,7 +88,8 @@ plot_data <- house |>
 ### The first plot
 
 ```{r}
-#| label: elections-basic-plot
+#| label: fig-elections-basic-plot
+#| fig-cap: "Plot"
 #| warning: false
 library(ggplot2)
 base_plot <- ggplot(data = plot_data) +
@@ -99,9 +100,9 @@ base_plot <- ggplot(data = plot_data) +
       fill = party
     ),
     position = "fill"
-  )
-base_plot +
+  ) +
   facet_wrap(~state_po)
+base_plot
 ```
 
 ### Packages and functions
@@ -109,7 +110,8 @@ base_plot +
 ... using the {geofacet} R package [@geofacet].
 
 ```{r}
-#| label: elections-geofacet-plot
+#| label: fig-elections-geofacet-plot
+#| fig-cap: "Plot"
 #| warning: false
 library(geofacet)
 map_plot <- base_plot +
@@ -138,17 +140,26 @@ bg_col <- "#fafafa"
 #| warning: false
 col_plot <- map_plot +
   scale_fill_manual(
-    values = c("Democrat" = blue_col, "Republican" = red_col, "Other" = "gray50")
+    values = c(
+      "Democrat" = blue_col,
+      "Republican" = red_col,
+      "Other" = "gray50"
+    )
   )
 ```
 
+\index{ggplot2!scale\_fill\_manual}
 
 ### Text and fonts
 
 ```{r}
 #| label: elections-fonts
-sysfonts::font_add_google("Roboto", "roboto")
-sysfonts::font_add_google("Carter One", "carter")
+sysfonts::font_add_google(
+  name = "Roboto", family = "roboto"
+)
+sysfonts::font_add_google(
+  name = "Carter One", family = "carter"
+)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "roboto"
@@ -161,8 +172,6 @@ title_font <- "carter"
 \index{sysfonts!font\_add\_google}
 \index{showtext!showtext\_auto}
 \index{showtext!showtext\_opts}
-
-Let's use {marquee} [@marquee]
 
 ```{r}
 #| label: elections-text
@@ -183,6 +192,7 @@ cap <- paste0(
 title <- "US House Election Results"
 ```
 
+\index{ggplot2!labs}
 
 ```{r}
 text_plot <- col_plot +
@@ -196,8 +206,11 @@ text_plot <- col_plot +
 
 ### Adjusting themes
 
+\index{ggplot2!geom\_text} \index{ggplot2!coord\_cartesian}
+
 ```{r}
 #| label: fig-elections-geofacet-style-1
+#| fig-cap: "Plot"
 #| warning: false
 styled_plot_1 <- text_plot +
   geom_text(
@@ -213,8 +226,11 @@ styled_plot_1 <- text_plot +
   coord_cartesian(expand = FALSE)
 ```
 
+\index{ggplot2!theme\_void}
+
 ```{r}
 #| label: fig-elections-plot-style-2
+#| fig-cap: "Plot"
 #| warning: false
 styled_plot_2 <- styled_plot_1 +
   theme_void(base_size = 6, base_family = body_font) +
@@ -264,7 +280,9 @@ styled_plot_2
 
 ```{r}
 #| label: elections-inset-plot
-p_inset <- ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
+p_inset <- ggplot(
+  data = dplyr::filter(plot_data, state_po == "CA")
+) +
   geom_area(
     mapping = aes(
       x = year,
@@ -329,9 +347,18 @@ p_inset <- ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
 
 
 ```{r}
-#|label: fig-combine-plots
+#| label: fig-combine-plots
+#| fig-cap: "Plot"
 library(patchwork)
-styled_plot_2 + inset_element(p_inset, 0.02, 0.087, 0.28, 0.55, align_to = "full", clip = FALSE) +
+styled_plot_2 + inset_element(
+  p = p_inset,
+  left = 0.025,
+  bottom = 0.087,
+  right = 0.285,
+  top = 0.55,
+  align_to = "full",
+  clip = FALSE
+) +
   theme(
     plot.background = element_rect(
       fill = bg_col,

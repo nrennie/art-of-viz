@@ -72,7 +72,7 @@ the first thing that jumps out is the `comments` column which appears to have a 
 #| label: timezones-barplot-na
 #| fig-cap: "A bar chart of the number of missing values in the `comments` column, where `TRUE` represents missing."
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(3.1, 4.1, 1.1, 2.1))
 barplot(
   table(is.na(timezones$comments)),
   cex.axis = 0.5,
@@ -87,7 +87,7 @@ The first column, `zone`, contains information on the timezone name - it's typic
 ```{r}
 #| label: timezones-tidy
 timezones_data <- timezones |>
-  dplyr::select(-comments) |> 
+  dplyr::select(-comments) |>
   tidyr::separate_wider_delim(
     cols = zone,
     delim = "/",
@@ -102,7 +102,7 @@ Now, we can explore how many time zones there are per continent: \index{graphics
 #| label: timezones-barplot-loc
 #| fig-cap: "A bar chart of the number of defined time zones in each  of nine geographic regions."
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(3.1, 2.1, 1.1, 2.1))
 barplot(
   table(timezones_data$continent),
   cex.axis = 0.5,
@@ -151,7 +151,9 @@ If you wanted only the polygon(s) for a specific country or region, you can spec
 ```{r}
 #| label: timezones-ne-country
 #| eval: false
-uk <- rnaturalearth::ne_countries(country = "united kingdom")
+uk <- rnaturalearth::ne_countries(
+  country = "united kingdom"
+)
 ```
 
 For specified countries, the `ne_states()` function provides administrative level 1 polygons e.g. major within-country regions such as states.
@@ -252,8 +254,8 @@ Similarly, we also load any fonts we want to use. Again, for this visualisation 
 
 ```{r}
 #| label: timezones-fonts
-sysfonts::font_add_google("Commissioner")
-sysfonts::font_add_google("Fraunces")
+sysfonts::font_add_google(name = "Commissioner")
+sysfonts::font_add_google(name = "Fraunces")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "Commissioner"
@@ -280,9 +282,9 @@ Let's plot a basic bar chart, by starting (as we always do) with passing our new
 #| fig-cap: "Bar chart showing the number of time zone locations in each continent."
 #| fig-asp: 0.7
 ggplot(
-    data = bar_data,
-    mapping = aes(x = continent, y = n)
-  ) +
+  data = bar_data,
+  mapping = aes(x = continent, y = n)
+) +
   geom_col()
 ```
 
@@ -407,7 +409,7 @@ We'll also re-draw the points again with a small adjustment -  let's change the 
 #| label: fig-timezones-basic-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side."
 basic_map <- ggplot() +
-  # Apply colors to background map  
+  # Apply colors to background map
   geom_sf(
     data = world,
     color = text_col,
@@ -419,7 +421,7 @@ basic_map <- ggplot() +
     mapping = aes(color = continent),
     size = 0.4,
   ) +
-  # Draw outer circle 
+  # Draw outer circle
   geom_sf(
     data = timezones_sf,
     mapping = aes(color = continent),
