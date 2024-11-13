@@ -11,18 +11,6 @@ execute:
 #| file: R/options.R
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/load_font_awesome.R
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/social_caption.R
-```
-
 # Technology Adoption: making gauge charts with {ggforce} {#technology}
 
 In this chapter we'll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.
@@ -69,8 +57,8 @@ As in other chapters in this book, we'll start with some basic exploratory plots
 ```{r}
 #| label: fig-technology-barplot
 #| fig-cap: "Bar chart of number of observations (all years, countries, and variables) in each category."
-# increase left margin
-par(mar = c(5.1, 8.1, 4.1, 2.1))
+#| echo: -1
+par(mar = c(2.1, 8.1, 1.1, 1.1))
 barplot(
   table(technology$category),
   # make labels smaller so they fit on the page
@@ -86,6 +74,8 @@ We have lots of observations relating to variables in the agriculture and transp
 ```{r}
 #| label: fig-technology-heatmap
 #| fig-cap: "Heatmap of number of observations (all countries and variables) in each category, each year. An increasing number of observations are seen in recent years."
+#| echo: -1
+par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
   table(technology$category, technology$year),
   # prevent re-ordering
@@ -103,6 +93,8 @@ Let's look into a specific variable in more detail. We need to narrow down the d
 ```{r}
 #| label: fig-technology-scatterplot
 #| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
+#| echo: -1
+par(mar = c(3.1, 2.1, 2.1, 2.1))
 pctimmunizmeas_df <- subset(
   technology, variable == "pctimmunizmeas"
 )
@@ -110,7 +102,7 @@ plot(
   x = pctimmunizmeas_df$year,
   y = pctimmunizmeas_df$value,
   xlab = "", ylab = "",
-  cex = 0.6,
+  cex = 0.5,
   main = "Percentage of children who received\na measles immunization"
 )
 ```
@@ -387,28 +379,14 @@ showtext::showtext_opts(dpi = 300)
 body_font <- "ubuntu"
 ```
 
-Let's define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away.
+Let's define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualisation, as well as the chart creator.
 
 ```{r}
 #| label: technology-text
 #| code-overflow: wrap
 title <- "Measles Immunizations"
 subtitle <- "The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
-```
-
-We also create a custom caption with Font Awesome icons, as described in @sec-cats. Remember to update the `caption` variable to include the source of the data for this visualisation.
-
-```{r}
-#| label: technology-style-3
-social <- social_caption(
-  icon_color = highlight_col,
-  font_color = text_col,
-  bg_color = bg_col,
-  font_family = body_font
-)
-caption <- glue::glue(
-  "**Data**: data.nber.org (10.3386/w15319)<br>**Graphic**: {social}"
-)
+caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
 ```
 
 Since the axis labels do not make too much sense for `geom_arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these off from the graph we already have since we haven't yet deleted the axis labels), as well as the `label` that should appear.
@@ -459,19 +437,18 @@ theme_plot
 
 This looks better but it's still not great. What do we still need to improve with styling?
 
-* The title text doesn't stand out and blends in to easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
+* The title text doesn't stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
 * The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from {ggtext}.
-* The caption text also hasn't rendered correctly since {ggplot2} doesn't know how to process HTML text on its own without the help of {ggtext}.
 * Since we're using `coord_fixed()` to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.
 * The legend takes up a lot of space and isn't very informative.
 
 \index{ggplot2!coord\_fixed} \index{ggtext!element\_textbox\_simple}
 
-Let's fix the first three of these issues by editing the `theme()` elements:
+Let's fix the first two of these issues by editing the `theme()` elements:
 
-* We use `element_textbox_simple()` for the plot title, subtitle, and caption, and left align all three. 
+* We use `element_textbox_simple()` for the subtitle, making sure to left align the text. 
 * We set `face = "bold"` for the title and facet `strip.text` and increase the font size using the `rel()` function.
-* As we've done in previous visualisation, we also set the background colors to `bg_col` and add some padding around the edges by setting the `plot.margin` argument.
+* As we've done in previous visualisations, we also set the background colors to `bg_col` and add some padding around the edges by setting the `plot.margin` argument.
 
 \index{ggplot2!rel}
 
@@ -489,10 +466,9 @@ styled_plot <- theme_plot +
     strip.text = element_text(
       face = "bold", size = rel(1.2)
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_text(
       margin = margin(b = 5),
       hjust = 0,
-      halign = 0,
       face = "bold",
       size = rel(1.5)
     ),
@@ -501,10 +477,9 @@ styled_plot <- theme_plot +
       hjust = 0,
       halign = 0
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_text(
       margin = margin(t = 10),
-      hjust = 0,
-      halign = 0
+      hjust = 0
     ),
     plot.margin = margin(5, 5, 5, 5)
   )
@@ -519,7 +494,7 @@ We have a few different options for dealing with the legend. Some options for a 
 
 * Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. We would also need to add a better title (or remove the title completely).
 * We could design a custom legend, similar to the one created in @sec-house. This might be a good option as double gauge charts are less common and readers might be less familiar with them. Adding additional information about how they work might prove helpful.
-* We could instead use colored text in the subtitle to indicate what the categories are, as we did in @sec-turbines and @sec-cats. For this visualisation, highlighting the *Immunized* would be enough as there are only two categories.
+* We could instead use colored text in the subtitle to indicate what the categories are. For this visualisation, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats. 
 
 What might a custom legend look like? A custom legend could be a subset of the full plot with some additional annotations. For example, we could subset the data to only include one country (`"USA"` in this case) and recreate the plot we already have. Here, we also remove the built-in legend and add a *How do I read this plot?* title.
 
@@ -550,7 +525,7 @@ legend_plot <- ggplot(
   scale_fill_manual(
     breaks = c("value", "no_value"),
     labels = c("Immunized", "Not Immunized"),
-    values = c("#990c58", "#949398")
+    values = c(highlight_col, second_col)
   ) +
   labs(title = "How do I read this plot?") +
   facet_wrap(~iso3c, nrow = 2) +
@@ -628,26 +603,7 @@ legend_with_text +
   )
 ```
 
-As with previous examples, don't be fooled into thinking that the positioning and sizing of the text and arrows is something that happened perfectly the first time. The values are often picked through a series of trial and error, and with practice you'll get better at choosing starting values.
-
-We could add this legend to the main plot, perhaps in the top right corner using {patchwork} [@patchwork] as we did in @sec-house. However, let's stop and think for a second. How much value does this custom legend add? Do we really need to use so much space to identify the two categories on the chart? The years are already labelled, and it's reasonably obvious that the three letters at the top represent a country. Maybe we don't need a full custom legend. Would some colored text in the subtitle not be just as effective?
-
-Here, we use the `glue()` function from the {glue} package [@glue], along with some HTML code to color part of the subtitle text using the `highlight_col`. We also remove the original legend by setting `legend.position = "none"`.
-
-```{r}
-#| label: fig-technology-style-3
-#| fig-cap: "Further styling of gauge chart to remove the legend, and add colored text in the subtitle as an alternative."
-# Define a better subtitle
-subtitle <- glue::glue(
-  "The inner bar represents the <span style='color: {highlight_col};'>percentage of children who received a measles immunization</span> in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
-)
-# Add the new subtitle and remove the legend
-styled_plot +
-  labs(subtitle = subtitle) +
-  theme(legend.position = "none")
-```
-
-This gives almost as much information as the custom legend idea, without taking up nearly as much space or providing as much of a distraction.
+As with previous examples, don't be fooled into thinking that the positioning and sizing of the text and arrows is something that happened perfectly the first time. The values are often picked through a series of trial and error, and with practice you'll get better at choosing starting values. We can add this legend to the main plot, perhaps in the top right corner using {patchwork} [@patchwork]. 
 
 ## Reflection
 
@@ -656,3 +612,5 @@ Are gauge charts the most effective method of visualising this data? No. Gauge c
 * There's no reason to use country codes instead of country names in this situation, other than perhaps laziness. There is space available for the full names. Though many people could likely work out which countries are shown here by their country codes, there's no need to make readers figure it out on their own. Providing the country names explicitly gives a reader less work to do, meaning they can focus on what you're actually trying to show. 
 
 * Similarly, providing the exact percentages as labelled text would make it easier to see what the change in immunization coverage is. It's pretty clear that there has been an increase across all six countries, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between Brazil and Sweden in 2010? It's too difficult to tell here.
+
+* How much value does this custom legend add? Do we really need to use so much space to identify the two categories on the chart? The years are already labelled, and it's reasonably obvious that the three letters at the top represent a country. Maybe we don't need a full custom legend. Would some colored text in the subtitle not be just as effective?

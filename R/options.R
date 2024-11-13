@@ -1,1 +1,1 @@
-options(width = 40)
+options(width = 60)
