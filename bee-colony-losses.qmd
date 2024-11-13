@@ -344,7 +344,7 @@ bg_col <- "#fecc27"
 highlight_col <- "black"
 ```
 
-Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again.
+Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color...
 
 Let's remake the `base_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
 
@@ -422,7 +422,15 @@ theme_plot <- text_plot +
   )
 ```
 
-\index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{ggplot2!margin} \index{ggtext!element\_textbox\_simple}
+The last step is adjusting the remaining theme elements: \index{ggplot2!element\_rect} \index{ggplot2!element\_text} \index{ggplot2!margin} \index{ggtext!element\_textbox\_simple}
+
+* Editing the background colors for the plot (`plot.background` set as yellow using `bg_col`) and grid squares (`panel.background` set as black using `highlight_col`).
+
+* The text text colour and margin for facet labels can be modified using the `strip.text` argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets). 
+
+* We change the title, subtitle, and caption text colour to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from {ggtext} to enable automatic line wrapping of the long text as described in @sec-programming.
+
+* We adjust the `plot.margin` to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.
 
 ```{r}
 #| label: bees-theme-plot-2
@@ -436,10 +444,6 @@ theme_plot +
     panel.background = element_rect(
       fill = highlight_col, color = highlight_col
     ),
-    strip.background = element_rect(
-      fill = bg_col,
-      color = bg_col
-    ),
     # facet labels
     strip.text.x = element_text(
       color = highlight_col,
@@ -451,7 +455,7 @@ theme_plot +
       margin = margin(r = 5)
     ),
     # text formatting
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_text(
       color = highlight_col,
       face = "bold"
     ),
@@ -459,9 +463,10 @@ theme_plot +
       color = highlight_col,
       margin = margin(t = 5, b = 5)
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_text(
       color = highlight_col,
-      margin = margin(t = 5)
+      margin = margin(t = 5),
+      hjust = 0
     ),
     plot.margin = margin(5, 10, 5, 5)
   )
