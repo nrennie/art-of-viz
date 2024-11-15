@@ -372,21 +372,21 @@ div.csl-indent {
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">languages</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 49
-  pldb_id    title      description type  appeared
-  &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt;
-1 java       Java       &lt;NA&gt;        pl        1995
-2 javascript JavaScript &lt;NA&gt;        pl        1995
-3 c          C          &lt;NA&gt;        pl        1972
-4 python     Python     &lt;NA&gt;        pl        1991
-5 sql        SQL        &lt;NA&gt;        quer…     1974
-6 cpp        C++        &lt;NA&gt;        pl        1985
-# ℹ 44 more variables: creators &lt;chr&gt;,
-#   website &lt;chr&gt;, domain_name &lt;chr&gt;,
-#   domain_name_registered &lt;dbl&gt;,
-#   reference &lt;chr&gt;, isbndb &lt;dbl&gt;,
-#   book_count &lt;dbl&gt;, semantic_scholar &lt;dbl&gt;,
+  pldb_id  title description type  appeared creators website
+  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;  
+1 java     Java  &lt;NA&gt;        pl        1995 James G… https:…
+2 javascr… Java… &lt;NA&gt;        pl        1995 Brendan… &lt;NA&gt;   
+3 c        C     &lt;NA&gt;        pl        1972 Dennis … &lt;NA&gt;   
+4 python   Pyth… &lt;NA&gt;        pl        1991 Guido v… https:…
+5 sql      SQL   &lt;NA&gt;        quer…     1974 Donald … &lt;NA&gt;   
+6 cpp      C++   &lt;NA&gt;        pl        1985 Bjarne … http:/…
+# ℹ 42 more variables: domain_name &lt;chr&gt;,
+#   domain_name_registered &lt;dbl&gt;, reference &lt;chr&gt;,
+#   isbndb &lt;dbl&gt;, book_count &lt;dbl&gt;, semantic_scholar &lt;dbl&gt;,
 #   language_rank &lt;dbl&gt;, github_repo &lt;chr&gt;,
-#   github_repo_stars &lt;dbl&gt;, …</code></pre>
+#   github_repo_stars &lt;dbl&gt;, github_repo_forks &lt;dbl&gt;,
+#   github_repo_updated &lt;dbl&gt;,
+#   github_repo_subscribers &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>You can also use <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has 4303 rows and 49 columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the #TidyTuesday GitHub repository (<a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md">github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md</a>) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset’s website at <a href="https://pldb.io/csv.html">pldb.io/csv.html</a>. Here, you’ll also notice that the #TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we’ll stick with the smaller version for this chapter!</p>
@@ -423,21 +423,21 @@ Figure&nbsp;2.1: A basic scatter plot of how language rank varies based on last 
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">languages</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">languages</span><span class="op">$</span><span class="va">last_activity</span><span class="op">)</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 49
-  pldb_id         title description type  appeared
-  &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt;
-1 roman-numerals  Roma…  &lt;NA&gt;       nume…     -900
-2 etruscan-numer… Etru…  &lt;NA&gt;       nume…     -700
-3 attic-numerals  Atti…  &lt;NA&gt;       nume…     -600
-4 greek-numerals  Gree…  &lt;NA&gt;       nume…     -300
-5 arezzo-notation arez… "The stave… musi…     1033
-6 fibonacci-nota… Libe… "The Arabi… nota…     1202
-# ℹ 44 more variables: creators &lt;chr&gt;,
-#   website &lt;chr&gt;, domain_name &lt;chr&gt;,
-#   domain_name_registered &lt;dbl&gt;,
-#   reference &lt;chr&gt;, isbndb &lt;dbl&gt;,
-#   book_count &lt;dbl&gt;, semantic_scholar &lt;dbl&gt;,
+  pldb_id  title description type  appeared creators website
+  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;  
+1 roman-n… Roma…  &lt;NA&gt;       nume…     -900 &lt;NA&gt;     &lt;NA&gt;   
+2 etrusca… Etru…  &lt;NA&gt;       nume…     -700 &lt;NA&gt;     &lt;NA&gt;   
+3 attic-n… Atti…  &lt;NA&gt;       nume…     -600 &lt;NA&gt;     &lt;NA&gt;   
+4 greek-n… Gree…  &lt;NA&gt;       nume…     -300 &lt;NA&gt;     &lt;NA&gt;   
+5 arezzo-… arez… "The stave… musi…     1033 &lt;NA&gt;     &lt;NA&gt;   
+6 fibonac… Libe… "The Arabi… nota…     1202 &lt;NA&gt;     &lt;NA&gt;   
+# ℹ 42 more variables: domain_name &lt;chr&gt;,
+#   domain_name_registered &lt;dbl&gt;, reference &lt;chr&gt;,
+#   isbndb &lt;dbl&gt;, book_count &lt;dbl&gt;, semantic_scholar &lt;dbl&gt;,
 #   language_rank &lt;dbl&gt;, github_repo &lt;chr&gt;,
-#   github_repo_stars &lt;dbl&gt;, …</code></pre>
+#   github_repo_stars &lt;dbl&gt;, github_repo_forks &lt;dbl&gt;,
+#   github_repo_updated &lt;dbl&gt;,
+#   github_repo_subscribers &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
 <p>Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn’t true. It also includes information on query languages, stylesheet languages, and protocols, amongst other things. Including numeral systems as you can see here.</p>
@@ -580,14 +580,14 @@ Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that 
 <div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 6
-  title  label     language_rank n     type   year
-  &lt;chr&gt;  &lt;chr&gt;             &lt;dbl&gt; &lt;fct&gt; &lt;chr&gt; &lt;dbl&gt;
-1 Python Comment …             3 1     appe…  1991
-2 Python Comment …             3 1     last…  2022
-3 Perl   Comment …             9 2     appe…  1987
-4 Perl   Comment …             9 2     last…  2022
-5 Ruby   Comment …            12 3     appe…  1995
-6 Ruby   Comment …            12 3     last…  2022</code></pre>
+  title  label            language_rank n     type      year
+  &lt;chr&gt;  &lt;chr&gt;                    &lt;dbl&gt; &lt;fct&gt; &lt;chr&gt;    &lt;dbl&gt;
+1 Python Comment token: #             3 1     appeared  1991
+2 Python Comment token: #             3 1     last_ac…  2022
+3 Perl   Comment token: #             9 2     appeared  1987
+4 Perl   Comment token: #             9 2     last_ac…  2022
+5 Ruby   Comment token: #            12 3     appeared  1995
+6 Ruby   Comment token: #            12 3     last_ac…  2022</code></pre>
 </div>
 </div>
 <p>Now we’re ready to start plotting!</p>
@@ -644,7 +644,7 @@ Figure&nbsp;2.8: A facetted dumbbell chart showing time between language appeara
 <span class="header-section-number">2.4.1</span> Colors</h3>
 <p>Let’s start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We’ll come back to choosing colors for this setting in <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Here, it’s a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements.</p>
 <p>To make visualizations that are more aesthetically pleasing, it’s often useful to think about whether you can match your color choices to the theme of the data. For example, if you’re creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we’re creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in <em>green screens</em> - <a href="https://en.wikipedia.org/wiki/Monochrome_monitor">monochrome monitors</a> that use a green phosphor screen, typically in the early days of computing.</p>
-<p>We can define some variables to store our colors in: a variable called <code>bg_col</code> that’s dark grey color we’ll use for the background; and a variable called <code>main_col</code> that’s a hex code for a bright green color we’ll use for the text and other geometric elements.</p>
+<p>We can define some variables to store our colors in: a variable called <code>bg_col</code> that’s dark gray color we’ll use for the background; and a variable called <code>main_col</code> that’s a hex code for a bright green color we’ll use for the text and other geometric elements.</p>
 <div id="tip-languages-colors" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -655,16 +655,16 @@ Tip&nbsp;2.2: Colors in R
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The dark grey, <code>"gray5"</code>, is a pre-defined color in R. Run <code><a href="https://rdrr.io/r/grDevices/colors.html">colors()</a></code> to see the list of all 657 pre-defined colors available.</p>
+<p>The dark gray, <code>"gray5"</code>, is a pre-defined color in R. Run <code><a href="https://rdrr.io/r/grDevices/colors.html">colors()</a></code> to see the list of all 657 pre-defined colors available.</p>
 </div>
 </div>
 <p>It’s useful to save colors as variables because it makes it much easier to edit colors later on. We <em>could</em> just use the hex code directly in each argument where we want to use the color. But as you’ll see when we start applying the colors to our chart, this can be many different arguments. If we decided we actually want to use a slightly different shade of green, we’d have to manually change all of them. By using a variable, we only need to change it once.</p>
 <div class="cell">
-<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"grey5"</span></span>
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray5"</span></span>
 <span><span class="va">main_col</span> <span class="op">&lt;-</span> <span class="st">"#66FF00"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Although you can use <code><a href="https://ggplot2.tidyverse.org/reference/update_defaults.html">update_geom_defaults()</a></code> to change the default colors used for lines, points, and text, I’m not a fan of this approach since it changes the colors for all plots in your R session and it’s quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function since they are not mapped to variables in the data. </p>
-<p>The point character (<code>pch</code>) for <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> is also set to <code>22</code> - a square which allows you to color the square and its outline different colors. The outline <code>color</code> is set to our green <code>main_col</code> and the square <code>fill</code> color is set to the dark grey <code>bg_col</code>.</p>
+<p>The point character (<code>pch</code>) for <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> is also set to <code>22</code> - a square which allows you to color the square and its outline different colors. The outline <code>color</code> is set to our green <code>main_col</code> and the square <code>fill</code> color is set to the dark gray <code>bg_col</code>.</p>
 <div class="cell" data-source-line-numbers="4,8,9,10">
 <div class="sourceCode" id="cb18" data-source-line-numbers="4,8,9,10" data-code-line-numbers="4,8,9,10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span></span>
@@ -692,7 +692,7 @@ Tip&nbsp;2.2: Colors in R
 <img src="programming-languages_files/figure-html/fig-langauges-basic-plot2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-langauges-basic-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.9: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark grey points.
+Figure&nbsp;2.9: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points.
 </figcaption></figure>
 </div>
 </div>
@@ -752,8 +752,12 @@ Figure&nbsp;2.10: A facetted dumbbell chart showing time between language appear
 <p>Working with fonts in R isn’t always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the <code>font_add_google()</code> function from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu and See file AUTHORS for details. 2022</a>)</span>. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at <a href="https://fonts.google.com/">fonts.google.com</a>. The <code>VT323</code> and <code>Share Tech Mono</code> fonts both look like they’ll fit in with our theme. The <code>font_add_google()</code> function looks through the Google Fonts database for the specified font <code>name</code> (e.g.&nbsp;<code>"VT323"</code>) and loads the font files you’ll need. The second argument, <code>family</code> is how we’ll refer to the font when using it to plot in R. By default it’s the same as the <code>name</code> but it’s often useful to change it to something else (e.g.&nbsp;<code>"vt"</code>), especially for long font names. </p>
 <p>We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the {showtext} package <span class="citation" data-cites="showtext">(<a href="references.html#ref-showtext" role="doc-biblioref">Qiu and See file AUTHORS for details. 2023</a>)</span> comes in. By running <code>showtext_auto()</code>, this means that the {showtext} package is automatically used to render text. We can also set <code>showtext_opts(dpi = 300)</code> to use fonts in the resolution we plan to save our image in later - see <a href="#sec-save-image" class="quarto-xref"><span>Section 2.4.4</span></a> for more details on image resolution. </p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"VT323"</span>, family <span class="op">=</span> <span class="st">"vt"</span><span class="op">)</span></span>
-<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Share Tech Mono"</span>, family <span class="op">=</span> <span class="st">"share"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"VT323"</span>, family <span class="op">=</span> <span class="st">"vt"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Share Tech Mono"</span>, family <span class="op">=</span> <span class="st">"share"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>

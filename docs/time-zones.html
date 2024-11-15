@@ -409,7 +409,7 @@ div.csl-indent {
 <p>The first column, <code>zone</code>, contains information on the timezone name - it’s typically in the form of <code>"Continent/City"</code>. To explore the spread of time zones across continents, we need to split this variable into two (or extract just the continent name from the timezone name). We can use <code>separate_wider_delim()</code> from {tidyr} to create two new columns from the <code>zone</code> column, splitting on the <code>/</code> character. Some of the timezone names have two <code>/</code> in their name e.g.&nbsp;<code>"America/North_Dakota/New_Salem"</code> meaning there are <em>too many</em> pieces for two columns. We can tell <code>separate_wider_delim()</code> to merge the last pieces since it still uniquely specifies the location. </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">timezones_data</span> <span class="op">&lt;-</span> <span class="va">timezones</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">comments</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">comments</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html">separate_wider_delim</a></span><span class="op">(</span></span>
 <span>    cols <span class="op">=</span> <span class="va">zone</span>,</span>
 <span>    delim <span class="op">=</span> <span class="st">"/"</span>,</span>
@@ -476,7 +476,9 @@ Tip&nbsp;13.1: Polygons for a specific country with {rnaturalearth}
 <div class="callout-body-container callout-body">
 <p>If you wanted only the polygon(s) for a specific country or region, you can specify the <code>country</code> argument:</p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">uk</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"united kingdom"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">uk</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span></span>
+<span>  country <span class="op">=</span> <span class="st">"united kingdom"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For specified countries, the <code>ne_states()</code> function provides administrative level 1 polygons e.g.&nbsp;major within-country regions such as states.</p>
 </div>
@@ -590,8 +592,8 @@ Figure&nbsp;13.4: Points representing different time zone locations on a world m
 <span class="header-section-number">13.3.5</span> Fonts</h3>
 <p>Similarly, we also load any fonts we want to use. Again, for this visualisation we’re using Google Fonts, so we can make use of the <code>font_add_google()</code> function in {sysfonts}. For the title, we’ll use the <em>Fraunces</em> font - an <em>old style</em> serif font inspired by 20th century typefaces. For the body font, we’ll use <em>Commissioner</em> - a sans serif font. As we’ve done in previous chapters, we use <code>showtext_auto()</code> to use the {showtext} automatically for plotting fonts, and set the desired resolution using <code>showtext_opts()</code> to set the dpi. </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span><span class="st">"Commissioner"</span><span class="op">)</span></span>
-<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span><span class="st">"Fraunces"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Commissioner"</span><span class="op">)</span></span>
+<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Fraunces"</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Commissioner"</span></span>
@@ -609,9 +611,9 @@ Figure&nbsp;13.4: Points representing different time zone locations on a world m
 <p>Let’s plot a basic bar chart, by starting (as we always do) with passing our new <code>bar_data</code> object into the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function. We also add the aesthetic mapping via the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function and place the <code>continent</code> on the x-axis and the count (<code>n</code>) on the y-axis. We then draw the columns of the bar chart using <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">bar_data</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">continent</span>, y <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  data <span class="op">=</span> <span class="va">bar_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">continent</span>, y <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-timezones-bar-plot-0" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -753,7 +755,7 @@ Figure&nbsp;13.7: A minimalist bar chart showing the number of time zone locatio
 <p>We’ll also re-draw the points again with a small adjustment - let’s change the shape that’s used for the points. You can set the shape using the <code>pch</code> (or <code>shape</code>) argument. There are 25 different options available for <code>pch</code>, which can be specified using the numbers 1 to 25. The shape we’ll use here is a circle with a dot in the middle. Unfortunately, this isn’t one of the 25 available options so we’ll have to make it ourselves. We can draw the dot in the middle using the default shape but making it a little smaller. We can add the circle by choosing <code>pch = 21</code> (which allows you to control both the <code>fill</code> and <code>color</code> of the shape) and making it a little bit bigger with a transparent fill. </p>
 <div class="cell">
 <div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="co"># Apply colors to background map  </span></span>
+<span>  <span class="co"># Apply colors to background map</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">world</span>,</span>
 <span>    color <span class="op">=</span> <span class="va">text_col</span>,</span>
@@ -765,7 +767,7 @@ Figure&nbsp;13.7: A minimalist bar chart showing the number of time zone locatio
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="co"># Draw outer circle </span></span>
+<span>  <span class="co"># Draw outer circle</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">timezones_sf</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span>,</span>
