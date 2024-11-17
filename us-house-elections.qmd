@@ -33,6 +33,8 @@ fig-asp: 0.5
 
 # US House Elections: geography on a grid with {geofacet} {#sec-house}
 
+In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and how to create a custom legend that we can include with {patchwork}.
+
 ## Data
 
 ```{r}
@@ -72,7 +74,7 @@ head(house)
 
 ```{r}
 #| label: elections-wrangling
-plot_data <- house |>
+house_data <- house |>
   dplyr::mutate(party = dplyr::case_when(
     party == "REPUBLICAN" ~ "Republican",
     party == "DEMOCRAT" ~ "Democrat",
@@ -82,6 +84,18 @@ plot_data <- house |>
   dplyr::group_by(year, state_po, party) |>
   dplyr::summarise(votes = sum(candidatevotes)) |>
   dplyr::ungroup()
+```
+
+There are soem years for which there were no non-Republican/dem candidates, and these rows are implicityly missing. 
+as we did in @sec-r-pkgs, we can turn these into explicit 0 values.
+
+```{r}
+#| label: elections-wrangling2
+plot_data <- house_data |> 
+  tidyr::complete(
+    year, state_po, party,
+    fill = list(votes = 0)
+  )
 ```
 
 

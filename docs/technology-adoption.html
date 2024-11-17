@@ -362,7 +362,7 @@ window.Quarto = {
 <li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">5.4.1</span> Colors</a></li>
   <li><a href="#text-and-fonts" id="toc-text-and-fonts" class="nav-link" data-scroll-target="#text-and-fonts"><span class="header-section-number">5.4.2</span> Text and fonts</a></li>
   <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">5.4.3</span> Adjusting themes</a></li>
-  <li><a href="#designing-a-better-legend" id="toc-designing-a-better-legend" class="nav-link" data-scroll-target="#designing-a-better-legend"><span class="header-section-number">5.4.4</span> Designing a better legend</a></li>
+  <li><a href="#alternatives-to-a-traditional-legend" id="toc-alternatives-to-a-traditional-legend" class="nav-link" data-scroll-target="#alternatives-to-a-traditional-legend"><span class="header-section-number">5.4.4</span> Alternatives to a traditional legend</a></li>
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">5.5</span> Reflection</a></li>
@@ -515,7 +515,7 @@ Figure&nbsp;5.3: Scatter plot of percentage children who received a measles immu
 <p>At the time of writing, there isn’t a built-in function in {ggplot2} to create gauge charts. If you’ve never heard of a gauge chart, this initial sketch might give you an idea of what we’re aiming for.</p>
 </section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
-<p>You can think of a gauge chart as being a stacked bar chart with curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
+<p>You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
 <div id="fig-technology-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-technology.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
@@ -893,128 +893,40 @@ Figure&nbsp;5.9: Further styling of gauge chart to change background color, prev
 </div>
 </div>
 <p>We’re almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it’s leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it.</p>
-</section><section id="designing-a-better-legend" class="level3" data-number="5.4.4"><h3 data-number="5.4.4" class="anchored" data-anchor-id="designing-a-better-legend">
-<span class="header-section-number">5.4.4</span> Designing a better legend</h3>
+</section><section id="alternatives-to-a-traditional-legend" class="level3" data-number="5.4.4"><h3 data-number="5.4.4" class="anchored" data-anchor-id="alternatives-to-a-traditional-legend">
+<span class="header-section-number">5.4.4</span> Alternatives to a traditional legend</h3>
+<p>TO FIX</p>
+<p>**coloured text - chapters custom legend -</p>
+<p>Here, there’s an argument to be made that a legend</p>
 <p>We have a few different options for dealing with the legend. Some options for a better legend:</p>
 <ul>
 <li>Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. We would also need to add a better title (or remove the title completely).</li>
 <li>We could design a custom legend, similar to the one created in <a href="us-house-elections.html" class="quarto-xref"><span>Chapter 14</span></a>. This might be a good option as double gauge charts are less common and readers might be less familiar with them. Adding additional information about how they work might prove helpful.</li>
-<li>We could instead use colored text in the subtitle to indicate what the categories are. For this visualisation, highlighting the <em>Immunized</em> would be enough as there are only two categories. We’ll look at ways to do this in R in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</li>
+<li>We could instead use colored text in the subtitle to indicate what the categories are. For this visualisation, highlighting the <em>Immunized</em> would be enough as there are only two categories. We’ll look at ways to do this in R in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. **</li>
 </ul>
-<p>What might a custom legend look like? A custom legend could be a subset of the full plot with some additional annotations. For example, we could subset the data to only include one country (<code>"USA"</code> in this case) and recreate the plot we already have. Here, we also remove the built-in legend and add a <em>How do I read this plot?</em> title.</p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">gauge_data</span>, <span class="va">iso3c</span> <span class="op">==</span> <span class="st">"USA"</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>, r0 <span class="op">=</span> <span class="fl">0.7</span>, r <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      start <span class="op">=</span> <span class="va">ymin_2010</span>, end <span class="op">=</span> <span class="va">ymax_2010</span>, fill <span class="op">=</span> <span class="va">YN</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    color <span class="op">=</span> <span class="cn">NA</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>, r0 <span class="op">=</span> <span class="fl">0.2</span>, r <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>      start <span class="op">=</span> <span class="va">ymin_1980</span>, end <span class="op">=</span> <span class="va">ymax_1980</span>, fill <span class="op">=</span> <span class="va">YN</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    color <span class="op">=</span> <span class="cn">NA</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">text_df</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
-<span>    family <span class="op">=</span> <span class="va">body_font</span>, size <span class="op">=</span> <span class="fl">3</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"no_value"</span><span class="op">)</span>,</span>
-<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Immunized"</span>, <span class="st">"Not Immunized"</span><span class="op">)</span>,</span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">highlight_col</span>, <span class="va">second_col</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"How do I read this plot?"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">iso3c</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
-<span>    legend.position <span class="op">=</span> <span class="st">"bottom"</span>,</span>
-<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
-<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
-<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
-<span>      face <span class="op">=</span> <span class="st">"bold"</span>, size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.2</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
-<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>b <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
-<span>      hjust <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>      halign <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>      face <span class="op">=</span> <span class="st">"bold"</span>,</span>
-<span>      size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>We might also add some annotations: first define a <code>data.frame</code> containing the positions and labels for the text, then add it to the plot using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. Note that we also set <code>clip = "off"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to prevent the text getting cut off if it lies outside the range of the plot, and adjust the limits of the <code>x</code> and <code>y</code> axes. </p>
-<div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Define the text and positions</span></span>
-<span><span class="va">legend_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="op">-</span><span class="fl">1.1</span>, <span class="op">-</span><span class="fl">0.7</span><span class="op">)</span>,</span>
-<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.75</span>, <span class="fl">0.95</span><span class="op">)</span>,</span>
-<span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"% not immunized in 2010"</span>,</span>
-<span>    <span class="st">"% immunized in 2010"</span>,</span>
-<span>    <span class="st">"ISO3 country code"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co"># Add to the legend plot</span></span>
-<span><span class="va">legend_with_text</span> <span class="op">&lt;-</span> <span class="va">legend_plot</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">legend_text</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>,</span>
-<span>      label <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_wrap.html">str_wrap</a></span><span class="op">(</span><span class="va">label</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    family <span class="op">=</span> <span class="va">body_font</span>, size <span class="op">=</span> <span class="fl">3</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>clip <span class="op">=</span> <span class="st">"off"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>And we could add some arrows using <code><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment()</a></code> to direct the text:</p>
-<div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_with_text</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"segment"</span>,</span>
-<span>    x <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, xend <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, y <span class="op">=</span> <span class="fl">0.99</span>, yend <span class="op">=</span> <span class="fl">1.05</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"mm"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"segment"</span>,</span>
-<span>    x <span class="op">=</span> <span class="fl">1.2</span>, xend <span class="op">=</span> <span class="fl">1.0</span>, y <span class="op">=</span> <span class="fl">0.25</span>, yend <span class="op">=</span> <span class="fl">0.15</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"mm"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"segment"</span>,</span>
-<span>    x <span class="op">=</span> <span class="op">-</span><span class="fl">1.1</span>, xend <span class="op">=</span> <span class="op">-</span><span class="fl">0.95</span>, y <span class="op">=</span> <span class="fl">0.55</span>, yend <span class="op">=</span> <span class="fl">0.4</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"mm"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span>  legend.position <span class="op">=</span> <span class="st">"none"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-technology-legend" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-legend-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="technology-adoption_files/figure-html/fig-technology-legend-1.png" class="img-fluid figure-img">
+<div id="fig-technology-style-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-style-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="technology-adoption_files/figure-html/fig-technology-style-3-1.png" class="img-fluid figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-legend-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.10: Example of a custom legend with added annotations explaining the interpretation of the gauge chart.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-technology-style-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.10: Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>As with previous examples, don’t be fooled into thinking that the positioning and sizing of the text and arrows is something that happened perfectly the first time. The values are often picked through a series of trial and error, and with practice you’ll get better at choosing starting values. We can add this legend to the main plot, perhaps in the top right corner using {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>.</p>
 </section></section><section id="reflection" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">5.5</span> Reflection</h2>
 <p>Are gauge charts the most effective method of visualising this data? No.&nbsp;Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change on arc length between 1980 and 2010, you’ll get different answers to if you measured the proportional change in area for the two. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?</p>
 <ul>
 <li><p>There’s no reason to use country codes instead of country names in this situation, other than perhaps laziness. There is space available for the full names. Though many people could likely work out which countries are shown here by their country codes, there’s no need to make readers figure it out on their own. Providing the country names explicitly gives a reader less work to do, meaning they can focus on what you’re actually trying to show.</p></li>
 <li><p>Similarly, providing the exact percentages as labelled text would make it easier to see what the change in immunization coverage is. It’s pretty clear that there has been an increase across all six countries, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What’s the difference between Brazil and Sweden in 2010? It’s too difficult to tell here.</p></li>
-<li><p>How much value does this custom legend add? Do we really need to use so much space to identify the two categories on the chart? The years are already labelled, and it’s reasonably obvious that the three letters at the top represent a country. Maybe we don’t need a full custom legend. Would some colored text in the subtitle not be just as effective?</p></li>
+<li><p><strong>no legend</strong> - coloured text</p></li>
 </ul>
 
 
