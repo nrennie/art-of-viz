@@ -97,7 +97,7 @@ There are some years for which there were no `"Other"` candidates in some states
 
 ```{r}
 #| label: elections-wrangling2
-plot_data <- house_data |> 
+plot_data <- house_data |>
   tidyr::complete(
     year, state_po, party,
     fill = list(votes = 0)
@@ -118,7 +118,7 @@ It's this second issue that means when developing faceted plots, especially when
 \index{ggplot2!ggplot} \index{ggplot2!aes}
 \index{ggplot2!geom\_area}
 
-using `position = "fill"`
+Since we're going to be comparing states (which each have very different population size, and therefore will have very different numbers of votes), rather than considering an area chart of votes, we'll look at the percentage. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` ...
 
 ```{r}
 #| label: fig-elections-single-plot
@@ -133,10 +133,10 @@ ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
       fill = party
     ),
     position = "fill"
-  ) 
+  )
 ```
 
-piping data in - tip?
+and we have ... 
 
 ::: {#tip-elections-piping .callout-tip}
 
@@ -149,8 +149,8 @@ code above could be re-written as below
 #| label: elections-plot-piping
 #| eval: false
 #| echo: true
-plot_data |> 
-  dplyr::filter(, state_po == "CA") |> 
+plot_data |>
+  dplyr::filter(, state_po == "CA") |>
   ggplot() +
   geom_area(
     mapping = aes(
@@ -159,7 +159,7 @@ plot_data |>
       fill = party
     ),
     position = "fill"
-  ) 
+  )
 ```
 
 However, I almost never do this for two reasons
@@ -195,7 +195,9 @@ As you can see in @fig-elections-basic-plot ... can't see the plots, only facet 
 
 ### Packages and functions
 
-... using the {geofacet} R package [@geofacet].
+To arrange the faceted plots into the ... using the {geofacet} R package [@geofacet]. The `geofacet` 
+
+In order to map..., one of the columns must match the ... . 
 
 \index{geofacet!facet\_geo}
 
@@ -209,19 +211,25 @@ map_plot <- base_plot +
 map_plot
 ```
 
+We still have the same problem of not being able to see the details of the chart as there are so many, but you can see from just the facet titles, that the plots are now arranged in a grid that resembles the USA. 
 
 ## Advanced styling
 
+We'll now style our charts to apply more intuitive colors, adjust the facet labels to allow the charts to be seen more easily, and create a custom legend that explains how to read this chart.
+
 ### Colors
 
-As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into stereotypes (e.g. pink for girls). But it's also important to but also use what is commonly known
+In the USA, the Republican party is represented by the color red and the Democrat party by blue. As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into negative stereotypes (e.g. pink for girls). But it's also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we'll stick to red and blue. 
+
+other colors
 
 ```{r}
 #| label: elections-colors
-text_col <- "#202A44"
 blue_col <- "#0015BC"
 red_col <- "#C41E3A"
-bg_col <- "#fafafa"
+other_col <- "#AAAAAA"
+text_col <- "#202A44"
+bg_col <- "#FAFAFA"
 ```
 
 \index{ggplot2!scale\_fill\_manual}
@@ -234,7 +242,7 @@ col_plot <- map_plot +
     values = c(
       "Democrat" = blue_col,
       "Republican" = red_col,
-      "Other" = "gray50"
+      "Other" = other_col
     )
   )
 ```
@@ -302,6 +310,7 @@ text_plot <- col_plot +
 ### Adjusting themes
 
 \index{ggplot2!geom\_text} \index{ggplot2!coord\_cartesian}
+\index{ggplot2!aes} \index{ggplot2!alpha}
 
 ```{r}
 #| label: fig-elections-geofacet-style-1
@@ -322,6 +331,10 @@ styled_plot_1 <- text_plot +
 ```
 
 \index{ggplot2!theme\_void}
+
+\index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!margin}
+\index{ggplot2!element\_blank} \index{ggtext!element\_textbox\_simple}
+\index{ggplot2!unit} \index{ggplot2!rel}
 
 ```{r}
 #| label: fig-elections-plot-style-2
@@ -373,9 +386,19 @@ styled_plot_2
 
 ### Legend
 
+\index{dplyr!filter}
+\index{ggplot2!ggplot} \index{ggplot2!aes}
+\index{ggplot2!geom\_area}
+\index{ggplot2!geom\_text}
+\index{ggplot2!scale\_fill\_manual}
+\index{ggplot2!coord\_cartesian}
+\index{ggplot2!theme\_void}
+
+\index{ggplot2!theme} \index{ggplot2!element\_rect}
+
 ```{r}
-#| label: elections-inset-plot
-p_inset <- ggplot(
+#| label: elections-ca-plot
+ca_plot <- ggplot(
   data = dplyr::filter(plot_data, state_po == "CA")
 ) +
   geom_area(
@@ -397,6 +420,22 @@ p_inset <- ggplot(
     color = alpha(bg_col, 0.7),
     size = 4
   ) +
+  # colors
+  scale_fill_manual(
+    values = c(
+      "Democrat" = blue_col,
+      "Republican" = red_col,
+      "Other" = other_col
+    )
+  )
+```
+
+
+```{r}
+#| label: fig-elections-inset-plot
+#| fig-cap: "Custom legend plot"
+#| fig-asp: 1
+p_inset <- ca_plot +
   # year labels
   geom_text(
     mapping = aes(
@@ -418,13 +457,6 @@ p_inset <- ggplot(
     color = alpha(bg_col, 0.7),
     size = 3
   ) +
-  scale_fill_manual(
-    values = c(
-      "Democrat" = blue_col,
-      "Republican" = red_col,
-      "Other" = "#aaaaaa"
-    )
-  ) +
   coord_cartesian(expand = FALSE) +
   theme_void() +
   theme(
@@ -438,6 +470,7 @@ p_inset <- ggplot(
       color = bg_col
     )
   )
+p_inset
 ```
 
 ### Joining with {patchwork}
@@ -454,9 +487,9 @@ p_inset <- ggplot(
 library(patchwork)
 styled_plot_2 + inset_element(
   p = p_inset,
-  left = 0.025,
+  left = 0.027,
   bottom = 0.087,
-  right = 0.285,
+  right = 0.287,
   top = 0.55,
   align_to = "full",
   clip = FALSE
