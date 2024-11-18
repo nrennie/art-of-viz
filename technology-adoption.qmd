@@ -3,6 +3,7 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
+fig-asp: 0.7
 ---
 
 ```{r}
@@ -19,7 +20,7 @@ In this chapter we'll discover how to create gauge charts, a type of chart not n
 
 The Cross‐country Historical Adoption of Technology (CHAT) dataset [@technology_data] contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing *as broad a definition of technology as possible* [@technology_data].
 
-The CHAT dataset was used as a \#TidyTuesday dataset in July 2022, so let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
+The CHAT dataset was used as a TidyTuesday dataset in July 2022, so let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: technology-load-data-show
@@ -315,7 +316,7 @@ We now have a double gauge chart - but it could look a lot nicer (and more infor
 
 ### Colors
 
-Let's start by defining some variables for our colors. Here, we define a `highlight_col` which we'll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black.
+Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black.
 
 ```{r}
 #| label: technology-colors
@@ -325,7 +326,7 @@ bg_col <- "#dedede"
 text_col <- "black"
 ```
 
-Before we add the new colors to our gauge chart, let's remove the black outline from around the segments - they're quite thick lines which don't add anything to the plot. There will be sufficient contrast between the segments with the new colors we've chosen. You can remove the outline from the arc by setting `color = NA` outside of the aesthetic mapping:
+Before we add the new colors to our gauge chart, let's remove the black outline from around the segments - they're quite thick lines which don't add anything to the plot. There will be sufficient contrast between the segments with the new colors we've chosen. You can remove the outline from the arc by setting `color = NA` outside of the aesthetic mapping: \index{ggforce!geom\_arc\_bar} \index{ggplot!ggplot} \index{ggplot!facet\_wrap} \index{ggplot!aes}
 
 ```{r}
 #| label: fig-technology-basic-plot-2
@@ -357,7 +358,7 @@ Now we can apply the colors using `scale_fill_manual()` from {ggplot2}, setting 
 
 ```{r}
 #| label: fig-technology-color-plot
-#| fig-cap: "Edited version of the previous plot with colors changed from defaults to grey and dark pink."
+#| fig-cap: "Edited version of the previous plot with colors changed from defaults to gray and dark pink."
 color_plot <- basic_plot +
   scale_fill_manual(
     breaks = c("value", "no_value"),
@@ -379,13 +380,13 @@ showtext::showtext_opts(dpi = 300)
 body_font <- "ubuntu"
 ```
 
-Let's define some text for the title and subtitle. Here, the title is simple (it could perhaps be a little more descriptive or interesting). The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualisation, as well as the chart creator.
+Let's define some text for the title and subtitle. Here, the title asks the reader a question, encouraging them to think and directing them to what they are looking at in the chart. The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualisation, as well as the chart creator.
 
 ```{r}
 #| label: technology-text
 #| code-overflow: wrap
-title <- "Measles Immunizations"
-subtitle <- "The inner bar represents the percentage of children who received a measles immunization in 1980, whilst the outer bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all countries."
+title <- "What percentage of children are immunized against measles?"
+subtitle <- "The inner pink bar represents the percentage of children who received a measles immunization in 1980, whilst the outer pink bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all six countries."
 caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
 ```
 
@@ -422,7 +423,7 @@ text_plot
 
 ### Adjusting themes
 
-We'll start by removing all of the theme elements such as the grey background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
+We'll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
 
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()` \index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
@@ -497,7 +498,7 @@ Although we could simply increase the height of the plot to stop the year labels
 * We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-house. 
 
 * We could instead use colored text in the subtitle to indicate what the categories are. For this visualisation, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats. 
-Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the purple color represents the positive response data (percentage who have been immunized). 
+Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the pink color represents the positive response data (percentage who have been immunized). 
 
 ::: {#tip-technology-legends .callout-tip}
 
@@ -540,4 +541,4 @@ Are gauge charts the most effective method of visualising this data? No. Gauge c
 
 * Similarly, providing the exact percentages as labelled text would make it easier to see what the change in immunization coverage is. It's pretty clear that there has been an increase across all six countries, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between Brazil and Sweden in 2010? It's too difficult to tell here.
 
-* Although a full, traditional legend is may be unnecessary here, the addition of some colored text may add clarification that the purple area is what represents that data. We'll look at using colored text instead of a legend in @sec-turbines and @sec-cats.
+* Although a full, traditional legend is may be unnecessary here, the addition of some colored text may add clarification that the pink area is what represents that data. We'll look at using colored text instead of a legend in @sec-turbines and @sec-cats.

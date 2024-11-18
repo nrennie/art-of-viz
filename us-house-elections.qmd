@@ -33,9 +33,11 @@ fig-asp: 0.5
 
 # US House Elections: geography on a grid with {geofacet} {#sec-house}
 
-In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and how to create a custom legend that we can include with {patchwork}.
+In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and how to create a custom legend that we can include with {patchwork}. \index{geofacet} \index{patchwork}
 
 ## Data
+
+\index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: elections-load-data-show
@@ -53,6 +55,7 @@ house <- tuesdata$house
 house <- readr::read_csv("data/house.csv")
 ```
 
+\index{utils!head}
 
 ```{r}
 #| label: elections-head-data
@@ -72,6 +75,10 @@ head(house)
 
 ### Data wrangling
 
+\index{dplyr!mutate}
+
+\index{dplyr!case\_when} \index{dplyr!filter} \index{dplyr!group\_by} \index{dplyr!summarise} \index{dplyr!ungroup}
+
 ```{r}
 #| label: elections-wrangling
 house_data <- house |>
@@ -86,8 +93,10 @@ house_data <- house |>
   dplyr::ungroup()
 ```
 
-There are soem years for which there were no non-Republican/dem candidates, and these rows are implicityly missing. 
+There are some years for which there were no non-Republican/dem candidates, and these rows are implicityly missing. 
 as we did in @sec-r-pkgs, we can turn these into explicit 0 values.
+
+\index{tidyr!complete}
 
 ```{r}
 #| label: elections-wrangling2
@@ -101,11 +110,40 @@ plot_data <- house_data |>
 
 ### The first plot
 
+when developing facet plots, especially when facet complicated, it can be useful to create the single plot first  - get the basics correct
+
+\index{dplyr!filter}
+
+piping data in - tip?
+
+\index{ggplot2!ggplot} \index{ggplot2!aes}
+\index{ggplot2!geom\_area}
+
+using `position = "fill"`
+
+```{r}
+#| label: fig-elections-single-plot
+#| fig-cap: "Plot"
+#| warning: false
+library(ggplot2)
+ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
+  geom_area(
+    mapping = aes(
+      x = year,
+      y = votes,
+      fill = party
+    ),
+    position = "fill"
+  ) 
+```
+
+\index{ggplot2!ggplot} \index{ggplot2!aes}
+\index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
+
 ```{r}
 #| label: fig-elections-basic-plot
 #| fig-cap: "Plot"
 #| warning: false
-library(ggplot2)
 base_plot <- ggplot(data = plot_data) +
   geom_area(
     mapping = aes(
@@ -122,6 +160,8 @@ base_plot
 ### Packages and functions
 
 ... using the {geofacet} R package [@geofacet].
+
+\index{geofacet!facet\_geo}
 
 ```{r}
 #| label: fig-elections-geofacet-plot
@@ -148,6 +188,7 @@ red_col <- "#C41E3A"
 bg_col <- "#fafafa"
 ```
 
+\index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: elections-add-colors
@@ -166,6 +207,13 @@ col_plot <- map_plot +
 
 ### Text and fonts
 
+{sysfonts}\index{sysfonts}
+{showtext}\index{showtext}
+
+\index{sysfonts!font\_add\_google}
+\index{showtext!showtext\_auto}
+\index{showtext!showtext\_opts}
+
 ```{r}
 #| label: elections-fonts
 sysfonts::font_add_google(
@@ -180,12 +228,9 @@ body_font <- "roboto"
 title_font <- "carter"
 ```
 
-{sysfonts}\index{sysfonts}
-{showtext}\index{showtext}
-
-\index{sysfonts!font\_add\_google}
-\index{showtext!showtext\_auto}
-\index{showtext!showtext\_opts}
+\index{social\_caption}
+\index{glue!glue}
+\index{base!paste0}
 
 ```{r}
 #| label: elections-text
@@ -359,6 +404,13 @@ p_inset <- ggplot(
   )
 ```
 
+### Joining with {patchwork}
+
+\index{patchwork} [@patchwork]
+
+\index{patchwork!inset\_element}
+
+\index{ggplot2!theme} \index{ggplot2!element\_rect}
 
 ```{r}
 #| label: fig-combine-plots
@@ -387,6 +439,10 @@ styled_plot_2 + inset_element(
 
 
 ## Reflection
+
+* Other category
+
+* 
 
 ::: {.content-visible when-format="html"}
 
