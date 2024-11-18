@@ -93,10 +93,7 @@ house_data <- house |>
   dplyr::ungroup()
 ```
 
-There are some years for which there were no non-Republican/dem candidates, and these rows are implicityly missing. 
-as we did in @sec-r-pkgs, we can turn these into explicit 0 values.
-
-\index{tidyr!complete}
+There are some years for which there were no `"Other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from {ggplot2}. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from {tidyr}, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
 
 ```{r}
 #| label: elections-wrangling2
@@ -107,14 +104,16 @@ plot_data <- house_data |>
   )
 ```
 
-
 ### The first plot
 
-when developing facet plots, especially when facet complicated, it can be useful to create the single plot first  - get the basics correct
+We've once again going to create a faceted plot, as we did in @sec-programming, @sec-museums, and @sec-technology. There are two key differences with this plot:
+
+* Instead of arranging the plots into a rectangular shape with a specified number of rows and columns, we want to arrange the plots in a way that resembles some underlying geography.
+* There are far more facets (over 50) compared to the previous plots we've made (which have mostly had less than 10). Sometimes creating a large number of facets can be slow.
+
+It's this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.
 
 \index{dplyr!filter}
-
-piping data in - tip?
 
 \index{ggplot2!ggplot} \index{ggplot2!aes}
 \index{ggplot2!geom\_area}
@@ -137,6 +136,41 @@ ggplot(data = dplyr::filter(plot_data, state_po == "CA")) +
   ) 
 ```
 
+piping data in - tip?
+
+::: {#tip-elections-piping .callout-tip}
+
+## Piping data into `ggplot()`
+
+Since the first argument of `ggplot` is `data`, this means 
+code above could be re-written as below
+
+```{r}
+#| label: elections-plot-piping
+#| eval: false
+#| echo: true
+plot_data |> 
+  dplyr::filter(, state_po == "CA") |> 
+  ggplot() +
+  geom_area(
+    mapping = aes(
+      x = year,
+      y = votes,
+      fill = party
+    ),
+    position = "fill"
+  ) 
+```
+
+However, I almost never do this for two reasons
+
+* the combination of `+` and `|>` looks weird
+* it's easy to end up with very long complicated code - keep the data wrangling and the plotting code separate
+
+:::
+
+Now that we have ...., we can pass the full data into `ggplot()` and add `facet_wrap()`. 
+
 \index{ggplot2!ggplot} \index{ggplot2!aes}
 \index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
 
@@ -156,6 +190,8 @@ base_plot <- ggplot(data = plot_data) +
   facet_wrap(~state_po)
 base_plot
 ```
+
+As you can see in @fig-elections-basic-plot ... can't see the plots, only facet labels. This is a very common problem when working with large numbers of facet categories.
 
 ### Packages and functions
 
