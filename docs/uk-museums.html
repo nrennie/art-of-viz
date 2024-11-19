@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The TidyTuesday Cookbook – 3&nbsp; UK Museums: highlighting line charts with {gghighlight}</title>
+<title>3&nbsp; UK Museums: highlighting line charts with {gghighlight} – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick} and plotting with {cowplot}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -359,7 +359,7 @@ div.csl-indent {
 </header><p>In this chapter we’ll consider different ways of visualising data that varies over time, aiming to avoid <em>spaghetti charts</em>, with the help of the {gghighlight} extension package.</p>
 <section id="data" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">3.1</span> Data</h2>
-<p>The <a href="https://museweb.dcs.bbk.ac.uk/data">Mapping Museums</a> project <span class="citation" data-cites="museums_data">(<a href="references.html#ref-museums_data" role="doc-biblioref">Mapping Museums 2021</a>)</span> has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/home">museweb.dcs.bbk.ac.uk</a>. It was also used as a #TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in November 2022, and we’ll use that version for this chapter.</p>
+<p>The <a href="https://museweb.dcs.bbk.ac.uk/data">Mapping Museums</a> project <span class="citation" data-cites="museums_data">(<a href="references.html#ref-museums_data" role="doc-biblioref">Mapping Museums 2021</a>)</span> has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/home">museweb.dcs.bbk.ac.uk</a>. It was also used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in November 2022, and we’ll use that version for this chapter.</p>
 <p>Let’s start by reading in the data using the <code>tidytuesdayR</code> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-11-22"</span><span class="op">)</span></span>
@@ -785,7 +785,7 @@ Tip&nbsp;3.3: Adding line breaks using <code>&lt;br&gt;</code>
 <span class="header-section-number">3.4.3</span> Adjusting themes</h3>
 <p>Now we need to edit the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> elements to apply the text fonts and styles, edit the background colors, and remove the legend. </p>
 <p>In {ggplot2}, the axis limits are chosen automatically based on the range of the data. It’s often useful to chose limits (and breaks) that are <em>nice</em> - it makes it easier to calculate where other values are. We can set <code>scale_y_continuous(limits = c(0, 300))</code> to make the range of the y-axis between 0 and 300. We can also set <code>coord_cartesian(expand = FALSE)</code> to remove the extra space around the plot area that is added by default - giving a slightly cleaner look. Using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code> as a base, we can set the default font size and family using <code>base_size = 7</code> and <code>base_family = body_font</code>. </p>
-<p>Setting <code>legend.position = "none"</code> removes the legend on the right hand side. The <code>plot.title.position = "plot"</code> and <code>plot.caption.position = "plot"</code> arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded grey by default), which doesn’t look good when you have long axis labels, or a multi-line axis title on the y-axis.</p>
+<p>Setting <code>legend.position = "none"</code> removes the legend on the right hand side. The <code>plot.title.position = "plot"</code> and <code>plot.caption.position = "plot"</code> arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded gray by default), which doesn’t look good when you have long axis labels, or a multi-line axis title on the y-axis.</p>
 <p>The <code>panel.spacing</code> argument controls how close the facets are to each other - this can help to stop the year labels on side-by-side plots from overlapping. Setting <code>plot.margin = margin(10, 15, 10, 10)</code> adds some extra space around the outside of the plot, with the higher value on the right hand side compensating and balancing out the space from the axis title on the left hand side. The <code>plot.background</code> and <code>panel.background</code> arguments set the background color of the plot and panel areas to be the <code>bg_col</code> variable previously defined.</p>
 <p>For the <code>plot.title</code>, <code>plot.subtitle</code>, and <code>plot.caption</code>, arguments, we use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from {ggtext} to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a <code>lineheight</code> of <code>0.5</code>, and set to use the <code>text_col</code> variable for the color. The title font is made slightly larger and in bold. The <code>axis.text</code> is also set to be <code>text_col</code> colored with a <code>lineheight</code> of <code>0.5</code> using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. </p>
 <p>Now, we have our final plot:</p>
@@ -955,6 +955,9 @@ Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Gr
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
 Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>

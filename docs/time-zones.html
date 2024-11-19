@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The TidyTuesday Cookbook – 13&nbsp; Time Zones: spatial data and mapping with {sf}</title>
+<title>13&nbsp; Time Zones: spatial data and mapping with {sf} – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick} and plotting with {cowplot}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -365,7 +365,7 @@ div.csl-indent {
 <section id="data" class="level2" data-number="13.1"><h2 data-number="13.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">13.1</span> Data</h2>
 <p>The <a href="https://data.iana.org/time-zones/tz-link.html">IANA (Interet Assigned Numbers Authority) tz database</a> contains data on the history of local time for different locations around the world <span class="citation" data-cites="zones_data">(<a href="references.html#ref-zones_data" role="doc-biblioref">Internet Assigned Numbers Authority 2023</a>)</span>. The website states that <em>“each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970.”</em> Many websites use the data in the IANA tz database to operate.</p>
-<p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">#TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data in using the <code>tt_load()</code> function from the {tidytuesdayR} package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
+<p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data in using the <code>tt_load()</code> function from the {tidytuesdayR} package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-28"</span><span class="op">)</span></span>
 <span><span class="va">timezones</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">timezones</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -579,7 +579,7 @@ Figure&nbsp;13.4: Points representing different time zone locations on a world m
 <span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#508080"</span></span>
 <span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#F0F5F5"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Then we define a named vector of colors, mapping the names of the regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol discusses several options for qualitative palettes in his <a href="https://personal.sron.nl/~pault/"><em>Colour schemes and templates</em> blog post</a> <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span>. Here, we use the <em>muted qualitative color scheme</em> palette <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span> which has 10 colors (including a pale grey for missing data) and is colorblind safe:</p>
+<p>Then we define a named vector of colors, mapping the names of the regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol discusses several options for qualitative palettes in his <a href="https://personal.sron.nl/~pault/"><em>Colour schemes and templates</em> blog post</a> <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span>. Here, we use the <em>muted qualitative color scheme</em> palette <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span> which has 10 colors (including a pale gray for missing data) and is colorblind safe:</p>
 <div class="cell">
 <div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_palette</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"#CC6677"</span>, <span class="st">"#332288"</span>, <span class="st">"#DDCC77"</span>,</span>
@@ -1042,6 +1042,9 @@ Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Gr
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
 Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>

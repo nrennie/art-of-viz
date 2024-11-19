@@ -39,6 +39,8 @@ In this chapter, we'll learn how to arrange faceted plots in a grid that resembl
 
 \index{tidytuesdayR!tt\_load}
 
+[@elections_data]
+
 ```{r}
 #| label: elections-load-data-show
 #| eval: false
@@ -66,6 +68,39 @@ head(house)
 ## Exploratory work
 
 ### Data exploration
+
+```{r}
+#| label: fig-elections-scatterplot
+#| fig-cap: "Bar chart "
+#| echo: -1
+#| fig-asp: 1.2
+par(mar = c(4.1, 4.1, 2.1, 2.1))
+plot(
+  house$year, house$candidatevotes
+)
+```
+
+Identifies a potential data issue
+
+
+```{r}
+#| label: fig-elections-boxplot
+#| fig-cap: "Box plot "
+#| fig-asp: 1.2
+#| echo: -1
+par(mar = c(4.1, 6.1, 1.1, 1.1))
+boxplot(
+  candidatevotes ~ party,
+  data = house[house$candidatevotes < 600000, ],
+  horizontal = TRUE,
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
+  xlab = "Number of candidate votes",
+  ylab = NULL
+)
+```
+
 
 ### Exploratory sketches
 
@@ -113,12 +148,14 @@ We've once again going to create a faceted plot, as we did in @sec-programming, 
 
 It's this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.
 
+We start by passing in the ... to the `data` argument of `ggplot()`. 
+
 \index{dplyr!filter}
 
-\index{ggplot2!ggplot} \index{ggplot2!aes}
-\index{ggplot2!geom\_area}
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_area}
 
-Since we're going to be comparing states (which each have very different population size, and therefore will have very different numbers of votes), rather than considering an area chart of votes, we'll look at the percentage. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` ...
+
+Since we're going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of votes, we'll look at the proportion for each party. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` does this for us. \index{ggplot2!geom\_area}
 
 ```{r}
 #| label: fig-elections-single-plot
@@ -142,8 +179,7 @@ and we have ...
 
 ## Piping data into `ggplot()`
 
-Since the first argument of `ggplot` is `data`, this means 
-code above could be re-written as below
+Since the first argument of `ggplot` is `data`, this means that we *could* pipe the data into the `ggplot()` function rather than explicitly stating it as the first argument. For example, the code above could be re-written as:
 
 ```{r}
 #| label: elections-plot-piping
@@ -162,10 +198,10 @@ plot_data |>
   )
 ```
 
-However, I almost never do this for two reasons
+Though this may arguably look neater than nesting `filter()` inside `ggplot()`, you're unlikely to see any other examples of piping into `ggplot()` for two reasons:
 
-* the combination of `+` and `|>` looks weird
-* it's easy to end up with very long complicated code - keep the data wrangling and the plotting code separate
+* The combination of `+` and `|>` looks odd, and this outweighs the increased neatness from piping (personal opinion).
+* It makes it easier to end up with very long, complicated code. Keeping the data wrangling and the plotting code separate often makes more sense.
 
 :::
 
@@ -298,6 +334,7 @@ title <- "US House Election Results"
 \index{ggplot2!labs}
 
 ```{r}
+#| label: elections-labs
 text_plot <- col_plot +
   labs(
     title = title,

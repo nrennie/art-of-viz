@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The TidyTuesday Cookbook – 12&nbsp; Doctors in an Ageing Population: making maps with {ggplot2}</title>
+<title>12&nbsp; Doctors in an Ageing Population: making maps with {ggplot2} – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick} and plotting with {cowplot}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -358,15 +358,15 @@ div.csl-indent {
 </header><p>In this chapter we’ll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.</p>
 <section id="data" class="level2" data-number="12.1"><h2 data-number="12.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">12.1</span> Data</h2>
-<p>There’s often a <em>Bring Your Own Data</em> week each year of #TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
-<p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some compaies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
+<p>There’s often a <em>Bring Your Own Data</em> week each year of TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
+<p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
 <p>One fantastic source of data is the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>). The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you’re ever looking for inspiration.</p>
 <p>For this chapter, we’ll visualise data on <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">Medical doctors per 1,000 people</a>, a dataset which comes from the Our World in Data website <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. You can load the data using the {owidR} R package <span class="citation" data-cites="owidR">(<a href="references.html#ref-owidR" role="doc-biblioref">York 2023</a>)</span>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">owidR</span><span class="op">)</span></span>
 <span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/owidR/man/owid.html">owid</a></span><span class="op">(</span><span class="st">"physicians-per-1000-people"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="tip-museums-view" class="callout callout-style-default callout-tip callout-titled">
+<div id="tip-doctors-view" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -389,16 +389,14 @@ Tip&nbsp;12.1: Saving data for later use
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">doctors</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 4
-  entity      code   year
-  &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;
-1 Afghanistan AFG    1960
-2 Afghanistan AFG    1965
-3 Afghanistan AFG    1970
-4 Afghanistan AFG    1981
-5 Afghanistan AFG    1986
-6 Afghanistan AFG    1987
-# ℹ 1 more variable:
-#   `Physicians (per 1,000 people)` &lt;dbl&gt;</code></pre>
+  entity      code   year `Physicians (per 1,000 people)`
+  &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;                           &lt;dbl&gt;
+1 Afghanistan AFG    1960                           0.035
+2 Afghanistan AFG    1965                           0.063
+3 Afghanistan AFG    1970                           0.065
+4 Afghanistan AFG    1981                           0.077
+5 Afghanistan AFG    1986                           0.183
+6 Afghanistan AFG    1987                           0.179</code></pre>
 </div>
 </div>
 <p>Often when there’s a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualising time series data, a simple scatter plot can also indicate if there’s a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a <em>spaghetti chart</em> as discussed in <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a>.</p>
@@ -553,7 +551,7 @@ Figure&nbsp;12.3: Map of the world with countries colored based on number of doc
 <p>We’ll start by considering alternative color palettes, then think about text that should be added, before finalising the layout.</p>
 <section id="colors" class="level3" data-number="12.4.1"><h3 data-number="12.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">12.4.1</span> Colors</h3>
-<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favourite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
+<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favorite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
 <p>{MetBrewer} does have functions that interface directly with {ggplot2} (such as <code><a href="https://rdrr.io/pkg/MetBrewer/man/scale_fill_met_c.html">scale_fill_met_c()</a></code>) but we’re going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the <code>"Hokusai2"</code> palette. The <code>text_col</code> is the 18th color and <code>highlight_col</code> is the 15th color. A variable containing the background color, <code>bg_col</code>, is also defined.</p>
 <div class="cell">
 <div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
@@ -587,8 +585,12 @@ Figure&nbsp;12.4: Map of the world with countries colored based on number of doc
 <span class="header-section-number">12.4.2</span> Text and fonts</h3>
 <p>As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. Here, the <em>Roboto</em> font is loaded through Google Fonts for the main font used, and <em>Roboto Slab</em> is loaded for use in the title. </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span><span class="op">)</span></span>
-<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto Slab"</span>, family <span class="op">=</span> <span class="st">"roboto_slab"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Roboto Slab"</span>, family <span class="op">=</span> <span class="st">"roboto_slab"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"roboto"</span></span>
@@ -958,6 +960,9 @@ Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Gr
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
 Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
