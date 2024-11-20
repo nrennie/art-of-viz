@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.5.37">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>13&nbsp; Time Zones: spatial data and mapping with {sf} – The TidyTuesday Cookbook</title>
+<title>The TidyTuesday Cookbook – 13&nbsp; Time Zones: spatial data and mapping with {sf}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -339,7 +339,7 @@ div.csl-indent {
   <li><a href="#editing-the-axes" id="toc-editing-the-axes" class="nav-link" data-scroll-target="#editing-the-axes"><span class="header-section-number">13.4.2</span> Editing the axes</a></li>
   <li><a href="#text" id="toc-text" class="nav-link" data-scroll-target="#text"><span class="header-section-number">13.4.3</span> Text</a></li>
   <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">13.4.4</span> Adjusting themes</a></li>
-  <li><a href="#join-with-patchwork" id="toc-join-with-patchwork" class="nav-link" data-scroll-target="#join-with-patchwork"><span class="header-section-number">13.4.5</span> Join with {patchwork}</a></li>
+  <li><a href="#joining-plots-with-patchwork" id="toc-joining-plots-with-patchwork" class="nav-link" data-scroll-target="#joining-plots-with-patchwork"><span class="header-section-number">13.4.5</span> Joining plots with {patchwork}</a></li>
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">13.5</span> Reflection</a></li>
@@ -907,10 +907,11 @@ Figure&nbsp;13.10: Points representing different time zone locations on a world 
 </div>
 </div>
 </div>
-</section><section id="join-with-patchwork" class="level3" data-number="13.4.5"><h3 data-number="13.4.5" class="anchored" data-anchor-id="join-with-patchwork">
-<span class="header-section-number">13.4.5</span> Join with {patchwork}</h3>
-<p>Finally, we need to join the legend bar chart to our main plot. For this, we’ll use the {patchwork} package <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> - just as we did in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a> to assemble multiple plots into a grid.</p>
-<p>In this visualisation, rather than arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our <code>styled_map</code> and add the <code>legend_plot</code> on top using the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function. The four positions given in the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is <code>npc</code> (normalised parent coordinates). In this setting the bottom left is <code>(0, 0)</code> and the top right is <code>(1, 1)</code>. This means specifying the <code>left</code> outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. </p>
+</section><section id="joining-plots-with-patchwork" class="level3" data-number="13.4.5"><h3 data-number="13.4.5" class="anchored" data-anchor-id="joining-plots-with-patchwork">
+<span class="header-section-number">13.4.5</span> Joining plots with {patchwork}</h3>
+<p>Finally, we need to join the legend bar chart to our main plot. For this, we’ll use {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>. The {patchwork} package allows you to ….</p>
+<p><strong>TODO tip about patchwork</strong></p>
+<p>In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our <code>styled_map</code> and add the <code>legend_plot</code> on top using the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function. The four positions given in the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is <code>npc</code> (normalised parent coordinates). In this setting the bottom left is <code>(0, 0)</code> and the top right is <code>(1, 1)</code>. This means specifying the <code>left</code> outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. </p>
 <p>We also remove the added margin from around the edge of the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function and setting all of the margins to zero. Remember that when combining a <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> with a <code>patchwork</code> object, it’s added using the <code>&amp;</code> operator rather than <code>+</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
@@ -980,9 +981,6 @@ Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and D
 <div id="ref-seafood_data" class="csl-entry" role="listitem">
 Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
 </div>
-<div id="ref-img_dibbern" class="csl-entry" role="listitem">
-Dibbern, Lilian. 2019. <span>“Lemur Beside Tree.”</span> <a href="https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY">https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY</a>.
-</div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
@@ -1024,6 +1022,9 @@ Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive 
 </div>
 <div id="ref-zones_data" class="csl-entry" role="listitem">
 Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+</div>
+<div id="ref-img_jax" class="csl-entry" role="listitem">
+Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
 </div>
 <div id="ref-kays2020" class="csl-entry" role="listitem">
 Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
@@ -1069,6 +1070,9 @@ Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</spa
 </div>
 <div id="ref-rcartocolor" class="csl-entry" role="listitem">
 Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-magick" class="csl-entry" role="listitem">
+Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
 </div>
 <div id="ref-doctors_data" class="csl-entry" role="listitem">
 Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.

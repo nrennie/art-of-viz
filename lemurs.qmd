@@ -4,7 +4,7 @@ filters:
 execute: 
   freeze: auto
 fig-width: 5
-fig-asp: 1
+fig-asp: 0.67
 ---
 
 ```{r}
@@ -13,9 +13,33 @@ fig-asp: 1
 #| file: R/options.R
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/load_font_awesome.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/source_caption.R
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/social_caption.R
+```
+
 # Lemurs: manipulating images with {magick} and plotting with {cowplot} {#sec-lemurs}
 
+In this chapter...
+
 ## Data
+
+@lemurs_data
+
+\index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-lemurs-data-show
@@ -37,11 +61,46 @@ lemurs <- readr::read_csv("data/lemur_data.csv")
 
 ### Data exploration
 
+\index{graphics!plot}
+
+```{r}
+#| label: fig-lemurs-scatter
+#| fig-cap: "Scatter"
+#| echo: -1
+par(mar = c(2.1, 2.1, 1.1, 2.1))
+plot(
+  lemurs$age_at_wt_mo,
+  lemurs$weight_g
+)
+```
+
+\index{graphics!boxplot}
+
+```{r}
+#| label: fig-lemurs-boxplot
+#| fig-cap: "Boxplot"
+#| fig-asp: 1.2
+#| echo: -1
+par(mar = c(2.1, 2.1, 1.1, 2.1))
+boxplot(
+  weight_g ~ taxon,
+  data = lemurs,
+  horizontal = TRUE,
+  xlab = "Weight",
+  ylab = NULL
+)
+```
+
+
 ### Exploratory sketches
 
 ## Preparing a plot
 
+
+
 ### Data wrangling
+
+\index{dplyr!filter}
 
 ```{r}
 #| label: lemurs-wrangling-1
@@ -50,76 +109,46 @@ cb_lemurs <- lemurs |>
 ```
 
 
-```{r}
-#| label: lemurs-wrangling-2
-oldest_cb_lemurs <- cb_lemurs |>
-  dplyr::select(name, sex, dob, dod, age_max_live_or_dead_y) |>
-  dplyr::distinct() |>
-  dplyr::slice_max(age_max_live_or_dead_y, n = 10)
-```
+### The first plot
 
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 ```{r}
-#| label: lemurs-wrangling-3
-plot_data <- oldest_cb_lemurs |>
-  dplyr::mutate(
-    name = stringr::str_to_title(name),
-    name = factor(name, levels = name),
-    dod2 = tidyr::replace_na(dod, lubridate::ymd("2021-08-24")),
-    mid_date = dob + floor(0.5 * (dod2 - dob)),
-    age_text = paste(round(age_max_live_or_dead_y, 1), "years")
-  )
-```
-
-maybe pivot longer
-
-## Creating multiple plots
-
-### Dumbbell plot
-
-
-```{r}
-#| label: fig-lemurs-dumbbell-1
-#| fig-cap: "Plot"
-#| fig-asp: 0.8
+#| label: fig-lemurs-base-plot
+#| fig-cap: "Basic scatter plot"
+#| message: false
 library(ggplot2)
-p1 <- ggplot(data = plot_data) +
+base_plot <- ggplot() +
   geom_point(
-    mapping = aes(
-      x = dob,
-      y = name,
-      color = sex
-    )
-  ) +
-  geom_point(
-    mapping = aes(
-      x = dod,
-      y = name, color = sex
-    )
-  ) +
-  geom_segment(
-    mapping = aes(
-      x = dob, xend = dod2,
-      y = name, yend = name,
-      color = sex
-    )
-  ) +
-  geom_text(
-    mapping = aes(
-      x = mid_date, y = name,
-      label = age_text,
-      color = sex
-    ),
-    vjust = -0.5
+    data = cb_lemurs,
+    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex)
   )
-p1
+base_plot
 ```
 
-will get missing value warning and this is fine
+note about assumptions - females heavier than males
 
-### Styling dumbbell plots
+* make points smaller and add some transparency
 
-#### Colors
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+
+```{r}
+base_plot <- ggplot() +
+  geom_point(
+    data = cb_lemurs,
+    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex),
+    alpha = 0.6,
+    size = 0.6
+  )
+base_plot
+```
+
+
+## Advanced styling
+
+### Colors
+
+ref to blog post male femlae stereotypes
 
 ```{r}
 #| label: lemurs-colors
@@ -129,101 +158,24 @@ f_col <- "#b13173"
 m_col <- "#21ADA8"
 ```
 
-still need to edit grid lines and axis text labels formatting
+\index{ggplot2!scale\_color\_manual}
 
 ```{r}
-#| label: fig-lemurs-dumbbell-2
-#| fig-cap: "Plot"
-#| fig-asp: 0.8
-p1_theme <- p1 +
+#| label: lemurs-col-plot
+col_plot <- base_plot +
   scale_color_manual(
     values = c("F" = f_col, "M" = m_col),
     guide = "none"
-  ) +
-  theme_minimal(base_size = 6) +
-  theme(
-    plot.background = element_rect(
-      fill = bg_col, color = bg_col
-    ),
-    axis.title = element_blank(),
-    axis.text = element_text(color = text_col)
   )
-p1_theme
-```
-
-### Scatter plot
-
-```{r}
-#| label: fig-lemurs-scatter-1
-#| fig-cap: "Plot"
-#| fig-width: 5
-#| fig-asp: 0.8
-p2 <- ggplot() +
-  geom_point(
-    data = cb_lemurs,
-    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex),
-    size = 0.5
-  ) +
-  labs(x = "Age (months)", y = "Weight (g)")
-p2
-```
-
-### Styling scatter plots
-
-```{r}
-#| label: fig-lemurs-scatter-1
-#| fig-cap: "Plot"
-#| fig-width: 5
-#| fig-asp: 0.8
-p2_theme <- p2 +
-  scale_color_manual(
-    values = c("F" = f_col, "M" = m_col),
-    breaks = c("F", "M"),
-    labels = c("Female", "Male"),
-    name = ""
-  ) +
-  theme_minimal(base_size = 6) +
-  theme(
-    plot.background = element_rect(
-      fill = bg_col, color = bg_col
-    ),
-    legend.position = "bottom"
-  )
-p2_theme
 ```
 
 
+### Fonts
 
-
-
-## Combining plots with {patchwork}
-
-```{r}
-#| label: fig-lemurs-patchwork
-library(patchwork)
-p1_theme + p2_theme
-```
+\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
-p3 <- patchwork::plot_spacer()
-p3_theme <- p3 + theme(
-  plot.background = element_rect(
-    fill = bg_col, color = bg_col
-  )
-)
-```
-
-
-```{r}
-#| label: fig-lemurs-join
-p <- (p1_theme | (p2_theme / p3_theme))
-p
-```
-
-### Adding text
-
-```{r}
-#| label: r-pkgs-fonts
+#| label: lemurs-fonts
 sysfonts::font_add_google(
   name = "Lato",
   family = "Lato"
@@ -238,74 +190,188 @@ body_font <- "Lato"
 title_font <- "Passion"
 ```
 
+coloured text below???
+
+\index{glue!glue}
+
 ```{r}
 #| label: lemurs-text
 title <- "Collared Brown Lemurs"
-subtitle <- "At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Once fully-grown, females tend to weigh more than males."
-cap <- "N. Rennie | Data:  Duke Lemur Center | Image:  Jax (Unsplash: @lysrix)"
+subtitle <- glue::glue("At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females</span> tend to weigh more than <span style='color:{m_col}'>males</span>, this chart does not account for pregnancy.")
 ```
 
-@img_jax
+
+pre-emptive - or maybe update later
+
+\index{social\_caption} \index{source\_caption}
 
 ```{r}
-#| label: fig-lemurs-text
-#| fig-cap: "Plot"
-p_text <- p + plot_annotation(
-  title = title,
-  subtitle = subtitle,
-  caption = cap
+#| label: lemurs-social
+social <- social_caption(
+  bg_color = bg_col,
+  icon_color = f_col,
+  font_color = text_col,
+  font_family = body_font
 )
-p_text
+cap <- source_caption(
+  source = "Duke Lemur Center",
+  sep = "<br>",
+  graphic = social
+)
 ```
 
-### Editing theme
+\index{ggplot2!labs}
 
 ```{r}
-#| label: fig-lemurs-theme
+#| label: fig-lemurs-labels
 #| fig-cap: "Plot"
-theme_plot <- p_text +
-  plot_annotation(
-    theme =
-      ggplot2::theme(
-        text = element_text(
-          size = 7, family = body_font, color = text_col
-        ),
-        plot.background = element_rect(
-          color = bg_col, fill = bg_col
-        ),
-        plot.title = element_text(
-          family = title_font,
-          size = rel(1.6),
-          margin = margin(b = 5)
-        ),
-        plot.subtitle = ggtext::element_textbox_simple(),
-        plot.caption = element_text(hjust = 0)
-      )
+text_plot <- col_plot +
+  labs(
+    title = title,
+    subtitle = subtitle,
+    caption = cap,
+    x = "Age (months)", y = "Weight (g)"
+  )
+text_plot
+```
+
+### Adjusting scales and themes
+
+still need to edit grid lines and axis text labels formatting colors
+
+\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} 
+\index{ggtext!element\_textbox\_simple}
+
+```{r}
+#| label: fig-lemurs-style-1
+#| fig-cap: "Plot"
+theme_plot <- text_plot +
+  theme_minimal(base_size = 6, base_family = body_font) +
+  theme(
+    # background
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    # text
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.title = element_text(
+      family = title_font,
+      size = rel(1.7),
+      color = text_col,
+      margin = margin(b = 5)
+    ),
+    plot.subtitle = ggtext::element_textbox_simple(
+      color = text_col
+    ),
+    plot.caption = ggtext::element_textbox_simple(
+      hjust = 0, halign = 0,
+      color = text_col
+    )
   )
 theme_plot
 ```
 
-needs further theming
 
-## Working with images
+add big margin for image space
 
-### How to remove background and flip in R
+one option = extend plot margin - but this also squashes titles...
+
+\index{ggplot2!theme} \index{ggplot2!margin}
+
+```{r}
+#| label: fig-lemurs-margin-1
+#| fig-cap: "Plot"
+theme_plot +
+  theme(
+    plot.margin = margin(5, 150, 5, 5)
+  )
+```
+
+better solution is to (play with limits and adjust )
+
+expand keeps grid lines, 
+
+\index{ggplot2!scale\_y\_continuous} \index{ggplot2!margin} \index{ggplot2!dup\_axis} \index{ggplot2!element\_text} \index{ggplot2!element\_blank}
+
+
+```{r}
+#| label: fig-lemurs-margin-2
+#| fig-cap: "Plot"
+styled_plot <- theme_plot +
+  scale_y_continuous(sec.axis = dup_axis()) +
+  theme(
+    plot.margin = margin(5, 5, 5, 5),
+    axis.text.y.right = element_text(
+      margin = margin(r = 150),
+      color = bg_col
+    ),
+    axis.title.y.right = element_blank()
+  )
+styled_plot
+```
+
+
+may wishe to adjust position of axis label
+
+## Images 
+
+where to find images - unsplash
+@img_jax
+
+### Reading and manipulating images with {magick}
+
+magick [@magick]
+mention other package
+
+reading image
+
+is this the right image
+
+\index{magick!image\_read}
+
+```{r}
+#| label: lemurs-magick-read
+lemur_img <- magick::image_read("images/lemur-nobg.png")
+lemur_img
+```
 
 maybe choose a different image
 
-### adding on top of patchwork
+### Adding images to with {cowplot}
+
+[@cowplot]
+
+tip - can also do with patchwork
+
+before we add, update caption to add image attribution
+
+\index{source\_caption} \index{ggplot2!labs}
 
 ```{r}
-# add lemur image
-lemur <- "images/lemur-nobg.png"
+#| label: lemurs-social-new
+cap <- paste0(
+  source_caption(source = "Duke Lemur Center", sep = "<br>", graphic = social),
+  "<br>**Image**: Jax (Unsplash: @lysrix)"
+)
+styled_plot <- styled_plot +
+  labs(caption = cap)
+```
+
+\index{cowplot!ggdraw} \index{cowplot!draw\_plot} \index{cowplot!draw\_image} 
+
+```{r}
+#| label: fig-lemurs-img-plot
+#| fig-cap: "Plot"
+#| warning: false
 final_plot <- cowplot::ggdraw() +
-  cowplot::draw_plot(theme_plot) +
+  cowplot::draw_plot(styled_plot) +
   cowplot::draw_image(
-    lemur,
+    lemur_img,
     x = 1, y = 0,
     hjust = 1, vjust = 0,
     halign = 1, valign = 0,
-    width = 0.5
+    width = 0.4
   )
 final_plot
 ```
@@ -315,3 +381,9 @@ add tip for ggimage
 make text labels and points a little bit smaller (see aes mapping?)
 
 ## Reflection
+
+To do
+- check img credit is right
+- flip image back then flip in R
+- coloured text in subtitle
+- fix subtitle text (pregnant lemurs)
