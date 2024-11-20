@@ -33,13 +33,13 @@ fig-asp: 0.67
 
 # Lemurs: manipulating images with {magick} and plotting with {cowplot} {#sec-lemurs}
 
-In this chapter...
+In this chapter, we'll cover how to load and manipulate images in R using the {magick} package. We'll also look at how to combine images with plots using the {cowplot} package.
 
 ## Data
 
-@lemurs_data
+We're going to be exploring data about lemurs from [Duke Lemur Center]() in this chapter [@lemurs_data]. The data ... 
 
-\index{tidytuesdayR!tt\_load}
+The data was used as a TidyTuesday dataset in August 2021, and so can be loaded into R using the `tt_load()` function from {tidytuesdayR} as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-lemurs-data-show
@@ -57,9 +57,15 @@ lemurs <- tuesdata$lemurs
 lemurs <- readr::read_csv("data/lemur_data.csv")
 ```
 
+The data 
+
 ## Exploratory work
 
+
+
 ### Data exploration
+
+Some of the 
 
 \index{graphics!plot}
 
@@ -94,9 +100,11 @@ boxplot(
 
 ### Exploratory sketches
 
+![Initial sketch of ...](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center"}
+
 ## Preparing a plot
 
-
+The data is reasonably clean
 
 ### Data wrangling
 
@@ -107,7 +115,6 @@ boxplot(
 cb_lemurs <- lemurs |>
   dplyr::filter(taxon == "ECOL")
 ```
-
 
 ### The first plot
 
@@ -158,7 +165,9 @@ f_col <- "#b13173"
 m_col <- "#21ADA8"
 ```
 
-\index{ggplot2!scale\_color\_manual}
+
+
+We'll use colored text in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we don't need a legend added. We've previously removed the legend by setting `legend.position = "none"` inside the `theme()` function, but an alternative approach is to set `guide = "none"` inside `scale_color_manual()`. This is particularly useful if you only want to remove a subset of legends when you are mapping multiple variables to different aesthetics. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
 
 ```{r}
 #| label: lemurs-col-plot
@@ -249,6 +258,7 @@ theme_plot <- text_plot +
   theme_minimal(base_size = 6, base_family = body_font) +
   theme(
     # background
+    plot.margin = margin(5, 5, 5, 5),
     plot.background = element_rect(
       fill = bg_col, color = bg_col
     ),
@@ -272,12 +282,7 @@ theme_plot <- text_plot +
 theme_plot
 ```
 
-
-add big margin for image space
-
-one option = extend plot margin - but this also squashes titles...
-
-\index{ggplot2!theme} \index{ggplot2!margin}
+We're going to add the image to the right hand side of the plot. The approach we're taking requires us to make some blank space. Perhaps the simplest approach is to increase the size of the margin on the right hand side of the plot using the `plot.margin` argument in `theme()`: \index{ggplot2!theme} \index{ggplot2!margin}
 
 ```{r}
 #| label: fig-lemurs-margin-1
@@ -288,12 +293,14 @@ theme_plot +
   )
 ```
 
-better solution is to (play with limits and adjust )
+However, as you can see in @fig-lemurs-margin-1, this approach results in the title and subtitle text also being ... . This may be . Another approach is to use the `expand` argument in `scale_x_continuous()` to increase the amount of space ... . However, since ..., this results in grid lines being included on the .. . You *could* play around with the breaks and ... to remove them, but there's an easier (slightly *hacky* solution). 
 
-expand keeps grid lines, 
+Though secondary axes are ... (add tip with blog post link), we're 
+
+duplicate the axis, add lots of margin space to the secondary axis labels, hide the axis labels by making them the same color as the background. 
+We also remove the title by setting `axis.title.y.right` to `element_blank()`.
 
 \index{ggplot2!scale\_y\_continuous} \index{ggplot2!margin} \index{ggplot2!dup\_axis} \index{ggplot2!element\_text} \index{ggplot2!element\_blank}
-
 
 ```{r}
 #| label: fig-lemurs-margin-2
@@ -301,7 +308,6 @@ expand keeps grid lines,
 styled_plot <- theme_plot +
   scale_y_continuous(sec.axis = dup_axis()) +
   theme(
-    plot.margin = margin(5, 5, 5, 5),
     axis.text.y.right = element_text(
       margin = margin(r = 150),
       color = bg_col
@@ -311,18 +317,17 @@ styled_plot <- theme_plot +
 styled_plot
 ```
 
+## Working with images 
 
-may wishe to adjust position of axis label
-
-## Images 
+Though ..., there are many reasons why you may wish to combine ... such as adding a company logo for consistent branding in plots or ... . If you do add images to plots, . 
 
 where to find images - unsplash
 @img_jax
 
 ### Reading and manipulating images with {magick}
 
+The {magick} package provides bindings to the ImageMagick image processing library
 magick [@magick]
-mention other package
 
 reading image
 
@@ -338,15 +343,21 @@ lemur_img
 
 maybe choose a different image
 
-### Adding images to with {cowplot}
+::: {#tip-lemurs-imager .callout-tip}
 
-[@cowplot]
+## Alternative packages for image processing
 
-tip - can also do with patchwork
+The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. In this chapter, we’ve used the {magick} package but you could do alternatively use the {imager} package instead.
 
-before we add, update caption to add image attribution
+:::
+
+### Adding images to plots with {cowplot}
+
+Before we go ahead with adding the image to the scatter plot, let's first update the caption to add an attribution for the image, in addition to the attributions for the data and graphic. We can use \index{base!paste0}
 
 \index{source\_caption} \index{ggplot2!labs}
+
+We can then override the 
 
 ```{r}
 #| label: lemurs-social-new
@@ -357,6 +368,9 @@ cap <- paste0(
 styled_plot <- styled_plot +
   labs(caption = cap)
 ```
+
+[@cowplot]
+
 
 \index{cowplot!ggdraw} \index{cowplot!draw\_plot} \index{cowplot!draw\_image} 
 
@@ -376,14 +390,18 @@ final_plot <- cowplot::ggdraw() +
 final_plot
 ```
 
+::: {#tip-lemurs-imgs .callout-tip}
+
+## Other approaches for adding images to {ggplot2} plots
+
+tip - can also do with patchwork
 add tip for ggimage
 
-make text labels and points a little bit smaller (see aes mapping?)
+:::
 
 ## Reflection
 
 To do
 - check img credit is right
 - flip image back then flip in R
-- coloured text in subtitle
-- fix subtitle text (pregnant lemurs)
+- redo sketch
