@@ -1,21 +1,21 @@
-social_caption <- function(twitter = "@nrennie35",
-                           mastodon = "fosstodon.org/@nrennie",
+social_caption <- function(mastodon = "fosstodon.org/@nrennie",
                            linkedin = "nicola-rennie",
+                           bluesky = "nrennie",
                            github = "nrennie",
                            icon_color = "black",
                            font_color = "black",
                            bg_color = "white",
                            font_family = "Commissioner") {
   icons <- list(
-    twitter = "&#xf099",
     mastodon = "&#xf4f6",
     linkedin = "&#xf08c",
+    bluesky = "&#xe671",
     github = "&#xf09b"
   )
   social <- list(
-    twitter = twitter,
     mastodon = mastodon,
     linkedin = linkedin,
+    bluesky = bluesky,
     github = github
   )
   social <- social[!is.na(social)]

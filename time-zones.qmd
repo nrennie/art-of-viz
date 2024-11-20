@@ -33,7 +33,7 @@ In this chapter we'll learn how to obtain map data using {rnaturalearth}, manipu
 
 The [IANA (Interet Assigned Numbers Authority) tz database](https://data.iana.org/time-zones/tz-link.html) contains data on the history of local time for different locations around the world [@zones_data]. The website states that *"each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970."* Many websites use the data in the IANA tz database to operate.
 
-The time zones data was used as a [\#TidyTuesday dataset in March 2023](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md), where the data wrangling code was adapted from code by [Davis Vaughan](https://gist.github.com/DavisVaughan). There are actually four data sets included but we'll focus on the `timezones` data for now. We can load the data in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR]: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The time zones data was used as a [TidyTuesday dataset in March 2023](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md), where the data wrangling code was adapted from code by [Davis Vaughan](https://gist.github.com/DavisVaughan). There are actually four data sets included but we'll focus on the `timezones` data for now. We can load the data in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR]: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: load-timezones-data-show
@@ -71,6 +71,8 @@ the first thing that jumps out is the `comments` column which appears to have a 
 ```{r}
 #| label: timezones-barplot-na
 #| fig-cap: "A bar chart of the number of missing values in the `comments` column, where `TRUE` represents missing."
+#| echo: -1
+par(mar = c(3.1, 4.1, 1.1, 2.1))
 barplot(
   table(is.na(timezones$comments)),
   cex.axis = 0.5,
@@ -85,7 +87,7 @@ The first column, `zone`, contains information on the timezone name - it's typic
 ```{r}
 #| label: timezones-tidy
 timezones_data <- timezones |>
-  dplyr::select(-comments) |> 
+  dplyr::select(-comments) |>
   tidyr::separate_wider_delim(
     cols = zone,
     delim = "/",
@@ -98,7 +100,9 @@ Now, we can explore how many time zones there are per continent: \index{graphics
 
 ```{r}
 #| label: timezones-barplot-loc
-#| fig-cap: "A bar chart of the number of defined time zones in each  of nine geographic regions."
+#| fig-cap: "A bar chart of the number of defined time zones in each of nine geographic regions."
+#| echo: -1
+par(mar = c(3.1, 2.1, 1.1, 2.1))
 barplot(
   table(timezones_data$continent),
   cex.axis = 0.5,
@@ -147,7 +151,9 @@ If you wanted only the polygon(s) for a specific country or region, you can spec
 ```{r}
 #| label: timezones-ne-country
 #| eval: false
-uk <- rnaturalearth::ne_countries(country = "united kingdom")
+uk <- rnaturalearth::ne_countries(
+  country = "united kingdom"
+)
 ```
 
 For specified countries, the `ne_states()` function provides administrative level 1 polygons e.g. major within-country regions such as states.
@@ -161,6 +167,7 @@ Since `sf` objects in R can be thought of as fancy data.frames, this means they 
 ```{r}
 #| label: fig-timezones-bg-map
 #| fig-cap: "Map of the world showing country outlines, with the default gray background."
+#| fig-asp: 0.6
 library(ggplot2)
 bg_map <- ggplot() +
   geom_sf(data = world)
@@ -229,7 +236,7 @@ highlight_col <- "#508080"
 bg_col <- "#F0F5F5"
 ```
 
-Then we define a named vector of colors, mapping the names of the regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol discusses several options for qualitative palettes in his [*Colour schemes and templates* blog post](https://personal.sron.nl/~pault/) [@Tol2021]. Here, we use the *muted qualitative color scheme* palette [@Tol2021] which has 10 colors (including a pale grey for missing data) and is colorblind safe:
+Then we define a named vector of colors, mapping the names of the regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol discusses several options for qualitative palettes in his [*Colour schemes and templates* blog post](https://personal.sron.nl/~pault/) [@Tol2021]. Here, we use the *muted qualitative color scheme* palette [@Tol2021] which has 10 colors (including a pale gray for missing data) and is colorblind safe:
 
 ```{r}
 #| label: timezones-col-palette
@@ -247,8 +254,8 @@ Similarly, we also load any fonts we want to use. Again, for this visualisation 
 
 ```{r}
 #| label: timezones-fonts
-sysfonts::font_add_google("Commissioner")
-sysfonts::font_add_google("Fraunces")
+sysfonts::font_add_google(name = "Commissioner")
+sysfonts::font_add_google(name = "Fraunces")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "Commissioner"
@@ -275,9 +282,9 @@ Let's plot a basic bar chart, by starting (as we always do) with passing our new
 #| fig-cap: "Bar chart showing the number of time zone locations in each continent."
 #| fig-asp: 0.7
 ggplot(
-    data = bar_data,
-    mapping = aes(x = continent, y = n)
-  ) +
+  data = bar_data,
+  mapping = aes(x = continent, y = n)
+) +
   geom_col()
 ```
 
@@ -402,7 +409,7 @@ We'll also re-draw the points again with a small adjustment -  let's change the 
 #| label: fig-timezones-basic-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side."
 basic_map <- ggplot() +
-  # Apply colors to background map  
+  # Apply colors to background map
   geom_sf(
     data = world,
     color = text_col,
@@ -414,7 +421,7 @@ basic_map <- ggplot() +
     mapping = aes(color = continent),
     size = 0.4,
   ) +
-  # Draw outer circle 
+  # Draw outer circle
   geom_sf(
     data = timezones_sf,
     mapping = aes(color = continent),
@@ -551,11 +558,13 @@ styled_map <- text_map +
 styled_map
 ```
 
-### Join with {patchwork}
+### Joining plots with {patchwork}
 
-Finally, we need to join the legend bar chart to our main plot. For this, we'll use the {patchwork} package [@patchwork] - just as we did in @sec-lemurs to assemble multiple plots into a grid. 
+Finally, we need to join the legend bar chart to our main plot. For this, we'll use {patchwork} [@patchwork]. The {patchwork} package allows you to .... 
 
-In this visualisation, rather than arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalised parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
+**TODO tip about patchwork**
+
+In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalised parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
 
 We also remove the added margin from around the edge of the plot using the `theme()` function and setting all of the margins to zero. Remember that when combining a `theme()` with a `patchwork` object, it's added using the `&` operator rather than `+`. \index{ggplot2!theme}
 

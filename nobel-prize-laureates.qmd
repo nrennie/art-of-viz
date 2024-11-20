@@ -114,6 +114,8 @@ Let's start by exploring the relationship between year of birth and year of awar
 ```{r}
 #| label: fig-nobel-scatter
 #| fig-cap: "A scatter plot of awardee birth date against year of award, showing the expected increasing trend."
+#| echo: -1
+par(mar = c(4.1, 4.1, 1.1, 2.1))
 plot(nobel_physics$birthdate, nobel_physics$year)
 ```
 
@@ -122,6 +124,8 @@ We might be interested in seeing whether this relationship is changing over time
 ```{r}
 #| label: fig-nobel-hist
 #| fig-cap: "A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested."
+#| echo: -1
+par(mar = c(4.1, 4.1, 1.1, 2.1))
 award_age <- nobel_physics$year -
   lubridate::year(nobel_physics$birthdate)
 plot(nobel_physics$year, award_age)
@@ -132,6 +136,8 @@ It looks like the age of awardees might be increasing slightly - this could be i
 ```{r}
 #| label: fig-nobel-gender-barplot
 #| fig-cap: "A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees."
+#| echo: -1
+par(mar = c(4.1, 4.1, 1.1, 2.1))
 barplot(
   table(nobel_physics$gender)
 )
@@ -170,6 +176,8 @@ It's always worth double checking that we do actually only have the data we expe
 ```{r}
 #| label: fig-nobel-barplot-category
 #| fig-cap: "A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate)."
+#| echo: -1
+par(mar = c(4.1, 4.1, 1.1, 2.1))
 barplot(
   table(nobel_physics$category)
 )
@@ -290,8 +298,12 @@ Both fonts are provided through Google Fonts so we'll use `font_add_google()` fr
 
 ```{r}
 #| label: nobel-fonts
-sysfonts::font_add_google("Passion One", "Passion")
-sysfonts::font_add_google("Ubuntu", "Ubuntu")
+sysfonts::font_add_google(
+  name = "Passion One", family = "Passion"
+)
+sysfonts::font_add_google(
+  name = "Ubuntu", family = "Ubuntu"
+)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
@@ -327,9 +339,9 @@ The primary color will be used to highlight the female awardees, as well as the 
 
 ```{r}
 #| label: nobel-color
-bg_col <- "grey95"
+bg_col <- "gray95"
 primary_col <- "black"
-secondary_col <- "grey75"
+secondary_col <- "gray75"
 ```
 
 We can apply these colors to the text showing the names using `scale_color_manual()` where we manually specify which color maps to which value in the `gender` column: \index{ggplot2!scale\_color\_manual}
@@ -498,9 +510,9 @@ category_plot <- function(
     nobel_category,
     nobel_data,
     r = 5,
-    bg_col = "grey95",
+    bg_col = "gray95",
     primary_col = "black",
-    secondary_col = "grey70",
+    secondary_col = "gray70",
     body_font = "Ubuntu",
     title_font = "Passion") {
   # Data wrangling
@@ -633,7 +645,7 @@ peace_plot <- category_plot(
 peace_plot
 ```
 
-What you might notice about this version of the chart is that a third color has appeared! In `scale_color_manual()`, we only specified which colors relate to `"male"` and `"female"` laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) grey text relates to organisations listed in the `nobel_peace` data.
+What you might notice about this version of the chart is that a third color has appeared! In `scale_color_manual()`, we only specified which colors relate to `"male"` and `"female"` laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) gray text relates to organisations listed in the `nobel_peace` data.
 
 We can save a copy of the visualization using `ggsave()`: \index{ggplot2!ggsave}
 

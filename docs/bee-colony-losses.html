@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.554">
-
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-
-<title>The Art of Data Visualization with {ggplot2} - 13&nbsp; Bee Colony Losses: visualising density with Poisson disk sampling</title>
+<title>4&nbsp; Bee Colony Losses: visualising quantities with Poisson disk sampling – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +16,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -42,7 +73,6 @@ div.csl-indent {
   margin-left: 2em;
 }</style>
 
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
@@ -50,8 +80,8 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./nobel-prize-laureates.html" rel="next">
-<link href="./technology-adoption.html" rel="prev">
+<link href="./technology-adoption.html" rel="next">
+<link href="./uk-museums.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -61,8 +91,7 @@ div.csl-indent {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet">
-<script id="quarto-search-options" type="application/json">{
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
@@ -88,36 +117,52 @@ div.csl-indent {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
-
-
+}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 </head>
-
 <body class="nav-sidebar floating">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./weird-wonderful.html">Weird and wonderful: completely custom charts</a></li><li class="breadcrumb-item"><a href="./bee-colony-losses.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./common-charts.html">Common charts don’t need to be boring!</a></li><li class="breadcrumb-item"><a href="./bee-colony-losses.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising quantities with Poisson disk sampling</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
-  </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
+      <a href="./">The TidyTuesday Cookbook</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -127,7 +172,7 @@ div.csl-indent {
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
@@ -149,12 +194,12 @@ div.csl-indent {
       <div class="sidebar-item-container"> 
             <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Common charts don't need to be boring!</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./programming-languages.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Programming Languages: dumbbell charts with {ggplot2}</span></span></a>
@@ -168,105 +213,105 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+  <a href="./bee-colony-losses.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising quantities with Poisson disk sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./icons-images.html" class="sidebar-item-text sidebar-link">
+            <a href="./text.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Making use of icons, fonts, and text</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./canadian-wind-turbines.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Canadian Wind Turbines: waffle plots, pictograms, and icons</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./cats.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./global-seafood.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualising spatial data</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./us-house-elections.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a href="./weird-wonderful.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Weird and wonderful: completely custom charts</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./bee-colony-losses.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nobel-prize-laureates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
   </div>
 </li>
       </ul>
-  </li>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./images.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Working with images</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick} and plotting with {cowplot}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./global-seafood.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualising spatial data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./us-house-elections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
@@ -286,19 +331,44 @@ div.csl-indent {
   </div>
 </li>
     </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">4.1</span> Data</a></li>
+  <li>
+<a href="#exploratory-work" id="toc-exploratory-work" class="nav-link" data-scroll-target="#exploratory-work"><span class="header-section-number">4.2</span> Exploratory work</a>
+  <ul class="collapse">
+<li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">4.2.1</span> Data exploration</a></li>
+  <li><a href="#exploratory-sketches" id="toc-exploratory-sketches" class="nav-link" data-scroll-target="#exploratory-sketches"><span class="header-section-number">4.2.2</span> Exploratory sketches</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">4.3</span> Preparing a plot</a>
+  <ul class="collapse">
+<li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">4.3.1</span> Data wrangling</a></li>
+  <li><a href="#poisson-disk-sampling-with-poissoned" id="toc-poisson-disk-sampling-with-poissoned" class="nav-link" data-scroll-target="#poisson-disk-sampling-with-poissoned"><span class="header-section-number">4.3.2</span> Poisson disk sampling with {poissoned}</a></li>
+  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">4.3.5</span> The first plot</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#advanced-styling" id="toc-advanced-styling" class="nav-link" data-scroll-target="#advanced-styling"><span class="header-section-number">4.4</span> Advanced styling</a>
+  <ul class="collapse">
+<li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">4.4.1</span> Colors</a></li>
+  <li><a href="#fonts" id="toc-fonts" class="nav-link" data-scroll-target="#fonts"><span class="header-section-number">4.4.2</span> Fonts</a></li>
+  <li><a href="#adding-text" id="toc-adding-text" class="nav-link" data-scroll-target="#adding-text"><span class="header-section-number">4.4.3</span> Adding text</a></li>
+  <li><a href="#sec-bees-theme" id="toc-sec-bees-theme" class="nav-link" data-scroll-target="#sec-bees-theme"><span class="header-section-number">4.4.4</span> Adjusting themes</a></li>
+  </ul>
+</li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">4.5</span> Reflection</a></li>
+  </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./weird-wonderful.html">Weird and wonderful: completely custom charts</a></li><li class="breadcrumb-item"><a href="./bee-colony-losses.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title"><span id="sec-bees" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising density with Poisson disk sampling</span></span></h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./common-charts.html">Common charts don’t need to be boring!</a></li><li class="breadcrumb-item"><a href="./bee-colony-losses.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising quantities with Poisson disk sampling</span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="sec-bees" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee Colony Losses: visualising quantities with Poisson disk sampling</span></span></h1>
 </div>
 
 
@@ -312,30 +382,516 @@ div.csl-indent {
   
 
 
-</header>
-
-
-<div class="callout callout-style-default callout-caution callout-titled">
+</header><p>In this chapter, we’ll learn how to explore patterns in missing data, install R packages that aren’t available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.</p>
+<section id="data" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">4.1</span> Data</h2>
+<p>As a major pollinator, bees are a vitally important part of our planet’s ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors <span class="citation" data-cites="bees_data">(<a href="references.html#ref-bees_data" role="doc-biblioref">United States Department of Agriculture: Economics, Statistics and Market Information System 2022</a>)</span>.</p>
+<p>The USDA honey bee colony data was used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in January 2022, and so can be loaded in using the {tidytuesdayR} package: </p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-01-11"</span><span class="op">)</span></span>
+<span><span class="va">colony</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">colony</span></span>
+<span><span class="va">stressor</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">stressor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since this version of the data is based on the 2021 release, it includes data up to June 2021. If you want to work with a more recent publication of the data, it can be obtained from <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">usda.library.cornell.edu/concern/publications/rn301137d</a>.</p>
+<p>Two different data sets are included. The first, <code>colony</code>, contains information about the number and size of bee colonies in each US state per year since 2015. The second, <code>stressor</code>, contains information about different sources of health stressors for bee colonies and what percentage of colonies are affected by these stressors, again for different states and time periods.</p>
+</section><section id="exploratory-work" class="level2" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="exploratory-work">
+<span class="header-section-number">4.2</span> Exploratory work</h2>
+<p>In this chapter, we’ll focus on the <code>colony</code> data, where we’ll try to build a picture of how bee colony numbers are changing over time.</p>
+<section id="data-exploration" class="level3" data-number="4.2.1"><h3 data-number="4.2.1" class="anchored" data-anchor-id="data-exploration">
+<span class="header-section-number">4.2.1</span> Data exploration</h3>
+<p>Let’s start by looking at a quick boxplot of how the number of colonies (<code>colony_n</code>) is changing over time, using the base R <code><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot()</a></code> function: </p>
+<div class="cell">
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">colony_n</span> <span class="op">~</span> <span class="va">year</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">colony</span>,</span>
+<span>  horizontal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Number of bee colonies"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-boxplot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Simple boxplot of number of bee colonies per year, showing a highly skewed distribution.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-bees-boxplot" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> doesn’t actually give us much information - except to suggest the distribution of the number of colonies is highly skewed and to suggest there are quite a few high values being classified as outliers. These outliers force the main section of the boxplots to be squashed on the left of the plot, making it difficult to tell if much is changing on average each year. This is also a more general problem with boxplots. There are many examples of data that illustrate the insufficiency of summary statistics, with Anscombe’s quartet <span class="citation" data-cites="Anscombe1973">(<a href="references.html#ref-Anscombe1973" role="doc-biblioref">Anscombe 1973</a>)</span> being perhaps the most famous example. Boxplots are essentially just summary statistics in disguise. Different data with identical boxplots can actually come from very different distributions <span class="citation" data-cites="Matejka2017">(<a href="references.html#ref-Matejka2017" role="doc-biblioref">Matejka and Fitzmaurice 2017</a>)</span>.</p>
+<p>Let’s start by trying to understand what’s causing these outliers. Are they real values? Are they mistakes in the data? Or have we made an incorrect assumption about the data? To understand this a bit better, let’s zoom in on one year, 2020, and look at the number of colonies in each state to understand which states the largest outliers relate to. </p>
+<div class="cell">
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">colony_2020</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">colony</span>, <span class="va">year</span> <span class="op">==</span> <span class="fl">2020</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">colony_n</span> <span class="op">~</span> <span class="va">state</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">colony_2020</span>,</span>
+<span>  horizontal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Number of bee colonies"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-boxplot2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-boxplot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-boxplot2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-boxplot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Boxplot of the number of bee colonies per state, showing an issue with the definition of ‘state’.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Though there are a few states (California, Florida, and North Dakota) with a much higher number of colonies, the main issue is that one of the <em>states</em> is the entirety of the United States i.e.&nbsp;the sum of all of the other values. You can also see from <a href="#fig-bees-boxplot2" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> that not all states are included individually - an <code>"Other States"</code> category is also included instead which groups some states (and perhaps regions).</p>
+<div id="tip-bees-names" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Caution
+Tip&nbsp;4.1: Choose appropriate column names
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This chapter is coming soon!</p>
+<p>It’s unfortunately not uncommon for a column name to suggest one thing (e.g.&nbsp;each value relates to a state), but for that column to actually include other values as well (e.g.&nbsp;a country). If you’re ever naming columns (especially for data you’ll share with other people) choose appropriate column names to avoid confusion. For example, <code>region</code> would be a more appropriate column name here.</p>
 </div>
 </div>
+<p>The other aspect of our data that boxplots don’t tell us about is the missingness. Boxplots only plot what’s there, not what’s not there. It’s especially important to remember this step since base R graphics don’t warn you about <code>NA</code> values in the way that {ggplot2} <span class="citation" data-cites="ggplot2">(<a href="references.html#ref-ggplot2" role="doc-biblioref">Wickham 2016</a>)</span> does. So how do we plot data that doesn’t exist? </p>
+<p>The {visdat} package <span class="citation" data-cites="visdat">(<a href="references.html#ref-visdat" role="doc-biblioref">Tierney 2017</a>)</span> is an excellent way to take a quick look at your data. It includes the <code>vis_miss()</code> function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we’ll start by visualising just the data for one state. We can use the <code><a href="https://rdrr.io/r/base/subset.html">subset()</a></code> function from base R to obtain just the data fro Alabama. </p>
+<div class="cell">
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">colony_AL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">colony</span>, <span class="va">state</span> <span class="op">==</span> <span class="st">"Alabama"</span><span class="op">)</span></span>
+<span><span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="va">colony_AL</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-vismiss" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-vismiss-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-vismiss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.3: A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<div id="tip-bees-vismiss" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;4.2: Showing long column names in <code>vis_miss()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You may notice that the column names in the plot generated by <code>vis_miss()</code> in <a href="#fig-bees-vismiss" class="quarto-xref">Figure&nbsp;<span>4.3</span></a> are rotated and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: </p>
+<ul>
+<li>Use the <code>abbreviate_vars()</code> function from {visdat} which abbreviates column names, and makes them less likely to exceed the available space.</li>
+<li>Exploit the fact that the plot output from <code>vis_miss()</code> is made with {ggplot2}. This means we can use the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function to extend the space available in the plot’s right margin.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">colony_AL</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars</a></span><span class="op">(</span>min_length <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-vismiss-tip" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-tip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-vismiss-tip-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-vismiss-tip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.4: A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. The label for the last column of data is now legible and not hidden by the edge of the plot.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>In <a href="#fig-bees-vismiss-tip" class="quarto-xref">Figure&nbsp;<span>4.4</span></a>, the rows are ordered in time, and you can see that there is no particular pattern appearing. The <code>colony_reno_pct</code> column has the most missing data, and that there a short time period where all data (other than the time and state) is missing. If you were to recreate this visualization for other states, you would see a similar pattern. </p>
+<p>Data is unavailable for all states during the period April-June 2019. This suggests that the data is not simply randomly missing, but there was perhaps a persistent data collection issue during this time period. Though it cannot be seen in <a href="#fig-bees-vismiss-tip" class="quarto-xref">Figure&nbsp;<span>4.4</span></a>, there is also (implicitly) missing data for the end of the last year in the data. This is due to the time when the data is reported, with annual data releases happening in August. This means we need to be careful with taking averages across years, as data is not complete for all years.</p>
+<p>For this chapter, we’re not going to dive into methods for modelling, imputing, or removing missing values in data as that’s a very big topic on its own. But whether or not you are explicitly addressing missing values, it’s important to be aware of whether there are missing values, consider what aspect of the data collection processes might have caused them, and the impact this has on what conclusions you can draw.</p>
+<p>Instead, we’ll limit our visualization to a quarter for which we have complete data e.g.&nbsp;perhaps only looking at annual trends in the <code>"January-March"</code> time period, though this approach does still have its limitations. The data is recorded quarterly, so there are four options for us to choose from: <code>"January-March"</code>, <code>"April-June"</code>, <code>"July-September"</code>, or <code>"October-December"</code>. Here, we’ll focus on data for <code>"October-December"</code>. The reason for this choice is because this time period is regarded as the start of the seasonal cycle for honey bees colonies, and the <em>“condition of the colony at this time of year greatly affects its prosperity for the next year”</em> <span class="citation" data-cites="Apiculture">(<a href="references.html#ref-Apiculture" role="doc-biblioref">Mid-Atlantic Apiculture Research and Extension Consortium 2024</a>)</span>.</p>
+<div id="tip-bees-missing" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;4.3: Avoid missing patterns about missingness
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>By default, the {visdat} packages assumes that missing data is encoded as <code>NA</code>. This is not always true - especially when you’re working with data that’s been processed by other software before you receive it. It’s not uncommon for missing values to be encoded using values such as <code>""</code>, <code>" "</code>, <code>99</code>, <code>999</code>, <code>-</code>, or <code>0</code>. The {naniar} package <span class="citation" data-cites="naniar">(<a href="references.html#ref-naniar" role="doc-biblioref">Tierney and Cook 2023</a>)</span> is very useful for summarising and wrangling missing values. The <code>replace_with_na()</code> function from {naniar} can help you to replace unusual encodings of missing values with <code>NA</code> for easier data processing in R. </p>
+<p>It’s also important to think about the ordering of the columns and rows when visualizing missing values. For example, if there is a column which holds a date, ordering the rows by date before visualising the missing data, will allow you to identify temporal patterns in the missingness. If the rows are ordered in some other way, you might miss this pattern.</p>
+</div>
+</div>
+</section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
+<span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
+<p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <a href="#fig-bees-sketch-blank" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
+<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square representing a combination of year and US state.
+</figcaption></figure>
+</div>
+<p>Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>.</p>
+<p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
+<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.6: Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.
+</figcaption></figure>
+</div>
+</section></section><section id="preparing-a-plot" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="preparing-a-plot">
+<span class="header-section-number">4.3</span> Preparing a plot</h2>
+<p>To bring this plot to life, we need to complete several tasks:</p>
+<ul>
+<li>Calculate the average number of colonies per year, per state.</li>
+<li>Simulate x- and y- coordinates for the points that will represent the number of colonies.</li>
+<li>Plot the points.</li>
+</ul>
+<p>This is the type of chart that has a lot of (at times complex) preparation, but the plotting itself will be relatively straightforward.</p>
+<section id="data-wrangling" class="level3" data-number="4.3.1"><h3 data-number="4.3.1" class="anchored" data-anchor-id="data-wrangling">
+<span class="header-section-number">4.3.1</span> Data wrangling</h3>
+<p>Let’s start by selecting a subset of states to visualize:</p>
+<div class="cell">
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">states_to_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"California"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Florida"</span>,</span>
+<span>  <span class="st">"Texas"</span>, <span class="st">"Idaho"</span>, <span class="st">"South Dakota"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then use the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function from {dplyr} to subset the data to only include rows for these states, and in our chosen time period of <code>"October-December"</code>. We also use the <code>select()</code> function to keep only the columns we actually need for our plot - the year, the state, and the number of colonies: </p>
+<div class="cell">
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">colony</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span></span>
+<span>    <span class="va">state</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">states_to_plot</span>,</span>
+<span>    <span class="va">months</span> <span class="op">==</span> <span class="st">"October-December"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
+<span>    <span class="va">year</span>, <span class="va">state</span>, <span class="va">colony_n</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By default, the states will be ordered in alphabetical order. To make it easier to communicate patterns, we’ll order the states based on the number of colonies in the final year of the data (2020). We start by determining what that order is by filtering the data to the year <code>2020</code>, arranging the data based on the <code>colony_n</code> column in a descending order (using <code>desc()</code> from {dplyr}), and then extracting the state column using <code>pull()</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">state_levels</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2020</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">colony_n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll convert the state column to a factor a little bit later, and this <code>state_levels</code> vector will provide us with the factor levels</p>
+<p>Now we need to generate the points that will represent the number of honey bee colonies in each grid square, as we sketched in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>. We could do something simple, such as using the <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> function to generate <code>x</code> and <code>y</code> coordinates from a uniform distribution. However, this approach is likely to lead a plot that looks a bit messy. Randomness doesn’t usually look very nice, and we would likely end up with lots of overlapping points. Instead, we want to generate points that don’t overlap and are at least some minimum distance apart. To do this, we’ll use <em>Poisson disk sampling</em>. </p>
+</section><section id="poisson-disk-sampling-with-poissoned" class="level3" data-number="4.3.2"><h3 data-number="4.3.2" class="anchored" data-anchor-id="poisson-disk-sampling-with-poissoned">
+<span class="header-section-number">4.3.2</span> Poisson disk sampling with {poissoned}</h3>
+<p>Poisson disk sampling is one way of generating <em>blue noise</em>, a type pattern where the points are mostly random but are fairly evenly distributed. In Poisson disk sampling, all of the points must be at least some distance, <span class="math inline">\(r\)</span> apart i.e.&nbsp;you can draw a <em>disk</em> of radius <span class="math inline">\(r\)</span> around each point and no other point will be included in the disk.</p>
+<p>There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within <span class="math inline">\(r\)</span> of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the {poissoned} package <span class="citation" data-cites="poissoned">(<a href="references.html#ref-poissoned" role="doc-biblioref">mikefc 2024</a>)</span> implements the approach outlined in <span class="citation" data-cites="bridson2007">Bridson (<a href="references.html#ref-bridson2007" role="doc-biblioref">2007</a>)</span>. This package allows you to generate samples in two or three dimesions - though we’ll stick to two dimensions here!</p>
+<div id="tip-bees-sampling" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;4.4: Installing R packages from GitHub
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<section id="using-remotes" class="level3" data-number="4.3.3"><h3 data-number="4.3.3" class="anchored" data-anchor-id="using-remotes">
+<span class="header-section-number">4.3.3</span> Using {remotes}</h3>
+<p>When this chapter was first written, the {poissoned} package wasn’t available on CRAN, so it had to be installed from GitHub instead. The {remotes} package <span class="citation" data-cites="remotes">(<a href="references.html#ref-remotes" role="doc-biblioref">Csárdi et al. 2024</a>)</span> can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the <code>install_github()</code> function, passing in a character string of the form <code>"user/repository"</code>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="using-pak" class="level3" data-number="4.3.4"><h3 data-number="4.3.4" class="anchored" data-anchor-id="using-pak">
+<span class="header-section-number">4.3.4</span> Using {pak}</h3>
+<p>An alternative to {remotes} is the {pak} package <span class="citation" data-cites="pak">(<a href="references.html#ref-pak" role="doc-biblioref">Csárdi and Hester 2024</a>)</span>. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using {pak}, use the <code>pkg_install()</code> function and again pass in the <code>"user/repository"</code> string: </p>
+<div class="cell">
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html">pkg_install</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The same function can be used for installing packages from CRAN e.g.&nbsp;<code>pak::pkg_install("ggplot2")</code>.</p>
+</section>
+</div>
+</div>
+<p>We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we’ll use the <code>poisson2d()</code> function from {poissoned}. Since we’re storing two coordinates (<code>x</code> and <code>y</code>) and the number of coordinate pairs will vary for each grid square, we’ll store the output in a list column. We can add list columns in the same way we would add any other new column using the <code>mutate()</code> function from {dplyr}. Since we want to generate samples according to the values of <code>state</code>, <code>year</code>, and <code>colony_n</code> in each <em>row</em> of our data, we use the <code>rowwise()</code> function from {dplyr}. Since we’re generating random data, we also need to make sure we set the random seed using <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> to ensure we get the same plot every time we run the code. </p>
+<p>We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e.&nbsp;there is an inverse relationship between <code>r</code> and <code>colony_n</code>. The default grid in <code>poisson2d()</code> goes from 0 to 10 on both axes. The values in <code>colony_n</code> range from 94000 to 770000, meaning that if we simply set the minimum radius to <code>1/colony_n</code>, we end up with points that are only 0.000001298701 apart. That’s a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set <code>r</code> to <code>200000/colony_n</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">bees_grid</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>    pts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu">poissoned</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">200000</span> <span class="op">/</span> <span class="va">colony_n</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finally, we use <code>unnest()</code> from {tidyr} to expand the <code>pts</code> list column into separate rows and columns, and make sure that the <code>state</code> column is a factor, ordered by the <code>state_levels</code> variable we defined earlier. </p>
+<div class="cell">
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bees_plot_data</span> <span class="op">&lt;-</span> <span class="va">bees_grid</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">state</span>, levels <span class="op">=</span> <span class="va">state_levels</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This generates a data set of the following form:</p>
+<div class="cell">
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bees_plot_data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 7,554 × 5
+    year state      colony_n     x     y
+   &lt;dbl&gt; &lt;fct&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1  2015 California   750000  5.29  5.79
+ 2  2015 California   750000  5.67  5.44
+ 3  2015 California   750000  4.78  5.70
+ 4  2015 California   750000  5.40  5.30
+ 5  2015 California   750000  5.76  5.01
+ 6  2015 California   750000  5.29  4.89
+ 7  2015 California   750000  5.07  5.50
+ 8  2015 California   750000  5.90  5.70
+ 9  2015 California   750000  5.09  5.18
+10  2015 California   750000  5.60  5.93
+# ℹ 7,544 more rows</code></pre>
+</div>
+</div>
+<div id="tip-bees-sampling" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;4.5: Compare uniform sampling with Poisson disk sampling
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To see the difference between Poisson disk sampling and Uniform sampling, we can simulate some data and plot it: </p>
+<div class="sourceCode" id="cb15" data-code-line-numbers=""><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="co"># Poisson disk sampling</span></span>
+<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu">poissoned</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">pts</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">pts</span><span class="op">$</span><span class="va">y</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Poisson disk sampling"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Uniform sampling same number of points</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Uniform sampling"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fig-bees-sampling" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sampling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-bees-sampling" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-bees-sampling-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-bees-sampling-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-sampling-1.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-bees-sampling-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Poisson disk sampling
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-bees-sampling" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-bees-sampling-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-bees-sampling-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-sampling-2.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-bees-sampling-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Uniform sampling
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sampling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.7: Plots comparing data generated using Poisson disk sampling and uniform sampling.
+</figcaption></figure>
+</div>
+<p>You can see in <a href="#fig-bees-sampling" class="quarto-xref">Figure&nbsp;<span>4.7</span></a> that the location of the points for Poisson disk sampling is not actually completely random, and is much <em>nicer</em> in appearance.</p>
+</div>
+</div>
+</section><section id="the-first-plot" class="level3" data-number="4.3.5"><h3 data-number="4.3.5" class="anchored" data-anchor-id="the-first-plot">
+<span class="header-section-number">4.3.5</span> The first plot</h3>
+<p>As we’ve done in all previous chapters, we start our plot using the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function and pass in the default data and aesthetic mappings we’ll use for all of the layers in the plot. To add the points we use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>, in the same way if we were making a traditional scatter plot. </p>
+<p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> and <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a>, we used <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create small multiple plots based on the levels of a categorical variable. Here we want to do something similar, but split based on the combination of levels from two categorical variables. We add the <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid()</a></code> function to create this grid of small multiple plots, with <code>state</code> being the rows and <code>year</code> being the columns of the grid. Setting <code>switch = "both"</code> places the facet labels on the opposite side of the grid from the default. This places labels on the left for the states, and on the bottom for the years. </p>
+<div class="cell">
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">bees_plot_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
+<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-base-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.8: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>You’ll notice that the points in <a href="#fig-bees-base-plot" class="quarto-xref">Figure&nbsp;<span>4.8</span></a> are slightly too large - the points for the California data are even distinguishable as points, it simply looks like a black square! We’ll reduce the size of the points in the next iteration of the plot.</p>
+</section></section><section id="advanced-styling" class="level2" data-number="4.4"><h2 data-number="4.4" class="anchored" data-anchor-id="advanced-styling">
+<span class="header-section-number">4.4</span> Advanced styling</h2>
+<p>Let’s start editing the stylistic elements of this chart to make it look more professional and visually appealing.</p>
+<section id="colors" class="level3" data-number="4.4.1"><h3 data-number="4.4.1" class="anchored" data-anchor-id="colors">
+<span class="header-section-number">4.4.1</span> Colors</h3>
+<p>We start by selecting some colors for our plot. We won’t be mapping any colors to columns in the data, but we still need to define a background color and a color for highlighted elements. To keep the plot looking clean, we’ll also use the same color for the text. Similar to <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, we can select these colors to match the topic of the data. What colors do you think of when you think of bees? Black and yellow. We’ll use yellow for the background color, and black for the highlight color.</p>
+<div class="cell">
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#fecc27"</span></span>
+<span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps <code>highlight_col</code> is not the best name to represent the <code>"black"</code> color…</p>
+<p>Let’s remake the <code>base_plot</code> from <a href="#fig-bees-base-plot" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>, but changing the <code>color</code> of the points and making them smaller using the <code>size</code> argument: </p>
+<div class="cell">
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">bees_plot_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
+<span>    size <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
+<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-base-plot2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-base-plot2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-base-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.9: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We’ll edit the background color of the facet grid squares later in <a href="#sec-bees-theme" class="quarto-xref"><span>Section 4.4.4</span></a>.</p>
+</section><section id="fonts" class="level3" data-number="4.4.2"><h3 data-number="4.4.2" class="anchored" data-anchor-id="fonts">
+<span class="header-section-number">4.4.2</span> Fonts</h3>
+<p>Since this is already quite a visually complex chart, we’ll avoid further distractions and use the same font for all text elements in the chart. This means we define only a single font variable, <code>body_font</code>. We’ll also use a simple, easy-to-read font. The <em>Red Hat</em> fonts are sans serif fonts, with the <em>Red Hat Text</em> version designed for increased legibility, especially at smaller font sizes. Again, it’s available through Google Fonts and so can be loaded using <code>font_add_google()</code> from {sysfonts}, with <code>showtext_auto()</code> allowing plots to draw text using {showtext} automatically. </p>
+<div class="cell">
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Red Hat Text"</span>, family <span class="op">=</span> <span class="st">"red_hat"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"red_hat"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="adding-text" class="level3" data-number="4.4.3"><h3 data-number="4.4.3" class="anchored" data-anchor-id="adding-text">
+<span class="header-section-number">4.4.3</span> Adding text</h3>
+<p>As in previous chapters, we write text for a title, subtitle, and caption and store the strings as variables to keep the main plotting code looking cleaner. The subtitle both describes the motivation for why the chart is important (the impact of reduced bee numbers) and gives a short explainer about how to read this non-standard chart (how the bee numbers are represented). The caption credits both the source of the data and the chart author.</p>
+<div class="cell">
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Bee colony losses in the United States"</span></span>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="st">"Bees are vital for the preservation of ecological balance and biodiversity in nature. Bee populations are rapidly declining around the world due to habitat loss, pollution and the use of pesticides, among other factors. The number of points in each square represents the number of bee colonies that exist during the months of October - December each year."</span></span>
+<span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="st">"Data: USDA | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then add this text using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function, and setting the <code>title</code>, <code>subtitle</code>, and <code>caption</code>. The x- and y- axes are meaningless for this visualization since the data is represented by the number of points rather than their locations. We remove the x- and y- axis titles by setting them both to <code>NULL</code> in <a href="#fig-bees-text-plot" class="quarto-xref">Figure&nbsp;<span>4.10</span></a>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="va">title</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
+<span>    caption <span class="op">=</span> <span class="va">cap</span>,</span>
+<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bees-text-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="bee-colony-losses_files/figure-html/fig-bees-text-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="sec-bees-theme" class="level3" data-number="4.4.4"><h3 data-number="4.4.4" class="anchored" data-anchor-id="sec-bees-theme">
+<span class="header-section-number">4.4.4</span> Adjusting themes</h3>
+<p>We can then remove the axis text and ticks using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>, which also removes the grid lines. Within <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>, we can also set the default font as our pre-defined <code>body_font</code> variable and reduce the size to ensure the facet labels fit within their allocated space. </p>
+<p>Since the grid square goes from 0-10 for both the x and y axes, it would make sense for the grid square to actually be square rather than rectangular to avoid the points looking closer together in one direction. We we use <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to force a 1:1 aspect ratio. Setting <code>expand = FALSE</code> to remove the extra padding around the edges of the plots also makes the differences in point density easier to see. </p>
+<div class="cell">
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span></span>
+<span>    base_family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    base_size <span class="op">=</span> <span class="fl">7.5</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The last step is adjusting the remaining theme elements: </p>
+<ul>
+<li><p>Editing the background colors for the plot (<code>plot.background</code> set as yellow using <code>bg_col</code>) and grid squares (<code>panel.background</code> set as black using <code>highlight_col</code>).</p></li>
+<li><p>The text text colour and margin for facet labels can be modified using the <code>strip.text</code> argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets).</p></li>
+<li><p>We change the title, subtitle, and caption text colour to <code>highlight_col</code> and align the caption to the left using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. Though the subtitle is defined using <code>element_textbox_simple()</code> from {ggtext} to enable automatic line wrapping of the long text as described in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>.</p></li>
+<li><p>We adjust the <code>plot.margin</code> to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># background colors</span></span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">highlight_col</span>, color <span class="op">=</span> <span class="va">highlight_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># facet labels</span></span>
+<span>    strip.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    strip.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>      angle <span class="op">=</span> <span class="fl">90</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># text formatting</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>      face <span class="op">=</span> <span class="st">"bold"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, b <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="bee-colony-losses_files/figure-html/bees-theme-plot-2-1.png" class="img-fluid figure-img"></p>
+<figcaption>A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The design is much more minimal, with the black background of the grid squares allowing the yellow points to be more easily seen due to the higher contrast.</figcaption></figure>
+</div>
+</div>
+</div>
+</section></section><section id="reflection" class="level2" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="reflection">
+<span class="header-section-number">4.5</span> Reflection</h2>
+<p>The bee-themed colors alongside the non-standard nature of this chart make it visually intriguing and fun. However, it takes a little bit more time to understand how to interpret the chart. This is a visualization that would work better in a setting where the author has time to explain how it works. For example, in a presentation or in an article with a <em>how to read this chart</em> explainer included. It would work less well in a standalone leaflet without an explanation where a reader might struggle to understand what is being shown. It’s more difficult to see the trend over time with type of chart. A simple line chart could show the same data in a more <em>standard</em>, easy-to-interpret way. However, line charts don’t catch attention in quite the same way. It all comes down to the purpose of the chart. Is the main aim to draw attention to important data on bee colonies, and show overall trends? Or is the main aim to communicate the colony size in each year, within some accuracy range? The answers to those questions will determine whether this is an appropriate chart type.</p>
+<p>This version of the chart shows only data for six states, even though we know from our exploratory analysis that data is available for (almost) all states. Some explanation as to why these states have been chosen could be added in the subtitle, or data for all states could be shown - although this would result in a very long chart! The visualization also assigns each state equal chart area - perhaps implying that each state has an equal geographic area which is of course untrue. The chart shows there are a lot of bees in California. California is also the third largest state in terms of area <span class="citation" data-cites="UScensus">(<a href="references.html#ref-UScensus" role="doc-biblioref">United States Census Bureau 2021</a>)</span> - maybe there’s just more room for bees? Perhaps standardizing the data by state area (or state agricultural area) would provide an easier comparison between states.</p>
+<p>Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger that might mean the numbers of bees isn’t changing very much. But we don’t see that when we only look at the number of colonies - we don’t get a full picture of the data by limiting the chart to only a single variable.</p>
+<p>Although this type of visualization has several disadvantages, and is far from perfect, hopefully it gives you an idea of how to think creatively about designing charts and how you might go about implementing them in R.</p>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-img_anderson" class="csl-entry" role="listitem">
 Anderson, Lance. 2017. <span>“School of Gray Fish.”</span> <a href="https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg">https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg</a>.
 </div>
+<div id="ref-Anscombe1973" class="csl-entry" role="listitem">
+Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
+</div>
 <div id="ref-aphalo2024" class="csl-entry" role="listitem">
 Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
+</div>
+<div id="ref-bridson2007" class="csl-entry" role="listitem">
+Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
+</div>
+<div id="ref-Brown2009" class="csl-entry" role="listitem">
+Brown, Mark J.F., and Paxton, Robert J. 2009. <span>“The Conservation of Bees: A Global Perspective.”</span> <em>Apidologie</em> 40 (3): 410–16. <a href="https://doi.org/10.1051/apido/2009019">https://doi.org/10.1051/apido/2009019</a>.
 </div>
 <div id="ref-geomtextpath" class="csl-entry" role="listitem">
 Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
@@ -351,6 +907,12 @@ Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes 
 </div>
 <div id="ref-technology_data" class="csl-entry" role="listitem">
 Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+</div>
+<div id="ref-pak" class="csl-entry" role="listitem">
+Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
+</div>
+<div id="ref-remotes" class="csl-entry" role="listitem">
+Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
 </div>
 <div id="ref-seafood_data" class="csl-entry" role="listitem">
 Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
@@ -372,6 +934,9 @@ Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessic
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
 Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-GAcharts" class="csl-entry" role="listitem">
+Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
 </div>
 <div id="ref-geofacet" class="csl-entry" role="listitem">
 Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
@@ -409,8 +974,20 @@ Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https:/
 <div id="ref-rnaturalearth" class="csl-entry" role="listitem">
 Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
 </div>
+<div id="ref-Matejka2017" class="csl-entry" role="listitem">
+Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> In, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
+</div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
+</div>
+<div id="ref-Apiculture" class="csl-entry" role="listitem">
+Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
+</div>
+<div id="ref-poissoned" class="csl-entry" role="listitem">
+mikefc. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
 </div>
 <div id="ref-MetBrewer" class="csl-entry" role="listitem">
 Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
@@ -520,8 +1097,17 @@ Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker,
 <div id="ref-funspotr" class="csl-entry" role="listitem">
 Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
 </div>
+<div id="ref-visdat" class="csl-entry" role="listitem">
+Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole Data Frames</span>.”</span> <em>JOSS</em> 2 (16): 355. <a href="https://doi.org/10.21105/joss.00355">https://doi.org/10.21105/joss.00355</a>.
+</div>
+<div id="ref-naniar" class="csl-entry" role="listitem">
+Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principles to Facilitate Missing Data Exploration, Visualization and Assessment of Imputations.”</span> <em>Journal of Statistical Software</em> 105 (7): 1–31. <a href="https://doi.org/10.18637/jss.v105.i07">https://doi.org/10.18637/jss.v105.i07</a>.
+</div>
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
+</div>
+<div id="ref-UScensus" class="csl-entry" role="listitem">
+United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
@@ -587,9 +1173,7 @@ Yutani, Hiroaki. 2023. <em><span class="nocase">gghighlight</span>: Highlight Li
 Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, and Anne D. Yoder. 2014. <span>“<span class="nocase">Life history profiles for 27 strepsirrhine primate taxa generated using captive data from the Duke Lemur Center</span>.”</span> <em>Scientific Data</em> 1 (1). <a href="https://doi.org/10.1038/sdata.2014.19">https://doi.org/10.1038/sdata.2014.19</a>.
 </div>
 </div>
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -624,18 +1208,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -667,7 +1240,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -675,7 +1270,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -997,21 +1592,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="./technology-adoption.html" class="pagination-link" aria-label="Technology Adoption: making gauge charts with {ggforce}">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span>
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./uk-museums.html" class="pagination-link" aria-label="UK Museums: highlighting line charts with {gghighlight}">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">UK Museums: highlighting line charts with {gghighlight}</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./nobel-prize-laureates.html" class="pagination-link" aria-label="Nobel Prize Laureates: positioning text and parameterising plots">
-        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./technology-adoption.html" class="pagination-link" aria-label="Technology Adoption: making gauge charts with {ggforce}">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology Adoption: making gauge charts with {ggforce}</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 
