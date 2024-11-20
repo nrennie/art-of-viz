@@ -179,7 +179,7 @@ col_plot <- base_plot +
 ```
 
 
-### Fonts
+### Fonts and text
 
 \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
@@ -293,14 +293,15 @@ theme_plot +
   )
 ```
 
-However, as you can see in @fig-lemurs-margin-1, this approach results in the title and subtitle text also being ... . This may be . Another approach is to use the `expand` argument in `scale_x_continuous()` to increase the amount of space ... . However, since ..., this results in grid lines being included on the .. . You *could* play around with the breaks and ... to remove them, but there's an easier (slightly *hacky* solution). 
+However, as you can see in @fig-lemurs-margin-1, this approach results in the title and subtitle text also being squashed to the left hand side of the plot as it doesn't extend into the margin. This may be desirable for some plots, but it doesn't work well here. Another approach is to use the `expand` argument in `scale_x_continuous()` to increase the amount of space at the right hand side of the x-axis. However, since this extends the axis, this results in grid lines being included in the additional space. We *could* play around with the breaks and axis text to remove the unwanted components, but there's an easier (slightly *hacky*) solution: add and edit a secondary y-axis. 
 
-Though secondary axes are ... (add tip with blog post link), we're 
+Secondary axes are almost always a poor choice of chart due to the fact that the choice of transformation for the secondary axis is entirely arbitrary but can hugely impact how the plot is interpreted. However, we're not actually going to use the secondary axis to present data, we're only going to use it to manipulate the layout of the plot background. To add some additional margin space on the right hand side, without squashing the title or adding grid lines in the margin, we can: \index{ggplot2!scale\_y\_continuous} \index{ggplot2!margin} \index{ggplot2!dup\_axis} \index{ggplot2!sec\_axis} \index{ggplot2!element\_text} 
 
-duplicate the axis, add lots of margin space to the secondary axis labels, hide the axis labels by making them the same color as the background. 
-We also remove the title by setting `axis.title.y.right` to `element_blank()`.
+* Duplicate the y-axis to create a secondary y-axis on the right hand side by setting `sec.axis = dup_axis()` inside `scale_y_continuous()`. The `sec_axis()` function could be used instead of `dup_axis()`, but there's no need to transform the axis in any way.
+* Add lots of margin space to the secondary axis labels by expand the right margin using `margin = margin(r = 150)` for the `axis.text.y.right` argument of `theme()`. 
+* Then hide the secondary axis labels by making them the same color as the background through also setting `color = bg_col` for `axis.text.y.right`.
 
-\index{ggplot2!scale\_y\_continuous} \index{ggplot2!margin} \index{ggplot2!dup\_axis} \index{ggplot2!element\_text} \index{ggplot2!element\_blank}
+We also remove the title by setting `axis.title.y.right` to `element_blank()`. \index{ggplot2!element\_blank}
 
 ```{r}
 #| label: fig-lemurs-margin-2
@@ -319,21 +320,17 @@ styled_plot
 
 ## Working with images 
 
-Though ..., there are many reasons why you may wish to combine ... such as adding a company logo for consistent branding in plots or ... . If you do add images to plots, . 
+Though you might not often find instructions , there are many reasons why you may wish to combine ... such as adding a company logo for consistent branding in plots or ... . If you do add images to plots, . 
 
 where to find images - unsplash
 @img_jax
 
 ### Reading and manipulating images with {magick}
 
-The {magick} package provides bindings to the ImageMagick image processing library
-magick [@magick]
+The {magick} package [@magick] provides bindings to the ImageMagick image processing library
+magick 
 
-reading image
-
-is this the right image
-
-\index{magick!image\_read}
+We can read an image into R using the `image_read()` function from {magick}: \index{magick!image\_read}
 
 ```{r}
 #| label: lemurs-magick-read
@@ -341,7 +338,7 @@ lemur_img <- magick::image_read("images/lemur-nobg.png")
 lemur_img
 ```
 
-maybe choose a different image
+When you print the image, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. 
 
 ::: {#tip-lemurs-imager .callout-tip}
 
@@ -353,11 +350,7 @@ The {magick} package is not the only R package that enables you to process and m
 
 ### Adding images to plots with {cowplot}
 
-Before we go ahead with adding the image to the scatter plot, let's first update the caption to add an attribution for the image, in addition to the attributions for the data and graphic. We can use \index{base!paste0}
-
-\index{source\_caption} \index{ggplot2!labs}
-
-We can then override the 
+Before we go ahead with adding the image to the scatter plot, let's first update the caption to add an attribution for the image, in addition to the attributions for the data and graphic. We can use `paste0()` to join together the output from the `source_caption()` function we were already using for the caption, with some additional styled text. You'll see that this new text is similar to the text described in @sec-turbines, with `<br>` adding a new and `**` used to style the word `Image` in bold text. We can then override the existing caption in the `labs()` function. \index{base!paste0} \index{source\_caption}  \index{ggplot2!labs}
 
 ```{r}
 #| label: lemurs-social-new
@@ -369,22 +362,30 @@ styled_plot <- styled_plot +
   labs(caption = cap)
 ```
 
-[@cowplot]
+The {cowplot} package [@cowplot]
 
+::: {#tip-lemurs-arrange .callout-tip}
 
-\index{cowplot!ggdraw} \index{cowplot!draw\_plot} \index{cowplot!draw\_image} 
+## R packages for combining plots
+
+There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use this in @sec-timezones and @sec-house. The {egg} package is also ... . 
+
+:::
+
+We start by using the `ggdraw()` function from {cowplot} which sets up a layer on top of our `styled_plot` {ggplot2} plot to allow us to draw on top of it. \index{cowplot!ggdraw}
+
+\index{cowplot!draw\_image} 
 
 ```{r}
 #| label: fig-lemurs-img-plot
 #| fig-cap: "Plot"
 #| warning: false
-final_plot <- cowplot::ggdraw() +
-  cowplot::draw_plot(styled_plot) +
+final_plot <- cowplot::ggdraw(styled_plot) +
   cowplot::draw_image(
     lemur_img,
     x = 1, y = 0,
-    hjust = 1, vjust = 0,
-    halign = 1, valign = 0,
+    hjust = 1, halign = 1,
+    vjust = 0, valign = 0,
     width = 0.4
   )
 final_plot
@@ -394,7 +395,6 @@ final_plot
 
 ## Other approaches for adding images to {ggplot2} plots
 
-tip - can also do with patchwork
 add tip for ggimage
 
 :::
