@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.37">
+<meta name="generator" content="quarto-1.5.55">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The TidyTuesday Cookbook – 6&nbsp; Canadian Wind Turbines: waffle plots, pictograms, and icons</title>
+<title>6&nbsp; Canadian Wind Turbines: waffle plots, pictograms, and icons – The TidyTuesday Cookbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick} and plotting with {cowplot}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -382,7 +382,7 @@ Tip&nbsp;6.1: Open Government data in Canada
 <section id="reading-data-with-openxlsx" class="level3" data-number="6.1.1"><h3 data-number="6.1.1" class="anchored" data-anchor-id="reading-data-with-openxlsx">
 <span class="header-section-number">6.1.1</span> Reading data with {openxlsx}</h3>
 <p>Though the {readxl} package <span class="citation" data-cites="readxl">(<a href="references.html#ref-readxl" role="doc-biblioref">Wickham and Bryan 2023</a>)</span> package can be used to read Excel files stored locally, it doesn’t work for reading in Excel files directly from a URL. We could visit the relevant <a href="https://open.canada.ca/data/dataset/">open.canada.ca/data/dataset</a> website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package <span class="citation" data-cites="openxlsx">(<a href="references.html#ref-openxlsx" role="doc-biblioref">Schauberger and Walker 2023</a>)</span> which allows us to pass in a URL.</p>
-<p>Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data (<a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called <code>url</code>.</p>
+<p>Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data (<a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called <code>url</code>. If you plan to download other datasets from the same site, it can be useful to save the main website as the <code>base_url</code> variable so that you can reuse this string later.</p>
 <p>We then use the <code>read.xlsx()</code> function from {openxlsx}, where we pass in the <code>url</code> variable to the <code>xlsxFile</code> argument: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_url</span> <span class="op">&lt;-</span> <span class="st">"https://ftp.cartes.canada.ca/"</span></span>
@@ -410,7 +410,7 @@ Tip&nbsp;6.2: Processing Excel files
 </ul>
 </div>
 </div>
-<p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> using an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
+<p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV file instead because they are smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> with an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">wind_turbines</span>,</span>
@@ -1013,6 +1013,9 @@ Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The
 <div id="ref-aphalo2024" class="csl-entry" role="listitem">
 Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
 </div>
+<div id="ref-imager" class="csl-entry" role="listitem">
+Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
+</div>
 <div id="ref-bridson2007" class="csl-entry" role="listitem">
 Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
 </div>
@@ -1150,6 +1153,9 @@ Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Acceleratin
 </div>
 <div id="ref-marquee" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-systemfonts" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, Jeroen Ooms, and Devon Govett. 2024. <em><span class="nocase">systemfonts: System Native Font Finding</span></em>. <a href="https://CRAN.R-project.org/package=systemfonts">https://CRAN.R-project.org/package=systemfonts</a>.
 </div>
 <div id="ref-ragg" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.

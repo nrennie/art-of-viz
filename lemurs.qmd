@@ -16,12 +16,6 @@ fig-asp: 0.67
 ```{r}
 #| echo: false
 #| eval: true
-#| file: R/load_font_awesome.R
-```
-
-```{r}
-#| echo: false
-#| eval: true
 #| file: R/source_caption.R
 ```
 
@@ -31,13 +25,17 @@ fig-asp: 0.67
 #| file: R/social_caption.R
 ```
 
-# Lemurs: manipulating images with {magick} and plotting with {cowplot} {#sec-lemurs}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = "ragg_png")
+```
+
+# Lemurs: manipulating images with {magick} {#sec-lemurs}
 
 In this chapter, we'll cover how to load and manipulate images in R using the {magick} package. We'll also look at how to combine images with plots using the {cowplot} package.
 
 ## Data
 
-We're going to be exploring data about lemurs from [Duke Lemur Center]() in this chapter [@lemurs_data]. The data ... 
+We're going to be exploring data about lemurs from [Duke Lemur Center](https://lemur.duke.edu/) in this chapter [@lemurs_data]. The data ... 
 
 The data was used as a TidyTuesday dataset in August 2021, and so can be loaded into R using the `tt_load()` function from {tidytuesdayR} as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
 
@@ -73,7 +71,7 @@ Some of the
 #| label: fig-lemurs-scatter
 #| fig-cap: "Scatter"
 #| echo: -1
-par(mar = c(2.1, 2.1, 1.1, 2.1))
+par(mar = c(3.1, 3.1, 2.1, 2.1))
 plot(
   lemurs$age_at_wt_mo,
   lemurs$weight_g
@@ -87,11 +85,14 @@ plot(
 #| fig-cap: "Boxplot"
 #| fig-asp: 1.2
 #| echo: -1
-par(mar = c(2.1, 2.1, 1.1, 2.1))
+par(mar = c(3.1, 3.1, 2.1, 2.1))
 boxplot(
   weight_g ~ taxon,
   data = lemurs,
   horizontal = TRUE,
+  cex.axis = 0.5,
+  cex.names = 0.5,
+  las = 1,
   xlab = "Weight",
   ylab = NULL
 )
@@ -143,7 +144,7 @@ note about assumptions - females heavier than males
 base_plot <- ggplot() +
   geom_point(
     data = cb_lemurs,
-    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex),
+    mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex, shape = sex),
     alpha = 0.6,
     size = 0.6
   )
@@ -160,8 +161,8 @@ ref to blog post male femlae stereotypes
 ```{r}
 #| label: lemurs-colors
 bg_col <- "#F5F5DC"
-text_col <- "#4e2e12"
-f_col <- "#b13173"
+text_col <- "#4E2E12"
+f_col <- "#B13173"
 m_col <- "#21ADA8"
 ```
 
@@ -169,44 +170,65 @@ m_col <- "#21ADA8"
 
 We'll use colored text in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we don't need a legend added. We've previously removed the legend by setting `legend.position = "none"` inside the `theme()` function, but an alternative approach is to set `guide = "none"` inside `scale_color_manual()`. This is particularly useful if you only want to remove a subset of legends when you are mapping multiple variables to different aesthetics. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
 
+in this case we do want to 
+
 ```{r}
 #| label: lemurs-col-plot
 col_plot <- base_plot +
   scale_color_manual(
     values = c("F" = f_col, "M" = m_col),
     guide = "none"
-  )
+  ) +
+  scale_shape(guide = "none")
 ```
 
 
 ### Fonts and text
 
-\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
+going to be using icons - showtext doesn't work well with this - cross ref this section in chap 1
+we'll use systemfonts instead. [@systemfonts] \index{systemfonts!register\_font}
+make sure using ragg device
+
+use same name as in original font awesome and social cap will still work 
+
+```{r}
+#| label: lemurs-fa-font
+systemfonts::register_font(
+  name = "Font Awesome 6 Brands",
+  plain = "fonts/Font-Awesome-6-Brands-Regular-400.otf"
+)
+```
+
+need to download font files from google fonts, can install on system and use ragg. may not have admin priviledges 
 
 ```{r}
 #| label: lemurs-fonts
-sysfonts::font_add_google(
+systemfonts::register_font(
   name = "Lato",
-  family = "Lato"
+  plain = "fonts/Lato/Lato-Regular.ttf",
+  bold = "fonts/Lato/Lato-Bold.ttf",
+  italic = "fonts/Lato/Lato-Italic.ttf"
 )
-sysfonts::font_add_google(
+systemfonts::register_font(
   name = "Passion One",
-  family = "Passion"
+  plain = "fonts/Passion_One/PassionOne-Regular.ttf",
+  bold = "fonts/Passion_One/PassionOne-Bold.ttf"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+
 body_font <- "Lato"
-title_font <- "Passion"
+title_font <- "Passion One"
 ```
 
 coloured text below???
+remove guide for shape
+add shapes in unicode (doesn't exactly match shape `&#x25B2;` - black triangle, really just means "filled" in triangle, rather than outlines white triangle)
 
 \index{glue!glue}
 
 ```{r}
 #| label: lemurs-text
 title <- "Collared Brown Lemurs"
-subtitle <- glue::glue("At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females</span> tend to weigh more than <span style='color:{m_col}'>males</span>, this chart does not account for pregnancy.")
+subtitle <- glue::glue("At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females &#x25CF;</span> tend to weigh more than <span style='color:{m_col}'>males &#x25B2;</span>, this chart does not account for pregnancy.")
 ```
 
 
@@ -355,7 +377,11 @@ Before we go ahead with adding the image to the scatter plot, let's first update
 ```{r}
 #| label: lemurs-social-new
 cap <- paste0(
-  source_caption(source = "Duke Lemur Center", sep = "<br>", graphic = social),
+  source_caption(
+    source = "Duke Lemur Center",
+    sep = "<br>",
+    graphic = social
+  ),
   "<br>**Image**: Jax (Unsplash: @lysrix)"
 )
 styled_plot <- styled_plot +
@@ -368,7 +394,7 @@ The {cowplot} package [@cowplot]
 
 ## R packages for combining plots
 
-There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use this in @sec-timezones and @sec-house. The {egg} package is also ... . 
+There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use this in @sec-time-zones and @sec-house. The {egg} package is also ... . 
 
 :::
 
