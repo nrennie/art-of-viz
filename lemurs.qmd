@@ -45,6 +45,7 @@ The data was used as a TidyTuesday dataset in August 2021, and so can be loaded 
 #| echo: true
 tuesdata <- tidytuesdayR::tt_load("2021-08-24")
 lemurs <- tuesdata$lemurs
+taxonomy <- tuesdata$taxonomy
 ```
 
 ```{r}
@@ -53,6 +54,7 @@ lemurs <- tuesdata$lemurs
 #| echo: false
 #| eval: true
 lemurs <- readr::read_csv("data/lemur_data.csv")
+taxonomy <- readr::read_csv("data/taxonomy.csv")
 ```
 
 The data 
@@ -109,12 +111,24 @@ The data is reasonably clean
 
 ### Data wrangling
 
+View the `taxonomy` data
+
+::: {.content-visible when-format="html"}
+
+```{r}
+#| label: lemurs-tax-table
+reactable::reactable(taxonomy)
+```
+
+
+:::
+
 \index{dplyr!filter}
 
 ```{r}
 #| label: lemurs-wrangling-1
-cb_lemurs <- lemurs |>
-  dplyr::filter(taxon == "ECOL")
+vrub_lemurs <- lemurs |>
+  dplyr::filter(taxon == "VRUB")
 ```
 
 ### The first plot
@@ -128,7 +142,7 @@ cb_lemurs <- lemurs |>
 library(ggplot2)
 base_plot <- ggplot() +
   geom_point(
-    data = cb_lemurs,
+    data = vrub_lemurs,
     mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex)
   )
 base_plot
@@ -143,10 +157,10 @@ note about assumptions - females heavier than males
 ```{r}
 base_plot <- ggplot() +
   geom_point(
-    data = cb_lemurs,
+    data = vrub_lemurs,
     mapping = aes(x = age_at_wt_mo, y = weight_g, color = sex, shape = sex),
     alpha = 0.6,
-    size = 0.6
+    size = 0.8
   )
 base_plot
 ```
@@ -185,11 +199,11 @@ col_plot <- base_plot +
 
 ### Fonts and text
 
-going to be using icons - showtext doesn't work well with this - cross ref this section in chap 1
-we'll use systemfonts instead. [@systemfonts] \index{systemfonts!register\_font}
-make sure using ragg device
+Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't play nicely with unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate r load font files available on your local system. 
 
-use same name as in original font awesome and social cap will still work 
+To register a font using {systemfonts}, we use the `register_font()` function. It looks quite similarl to the `font_add()` function from {showtext} for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons as we did in @sec-cats. \index{systemfonts!register\_font}
+
+The first argument `name` will be the name that the font is known by in R. You can choose any name you want, but here we'll make sure to use the same name as we did for the `family` argument in @sec-cats, in order for our `social_caption()` to still work. The `plain` argument, is then the path to the font file. 
 
 ```{r}
 #| label: lemurs-fa-font
@@ -199,7 +213,21 @@ systemfonts::register_font(
 )
 ```
 
-need to download font files from google fonts, can install on system and use ragg. may not have admin priviledges 
+::: {#tip-lemurs-device .callout-tip}
+
+## Setting a graphics device
+
+Tools -> 
+
+`knitr::opts_chunk$set(dev = "ragg_png")`
+
+:::
+
+We can also use `register_font()` from {systemfonts} to load the fonts we'll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. 
+
+For the body font, we'll use *Lato*, a sans serif font designed by [Łukasz Dziedzic](http://www.latofonts.com/team/). The font files can be downloaded from [fonts.google.com/specimen/Lato](https://fonts.google.com/specimen/Lato) or [www.latofonts.com/lato-free-fonts](https://www.latofonts.com/lato-free-fonts/). For the title font, we'll use *Passion One* - a font specifically designed for large titles! It can be downloaded from [fonts.google.com/specimen/Passion+One](https://fonts.google.com/specimen/Passion+One). When you download these fonts, you'll see that you don't just download a single file, you actually download multiple files - one for each variation of the font that is available e.g. bold and italic. 
+
+In `register_font()`, you pass these different font files into the relevant argument e.g. passing the font file for the bold version into the `bold` argument. Note that not all fonts have every style available. Here, *Passion one* isn't available in italic so we simply don't pass anything into the `italic` argument when loading `Passion One`. If you're not going to use a particular font style (for example, if you know you won't write any text in bold when using Lato font) you don't need to load this style in with `register_font()`. However, it can be useful to have it available, just in case you change your mind!
 
 ```{r}
 #| label: lemurs-fonts
@@ -219,20 +247,17 @@ body_font <- "Lato"
 title_font <- "Passion One"
 ```
 
-coloured text below???
-remove guide for shape
+can install on system and use ragg. may not have admin priviledges 
+
 add shapes in unicode (doesn't exactly match shape `&#x25B2;` - black triangle, really just means "filled" in triangle, rather than outlines white triangle)
 
 \index{glue!glue}
 
 ```{r}
 #| label: lemurs-text
-title <- "Collared Brown Lemurs"
-subtitle <- glue::glue("At Duke Lemur Center, collared brown lemurs live to an average of 23.6 years. The oldest collared brown lemur at Duke Lemur Center was Yvette who was born in 1959 and lived to the age of 32.6 years. Collared brown lemurs mature at about 3 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females &#x25CF;</span> tend to weigh more than <span style='color:{m_col}'>males &#x25B2;</span>, this chart does not account for pregnancy.")
+title <- "How much does a red ruffed lemur weigh?"
+subtitle <- glue::glue("At Duke Lemur Center, red ruffed lemurs live to an average of {round(mean(vrub_lemurs$age_at_death_y, na.rm = TRUE), 1)} years, and mature at about 2 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females &#x25CF;</span> tend to weigh more than <span style='color:{m_col}'>males &#x25B2;</span>, this chart does not account for pregnancy.")
 ```
-
-
-pre-emptive - or maybe update later
 
 \index{social\_caption} \index{source\_caption}
 
@@ -311,7 +336,7 @@ We're going to add the image to the right hand side of the plot. The approach we
 #| fig-cap: "Plot"
 theme_plot +
   theme(
-    plot.margin = margin(5, 150, 5, 5)
+    plot.margin = margin(5, 120, 5, 5)
   )
 ```
 
@@ -332,7 +357,7 @@ styled_plot <- theme_plot +
   scale_y_continuous(sec.axis = dup_axis()) +
   theme(
     axis.text.y.right = element_text(
-      margin = margin(r = 150),
+      margin = margin(r = 120),
       color = bg_col
     ),
     axis.title.y.right = element_blank()
@@ -342,33 +367,77 @@ styled_plot
 
 ## Working with images 
 
-Though you might not often find instructions , there are many reasons why you may wish to combine ... such as adding a company logo for consistent branding in plots or ... . If you do add images to plots, . 
+Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you're just looking for a way to make your plot more eye catching! 
 
-where to find images - unsplash
-@img_jax
+### Reading and manipulating images with {magick} and {imager}
 
-### Reading and manipulating images with {magick}
+The {magick} package [@magick] provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including png, jpeg, and pdf.
 
-The {magick} package [@magick] provides bindings to the ImageMagick image processing library
-magick 
+The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. There are some operations that are easier in {imager}, and some that are easier in {magick}. In this chapter, we’re going to use both packages together to demonstrate how easy it is.
 
-We can read an image into R using the `image_read()` function from {magick}: \index{magick!image\_read}
+::: {#tip-lemurs-unsplash .callout-tip}
 
-```{r}
-#| label: lemurs-magick-read
-lemur_img <- magick::image_read("images/lemur-nobg.png")
-lemur_img
-```
+## Finding images for reuse
 
-When you print the image, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. 
+When you're adding a logo to your plot, it's (reasonably) easy to know which image to use and where to find it. If you don't already have the image you want to overlay, you also need to know how and where to find it. 
 
-::: {#tip-lemurs-imager .callout-tip}
-
-## Alternative packages for image processing
-
-The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. In this chapter, we’ve used the {magick} package but you could do alternatively use the {imager} package instead.
+If you add images to plots that you don't own, make sure you have permission to re-use the image and check that the license file allows you to. Site such as Unsplash ([unsplash.com](https://unsplash.com/)), Wikimedia Commons ([commons.wikimedia.org](https://commons.wikimedia.org/)), or Pixabay ([pixabay.com](https://pixabay.com/)) can be good places to find images that are free to re-use.
 
 :::
+
+For this visualization, we're going to use a photograph of a red ruffed lemur from [Unsplash](https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k) taken by [Jax](https://unsplash.com/@lysrix) [@img_jax].
+
+We're going to start with the {imager} package and use it to read the image into R with the `load.image()` function. If you were using {magick} to start with, you would use the `image_read()` function instead. \index{imager!load.image} \index{magick!image\_read}
+
+```{r}
+#| label: fig-lemurs-imager-read
+#| fig-cap: "Test"
+lemur_img <- imager::load.image("images/lemur.jpg")
+plot(lemur_img)
+```
+
+crop out bit on left
+
+```{r}
+#| label: lemurs-imager-crop
+px <- imager::Xc(lemur_img) <= 200
+lemur_img[px] <- 0
+px <- imager::Xc(lemur_img) <= 275 & imager::Yc(lemur_img) >= 320
+lemur_img[px] <- 0
+```
+
+when print image draws on traditional grid
+background needs removing so draw an outline
+
+```{r}
+#| label: figlemurs-img-outline
+#| fig-cap: "Test"
+detect_outline <- imager::px.flood(
+  im = lemur_img,
+  x = 420,
+  y = 200,
+  sigma = 0.5,
+  high_connexity = T
+)
+plot(lemur_img)
+imager::highlight(detect_outline)
+```
+
+then remove
+
+```{r}
+#| label: fig-lemurs-img-rmbg
+#| fig-cap: "Test"
+lemur_img[detect_outline] <- 0
+lemur_nobg <- imager::cimg2magick(lemur_img) |>
+  magick::image_flop() |>
+  magick::image_transparent("black")
+lemur_nobg
+```
+
+not perfect as also remove white collar
+
+When you print the image with {magick}, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. 
 
 ### Adding images to plots with {cowplot}
 
@@ -408,7 +477,7 @@ We start by using the `ggdraw()` function from {cowplot} which sets up a layer o
 #| warning: false
 final_plot <- cowplot::ggdraw(styled_plot) +
   cowplot::draw_image(
-    lemur_img,
+    lemur_nobg,
     x = 1, y = 0,
     hjust = 1, halign = 1,
     vjust = 0, valign = 0,
@@ -416,6 +485,8 @@ final_plot <- cowplot::ggdraw(styled_plot) +
   )
 final_plot
 ```
+
+you might see warnings about fonts. as long as the fonts are appear as you expect on the chart, you can ignore them
 
 ::: {#tip-lemurs-imgs .callout-tip}
 
@@ -427,7 +498,9 @@ add tip for ggimage
 
 ## Reflection
 
-To do
-- check img credit is right
-- flip image back then flip in R
-- redo sketch
+* pregnancy
+* image background removal
+
+
+
+
