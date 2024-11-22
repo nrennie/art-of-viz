@@ -396,7 +396,13 @@ lemur_img <- imager::load.image("images/lemur.jpg")
 plot(lemur_img)
 ```
 
-crop out bit on left
+You can view the image to check it's been loaded correctly by running `plot(lemur_img)`, and you'll see that it's plotted on a traditional base R graphics grid. Don't worry about how to deal with this background grid - we'll deal with that a little bit later!
+
+Though this is a fun image of a lemur, overlaying it on top of the plot in its raw format isn't going to be the most aesthetically pleased. The background of the image would be quite clear again the plot. It would be better if the image was simply of the lemur itself with a transparent background. There are many online tools and desktop software available that could remove the background for you, but we can also do this in R!
+
+Let's start by cropping out as much of the background as possible. In {imager}, the `Xc()` and `Yc()` functions return pixel coordinates for an image, for x- and y- coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. \index{imager!Xc} \index{imager!Yc}
+
+Running `imager::Xc(lemur_img) <= 200` creates a pixel matrix where all values with an x-coordinate less than or equal to 200 are `TRUE`, and is otherwise `FALSE`. Setting these values to `0` turns those pixels to the color black. We can do something similar to remove sections where the x-coordinate is less than 275 and the y-coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis - it goes the opposite direction of most plots! \index{imager!Xc}
 
 ```{r}
 #| label: lemurs-imager-crop
@@ -406,8 +412,9 @@ px <- imager::Xc(lemur_img) <= 275 & imager::Yc(lemur_img) >= 320
 lemur_img[px] <- 0
 ```
 
-when print image draws on traditional grid
-background needs removing so draw an outline
+Now we need to remove the rest of the background. 
+
+background needs removing so draw an outline \index{imager!px.flood} \index{imager!highlight}
 
 ```{r}
 #| label: figlemurs-img-outline
@@ -417,13 +424,15 @@ detect_outline <- imager::px.flood(
   x = 420,
   y = 200,
   sigma = 0.5,
-  high_connexity = T
+  high_connexity = TRUE
 )
 plot(lemur_img)
 imager::highlight(detect_outline)
 ```
 
 then remove
+
+\index{imager!cimg2magick} \index{}
 
 ```{r}
 #| label: fig-lemurs-img-rmbg
@@ -435,7 +444,7 @@ lemur_nobg <- imager::cimg2magick(lemur_img) |>
 lemur_nobg
 ```
 
-not perfect as also remove white collar
+not perfect as also remove white *collar*
 
 When you print the image with {magick}, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. 
 
@@ -461,9 +470,9 @@ The {cowplot} package [@cowplot]
 
 ::: {#tip-lemurs-arrange .callout-tip}
 
-## R packages for combining plots
+## R packages for combining plots and images
 
-There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use this in @sec-time-zones and @sec-house. The {egg} package is also ... . 
+There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use in @sec-time-zones and @sec-house. The {egg} package [@egg] is another popular alternative, with the `geom_custom()` function being especially useful for adding images. The {ggimage} package  [@ggimage] can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g. file paths or image coordinates.
 
 :::
 
