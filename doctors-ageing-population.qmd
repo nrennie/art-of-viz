@@ -2,7 +2,7 @@
 filters:
   - line-highlight
 execute: 
-  freeze: true
+  freeze: auto
 ---
 
 ```{r}
@@ -29,9 +29,9 @@ In this chapter we'll learn how to identify open data sources, make maps with {g
 
 ## Data 
 
-There's often a *Bring Your Own Data* week each year of \#TidyTuesday\index{TidyTuesday} [@tidytuesday], where participants are encouraged to source their own data. Some use their own data - visualising how many times they've gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?
+There's often a *Bring Your Own Data* week each year of TidyTuesday\index{TidyTuesday} [@tidytuesday], where participants are encouraged to source their own data. Some use their own data - visualising how many times they've gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?
 
-There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some compaies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine ([datasetsearch.research.google.com](https://datasetsearch.research.google.com/)) might also help you to identify data you're interested in.
+There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine ([datasetsearch.research.google.com](https://datasetsearch.research.google.com/)) might also help you to identify data you're interested in.
 
 One fantastic source of data is the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)). The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you're ever looking for inspiration.\index{Our World in Data}
 
@@ -53,7 +53,7 @@ doctors <- owid("physicians-per-1000-people")
 doctors <- readr::read_csv("data/doctors.csv")
 ```
 
-::: {#tip-museums-view .callout-tip}
+::: {#tip-doctors-view .callout-tip}
 
 ## Saving data for later use
 
@@ -80,7 +80,7 @@ Often when there's a time component to data, one of the most obvious patterns to
 #| label: fig-doctors-base-plot
 #| fig-cap: "Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R."
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(3.1, 4.1, 1.1, 2.1))
 plot(
   x = doctors$year,
   y = doctors$`Physicians (per 1,000 people)`,
@@ -221,7 +221,7 @@ We'll start by considering alternative color palettes, then think about text tha
 
 ### Colors
 
-There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package\index{paletteer} is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favourite is color palette R packages is {MetBrewer}\index{MetBrewer} [@MetBrewer] - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using `MetBrewer::display_all(colorblind_only = TRUE)`. Since `doctors` is a continuous variable, we'll look at the sequential palettes only.
+There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package\index{paletteer} is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favorite is color palette R packages is {MetBrewer}\index{MetBrewer} [@MetBrewer] - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using `MetBrewer::display_all(colorblind_only = TRUE)`. Since `doctors` is a continuous variable, we'll look at the sequential palettes only.
 
 {MetBrewer} does have functions that interface directly with {ggplot2} (such as `scale_fill_met_c()`) but we're going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the `"Hokusai2"` palette. The `text_col` is the 18th color and `highlight_col` is the 15th color. A variable containing the background color, `bg_col`, is also defined.
 
@@ -255,8 +255,12 @@ As in previous chapters, fonts can be defined using the {sysfonts}\index{sysfont
 
 ```{r}
 #| label: doctors-font
-sysfonts::font_add_google(name = "Roboto", family = "roboto")
-sysfonts::font_add_google(name = "Roboto Slab", family = "roboto_slab")
+sysfonts::font_add_google(
+  name = "Roboto", family = "roboto"
+)
+sysfonts::font_add_google(
+  name = "Roboto Slab", family = "roboto_slab"
+)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "roboto"

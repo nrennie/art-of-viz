@@ -224,7 +224,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nobel-prize-laureates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterizing plots</span></span></a>
   </div>
 </li>
       </ul>
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -382,10 +382,14 @@ Tip&nbsp;6.1: Open Government data in Canada
 <section id="reading-data-with-openxlsx" class="level3" data-number="6.1.1"><h3 data-number="6.1.1" class="anchored" data-anchor-id="reading-data-with-openxlsx">
 <span class="header-section-number">6.1.1</span> Reading data with {openxlsx}</h3>
 <p>Though the {readxl} package <span class="citation" data-cites="readxl">(<a href="references.html#ref-readxl" role="doc-biblioref">Wickham and Bryan 2023</a>)</span> package can be used to read Excel files stored locally, it doesn’t work for reading in Excel files directly from a URL. We could visit the relevant <a href="https://open.canada.ca/data/dataset/">open.canada.ca/data/dataset</a> website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package <span class="citation" data-cites="openxlsx">(<a href="references.html#ref-openxlsx" role="doc-biblioref">Schauberger and Walker 2023</a>)</span> which allows us to pass in a URL.</p>
-<p>Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data (<a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called <code>url</code>.</p>
+<p>Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data (<a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called <code>url</code>. If you plan to download other datasets from the same site, it can be useful to save the main website as the <code>base_url</code> variable so that you can reuse this string later.</p>
 <p>We then use the <code>read.xlsx()</code> function from {openxlsx}, where we pass in the <code>url</code> variable to the <code>xlsxFile</code> argument: </p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"</span></span>
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_url</span> <span class="op">&lt;-</span> <span class="st">"https://ftp.cartes.canada.ca/"</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span></span>
+<span>  <span class="va">base_url</span>,</span>
+<span>  <span class="st">"pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">wind_turbines</span> <span class="op">&lt;-</span> <span class="fu">openxlsx</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/openxlsx/man/read.xlsx.html">read.xlsx</a></span><span class="op">(</span>xlsxFile <span class="op">=</span> <span class="va">url</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tip-turbines-excel" class="callout callout-style-default callout-tip callout-titled">
@@ -406,7 +410,7 @@ Tip&nbsp;6.2: Processing Excel files
 </ul>
 </div>
 </div>
-<p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> using an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
+<p>We don’t want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let’s save a copy locally. We could simply save the Excel file (or we could have used <code><a href="https://rdrr.io/r/utils/download.file.html">download.file()</a></code> instead of <code>read_csv()</code>). However, it would be better to save it as a CSV file instead because they are smaller in size, and can be opened in a simple text editor. Luckily the <code>wind_turbines</code> data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> with an appropriate file name (and setting <code>row.names = FALSE</code> to avoid adding an additional column of row names). </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">wind_turbines</span>,</span>
@@ -812,7 +816,7 @@ Figure&nbsp;6.7: All qualitative color palettes with at least 6 colors in the {r
 </div>
 </div>
 </div>
-<p>Although the {rcartocolor} package has the <code>scale_fill_carto_d()</code> which we could use directly in our plots, we’ll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in <a href="#fig-turbines-rcarto" class="quarto-xref">Figure&nbsp;<span>6.7</span></a>, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That’s a great choice for representing missing data, but when we want different colors for categories it doesn’t work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the <code>carto_pal()</code> function and then extract only the first 6. We’ll use the <code>"Vivid"</code> palette here. </p>
+<p>Although the {rcartocolor} package has the <code>scale_fill_carto_d()</code> which we could use directly in our plots, we’ll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in <a href="#fig-turbines-rcarto" class="quarto-xref">Figure&nbsp;<span>6.7</span></a>, in the qualitative palettes in the {rcartocolor} package, the last color is often a gray color. That’s a great choice for representing missing data, but when we want different colors for categories it doesn’t work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the <code>carto_pal()</code> function and then extract only the first 6. We’ll use the <code>"Vivid"</code> palette here. </p>
 <p>We also make the <code>col_palette</code> vector a named vector by using the <code><a href="https://rdrr.io/r/base/names.html">names()</a></code> function, and using <code>region_levels</code> as the names. Although this isn’t necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.</p>
 <div class="cell">
 <div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_palette</span> <span class="op">&lt;-</span> <span class="fu">rcartocolor</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rcartocolor/man/carto_pal.html">carto_pal</a></span><span class="op">(</span></span>
@@ -1009,6 +1013,12 @@ Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The
 <div id="ref-aphalo2024" class="csl-entry" role="listitem">
 Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
 </div>
+<div id="ref-egg" class="csl-entry" role="listitem">
+Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2’: Custom Geom, Custom Themes, Plot Alignment, Labelled Panels, Symmetric Scales, and Fixed Panel Size</span></em>. <a href="https://CRAN.R-project.org/package=egg">https://CRAN.R-project.org/package=egg</a>.
+</div>
+<div id="ref-imager" class="csl-entry" role="listitem">
+Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
+</div>
 <div id="ref-bridson2007" class="csl-entry" role="listitem">
 Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
 </div>
@@ -1039,9 +1049,6 @@ Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and D
 <div id="ref-seafood_data" class="csl-entry" role="listitem">
 Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
 </div>
-<div id="ref-img_dibbern" class="csl-entry" role="listitem">
-Dibbern, Lilian. 2019. <span>“Lemur Beside Tree.”</span> <a href="https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY">https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY</a>.
-</div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
@@ -1056,6 +1063,9 @@ Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessic
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
 Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-GAcharts" class="csl-entry" role="listitem">
+Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
 </div>
 <div id="ref-geofacet" class="csl-entry" role="listitem">
 Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
@@ -1081,6 +1091,9 @@ Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive 
 <div id="ref-zones_data" class="csl-entry" role="listitem">
 Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
 </div>
+<div id="ref-img_jax" class="csl-entry" role="listitem">
+Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+</div>
 <div id="ref-kays2020" class="csl-entry" role="listitem">
 Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
 </div>
@@ -1098,6 +1111,9 @@ Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Gr
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
 Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
@@ -1117,11 +1133,17 @@ Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</spa
 <div id="ref-tibble" class="csl-entry" role="listitem">
 Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
 </div>
+<div id="ref-Muth2018" class="csl-entry" role="listitem">
+Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span>
+</div>
 <div id="ref-turbines_data" class="csl-entry" role="listitem">
 Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
 </div>
 <div id="ref-rcartocolor" class="csl-entry" role="listitem">
 Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-magick" class="csl-entry" role="listitem">
+Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
 </div>
 <div id="ref-doctors_data" class="csl-entry" role="listitem">
 Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
@@ -1137,6 +1159,9 @@ Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Acceleratin
 </div>
 <div id="ref-marquee" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-systemfonts" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, Jeroen Ooms, and Devon Govett. 2024. <em><span class="nocase">systemfonts: System Native Font Finding</span></em>. <a href="https://CRAN.R-project.org/package=systemfonts">https://CRAN.R-project.org/package=systemfonts</a>.
 </div>
 <div id="ref-ragg" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.

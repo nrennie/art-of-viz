@@ -224,7 +224,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nobel-prize-laureates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterising plots</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize Laureates: positioning text and parameterizing plots</span></span></a>
   </div>
 </li>
       </ul>
@@ -241,7 +241,7 @@ div.csl-indent {
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: combining plots with {patchwork}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images with {magick}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -358,15 +358,15 @@ div.csl-indent {
 </header><p>In this chapter we’ll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.</p>
 <section id="data" class="level2" data-number="12.1"><h2 data-number="12.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">12.1</span> Data</h2>
-<p>There’s often a <em>Bring Your Own Data</em> week each year of #TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
-<p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some compaies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
+<p>There’s often a <em>Bring Your Own Data</em> week each year of TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
+<p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
 <p>One fantastic source of data is the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>). The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you’re ever looking for inspiration.</p>
 <p>For this chapter, we’ll visualise data on <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">Medical doctors per 1,000 people</a>, a dataset which comes from the Our World in Data website <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. You can load the data using the {owidR} R package <span class="citation" data-cites="owidR">(<a href="references.html#ref-owidR" role="doc-biblioref">York 2023</a>)</span>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">owidR</span><span class="op">)</span></span>
 <span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/owidR/man/owid.html">owid</a></span><span class="op">(</span><span class="st">"physicians-per-1000-people"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="tip-museums-view" class="callout callout-style-default callout-tip callout-titled">
+<div id="tip-doctors-view" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -389,16 +389,14 @@ Tip&nbsp;12.1: Saving data for later use
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">doctors</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 4
-  entity      code   year
-  &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;
-1 Afghanistan AFG    1960
-2 Afghanistan AFG    1965
-3 Afghanistan AFG    1970
-4 Afghanistan AFG    1981
-5 Afghanistan AFG    1986
-6 Afghanistan AFG    1987
-# ℹ 1 more variable:
-#   `Physicians (per 1,000 people)` &lt;dbl&gt;</code></pre>
+  entity      code   year `Physicians (per 1,000 people)`
+  &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;                           &lt;dbl&gt;
+1 Afghanistan AFG    1960                           0.035
+2 Afghanistan AFG    1965                           0.063
+3 Afghanistan AFG    1970                           0.065
+4 Afghanistan AFG    1981                           0.077
+5 Afghanistan AFG    1986                           0.183
+6 Afghanistan AFG    1987                           0.179</code></pre>
 </div>
 </div>
 <p>Often when there’s a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualising time series data, a simple scatter plot can also indicate if there’s a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a <em>spaghetti chart</em> as discussed in <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a>.</p>
@@ -553,7 +551,7 @@ Figure&nbsp;12.3: Map of the world with countries colored based on number of doc
 <p>We’ll start by considering alternative color palettes, then think about text that should be added, before finalising the layout.</p>
 <section id="colors" class="level3" data-number="12.4.1"><h3 data-number="12.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">12.4.1</span> Colors</h3>
-<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favourite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
+<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favorite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
 <p>{MetBrewer} does have functions that interface directly with {ggplot2} (such as <code><a href="https://rdrr.io/pkg/MetBrewer/man/scale_fill_met_c.html">scale_fill_met_c()</a></code>) but we’re going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the <code>"Hokusai2"</code> palette. The <code>text_col</code> is the 18th color and <code>highlight_col</code> is the 15th color. A variable containing the background color, <code>bg_col</code>, is also defined.</p>
 <div class="cell">
 <div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
@@ -587,8 +585,12 @@ Figure&nbsp;12.4: Map of the world with countries colored based on number of doc
 <span class="header-section-number">12.4.2</span> Text and fonts</h3>
 <p>As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. Here, the <em>Roboto</em> font is loaded through Google Fonts for the main font used, and <em>Roboto Slab</em> is loaded for use in the title. </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span><span class="op">)</span></span>
-<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto Slab"</span>, family <span class="op">=</span> <span class="st">"roboto_slab"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Roboto Slab"</span>, family <span class="op">=</span> <span class="st">"roboto_slab"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"roboto"</span></span>
@@ -866,6 +868,12 @@ Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The
 <div id="ref-aphalo2024" class="csl-entry" role="listitem">
 Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
 </div>
+<div id="ref-egg" class="csl-entry" role="listitem">
+Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2’: Custom Geom, Custom Themes, Plot Alignment, Labelled Panels, Symmetric Scales, and Fixed Panel Size</span></em>. <a href="https://CRAN.R-project.org/package=egg">https://CRAN.R-project.org/package=egg</a>.
+</div>
+<div id="ref-imager" class="csl-entry" role="listitem">
+Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
+</div>
 <div id="ref-bridson2007" class="csl-entry" role="listitem">
 Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
 </div>
@@ -896,9 +904,6 @@ Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and D
 <div id="ref-seafood_data" class="csl-entry" role="listitem">
 Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
 </div>
-<div id="ref-img_dibbern" class="csl-entry" role="listitem">
-Dibbern, Lilian. 2019. <span>“Lemur Beside Tree.”</span> <a href="https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY">https://unsplash.com/photos/lemur-beside-tree-3TwT-n8RTNY</a>.
-</div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
@@ -913,6 +918,9 @@ Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessic
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
 Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-GAcharts" class="csl-entry" role="listitem">
+Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
 </div>
 <div id="ref-geofacet" class="csl-entry" role="listitem">
 Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
@@ -938,6 +946,9 @@ Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive 
 <div id="ref-zones_data" class="csl-entry" role="listitem">
 Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
 </div>
+<div id="ref-img_jax" class="csl-entry" role="listitem">
+Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+</div>
 <div id="ref-kays2020" class="csl-entry" role="listitem">
 Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
 </div>
@@ -955,6 +966,9 @@ Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Gr
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
 McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
 Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
@@ -974,11 +988,17 @@ Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</spa
 <div id="ref-tibble" class="csl-entry" role="listitem">
 Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
 </div>
+<div id="ref-Muth2018" class="csl-entry" role="listitem">
+Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span>
+</div>
 <div id="ref-turbines_data" class="csl-entry" role="listitem">
 Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
 </div>
 <div id="ref-rcartocolor" class="csl-entry" role="listitem">
 Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-magick" class="csl-entry" role="listitem">
+Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
 </div>
 <div id="ref-doctors_data" class="csl-entry" role="listitem">
 Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
@@ -994,6 +1014,9 @@ Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Acceleratin
 </div>
 <div id="ref-marquee" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-systemfonts" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, Jeroen Ooms, and Devon Govett. 2024. <em><span class="nocase">systemfonts: System Native Font Finding</span></em>. <a href="https://CRAN.R-project.org/package=systemfonts">https://CRAN.R-project.org/package=systemfonts</a>.
 </div>
 <div id="ref-ragg" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.

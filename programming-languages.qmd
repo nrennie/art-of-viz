@@ -19,9 +19,9 @@ In this chapter we'll learn how to combine points and lines to create dumbbell c
 
 In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopaedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
 
-The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a \#TidyTuesday dataset in March 2023, meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
+The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023, meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
 
-The {tidytuesdayR} R package has several functions for helping to get data and information about \#TidyTusday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTusday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: langauges-load-data-show
@@ -49,7 +49,7 @@ What does the data look like? We can inspect the first six rows of the data usin
 head(languages)
 ```
 
-You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the \#TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the \#TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
+You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
 
 There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the `github_` columns might be related to the fact that many programming languages precede GitHub's creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn't a statistics book, so for the purposes of visualization we'll focus on columns that are mostly complete. \index{missing data}
 
@@ -273,13 +273,13 @@ Let's start with colors. How do you decide which colors to use? The more complex
 
 To make visualizations that are more aesthetically pleasing, it's often useful to think about whether you can match your color choices to the theme of the data. For example, if you're creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we're creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in *green screens* - [monochrome monitors](https://en.wikipedia.org/wiki/Monochrome_monitor) that use a green phosphor screen, typically in the early days of computing. 
 
-We can define some variables to store our colors in: a variable called `bg_col` that's dark grey color we'll use for the background; and a variable called `main_col` that's a hex code for a bright green color we'll use for the text and other geometric elements.
+We can define some variables to store our colors in: a variable called `bg_col` that's dark gray color we'll use for the background; and a variable called `main_col` that's a hex code for a bright green color we'll use for the text and other geometric elements.
 
 ::: {#tip-languages-colors .callout-tip}
 
 ## Colors in R
 
-The dark grey, `"gray5"`, is a pre-defined color in R. Run `colors()` to see the list of all `r length(colors())` pre-defined colors available.
+The dark gray, `"gray5"`, is a pre-defined color in R. Run `colors()` to see the list of all `r length(colors())` pre-defined colors available.
 
 :::
 
@@ -287,17 +287,17 @@ It's useful to save colors as variables because it makes it much easier to edit 
 
 ```{r}
 #| label: langauges-color-vars
-bg_col <- "grey5"
+bg_col <- "gray5"
 main_col <- "#66FF00"
 ```
 
 Although you can use `update_geom_defaults()` to change the default colors used for lines, points, and text, I'm not a fan of this approach since it changes the colors for all plots in your R session and it's quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the `aes()` function since they are not mapped to variables in the data. \index{ggplot2!aes} \index{ggplot2!update\_geom\_defaults}
 
-The point character (`pch`) for `geom_point()` is also set to `22` - a square which allows you to color the square and its outline different colors. The outline `color` is set to our green `main_col` and the square `fill` color is set to the dark grey `bg_col`.
+The point character (`pch`) for `geom_point()` is also set to `22` - a square which allows you to color the square and its outline different colors. The outline `color` is set to our green `main_col` and the square `fill` color is set to the dark gray `bg_col`.
 
 ```{r}
 #| label: fig-langauges-basic-plot2
-#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark grey points."
+#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points."
 #| source-line-numbers: "4,8,9,10"
 basic_plot <- ggplot(data = plot_data) +
   geom_line(
@@ -381,8 +381,12 @@ We also need to make sure that whichever graphics device we are using, is able t
 
 ```{r}
 #| label: langauges-showtext
-sysfonts::font_add_google(name = "VT323", family = "vt")
-sysfonts::font_add_google(name = "Share Tech Mono", family = "share")
+sysfonts::font_add_google(
+  name = "VT323", family = "vt"
+)
+sysfonts::font_add_google(
+  name = "Share Tech Mono", family = "share"
+)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 ```
@@ -394,6 +398,7 @@ showtext::showtext_opts(dpi = 300)
 There are several alternatives to {showtext} for working with fonts in R. Depending on what you're creating, you might find one of these works better for you:
 
 * The {ragg} package [@ragg] uses a different graphics device, and allows to use any fonts installed on your system. You can usually install additional fonts by downloading the relevant font files, then right clicking and choosing the install option.
+* The {systemfonts} package [@systemfonts] allows you to locate or load local font files based on font family and style. We'll look at an example of using {systemfonts} in @sec-lemurs.
 * The {extrafont} package [@extrafont] which focuses on using TrueType fonts in PDF formats.
 
 :::
@@ -647,11 +652,9 @@ If you're saving images at a different size or resolution (e.g. 300 dpi) to the 
 
 Even though we're essentially *finished* with this visualization, it's useful to get some feedback on how effective it is. You could share your visualization with a colleague or friend and ask for them to critique it. Alternatively, you can reflect on your own work with a critical eye. Reflecting on your own work is often more successful if you leave your visualization alone for a little while first. When you come back to it, think about whether your choice of plot was the best one, whether the fonts need re-sizing, or if you should use a different color scheme. So, which elements of this visualization could still be improved?
 
-There are two immediate aspects that jump out:
+When using dumbbell charts to show timeframes like this, the dots at each end are often taken as start and end time points. In this chart, that doesn't quite make sense. Imagine a programming language that was last active twenty years ago and is officially no longer maintained. Then imagine a different language that was last updated last week. The end time point (showing `last_activity`) is represented the same way in these two cases. Using an open-ended dumbbell for languages that are still actively being maintained might be more representative of what's actually happening in the data.
 
-* When using dumbbell charts to show timeframes like this, the dots at each end are often taken as start and end time points. In this chart, that doesn't quite make sense. Imagine a programming language that was last active twenty years ago and is officially no longer maintained. Then imagine a different language that was last updated last week. The end time point (showing `last_activity`) is represented the same way in these two cases. Using an open-ended dumbbell for languages that are still actively being maintained might be more representative of what's actually happening in the data.
-
-* The labels showing the name and rank of the programming languages are a little bit hard to read. Each label isn't distinct enough from the labels above or below it. One option would be to change the size of the image - making the image taller would allow more space between each label. A second option would be to make the language name a slightly larger bold font, with the rank in a slightly smaller font below. This would make it clearer that there are ten labels rather than 20! We'll discuss how to add more complex formatting to text labels in @sec-cats, using the {ggtext} package. 
+The labels showing the name and rank of the programming languages are a little bit hard to read. Each label isn't distinct enough from the labels above or below it. One option would be to change the size of the image - making the image taller would allow more space between each label. A second option would be to make the language name a slightly larger bold font, with the rank in a slightly smaller font below. This would make it clearer that there are ten labels rather than 20! We'll discuss how to add more complex formatting to text labels in @sec-cats, using the {ggtext} package. 
 
 \index{ggtext}
 

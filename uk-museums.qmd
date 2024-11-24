@@ -17,7 +17,7 @@ In this chapter we'll consider different ways of visualising data that varies ov
 
 ## Data
 
-The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at [museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home). It was also used as a \#TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022, and we'll use that version for this chapter.
+The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at [museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home). It was also used as a TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022, and we'll use that version for this chapter.
 
 Let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
@@ -138,7 +138,10 @@ museum_subset <- museums |>
     dplyr::across(
       c(opened1, opened2, closed1, closed2), as.numeric
     ),
-    Area_Deprivation_index = factor(Area_Deprivation_index, levels = 1:10)
+    Area_Deprivation_index = factor(
+      Area_Deprivation_index,
+      levels = 1:10
+    )
   )
 ```
 
@@ -390,7 +393,9 @@ Let's start by loading in a different font using `font_add_google()` from {sysfo
 
 ```{r}
 #| label: museums-fonts
-sysfonts::font_add_google("Raleway", "raleway")
+sysfonts::font_add_google(
+  name = "Raleway", family = "raleway"
+)
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "raleway"
@@ -433,7 +438,7 @@ Now we need to edit the `theme()` elements to apply the text fonts and styles, e
 
 In {ggplot2}, the axis limits are chosen automatically based on the range of the data. It's often useful to chose limits (and breaks) that are *nice* - it makes it easier to calculate where other values are. We can set `scale_y_continuous(limits = c(0, 300))` to make the range of the y-axis between 0 and 300. We can also set `coord_cartesian(expand = FALSE)` to remove the extra space around the plot area that is added by default - giving a slightly cleaner look. Using `theme_minimal()` as a base, we can set the default font size and family using `base_size = 7` and `base_family = body_font`. \index{ggplot2!theme\_minimal} \index{ggplot2!coord\_cartesian} \index{ggplot2!scale\_y\_continuous}
 
-Setting `legend.position = "none"` removes the legend on the right hand side. The `plot.title.position = "plot"` and `plot.caption.position = "plot"` arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded grey by default), which doesn't look good when you have long axis labels, or a multi-line axis title on the y-axis.
+Setting `legend.position = "none"` removes the legend on the right hand side. The `plot.title.position = "plot"` and `plot.caption.position = "plot"` arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded gray by default), which doesn't look good when you have long axis labels, or a multi-line axis title on the y-axis.
 
 The `panel.spacing` argument controls how close the facets are to each other -  this can help to stop the year labels on side-by-side plots from overlapping. Setting `plot.margin = margin(10, 15, 10, 10)` adds some extra space around the outside of the plot, with the higher value on the right hand side compensating and balancing out the space from the axis title on the left hand side. The `plot.background` and `panel.background` arguments set the background color of the plot and panel areas to be the `bg_col` variable previously defined.
 
@@ -486,10 +491,9 @@ text_plot +
 
 ## Reflection
 
-Is there anything that could still be improved about this plot? There are two main elements that jump out:
+Is there anything that could still be improved about this plot? The axis text denoting the years only appears on the bottom row of faceted plots. This makes it a little bit tricky to see what's going on in the first row without first looking at the years in the row below. It's a fairly minor point, but adding year labels to the top row would just make it easier for a reader.
 
-* The axis text denoting the years only appears on the bottom row of faceted plots. This makes it a little bit tricky to see what's going on in the first row without first looking at the years in the row below. It's a fairly minor point, but adding year labels to the top row would just make it easier for a reader.
-* We removed the legend from the plot with the reason that *the colors are based on the levels of deprivation, which are already labelled on the facet titles*. This same argument could be used to remove the colors altogether. There's no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g. red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean.
+We removed the legend from the plot with the reason that *the colors are based on the levels of deprivation, which are already labelled on the facet titles*. This same argument could be used to remove the colors altogether. There's no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g. red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean.
 
 ::: {.content-visible when-format="html"}
 

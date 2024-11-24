@@ -19,7 +19,7 @@ In this chapter, we'll learn how to explore patterns in missing data, install R 
 
 ## Data
 
-As a major pollinator, bees are a vitally important part of our planet's ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors [@bees_data].
+As a major pollinator, bees are a vitally important part of our planet's ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [@Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors [@bees_data].
 
 The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] data set in January 2022, and so can be loaded in using the {tidytuesdayR} package: \index{tidytuesdayR!tt\_load}
 
@@ -249,7 +249,7 @@ The same function can be used for installing packages from CRAN e.g. `pak::pkg_i
 
 We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we'll use the `poisson2d()` function from {poissoned}. Since we're storing two coordinates (`x` and `y`) and the number of coordinate pairs will vary for each grid square, we'll store the output in a list column. We can add list columns in the same way we would add any other new column using the `mutate()` function from {dplyr}. Since we want to generate samples according to the values of `state`, `year`, and `colony_n` in each *row* of our data, we use the `rowwise()` function from {dplyr}. Since we're generating random data, we also need to make sure we set the random seed using `set.seed()` to ensure we get the same plot every time we run the code. \index{dplyr!mutate} \index{dplyr!rowwise} \index{base!set.seed}
 
-We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e. there is an inverse relationship between `r` and `colony_n`. The default grid in `poisson2d()` goes from 0 to 10 on both axes. The values in `colony_n` range from `r min(plot_data$colony_n)` to `r max(plot_data$colony_n)`, meaning that if we simply set the minimum radius to `1/colony_n`, we end up with points that are only `r format(1/max(plot_data$colony_n), scientific = FALSE)` apart. That's a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set `r` to `200000/colony_n`. \index{poissoned!poisson2d}
+We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e. there is an inverse relationship between `r` and `colony_n`. The default grid in `poisson2d()` goes from 0 to 10 on both axes. The values in `colony_n` range from `r format(min(plot_data$colony_n), scientific = FALSE)` to `r format(max(plot_data$colony_n), scientific = FALSE)`, meaning that if we simply set the minimum radius to `1/colony_n`, we end up with points that are only `r format(1/max(plot_data$colony_n), scientific = FALSE)` apart. That's a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set `r` to `200000/colony_n`. \index{poissoned!poisson2d}
 
 ```{r}
 #| label: bees-disk-sampling
@@ -372,8 +372,7 @@ Since this is already quite a visually complex chart, we'll avoid further distra
 ```{r}
 #| label: bees-fonts
 sysfonts::font_add_google(
-  name = "Red Hat Text",
-  family = "red_hat"
+  name = "Red Hat Text", family = "red_hat"
 )
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
