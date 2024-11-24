@@ -35,7 +35,7 @@ You can search for more open data at [search.open.canada.ca/opendata](https://se
 
 Though the {readxl} package [@readxl] package can be used to read Excel files stored locally, it doesn't work for reading in Excel files directly from a URL. We could visit the relevant [open.canada.ca/data/dataset](https://open.canada.ca/data/dataset/) website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package [@openxlsx] which allows us to pass in a URL.
 
-Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ([open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called `url`.
+Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ([open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called `url`. If you plan to download other datasets from the same site, it can be useful to save the main website as the `base_url` variable so that you can reuse this string later.
 
 We then use the `read.xlsx()` function from {openxlsx}, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
 
@@ -43,7 +43,11 @@ We then use the `read.xlsx()` function from {openxlsx}, where we pass in the `ur
 #| label: turbines-download-1
 #| eval: false
 #| echo: true
-url <- "https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
+base_url <- "https://ftp.cartes.canada.ca/"
+url <- paste0(
+  base_url,
+  "pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
+)
 wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
 ```
 
@@ -61,7 +65,7 @@ There are some features of Excel files that can make them more human-friendly bu
 
 :::
 
-We don't want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let's save a copy locally. We could simply save the Excel file (or we could have used `download.file()` instead of `read_csv()`). However, it would be better to save it as a CSV files instead because they smaller in size, and can be opened in a simple text editor. Luckily the `wind_turbines` data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using `write.csv()` using an appropriate file name (and setting `row.names = FALSE` to avoid adding an additional column of row names). \index{utils!write.csv}
+We don't want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let's save a copy locally. We could simply save the Excel file (or we could have used `download.file()` instead of `read_csv()`). However, it would be better to save it as a CSV file instead because they are smaller in size, and can be opened in a simple text editor. Luckily the `wind_turbines` data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using `write.csv()` with an appropriate file name (and setting `row.names = FALSE` to avoid adding an additional column of row names). \index{utils!write.csv}
 
 ```{r}
 #| label: turbines-download-2
@@ -106,6 +110,8 @@ Let's start by exploring the hypothesis that wind turbines with a larger rotor d
 ```{r}
 #| label: fig-turbines-scatter
 #| fig-cap: "Scatter plot showing the relationship between rotor diameter and turbine capacity."
+#| echo: -1
+par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
   wind_turbines$`Rotor.diameter.(m)`,
   as.numeric(wind_turbines$`Turbine.rated.capacity.(kW)`),
@@ -129,9 +135,8 @@ Let's instead look at the number of turbines in each region, by creating an orde
 ```{r}
 #| label: fig-turbines-barplot
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
-# Add space for labels
-# (default b, l, t, r = 5.1, 4.1, 4.1, 2.1)
-par(mar = c(5.1, 6.6, 4.1, 2.1))
+#| echo: -1
+par(mar = c(3.1, 6.6, 1.1, 2.1))
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
   # make labels smaller so they fit on the page
@@ -147,6 +152,8 @@ Most of the turbines are located in Ontario, but has this always been the case? 
 ```{r}
 #| label: fig-turbines-barplot-2
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
+#| echo: -1
+par(mar = c(3.1, 4.1, 1.1, 2.1))
 barplot(
   table(
     wind_turbines$`Province/Territory`,
@@ -434,12 +441,14 @@ In the {rcartocolor} package, categorical palettes are referred to as *qualitati
 #| label: fig-turbines-rcarto
 #| fig-cap: "All qualitative color palettes with at least 6 colors in the {rcartocolor} package."
 #| fig-asp: 0.8
+#| echo: -1
+par(mar = c(2.1, 4.1, 1.1, 2.1))
 rcartocolor::display_carto_all(
   n = 6, type = "qualitative"
 )
 ```
 
-Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a grey color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal}
+Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal}
 
 We also make the `col_palette` vector a named vector by using the `names()` function, and using `region_levels` as the names. Although this isn't necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.
 
