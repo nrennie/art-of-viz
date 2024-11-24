@@ -13,11 +13,19 @@ fig-asp: 0.75
 #| file: R/options.R
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/source_caption.R
+```
+
 # Cats: data-driven annotations with {ggtext} {#sec-cats}
 
 In this chapter, we'll learn how to join multiple data sets together, create custom captions with social media icons, and add data-driven annotations to our plots. 
 
 ## Data
+
+Data from [@cats_data] from the accompanying paper @kays2020
 
 ```{r}
 #| label: cats-data-show
@@ -41,9 +49,40 @@ cats_reference <- readr::read_csv("data/cats_uk_reference.csv")
 
 ### Data exploration
 
+```{r}
+#| label: fig-cats-speed-hist
+#| fig-cap: "Plot"
+hist(cats$ground_speed)
+```
+
+```{r}
+#| label: fig-cats-bar-hrs
+#| fig-cap: "Plot"
+barplot(
+  table(cats_reference$hrs_indoors)
+)
+```
+
+```{r}
+#| label: fig-cats-bar-age
+#| fig-cap: "Plot"
+barplot(
+  table(cats_reference$age_years)
+)
+```
+
+
+```{r}
+#| label: fig-cats-bar-age-hrs
+#| fig-cap: "Plot"
+barplot(
+  table(cats_reference$hrs_indoors, cats_reference$age_years)
+)
+```
+
 ### Exploratory sketches
 
-![Initial sketch of a scatter plot with annotations](images/sketch-packages-1.png){#fig-cats-sketch fig-align="center"}
+![Initial sketch of a scatter plot with annotations](images/sketch-cats.png){#fig-cats-sketch fig-align="center"}
 
 ## Preparing a plot
 
@@ -81,6 +120,7 @@ plot_data <- cats_data |>
 
 ```{r}
 #| label: fig-cats-base-plot
+#| fig-cap: "Plot"
 library(ggplot2)
 base_plot <- ggplot() +
   geom_point(
@@ -270,6 +310,8 @@ st <- glue::glue(
 
 [@ggtext]
 
+[@social_icons]
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -290,12 +332,6 @@ social <- social_caption(
   font_color = cats_palette$dark_text,
   font_family = body_font
 )
-```
-
-```{r}
-#| echo: true
-#| eval: true
-#| file: R/source_caption.R
 ```
 
 ```{r}
