@@ -29,13 +29,13 @@ fig-asp: 0.67
 knitr::opts_chunk$set(dev = "ragg_png")
 ```
 
-# Lemurs: manipulating images with {magick} {#sec-lemurs}
+# Lemurs: manipulating images in R {#sec-lemurs}
 
 In this chapter, we'll cover how to load and manipulate images in R using the {magick} and {imager} packages. We'll also look at how to combine images with plots using the {cowplot} package.
 
 ## Data
 
-We're going to be exploring data about lemurs from [Duke Lemur Center](https://lemur.duke.edu/) in this chapter [@lemurs_data]. ... The data was used as a TidyTuesday dataset in August 2021, and so can be loaded into R using the `tt_load()` function from {tidytuesdayR} as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
+We're going to be exploring data about lemurs from [Duke Lemur Center](https://lemur.duke.edu/) in this chapter [@lemurs_data]. Duke Lemur Center houses hundreds of lemurs across many different species, and collect data on their lemur residents to better understand the factors that effect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by [Jesse Mostipak](https://github.com/kierisi)), and so can be loaded into R using the `tt_load()` function from {tidytuesdayR} as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-lemurs-data-show
@@ -55,32 +55,32 @@ lemurs <- readr::read_csv("data/lemur_data.csv")
 taxonomy <- readr::read_csv("data/taxonomy.csv")
 ```
 
-The data
+The `lemurs` data contains information on individual lemurs, and is the data set we'll mainly focus on in this chapter. The data has `r nrow(lemurs)` rows and `r `ncol(lemurs)`, making it a reasonably large dataset. The columns give information on the `taxon` code identifying the species of lemur, the name and sex of the lemur, the lemurs parents, whether they are still alive, the lemurs age and weight, and many other variables. Many of the columns give duplicated information since they express the same data in different units e.g. the lemur's age is given in five different columns: in days, weeks, months, decimal months, and years.
+
+Though there are `r nrow(lemurs)` rows of data, this doesn't mean that there are data on `r nrow(lemurs)` lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e. different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lmeurs e.g. if a lemur is still alive, there will be no `age_at_death_y` value. This also means that if we wanted to process the missing data, we'd likely need to start with rule-based approach to decide which values should be *missing* and which ones are unexpectedly missing. 
 
 The `taxonomy` data is essentially a look up table for the `taxon` column in the `lemurs` data. For each `taxon` code, the `taxonomy` data provides the Latin name (`latin_name`) for the species, as well as the common name (`common_name`). If desired, the two datasets could be joined using the `taxon` column.
 
 ## Exploratory work
 
-
+Given the size of the data and the diversity of the variables included, there are many aspects of it that we may wish to explore further. We could use the parental information to [construct a family tree of lemurs](https://raw.githubusercontent.com/nrennie/data-viz-projects/refs/heads/main/Lemur%20Family%20Tree/images/lemur-family-tree.png). We could compare the range of weights and ages across different species of lemurs. We could look at the *normal* growth curve for lemurs to identify which ones are outside of a normal weight range for their age. There are almost endless options!
 
 ### Data exploration
 
-Some of the 
-
-\index{graphics!plot}
+Let's focus in on the growth curve idea, and look at the relationship between lemur age and weight. We can use the base R `plot()` function to create @fig-lemurs-scatter, showing the relationship between age in months and weight in grams. As we might expect with a data set containing `r nrow(lemurs)` data points, the scatter plot doesn't clearly show any real pattern as there's too much variablity and many of the points overlap. \index{graphics!plot}
 
 ```{r}
 #| label: fig-lemurs-scatter
 #| fig-cap: "Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern."
 #| echo: -1
-par(mar = c(3.1, 3.1, 2.1, 2.1))
+par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
   lemurs$age_at_wt_mo,
   lemurs$weight_g
 )
 ```
 
-\index{graphics!boxplot}
+We know that there are `r nrow(taxonomy)` species of lemur in the data, and, even if you don't know much about lemurs, you might expect that the weights vary by species. A quick boxplot of weights by species using the `boxplot()` function in R confirms this, with @fig-lemurs-boxplot showing that there are big differences in lemur weights between species. \index{graphics!boxplot}
 
 ```{r}
 #| label: fig-lemurs-boxplot
@@ -100,8 +100,9 @@ boxplot(
 )
 ```
 
-
 ### Exploratory sketches
+
+Given the variability in weights between species, we may wish to focus in on a single species. Let's keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating @fig-lemurs-scatter for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognisable just by their common name, we'll add an image of the lemur species in the bottom right corner to add more context to the chart.
 
 ![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center"}
 
@@ -300,12 +301,11 @@ text_plot
 
 ### Adjusting themes
 
-Now we need to add some final styling to implement the background and text colors, as well as making sure the raw HTML code is processed correctly.
+Now we need to add some final styling to implement the background and text colors, as well as making sure the raw HTML code is processed correctly. 
 
-still need to edit grid lines and axis text labels formatting colors
+We start with `theme_minimal()` as a base, which keeps the grid lines and axes but removes the grey background and dark axis ticks. We also set the base font size as size `6` and use our previously defined `body_font` variable as the base font family. We can then make a few further adjustments using `theme()`, where we remove the legend by setting `legend.position = "none"`, add a margin around the edge of the plot, and apply the selected background color using `element_rect()`. \index{ggplot2!theme\_minimal} \index{ggplot2!theme}  \index{ggplot2!element\_rect}
 
-\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!element\_text} 
-\index{ggtext!element\_textbox\_simple}
+Setting `plot.title.position` and `plot.caption.position` to `"plot"` aligns the title, subtitle, and caption with outside of the entire plot rather than the panel with the scatter plot - giving a cleaner, more balanced look. The title text is further adjusted with `element_text()` to use the `title_font` family, increase it in size, change the color, and add a little bit more space at the bottom of it. As described in @sec-programming and @sec-cats, we use `element_textbox_simple()` from {ggtext} for the plot subtitle and caption to force the long text to wrap onto multiple lines, and to correctly process the HTML code in the caption. \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_text} 
 
 ```{r}
 #| label: fig-lemurs-style-1
