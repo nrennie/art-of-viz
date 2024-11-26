@@ -21,13 +21,13 @@ fig-asp: 0.75
 
 # Cats: data-driven annotations with {ggtext} {#sec-cats}
 
-In this chapter, we'll learn how to join multiple data sets together, create custom captions with social media icons, and add data-driven annotations to our plots. 
+In this chapter, we'll learn how to create custom captions with social media icons, and add data-driven annotations to our plots. 
 
 ## Data
 
-Data from [@cats_data] from the accompanying paper @kays2020
+Between 2013 and 2017, @kays2020 recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data [@cats_data] was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they're not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we'll focus on the data from cats (and their owners!) based in the United Kingdom.
 
-\index{tidytuesdayR!tt\_load}
+The data was used as a TidyTuesday dataset in January 2023, and so can be loaded with the `tt_load()` function from {tidytuesdayR} [@tidytuesdayR]. There are two datasets included, which we'll read in as `cats` and `cats_reference`. \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: cats-data-show
@@ -47,29 +47,54 @@ cats <- readr::read_csv("data/cats_uk.csv")
 cats_reference <- readr::read_csv("data/cats_uk_reference.csv")
 ```
 
-The `cats` data contains information from the sensors including the latitude and longitudes recorded at different timestamps. There are multiple (many) observations for each cat, resulting in a total of `r nrow(cats)` rows across `r ncol(cats)` columns. Some of the observations have been marked as outliers, either by an automatic algorithm, manually, or both. 
-
-The `cats_reference` data provides information on each individual cat such as their name, age, sex, how long they spend indoors, and what type of food they eat. The two datasets can be joined by the `tag_id` column that exists in both `cats` and `cats_reference`.
-
-
-color by male/female, x-age, y-hrs indoors
-
+The `cats` data contains information from the sensors including the latitudes and longitudes recorded at different timestamps. There are multiple (many) observations for each cat, resulting in a total of `r nrow(cats)` rows across `r ncol(cats)` columns. Some of the observations have been marked as outliers, either by an automatic algorithm, manually, or both. The `cats_reference` data contains information provided by the cat owners on each individual cat such as their name, age, sex, how long they spend indoors, and what type of food they eat. The two datasets can be joined by the `tag_id` column that exists in both `cats` and `cats_reference`.
 
 ## Exploratory work
 
+With the `cats` data, we could focus the spatial patterns and look at the range of where cats travel. For example, how far does the average cat travel in a day? Alternatively, we could focus on the `cats_reference` data and look at relationships between different behaviours and characteristics of cats. For example, do older cats spend more time indoors? Or do cats who live with other cats bring home more prey?
+
+The third option, and perhaps the most useful, is to join the two datasets together. Joining the data on the individuals to their geographic data might allow us to answer questions such as: do male cats travel further per day? Do older cats stay closer to home? What are the strategies of a cat that brings home lots of *gifts*?
+
 ### Data exploration
 
-\index{graphics!hist}
+Let's start by digging into the geographic `cats` data. We can make a very quick plot of the co-ordinate data using `plot()`. \index{graphics!plot}
+
+```{r}
+#| label: fig-cats-map
+#| fig-cap: "Plot"
+plot(
+  cats$location_long, cats$location_lat,
+  xlab = "Longitude", ylab = "Latitude"
+)
+```
+
+Given that the data in @fig-cats-map is geographic coordinate data, we would be able to understand it a bit better with a background map to give more context to location and distance. However, even with this very minimal map, it's clear that there are lots of small clusters of points - perhaps each cluster is a specific cat?
+
+::: {#tip-cats-lat-long .callout-tip}
+
+## Remembering latitude and longitude
+
+No matter how many times you plot them on a map, remembering which way round latitude and longitude go on the x- and y-axes might not seem to get any easier! One way to help you remember:
+
+* Picture a world map. It's probably rectangular with the *long* edge going along the bottom.
+* The *longitude* goes along the bottom i.e. the x-axis.
+
+:::
+
+The GPS sensors also report data on the ground speed of the cats, potentially allowing us to see patterns in their activity level throughout the day. Let's have a look at the `ground_speed` column by plotting an exploratory histogram with `hist()`: \index{graphics!hist}
 
 ```{r}
 #| label: fig-cats-speed-hist
 #| fig-cap: "Plot"
-hist(cats$ground_speed)
+hist(cats$ground_speed,
+  xlab = "Ground speed (m/s)",
+  main = "Histogram of ground speed"
+)
 ```
 
-At first glance you might not notice anything of particular note about @fig-cats-speed-hist. However, the data description reports that the ground speed is measured meters per second (m/s), but the histogram goes up to 250,000. For those who don't often work in m/s, that's about 560,000 miles per hour, or 900,000 kilometres per hour! Either these are exceptionally fast cats or there's an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don't know what the issue is, but this is certainly a column in the data that we shouldn't trust too much.
+At first glance you might not see anything of particular note about @fig-cats-speed-hist. However, the data description reports that the ground speed is measured in meters per second (m/s), but the histogram goes up to 250,000. For those of you who don't often work in m/s, that's about 560,000 miles per hour, or 900,000 kilometres per hour! Either these are exceptionally fast cats or there's an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don't know what the issue is, but this is certainly a column in the data that we shouldn't trust too much.
 
-Let's focus on the `cats_reference` data instead, and looking how characteristics of the study cats varied. For example, we might look at the time the cats spends indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many ... using `table()` and use `barplot()` to visualize it: \index{graphics!barplot} \index{base!table}
+Let's focus on the `cats_reference` data instead, and look at how characteristics of the study cats varied. For example, we might look at how long the cats spend indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many cats fall into each time indoors *category* using `table()` and then use `barplot()` to visualize it: \index{graphics!barplot} \index{base!table}
 
 ```{r}
 #| label: fig-cats-bar-hrs
@@ -92,17 +117,17 @@ plot(
 
 There's a little bit of a pattern in @fig-cats-scatter, but not a particularly strong one. This is perhaps partly due to the categorical nature of the `hrs_indoors` column, since we lose information when we group data that is naturally continuous.
 
-This also results in many of the points being stacked on top a better plot might use size, bubble plot
-
-What other factors might affect how long a cat spends indoors? There are several factors - owners working patterns, 
+This categorization of data also results in many of the points being stacked on top of each other. There are `r nrow(cats_reference)` cats in the data, but there doesn't appear to be `r nrow(cats_reference)` points in @fig-cats-scatter. If we were to take the visualization further, we might consider changing it from a scatter plot to a bubble plot. With bubble plots, the size of the points relates to some other variable e.g. the number of cats in each `age_years`-`hrs_indoor` category combination.
 
 ### Exploratory sketches
+
+Let's take the idea from @fig-cats-scatter but ... 
+
 
 ![Initial sketch of a scatter plot with annotations](images/sketch-cats.png){#fig-cats-sketch fig-align="center"}
 
 ## Preparing a plot
 
-Let's take the idea from @fig-cats-scatter but ... 
 
 ### Data wrangling
 
@@ -114,10 +139,10 @@ There's one cat (``) whose age is unknown, so we use. see ...
 #| label: cats-wrangling
 plot_data <- cats_reference |>
   dplyr::select(age_years, hrs_indoors) |>
-  dplyr::mutate(hrs_indoors = factor(hrs_indoors)) |> 
+  dplyr::mutate(hrs_indoors = factor(hrs_indoors)) |>
   dplyr::group_by(age_years, hrs_indoors) |>
   dplyr::count() |>
-  dplyr::ungroup() |> 
+  dplyr::ungroup() |>
   tidyr::drop_na()
 ```
 
@@ -178,24 +203,19 @@ base_plot
 
 ```{r}
 #| label: cats-fonts
-sysfonts::font_add_google(
-  name = "Fraunces",
-  family = "fraunces"
-)
-sysfonts::font_add_google(
-  name = "Commissioner",
-  family = "commissioner"
-)
+sysfonts::font_add_google(name = "Fraunces", )
+sysfonts::font_add_google(name = "Commissioner")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-title_font <- "fraunces"
-body_font <- "commissioner"
+title_font <- "Fraunces"
+body_font <- "Commissioner"
 ```
-
 
 ### Adding annotations
 
-\index{ggplot2!slice\_max}
+In @sec-programming, when we constructed the subtitle, we used the `glue()` function from {glue} to create a data-driven subtitle. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It's a more efficient approach that's less prone to accidental errors than *hard coding* all of the text. We can take a similar approach when adding annotations to plots.
+
+Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from {dplyr} to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
 
 ```{r}
 #| label: cats-oldest
@@ -203,7 +223,9 @@ annot_oldest <- cats_reference |>
   dplyr::slice_max(age_years)
 ```
 
-fix location of annotation
+When it comes to adding the annotation to the plot, there are several options: `annotate()` which ; `geom_text()`; or `geom_label()` which works similarly to `geom_text()` ... . Here, annotate ... 
+
+However, we're going to {ggtext} instead of ... . We've already seen examples of using 
 
 [@ggtext]
 
@@ -230,7 +252,7 @@ annotated_plot <- base_plot +
     maxheight = unit(4, "lines"),
     minwidth = unit(6, "lines"),
     maxwidth = unit(8, "lines")
-  ) 
+  )
 annotated_plot
 ```
 
@@ -254,22 +276,29 @@ arrow_plot <- annotated_plot +
 arrow_plot
 ```
 
-make hrs_categorical
-
-
 ### Adding text
 
 ```{r}
 #| label: cats-text-1
-title <- "Indoor cats are fast - and they don't slow down!"
-st <- "Only 7% of cats in the study spend more than 17.5 hours per day indoors. Cats who spend more than 17.5 hours a day indoors tend to be among the faster cats, having higher average ground speed compared to cats who spend less time indoors! Age seems to have minimal impact on speed."
+title <- "Do older cats spend more time indoors?"
+
+perc_indoor <- round(100 * sum(cats_reference$hrs_indoors == "22.5") / nrow(cats_reference))
+st <- glue("Some {perc_indoor}% of cats in the study spend more than 17.5 hours per day indoors. Cats who spend more than 17.5 hours a day indoors tend to be among the faster cats, having higher average ground speed compared to cats who spend less time indoors! Age seems to have minimal impact on speed.")
 ```
 
 ### Custom caption functions
 
-[@ggtext]
+When we constructed the `source_caption()` function in @sec-turbines, we simply passed in a character string with the ... to indicate the creator of the chart. What might be more useful is a way to contact or better identify the author of the chart. This also works ... to see more of their work. It's very common in website, ... to link to social meda profiles. We can do something very similar for a static chart. Instead of ..., we'll create a caption that contains social media icons and the associated handles. Since this is something we are likely to add to multiple different plots, we'll create a function that produces this caption based on ... [@social_icons]
 
-[@social_icons]
+But first, before we jump into writing functions, we need to get some social media icons! font awesome ... The process is very similar to loading the Font Awesome Solid icons in @sec-turbines. 
+
+When downloading the zip file of Font Awesome icons in @sec-turbines, 
+
+[Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
+
+As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use {showtext} to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+
+
 
 \index{sysfonts!font\_add} \index{base!file.path}
 
@@ -280,6 +309,8 @@ st <- "Only 7% of cats in the study spend more than 17.5 hours per day indoors. 
 ```
 
 \index{social\_caption} \index{base!list} \index{glue!glue}
+
+[@ggtext]
 
 ```{r}
 #| echo: true
@@ -298,7 +329,7 @@ social <- social_caption(
 social
 ```
 
-\index{source\_caption}
+We can then use our `source_caption()` function from @sec-turbines, and pass the output from the `social_caption()` function into the `graphic` argument. We also ... and separate the two with ... \index{source\_caption}
 
 ```{r}
 #| label: cats-souce-cap
@@ -309,7 +340,7 @@ cap <- source_caption(
 )
 ```
 
-\index{ggplot2!labs}
+The text can then be added to @fig-cats-arrow using the `labs()` function as normal, by passing in the variables to the `title`, `subtitle`, and `caption` arguments. We also add more informative text for the title on the x and y axes, making sure to also specify the units. \index{ggplot2!labs}
 
 ```{r}
 #| label: fig-cats-text-plot
@@ -337,7 +368,6 @@ text_plot
 text_plot +
   theme_minimal(base_family = body_font, base_size = 6.5) +
   theme(
-    # text formatting
     text = element_text(color = text_col),
     plot.title.position = "plot",
     plot.caption.position = "plot",
