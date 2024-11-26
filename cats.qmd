@@ -27,6 +27,8 @@ In this chapter, we'll learn how to join multiple data sets together, create cus
 
 Data from [@cats_data] from the accompanying paper @kays2020
 
+\index{tidytuesdayR!tt\_load}
+
 ```{r}
 #| label: cats-data-show
 #| eval: false
@@ -57,6 +59,8 @@ color by male/female, x-age, y-hrs indoors
 
 ### Data exploration
 
+\index{graphics!hist}
+
 ```{r}
 #| label: fig-cats-speed-hist
 #| fig-cap: "Plot"
@@ -65,7 +69,7 @@ hist(cats$ground_speed)
 
 At first glance you might not notice anything of particular note about @fig-cats-speed-hist. However, the data description reports that the ground speed is measured meters per second (m/s), but the histogram goes up to 250,000. For those who don't often work in m/s, that's about 560,000 miles per hour, or 900,000 kilometres per hour! Either these are exceptionally fast cats or there's an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don't know what the issue is, but this is certainly a column in the data that we shouldn't trust too much.
 
-Let's focus on the `cats_reference` data instead, and looking how characteristics of the study cats varied. For example, we might look at the time the cats spends indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many ... using `table()` and use `barplot()` to visualize it:
+Let's focus on the `cats_reference` data instead, and looking how characteristics of the study cats varied. For example, we might look at the time the cats spends indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many ... using `table()` and use `barplot()` to visualize it: \index{graphics!barplot} \index{base!table}
 
 ```{r}
 #| label: fig-cats-bar-hrs
@@ -75,7 +79,7 @@ barplot(
 )
 ```
 
-We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let's use `plot()` to create a quick scatter plot of `age_years` against `hrs_indoors` to investigate:
+We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let's use `plot()` to create a quick scatter plot of `age_years` against `hrs_indoors` to investigate: \index{graphics!plot}
 
 ```{r}
 #| label: fig-cats-scatter
@@ -104,10 +108,13 @@ Let's take the idea from @fig-cats-scatter but ...
 
 There's one cat (``) whose age is unknown, so we use. see ... 
 
+\index{dplyr!select} \index{dplyr!mutate} \index{dplyr!group\_by} \index{dplyr!count} \index{dplyr!ungroup} \index{tidyr!drop\_na} \index{base!factor}
+
 ```{r}
 #| label: cats-wrangling
 plot_data <- cats_reference |>
   dplyr::select(age_years, hrs_indoors) |>
+  dplyr::mutate(hrs_indoors = factor(hrs_indoors)) |> 
   dplyr::group_by(age_years, hrs_indoors) |>
   dplyr::count() |>
   dplyr::ungroup() |> 
@@ -115,6 +122,8 @@ plot_data <- cats_reference |>
 ```
 
 ### The first plot
+
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 ```{r}
 #| label: fig-cats-base-plot
@@ -144,11 +153,11 @@ highlight_col <- "#914D76"
 bg_col <- "white"
 ```
 
+\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 ```{r}
 #| label: fig-cats-base-plot-2
 #| fig-cap: "Plot"
-library(ggplot2)
 base_plot <- ggplot() +
   geom_point(
     data = plot_data,
@@ -164,6 +173,8 @@ base_plot
 
 
 ### Fonts
+
+\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: cats-fonts
@@ -184,6 +195,8 @@ body_font <- "commissioner"
 
 ### Adding annotations
 
+\index{ggplot2!slice\_max}
+
 ```{r}
 #| label: cats-oldest
 annot_oldest <- cats_reference |>
@@ -191,6 +204,10 @@ annot_oldest <- cats_reference |>
 ```
 
 fix location of annotation
+
+[@ggtext]
+
+\index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
 
 ```{r}
 #| label: fig-cats-annot-1
@@ -216,6 +233,8 @@ annotated_plot <- base_plot +
   ) 
 annotated_plot
 ```
+
+\index{ggplot2!annotate} \index{grid!arrow} \index{grid!unit}
 
 ```{r}
 #| label: fig-cats-arrow
@@ -252,11 +271,15 @@ st <- "Only 7% of cats in the study spend more than 17.5 hours per day indoors. 
 
 [@social_icons]
 
+\index{sysfonts!font\_add} \index{base!file.path}
+
 ```{r}
 #| echo: true
 #| eval: true
 #| file: R/load_font_awesome.R
 ```
+
+\index{social\_caption} \index{base!list} \index{glue!glue}
 
 ```{r}
 #| echo: true
@@ -275,6 +298,8 @@ social <- social_caption(
 social
 ```
 
+\index{source\_caption}
+
 ```{r}
 #| label: cats-souce-cap
 cap <- source_caption(
@@ -284,6 +309,7 @@ cap <- source_caption(
 )
 ```
 
+\index{ggplot2!labs}
 
 ```{r}
 #| label: fig-cats-text-plot
@@ -300,6 +326,10 @@ text_plot
 ```
 
 ### Adjusting themes
+
+
+\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_text}
+\index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_blank} \index{ggplot2!element\_rect}
 
 ```{r}
 #| label: fig-cats-styled-plot
