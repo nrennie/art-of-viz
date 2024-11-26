@@ -45,6 +45,14 @@ cats <- readr::read_csv("data/cats_uk.csv")
 cats_reference <- readr::read_csv("data/cats_uk_reference.csv")
 ```
 
+The `cats` data contains information from the sensors including the latitude and longitudes recorded at different timestamps. There are multiple (many) observations for each cat, resulting in a total of `r nrow(cats)` rows across `r ncol(cats)` columns. Some of the observations have been marked as outliers, either by an automatic algorithm, manually, or both. 
+
+The `cats_reference` data provides information on each individual cat such as their name, age, sex, how long they spend indoors, and what type of food they eat. The two datasets can be joined by the `tag_id` column that exists in both `cats` and `cats_reference`.
+
+
+color by male/female, x-age, y-hrs indoors
+
+
 ## Exploratory work
 
 ### Data exploration
@@ -55,6 +63,10 @@ cats_reference <- readr::read_csv("data/cats_uk_reference.csv")
 hist(cats$ground_speed)
 ```
 
+At first glance you might not notice anything of particular note about @fig-cats-speed-hist. However, the data description reports that the ground speed is measured meters per second (m/s), but the histogram goes up to 250,000. For those who don't often work in m/s, that's about 560,000 miles per hour, or 900,000 kilometres per hour! Either these are exceptionally fast cats or there's an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don't know what the issue is, but this is certainly a column in the data that we shouldn't trust too much.
+
+Let's focus on the `cats_reference` data instead, and looking how characteristics of the study cats varied. For example, we might look at the time the cats spends indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many ... using `table()` and use `barplot()` to visualize it:
+
 ```{r}
 #| label: fig-cats-bar-hrs
 #| fig-cap: "Plot"
@@ -63,22 +75,22 @@ barplot(
 )
 ```
 
+We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let's use `plot()` to create a quick scatter plot of `age_years` against `hrs_indoors` to investigate:
+
 ```{r}
-#| label: fig-cats-bar-age
-#| fig-cap: "Plot"
-barplot(
-  table(cats_reference$age_years)
+#| label: fig-cats-scatter
+#| fig-cap: "Scatter plot"
+plot(
+  cats_reference$age_years, cats_reference$hrs_indoors,
+  xlab = "Age", ylab = "Hours indoors"
 )
 ```
 
+There's a little bit of a pattern in @fig-cats-scatter, but not a particularly strong one. This is perhaps partly due to the categorical nature of the `hrs_indoors` column, since we lose information when we group data that is naturally continuous.
 
-```{r}
-#| label: fig-cats-bar-age-hrs
-#| fig-cap: "Plot"
-barplot(
-  table(cats_reference$hrs_indoors, cats_reference$age_years)
-)
-```
+This also results in many of the points being stacked on top a better plot might use size, bubble plot
+
+What other factors might affect how long a cat spends indoors? There are several factors - owners working patterns, 
 
 ### Exploratory sketches
 
@@ -86,33 +98,19 @@ barplot(
 
 ## Preparing a plot
 
-maybe switch to age vs hours indoors
+Let's take the idea from @fig-cats-scatter but ... 
 
 ### Data wrangling
 
-```{r}
-#| label: cats-wrangling-1
-cats_data <- cats |>
-  dplyr::select(tag_id, ground_speed) |>
-  dplyr::group_by(tag_id) |>
-  dplyr::summarise(avg_speed = mean(ground_speed, na.rm = TRUE))
-```
+There's one cat (``) whose age is unknown, so we use. see ... 
 
 ```{r}
-#| label: cats-wrangling-2
-plot_data <- cats_data |>
-  dplyr::left_join(
-    dplyr::select(cats_reference, c(tag_id, animal_id, hrs_indoors, age_years)),
-    by = "tag_id"
-  ) |>
-  dplyr::select(-tag_id) |>
-  dplyr::mutate(
-    hrs_indoors = as.character(hrs_indoors <= 17.5),
-    hrs_indoors = dplyr::recode(hrs_indoors,
-      "TRUE" = "Mostly outdoors or mixed",
-      "FALSE" = "Mostly indoors"
-    )
-  ) |>
+#| label: cats-wrangling
+plot_data <- cats_reference |>
+  dplyr::select(age_years, hrs_indoors) |>
+  dplyr::group_by(age_years, hrs_indoors) |>
+  dplyr::count() |>
+  dplyr::ungroup() |> 
   tidyr::drop_na()
 ```
 
@@ -127,8 +125,8 @@ base_plot <- ggplot() +
     data = plot_data,
     mapping = aes(
       x = age_years,
-      y = avg_speed,
-      color = hrs_indoors
+      y = hrs_indoors,
+      size = n
     )
   )
 base_plot
@@ -141,21 +139,28 @@ base_plot
 
 ```{r}
 #| label: cats-colors
-cats_palette <- list(
-  "Mostly outdoors or mixed" = "#95B2B8",
-  "Mostly indoors" = "#914D76",
-  "dark_text" = "#2F4F4F",
-  "light_text" = "#546666",
-  "bg_col" = "white"
-)
+text_col <- "#2F4F4F"
+highlight_col <- "#914D76"
+bg_col <- "white"
 ```
+
 
 ```{r}
-#| label: cats-colors-plot
-col_plot <- base_plot +
-  scale_color_manual(values = cats_palette, guide = "none")
+#| label: fig-cats-base-plot-2
+#| fig-cap: "Plot"
+library(ggplot2)
+base_plot <- ggplot() +
+  geom_point(
+    data = plot_data,
+    mapping = aes(
+      x = age_years,
+      y = hrs_indoors,
+      size = n
+    ),
+    color = highlight_col
+  )
+base_plot
 ```
-
 
 
 ### Fonts
@@ -180,90 +185,35 @@ body_font <- "commissioner"
 ### Adding annotations
 
 ```{r}
-#| label: cats-summaries
-p_summaries <- plot_data |>
-  dplyr::group_by(hrs_indoors) |>
-  dplyr::summarise(
-    avg_speed = mean(avg_speed),
-    avg_age = mean(age_years)
-  ) |>
-  dplyr::mutate(avg_speed = round(avg_speed))
+#| label: cats-oldest
+annot_oldest <- cats_reference |>
+  dplyr::slice_max(age_years)
 ```
 
-
-```{r}
-#| label: cats-outliers
-p_outlier <- plot_data |>
-  dplyr::filter(avg_speed > 4000)
-
-p_outlier2 <- plot_data |>
-  dplyr::filter(age_years > 15)
-```
-
+fix location of annotation
 
 ```{r}
 #| label: fig-cats-annot-1
 #| fig-cap: "Plot"
-annotated_plot <- col_plot +
-  # Summary
+annotated_plot <- base_plot +
   ggtext::geom_textbox(
-    data = p_summaries,
+    data = annot_oldest,
     mapping = aes(
-      x = avg_age, y = avg_speed,
+      x = age_years, y = hrs_indoors,
       label = glue::glue(
-        "{hrs_indoors}<span style='color:{cats_palette$light_text};
-  font-size:6pt'><br>Average speed: {avg_speed} m/s"
+        "{animal_id}<span style='font-size:4pt'><br>Age: {age_years} years</span>"
       )
     ),
     halign = 0.5, hjust = 0.5,
     size = 2.5,
     lineheight = 0.5,
     family = body_font,
-    box.color = cats_palette$dark_text,
+    box.color = text_col,
     alpha = 0.6,
     maxheight = unit(4, "lines"),
     minwidth = unit(6, "lines"),
     maxwidth = unit(8, "lines")
-  ) +
-  # Outlier
-  ggtext::geom_textbox(
-    data = p_outlier,
-    mapping = aes(
-      x = age_years, y = avg_speed - 750,
-      label = glue::glue("<span style='color:{cats_palette$`Mostly outdoors or mixed`}'>{animal_id}</span>
-     <span style='color:{cats_palette$light_text}; font-size:6pt'><br>by name, magic by nature!
-     One speedy cat has an average speed of {avg_speed} m/s!</span>")
-    ),
-    halign = 0, hjust = 0.5,
-    size = 2.5,
-    lineheight = 0.4,
-    family = body_font,
-    box.size = 2,
-    box.color = NA,
-    fill = cats_palette$light_text,
-    alpha = 0.1,
-    minwidth = unit(6, "lines"),
-    maxwidth = unit(8, "lines")
-  ) +
-  # Outlier 2
-  ggtext::geom_textbox(
-    data = p_outlier2,
-    mapping = aes(
-      x = age_years, y = avg_speed,
-      label = glue::glue("<span style='color:{cats_palette$`Mostly indoors`}'>{animal_id}</span>
-     <span style='color:{cats_palette$light_text}; font-size:6pt'><br>was the oldest cat in the study, with an age of {age_years} years.</span>")
-    ),
-    halign = 1, hjust = 0.95,
-    vjust = -0.5,
-    size = 2.5,
-    lineheight = 0.4,
-    family = body_font,
-    box.color = NA,
-    fill = cats_palette$light_text,
-    alpha = 0.1,
-    minwidth = unit(6, "lines"),
-    maxwidth = unit(8, "lines")
-  )
+  ) 
 annotated_plot
 ```
 
@@ -273,37 +223,27 @@ annotated_plot
 arrow_plot <- annotated_plot +
   annotate(
     geom = "curve",
-    x = 2,
-    y = 4500,
-    xend = 3,
-    yend = 4900,
+    x = 12,
+    y = 12.5,
+    xend = 15,
+    yend = 20,
     linewidth = 0.3,
-    colour = cats_palette$`Mostly outdoors or mixed`,
-    curvature = 0.5,
-    arrow = arrow(length = unit(1.5, "mm"), type = "closed")
-  ) +
-  annotate(
-    geom = "curve",
-    x = 14.8,
-    y = 3200,
-    xend = 15.6,
-    yend = 2800,
-    linewidth = 0.3,
-    colour = cats_palette$`Mostly indoors`,
+    colour = text_col,
     curvature = 0.5,
     arrow = arrow(length = unit(1.5, "mm"), type = "closed")
   )
 arrow_plot
 ```
 
+make hrs_categorical
+
+
 ### Adding text
 
 ```{r}
 #| label: cats-text-1
 title <- "Indoor cats are fast - and they don't slow down!"
-st <- glue::glue(
-  "Only 7% of cats in the study spend more than 17.5 hours per day indoors. <span style='color:{cats_palette$`Mostly indoors`}'>Cats who spend more than 17.5 hours a day indoors</span> tend to be among the faster cats, having higher average ground speed compared to <span style='color:{cats_palette$`Mostly outdoors or mixed`}'>cats who spend less time indoors</span>! Age seems to have minimal impact on speed."
-)
+st <- "Only 7% of cats in the study spend more than 17.5 hours per day indoors. Cats who spend more than 17.5 hours a day indoors tend to be among the faster cats, having higher average ground speed compared to cats who spend less time indoors! Age seems to have minimal impact on speed."
 ```
 
 ### Custom caption functions
@@ -327,17 +267,19 @@ st <- glue::glue(
 ```{r}
 #| label: cats-social
 social <- social_caption(
-  bg_color = cats_palette$bg_col,
-  icon_color = cats_palette$`Mostly indoors`,
-  font_color = cats_palette$dark_text,
+  bg_color = bg_col,
+  icon_color = highlight_col,
+  font_color = text_col,
   font_family = body_font
 )
+social
 ```
 
 ```{r}
 #| label: cats-souce-cap
-source_cap <- source_caption(
+cap <- source_caption(
   source = "McDonald JL, Cole H. 2020. doi.org/10.5441/001/1.pf315732.",
+  sep = "<br>",
   graphic = social
 )
 ```
@@ -350,9 +292,9 @@ text_plot <- arrow_plot +
   labs(
     title = title,
     subtitle = st,
-    caption = source_cap,
+    caption = cap,
     x = "Age of cat (years)",
-    y = "Average ground speed (m/s)"
+    y = "Average time spend indoors (hours per day)"
   )
 text_plot
 ```
@@ -360,17 +302,19 @@ text_plot
 ### Adjusting themes
 
 ```{r}
+#| label: fig-cats-styled-plot
+#| fig-cap: "Plot"
 text_plot +
   theme_minimal(base_family = body_font, base_size = 6.5) +
   theme(
     # text formatting
-    text = element_text(color = cats_palette$light_text),
+    text = element_text(color = text_col),
     plot.title.position = "plot",
     plot.caption.position = "plot",
     plot.margin = margin(5, 5, 5, 5),
     plot.title = ggtext::element_textbox_simple(
       family = title_font,
-      color = cats_palette$dark_text
+      color = text_col
     ),
     plot.subtitle = ggtext::element_textbox_simple(
       margin = margin(t = 5)
@@ -379,10 +323,10 @@ text_plot +
       margin = margin(t = 5)
     ),
     axis.text = element_text(
-      color = cats_palette$light_text
+      color = text_col
     ),
     axis.title = element_text(
-      color = cats_palette$dark_text
+      color = text_col
     ),
     axis.title.y = element_text(
       margin = margin(r = 10)
@@ -390,16 +334,18 @@ text_plot +
     legend.position = "none",
     panel.grid.minor = element_blank(),
     plot.background = element_rect(
-      fill = cats_palette$bg_col,
-      color = cats_palette$bg_col
+      fill = bg_col,
+      color = bg_col
     ),
     panel.background = element_rect(
-      fill = cats_palette$bg_col,
-      color = cats_palette$bg_col
+      fill = bg_col,
+      color = bg_col
     )
   )
 ```
 
+to do, fix annotation placing and text
+fix arrow
 
 ## Reflection
 
