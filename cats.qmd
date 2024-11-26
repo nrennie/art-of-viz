@@ -121,19 +121,19 @@ This categorization of data also results in many of the points being stacked on 
 
 ### Exploratory sketches
 
-Let's take the idea from @fig-cats-scatter but ... 
+Let's take the idea from @fig-cats-scatter but develop into a much more effective visualization, making particular use of text and annotations. We'll update the chart to make a bubble plot. But we'll also add annotations to highlight interesting aspects of the data e.g. the oldest cat, or the average amount of time spent indoors. @fig-cats-sketch gives a basic illustration of how we might develop it:
 
-
-![Initial sketch of a scatter plot with annotations](images/sketch-cats.png){#fig-cats-sketch fig-align="center"}
+![Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.](images/sketch-cats.png){#fig-cats-sketch fig-align="center"}
 
 ## Preparing a plot
 
+In order to create @fig-cats-sketch in {ggplot2}, we only need to work with two columns in the `cats_reference` data: the cat age, `age_years`, and the average number of hours per day spent indoors, `hrs_indoors`.
 
 ### Data wrangling
 
-There's one cat (``) whose age is unknown, so we use. see ... 
+The `hrs_indoors` column contains five categories for time spend indoors: `2.5`, `7.5`, `12.5`, `17.5`, and `22.5`. Since these category names are numbers, they are encoded in R as numeric columns instead of categories, so we start by convert the `hrs_indoors` column to a `factor()`. To know how big the *bubbles* of our plot will be, we need to know how many cats there are for each combination of age and indoor time. We `group_by()` the two relevant columns and then use `count()` from {dplyr} to count the number of each category combination, before un-grouping with `ungroup()`. \index{dplyr!select} \index{dplyr!mutate} \index{base!factor} \index{dplyr!group\_by} \index{dplyr!count} \index{dplyr!ungroup} 
 
-\index{dplyr!select} \index{dplyr!mutate} \index{dplyr!group\_by} \index{dplyr!count} \index{dplyr!ungroup} \index{tidyr!drop\_na} \index{base!factor}
+There's one cat (`r cats_reference$animal_id[is.na(cats_reference$age_years)]`) whose age is unknown, so we use `drop_na()` from {tidyr} to remove this value. See @sec-bees and @sec-r-pkgs for some other discussions on visualizing and dealing with missing values in your data. \index{tidyr!drop\_na} 
 
 ```{r}
 #| label: cats-wrangling
@@ -148,26 +148,27 @@ plot_data <- cats_reference |>
 
 ### The first plot
 
-\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+We pass our data into the `ggplot()` function as always, and then set up the aesthetic mapping with `aes()`. As we did in @fig-cats-scatter, we put age on the x-axis and hours indoors on the y-axis. Here, we also map the number of cats in each category combination, `n`, to the `size` aesthetic to make the bubbles. Although we are making a bubble plot rather than a scatter plot, we still use `geom_point()` since both types of plots are made from points. Scatter plots are essentially a special case of bubble plots where all of the points represent one observation and so are all the same size. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 ```{r}
 #| label: fig-cats-base-plot
 #| fig-cap: "Plot"
 library(ggplot2)
-base_plot <- ggplot() +
-  geom_point(
-    data = plot_data,
-    mapping = aes(
-      x = age_years,
-      y = hrs_indoors,
-      size = n
-    )
+base_plot <- ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = age_years,
+    y = hrs_indoors,
+    size = n
   )
+) +
+  geom_point()
 base_plot
 ```
 
-
 ## Advanced styling
+
+something here
 
 ### Colors
 
@@ -178,26 +179,30 @@ highlight_col <- "#914D76"
 bg_col <- "white"
 ```
 
-\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+We can update our initial `base_plot` code to change the color of the points to `highlight_col` inside `geom_point()`. Remember that since this color isn't based on a column in the data, it doesn't need to go inside `aes()`. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+
+The `size` legend is generated automatically, and it picks evenly spaced intervals given the range of the data. Unfortunately this sometimes results in labels that don't quite make sense. Here, we have a label for 2.5 cats - not something that exists in the natural world! Let's choose more appropriate breaks for the `size` legend. Here, our `size` data ranges between `r min(plot_data$n)` and `r max(plot_data$n)`, so let's go for `3`, `6`, and `9`. We pass these desired break points in as a vector to `scale_size()`. Note that the sizes of the points in the plot are unchanged, only the legend is updated. \index{ggplot2!scale\_size}
 
 ```{r}
 #| label: fig-cats-base-plot-2
 #| fig-cap: "Plot"
-base_plot <- ggplot() +
-  geom_point(
-    data = plot_data,
-    mapping = aes(
-      x = age_years,
-      y = hrs_indoors,
-      size = n
-    ),
-    color = highlight_col
+#| code-line-numbers: "9"
+base_plot <- ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = age_years,
+    y = hrs_indoors,
+    size = n
   )
+) +
+  geom_point(color = highlight_col) +
+  scale_size(breaks = c(3, 6, 9))
 base_plot
 ```
 
-
 ### Fonts
+
+Fun and funky 
 
 \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
@@ -238,9 +243,10 @@ annotated_plot <- base_plot +
   ggtext::geom_textbox(
     data = annot_oldest,
     mapping = aes(
-      x = age_years, y = hrs_indoors,
+      x = age_years - 2.5,
+      y = factor(hrs_indoors),
       label = glue::glue(
-        "{animal_id}<span style='font-size:4pt'><br>Age: {age_years} years</span>"
+        "The oldest cat is <span style='color:{highlight_col}'>{animal_id}</span> who is {age_years} years old."
       )
     ),
     halign = 0.5, hjust = 0.5,
@@ -248,15 +254,26 @@ annotated_plot <- base_plot +
     lineheight = 0.5,
     family = body_font,
     box.color = text_col,
-    alpha = 0.6,
+    color = text_col,
+    alpha = 0.5,
     maxheight = unit(4, "lines"),
-    minwidth = unit(6, "lines"),
-    maxwidth = unit(8, "lines")
+    minwidth = unit(2, "lines"),
+    maxwidth = unit(4, "lines")
   )
 annotated_plot
 ```
 
+::: {#tip-cats-repel .callout-tip}
+
+## Non-overlapping labels
+
+Here, we're only positioning one annotation and so it's reasonably easy to ... adjust the position manually. If you have many textual annotations , and they ... ., the {ggrepel} package [@ggrepel] may help. It ...
+
+:::
+
 \index{ggplot2!annotate} \index{grid!arrow} \index{grid!unit}
+
+thing about factors
 
 ```{r}
 #| label: fig-cats-arrow
@@ -264,10 +281,10 @@ annotated_plot
 arrow_plot <- annotated_plot +
   annotate(
     geom = "curve",
-    x = 12,
-    y = 12.5,
-    xend = 15,
-    yend = 20,
+    x = 15.1,
+    xend = 16,
+    y = 4.6,
+    yend = 4.9,
     linewidth = 0.3,
     colour = text_col,
     curvature = 0.5,
@@ -276,31 +293,35 @@ arrow_plot <- annotated_plot +
 arrow_plot
 ```
 
+::: {#tip-cats-highlight .callout-tip}
+
+## Highlighting observations in data
+
+In @sec-museums, we used {gghighlight} [@gghighlight] to ... 
+
+:::
+
 ### Adding text
 
 ```{r}
 #| label: cats-text-1
+# title text
 title <- "Do older cats spend more time indoors?"
 
+# subtitle text
 perc_indoor <- round(100 * sum(cats_reference$hrs_indoors == "22.5") / nrow(cats_reference))
-st <- glue::glue("Some {perc_indoor}% of cats in the study spend more than 17.5 hours per day indoors. Cats who spend more than 17.5 hours a day indoors tend to be among the faster cats, having higher average ground speed compared to cats who spend less time indoors! Age seems to have minimal impact on speed.")
+st <- glue::glue("Around {perc_indoor}% of cats in the study spend on average 22.5 hours per day indoors! There is a slight trend for cats to spend more time indoors as they age.")
 ```
 
 ### Custom caption functions
 
-When we constructed the `source_caption()` function in @sec-turbines, we simply passed in a character string with the ... to indicate the creator of the chart. What might be more useful is a way to contact or better identify the author of the chart. This also works ... to see more of their work. It's very common in website, ... to link to social meda profiles. We can do something very similar for a static chart. Instead of ..., we'll create a caption that contains social media icons and the associated handles. Since this is something we are likely to add to multiple different plots, we'll create a function that produces this caption based on ... [@social_icons]
+When we constructed the `source_caption()` function in @sec-turbines, we simply passed in a character string to indicate the name of the creator of the chart (e.g. `"N. Rennie"`). What might be more useful is a way to contact or better identify the author of the chart. This could allow readers to dig into the data or code if they choose to, and allow chart creators to more easily link to other examples of their work. It's very common in websites, for example, to link to social media profiles. We can actually do something very similar for a static chart [@social_icons]. 
 
-But first, before we jump into writing functions, we need to get some social media icons! font awesome ... The process is very similar to loading the Font Awesome Solid icons in @sec-turbines. 
+Instead of simply passing in a character string with a name, we'll create a caption that contains social media icons and the associated handles. Since this is something we are likely to add to multiple different plots (and perhaps with different social media details), we'll create a function that produces this caption based on some user inputs. 
 
-When downloading the zip file of Font Awesome icons in @sec-turbines, 
+But first, before we jump into writing functions, we need to get some social media icons! As we did in @sec-turbines, we'll again use [Font Awesome](https://fontawesome.com/) icons [@fontawesome], but this time we'll use the *Brand* pack of icons instead of the *Solid* icons. The process of loading the icons here is essentially the same as loading the Font Awesome icons in @sec-turbines. After you've downloaded zip file of freely available icons from [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option, you should see a file called `Font-Awesome-6-Brands-Regular-400.otf`. Again, save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
 
-[Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
-
-As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use {showtext} to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
-
-
-
-\index{sysfonts!font\_add} \index{base!file.path}
+As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is how we'll refer to the font  in R, and the `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` to use {showtext} to render the text and set the desired resolution.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| echo: true
@@ -318,6 +339,8 @@ As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font i
 #| file: R/social_caption.R
 ```
 
+We can then use the `social_caption()` function, passing in the color and font variables we've previously defined to their relevant arguments:
+
 ```{r}
 #| label: cats-social
 social <- social_caption(
@@ -329,7 +352,7 @@ social <- social_caption(
 social
 ```
 
-We can then use our `source_caption()` function from @sec-turbines, and pass the output from the `social_caption()` function into the `graphic` argument. We also ... and separate the two with ... \index{source\_caption}
+You can see that the output of the `social_caption()` is a pretty incomprehensible string that would've been quite tricky to type out manually - are't we glad we built a function to do it for us! We can then use our `source_caption()` function from @sec-turbines, and pass the output from the `social_caption()` function into the `graphic` argument. We also place them on separate lines by using `<br>`. \index{source\_caption}
 
 ```{r}
 #| label: cats-souce-cap
@@ -342,6 +365,8 @@ cap <- source_caption(
 
 The text can then be added to @fig-cats-arrow using the `labs()` function as normal, by passing in the variables to the `title`, `subtitle`, and `caption` arguments. We also add more informative text for the title on the x and y axes, making sure to also specify the units. \index{ggplot2!labs}
 
+By default, the legend title is simply the name of the column mapped to the aesthetic in the legend. Here, the column mapped to `size` is `n` and so that's the name of the legend, which isn't very informative. There are several different ways to edit the name of the legend. We could have specified the `name` argument when we used `scale_size()` earlier. An alternative, is to use the `labs()` function. The title for any aesthetic can be specified in `labs()`, not just `x` and `y`. We simply pass the desired legend title into `size`.
+
 ```{r}
 #| label: fig-cats-text-plot
 #| fig-cap: "Plot"
@@ -351,7 +376,8 @@ text_plot <- arrow_plot +
     subtitle = st,
     caption = cap,
     x = "Age of cat (years)",
-    y = "Average time spend indoors (hours per day)"
+    y = "Average time spend indoors (hours per day)",
+    size = "Number of cats"
   )
 text_plot
 ```
@@ -362,36 +388,40 @@ text_plot
 \index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_text}
 \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_blank} \index{ggplot2!element\_rect}
 
+overlaying legend add outline box to distinguish between points on chart, and points in legend
+
 ```{r}
 #| label: fig-cats-styled-plot
 #| fig-cap: "Plot"
 text_plot +
   theme_minimal(base_family = body_font, base_size = 6.5) +
   theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.9, 0.25),
+    legend.background = element_rect(
+      fill = alpha(bg_col, 0.6),
+      color = text_col
+    ),
     text = element_text(color = text_col),
     plot.title.position = "plot",
     plot.caption.position = "plot",
     plot.margin = margin(5, 5, 5, 5),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_text(
       family = title_font,
-      color = text_col
+      color = text_col,
+      face = "bold",
+      size = rel(1.5)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
-      margin = margin(t = 5)
-    ),
+    plot.subtitle = ggtext::element_textbox_simple(),
     plot.caption = ggtext::element_textbox_simple(
       margin = margin(t = 5)
     ),
     axis.text = element_text(
       color = text_col
     ),
-    axis.title = element_text(
-      color = text_col
-    ),
     axis.title.y = element_text(
       margin = margin(r = 10)
     ),
-    legend.position = "none",
     panel.grid.minor = element_blank(),
     plot.background = element_rect(
       fill = bg_col,
@@ -403,9 +433,6 @@ text_plot +
     )
   )
 ```
-
-to do, fix annotation placing and text
-fix arrow
 
 ## Reflection
 
