@@ -218,7 +218,9 @@ body_font <- "Commissioner"
 
 ### Adding annotations
 
-In @sec-programming, when we constructed the subtitle, we used the `glue()` function from {glue} to create a data-driven subtitle. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It's a more efficient approach that's less prone to accidental errors than *hard coding* all of the text. We can take a similar approach when adding annotations to plots.
+Charts are considered *visual* elements. And the quote *a picture is worth a thousand words* is often floated around as motivation for why you should visualize your data instead of describing it. But just because you're making a *picture* doesn't mean you can't also use words. It's not necessarily a weakness of a chart, if adding some textual indicators improves its clarity.
+
+In @sec-programming, when we constructed the subtitle, we used `glue()` to create data-driven text. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It's a more efficient approach that's less prone to accidental errors than *hard coding* all of the text. We can take a similar approach when adding annotations to plots.
 
 Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from {dplyr} to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
 
@@ -230,9 +232,13 @@ annot_oldest <- cats_reference |>
 
 When it comes to adding the annotation to the plot, there are several options: `annotate()` which ; `geom_text()`; or `geom_label()` which works similarly to `geom_text()` ... . Here, annotate ... 
 
-However, we're going to {ggtext} instead of ... . We've already seen examples of using 
+However, we're going to use {ggtext} [@ggtext] instead of just {ggplot2}. The {ggtext} package will allow us to ... . We've already seen examples of using {ggtext} for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've already seen examples of coloring sections of text in @sec-turbines using the {marquee} package, but we'll look at {ggtext} as a comparison.
 
-[@ggtext]
+explain code below
+
+
+
+Although we've used .. `geom_textbox()`, you can ...something similar in subtitle, element_textbox simple 
 
 \index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
 
@@ -274,6 +280,8 @@ Here, we're only positioning one annotation and so it's reasonably easy to ... a
 \index{ggplot2!annotate} \index{grid!arrow} \index{grid!unit}
 
 thing about factors
+
+If you want to add a straight line arrow, you can set `geom = "segment"`, but curved arrows often look less severe.
 
 ```{r}
 #| label: fig-cats-arrow
@@ -396,32 +404,26 @@ overlaying legend add outline box to distinguish between points on chart, and po
 text_plot +
   theme_minimal(base_family = body_font, base_size = 6.5) +
   theme(
+    # legend styling
     legend.position = "inside",
     legend.position.inside = c(0.9, 0.25),
     legend.background = element_rect(
       fill = alpha(bg_col, 0.6),
       color = text_col
     ),
+    # text
     text = element_text(color = text_col),
-    plot.title.position = "plot",
-    plot.caption.position = "plot",
-    plot.margin = margin(5, 5, 5, 5),
     plot.title = element_text(
       family = title_font,
-      color = text_col,
       face = "bold",
       size = rel(1.5)
     ),
     plot.subtitle = ggtext::element_textbox_simple(),
-    plot.caption = ggtext::element_textbox_simple(
-      margin = margin(t = 5)
-    ),
-    axis.text = element_text(
-      color = text_col
-    ),
-    axis.title.y = element_text(
-      margin = margin(r = 10)
-    ),
+    plot.caption = ggtext::element_textbox_simple(),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    # background and grid
+    plot.margin = margin(5, 5, 5, 5),
     panel.grid.minor = element_blank(),
     plot.background = element_rect(
       fill = bg_col,
@@ -435,6 +437,11 @@ text_plot +
 ```
 
 ## Reflection
+
+* more variables
+
+The legend box and the annotation box currently look quite different. The legend box has square corners, compared to rounded corners, and the outline color is darker. For consistency, it would look better if both boxes appear with the same styling. 
+
 
 ::: {.content-visible when-format="html"}
 
