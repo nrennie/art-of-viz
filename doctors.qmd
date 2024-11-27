@@ -35,14 +35,15 @@ There are many open sources of data, covering a wide range of topics, time frame
 
 One fantastic source of data is the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)). The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you're ever looking for inspiration.\index{Our World in Data}
 
-For this chapter, we'll visualize data on [Medical doctors per 1,000 people](https://ourworldindata.org/grapher/physicians-per-1000-people),  a dataset which comes from the Our World in Data website [@doctors_data]. You can load the data using the {owidR} R package [@owidR]: \index{owidR!owid}
+For this chapter, we'll visualize data on *Medical doctors per 1,000 people* using the dataset from the Our World in Data website [@doctors_data]. You can either download the CSV file from [ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people) manually or you can do as we did in @sec-turbines, and download it directly into R using the URL. Simply pass the URL into the `read_csv()` function from {readr} (or `read.csv()` from base R if you prefer): \index{readr!read\_csv} \index{utils!read.csv}
 
 ```{r}
-#| label: doctors-load-data-show
+#| label: doctors-load-data-csv-show
 #| eval: false
 #| echo: true
-library(owidR)
-doctors <- owid("physicians-per-1000-people")
+doctors <- readr::read_csv(
+  "https://ourworldindata.org/grapher/physicians-per-1000-people.csv"
+)
 ```
 
 ```{r}
@@ -52,6 +53,22 @@ doctors <- owid("physicians-per-1000-people")
 #| eval: true
 doctors <- readr::read_csv("data/doctors.csv")
 ```
+
+::: {#tip-doctors-owid .callout-tip}
+
+## Connecting to Our World in Data via R
+
+The {owidR} R package [@owidR] provides an R interface to the Our World in Data website, allowing you to search and download data in R without having to navigate through the website. However, it's not much less complicated than passing in the URL to `read_csv()`. At the time of writing, the {owidR} package also hasn't been updated to use the newest API and the following code results in errors: \index{owidR!owid}
+
+```{r}
+#| label: doctors-load-data-show
+#| eval: false
+#| echo: true
+library(owidR)
+doctors <- owid("physicians-per-1000-people")
+```
+
+:::
 
 ::: {#tip-doctors-view .callout-tip}
 
@@ -512,7 +529,7 @@ We can then finally save a copy with `ggsave()`: \index{ggplot2!ggsave}
 ggsave(
   filename = "doctors.png",
   width = 5,
-  height = 0.67*5
+  height = 0.67 * 5
 )
 ```
 
