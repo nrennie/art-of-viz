@@ -356,16 +356,16 @@ div.csl-indent {
 <section id="data" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">7.1</span> Data</h2>
 <p>Between 2013 and 2017, <span class="citation" data-cites="kays2020">Kays et al. (<a href="references.html#ref-kays2020" role="doc-biblioref">2020</a>)</span> recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data <span class="citation" data-cites="cats_data">(<a href="references.html#ref-cats_data" role="doc-biblioref">McDonald and Cole 2020</a>)</span> was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they’re not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we’ll focus on the data from cats (and their owners!) based in the United Kingdom.</p>
-<p>The data was used as a TidyTuesday dataset in January 2023, and so can be loaded with the <code>tt_load()</code> function from {tidytuesdayR} <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>. There are two datasets included, which we’ll read in as <code>cats</code> and <code>cats_reference</code>. </p>
+<p>The data was used as a TidyTuesday dataset in January 2023 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), and so can be loaded with the <code>tt_load()</code> function from {tidytuesdayR} <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>. There are two datasets included, which we’ll read in as <code>cats</code> and <code>cats_reference</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-01-31"</span><span class="op">)</span></span>
 <span><span class="va">cats</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">cats_uk</span></span>
 <span><span class="va">cats_reference</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">cats_uk_reference</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The <code>cats</code> data contains information from the sensors including the latitudes and longitudes recorded at different timestamps. There are multiple (many) observations for each cat, resulting in a total of 18215 rows across 11 columns. Some of the observations have been marked as outliers, either by an automatic algorithm, manually, or both. The <code>cats_reference</code> data contains information provided by the cat owners on each individual cat such as their name, age, sex, how long they spend indoors, and what type of food they eat. The two datasets can be joined by the <code>tag_id</code> column that exists in both <code>cats</code> and <code>cats_reference</code>.</p>
+<p>The <code>cats</code> data contains information from the sensors including the latitudes and longitudes recorded at different time stamps. There are multiple (many) observations for each cat, resulting in a total of 18215 rows across 11 columns. Some of the observations have been marked as outliers, either by an automatic algorithm, manually, or both. The <code>cats_reference</code> data contains information provided by the cat owners on each individual cat such as their name, age, sex, how long they spend indoors, and what type of food they eat. The two datasets can be joined by the <code>tag_id</code> column that exists in both <code>cats</code> and <code>cats_reference</code>.</p>
 </section><section id="exploratory-work" class="level2" data-number="7.2"><h2 data-number="7.2" class="anchored" data-anchor-id="exploratory-work">
 <span class="header-section-number">7.2</span> Exploratory work</h2>
-<p>With the <code>cats</code> data, we could focus the spatial patterns and look at the range of where cats travel. For example, how far does the average cat travel in a day? Alternatively, we could focus on the <code>cats_reference</code> data and look at relationships between different behaviours and characteristics of cats. For example, do older cats spend more time indoors? Or do cats who live with other cats bring home more prey?</p>
+<p>With the <code>cats</code> data, we could focus the spatial patterns and look at the range of where cats travel. For example, how far does the average cat travel in a day? Alternatively, we could focus on the <code>cats_reference</code> data and look at relationships between different behaviors and characteristics of cats. For example, do older cats spend more time indoors? Or do cats who live with other cats bring home more prey?</p>
 <p>The third option, and perhaps the most useful, is to join the two datasets together. Joining the data on the individuals to their geographic data might allow us to answer questions such as: do male cats travel further per day? Do older cats stay closer to home? What are the strategies of a cat that brings home lots of <em>gifts</em>?</p>
 <section id="data-exploration" class="level3" data-number="7.2.1"><h3 data-number="7.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">7.2.1</span> Data exploration</h3>
@@ -421,7 +421,7 @@ Figure&nbsp;7.2: Histogram of the ground speeds recorded from GPS sensors, showi
 </div>
 </div>
 </div>
-<p>At first glance you might not see anything of particular note about <a href="#fig-cats-speed-hist" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>. However, the data description reports that the ground speed is measured in meters per second (m/s), but the histogram goes up to 250,000. For those of you who don’t often work in m/s, that’s about 560,000 miles per hour, or 900,000 kilometres per hour! Either these are exceptionally fast cats or there’s an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don’t know what the issue is, but this is certainly a column in the data that we shouldn’t trust too much.</p>
+<p>At first glance you might not see anything of particular note about <a href="#fig-cats-speed-hist" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>. However, the data description reports that the ground speed is measured in meters per second (m/s), but the histogram goes up to 250,000. For those of you who don’t often work in m/s, that’s about 560,000 miles per hour, or 900,000 kilometers per hour! Either these are exceptionally fast cats or there’s an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don’t know what the issue is, but this is certainly a column in the data that we shouldn’t trust too much.</p>
 <p>Let’s focus on the <code>cats_reference</code> data instead, and look at how characteristics of the study cats varied. For example, we might look at how long the cats spend indoors, which is recorded as a categorical variable, <code>hrs_indoors</code>. We can calculate how many cats fall into each time indoors <em>category</em> using <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> and then use <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> to visualize it: </p>
 <div class="cell">
 <div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
@@ -505,7 +505,7 @@ Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the r
 <img src="cats_files/figure-html/fig-cats-base-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.6: Plot
+Figure&nbsp;7.6: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category.
 </figcaption></figure>
 </div>
 </div>
@@ -540,7 +540,7 @@ Figure&nbsp;7.6: Plot
 <img src="cats_files/figure-html/fig-cats-base-plot-2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.7: Plot
+Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers.
 </figcaption></figure>
 </div>
 </div>
@@ -600,7 +600,7 @@ Figure&nbsp;7.7: Plot
 <img src="cats_files/figure-html/fig-cats-annot-1-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-annot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.8: Plot
+Figure&nbsp;7.8: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called ‘Boots’.
 </figcaption></figure>
 </div>
 </div>
@@ -641,7 +641,7 @@ Tip&nbsp;7.2: Non-overlapping labels
 <img src="cats_files/figure-html/fig-cats-arrow-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-arrow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.9: Plot
+Figure&nbsp;7.9: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called ‘Boots’, with an arrow pointing towards the data point for this cat.
 </figcaption></figure>
 </div>
 </div>
@@ -731,7 +731,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <pre data-code-line-numbers=""><code>[1] "&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xf08c;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Ubuntu;color:#2F4F4F;'&gt;nicola-rennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xe671;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Ubuntu;color:#2F4F4F;'&gt;nrennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xf09b;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Ubuntu;color:#2F4F4F;'&gt;nrennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;"</code></pre>
 </div>
 </div>
-<p>You can see that the output of the <code>social_caption()</code> is a pretty incomprehensible string that would’ve been quite tricky to type out manually - are’t we glad we built a function to do it for us! We can then use our <code>source_caption()</code> function from <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and pass the output from the <code>social_caption()</code> function into the <code>graphic</code> argument. We also place them on separate lines by using <code>&lt;br&gt;</code>. </p>
+<p>You can see that the output of the <code>social_caption()</code> is a pretty incomprehensible string that would’ve been quite tricky to type out manually - aren’t we glad we built a function to do it for us! We can then use our <code>source_caption()</code> function from <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and pass the output from the <code>social_caption()</code> function into the <code>graphic</code> argument. We also place them on separate lines by using <code>&lt;br&gt;</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
 <span>  source <span class="op">=</span> <span class="st">"McDonald JL, Cole H. 2020. doi.org/10.5441/001/1.pf315732."</span>,</span>
@@ -748,7 +748,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
 <span>    caption <span class="op">=</span> <span class="va">cap</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Age of cat (years)"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Average time spend indoors (hours per day)"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Average time spent indoors (hours per day)"</span>,</span>
 <span>    size <span class="op">=</span> <span class="st">"Number of cats"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -758,7 +758,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <img src="cats_files/figure-html/fig-cats-text-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.10: Plot
+Figure&nbsp;7.10: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A title, subtitle, and caption has been added, although the caption appears with raw HTML code, rather than correctly formatted.
 </figcaption></figure>
 </div>
 </div>
@@ -807,7 +807,7 @@ Figure&nbsp;7.10: Plot
 <img src="cats_files/figure-html/fig-cats-styled-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-styled-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.11: Plot
+Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot.
 </figcaption></figure>
 </div>
 </div>
@@ -822,11 +822,9 @@ Figure&nbsp;7.11: Plot
 </div>
 </section></section><section id="reflection" class="level2" data-number="7.5"><h2 data-number="7.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">7.5</span> Reflection</h2>
-<ul>
-<li>more variables</li>
-</ul>
+<p>In this chart, we’ve considered only two variables, and there are many</p>
 <p>The legend box and the annotation box currently look quite different. The legend box has square corners, compared to rounded corners, and the outline color is darker. For consistency, it would look better if both boxes appear with the same styling.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
