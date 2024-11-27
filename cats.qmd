@@ -286,11 +286,13 @@ Here, we're only positioning one annotation and so it's reasonably easy to manua
 
 :::
 
-\index{ggplot2!annotate} \index{grid!arrow} \index{grid!unit}
+To add clarity about which aspect of the plot the annotation refers to, we can add an arrow that points from the textbox to the relevant data point. Since we're only adding one arrow, we'll use the `annotate()` function. When using `annotate()`, we need to specify what type of *geom* we want to use. Though we're trying to add an arrow, this isn't actually a geom. We need to add a line, and then decorate the end of the line with an arrow. If you want to add a straight line arrow, you can set `geom = "segment"`, but curved arrows often look less severe so we use `geom = "curve"`. \index{ggplot2!annotate} 
 
-thing about factors
+We use need to tell `annotate()` where to put the arrow. Don't be fooled by thinking that these co-ordinate choices were perfect first time! It takes at least a little bit of trial and error to get the arrow positioned where we want it. We can use the x-axis in @fig-cats-annot-1 as a guide for choosing what the `x` and `xend` values should be. The choice of `y` and `yend` values might look a little odd - why are we placing an arrow at around 5, when the y-axis suggests we want to place the arrow around 22? Remember that `hrs_indoors` is actually a factor column, not a numeric column. \index{ggplot2!annotate} 
 
-If you want to add a straight line arrow, you can set `geom = "segment"`, but curved arrows often look less severe.
+Though you might expect {ggplot2} to complain when we try to place in arrow using numeric values on a discrete scale, surprisingly, it doesn't. Since factors are essentially just ordered categories, R assigns the first level in the factor to `1`, the second level to `2`, and so on. This means you *can* convert factors to numeric variables - though be warned that the results might not always be what you expect! For our chart, we want to position the end of the arrow just below the `22.5` value which is the fifth category, so the `y` and `yend` values are slightly below `5`.
+
+We add some further styling to the line by specifying the width, the color, and how curved the line is. To add the arrow on the end of the line, we use the `arrow()` function. This function allows us to define the length of the arrow - note this is the length of the arrowhead, rather than the entire arrow. We also specify that the type is `"closed"`, meaning that the arrowhead is a filled triangle. The default is `"open"` which, at smaller arrow sizes, sometimes looks less clear. \index{grid!arrow}
 
 ```{r}
 #| label: fig-cats-arrow
@@ -351,22 +353,23 @@ As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font i
 Let's go back to adding social media icons and create a function, `social_caption()` that will write the caption for us. We start by thinking about what options should be user specified:
 
 * A choice of which social media icons and handles are included. We want users to be able to update the handle that goes with a particular social media icon e.g. for switching between work and personal accounts.
-We should also give a user the option to *switch off* a specific social media icon if they want to.
+* We should also give a user the option to *switch off* a specific social media icon if they want to.
 * The colors of the icons and the fonts. We might choose to force these to be the same, or allow them to be different.
-* The font of the non-icon text i.e. the social media handles. We want a user to be able to pass in their choice of font to match with the text in the rest of their chart.
+* The font family of the non-icon text i.e. the social media handles. We want a user to be able to pass in their choice of font to match with the text in the rest of their chart.
 
 To construct this example `social_caption()` function, we'll include icons for LinkedIn, GitHub, and BlueSky. You might choose to include others. We'll have one argument in the function for each of these social media sites, with the default value specified as the handle that will be used most often. We also add two arguments to control the icon and font colors: `icon_color` and `font_color`. Both are set to `"black"` by default, which is consistent with other {ggplot2} text.
 
-need bg_col?
-default font
+Within the function, we start by putting together a `data.frame` that maps the values a user has input for the social media handles to the correct icon. We're going to be using {ggtext} [@ggtext] to process the caption, meaning we can write HTML code to join together icons, text, and text formatting. We also need to know which Unicode characters map to each social media icons so that we can pass them into some HTML code.
 
-Within the function, we start by putting together a list of ... for the relevant social media icons. As we did when looking for the ... icon in @sec-turbines..., we can search for e.g. the GitHub icon on ..., and look in the ... 
+Take the GitHub icon as an example. You can search for the icon you want at [fontawesome.com/icons](https://fontawesome.com/icons), and you’ll see the Unicode icon in the top right of the screen (although a Google search or ChatGPT would likely work equally well!) The Unicode for the GitHub icon is `f09b`, and to use this in HTML code we can write it as `&#xf09b`. We repeat this for the other icons we want to use. 
 
-\index{social\_caption} \index{base!list} \index{glue!glue}
+We then use `na.omit()` to remove any rows of our `data.frame` that contain `NA` values. Since we've set default arguments for each social media handle, there won't be any default values in our `data.frame` be default either. However, if a user wants to exclude a particular icon and handle from the caption, the can do so by setting that argument in the function to `NA`. 
 
-you could also use purrr, dplyr 
+The glue_icon function creates a styled HTML snippet for a social media icon and its associated text, using the glue package for string interpolation. It combines two spans: one for the icon (styled with the "Font Awesome 6 Brands" font and a customizable icon_color) and another for the social media text (styled with customizable font_family and font_color), separated by spaces (&nbsp;) and followed by extra spacing (&emsp;).
 
-[@ggtext]
+Rather than trying to immediately write a function that joins together many icons and handles, we'll start by writing a function that joins one icon and one social media handle. The inner function, `glue_icon()`, creates a styled HTML snippet using the `glue()` to join together the icon Unicode and the text within the snippet. The HTML snippet contains two spans: one for the icon (styled with the `"Font Awesome 6 Brands"` font and our chosen `icon_color`) and another for the social media text (styled with our chosen `font_family` and `font_color`). We also add a space between the icon and the handle with `&nbsp;`, and a larger space at the end to separate multiple icons using `&emsp;`. These are special strings for adding spaces to HTML. Note that because we have quotation marks inside quotation marks inside quotation marks, we need to escape the inner ones using `\"`. \index{glue!glue}
+
+Finally, we use `map2()` from {purrr} [@purrr] to apply `glue_icon()` to each row of our `icon_df` data. We then collapse the resulting list into a vector using `as_vector()` from {purrr}. We then further collapse the vector into a single character string with `str_flatten()` from {stringr}. This flattened string is our social media caption. \index{purrr!map2} \index{purrr!as\_vector} \index{stringr!str\_flatten} \index{social\_caption}  
 
 ```{r}
 #| echo: true
@@ -480,13 +483,17 @@ ggsave(
 
 ## Reflection
 
-In this chart, we've considered only two variables, and there are many 
+This is a very clean looking chart and, though annotations have been added, it doesn't look too busy or complex. We could (carefully) add further annotations to perhaps highlight the youngest cats or the cats who spent the least amount of time indoors. 
 
 The legend box and the annotation box currently look quite different. The legend box has square corners, compared to rounded corners, and the outline color is darker. For consistency, it would look better if both boxes appear with the same styling. 
+
+In this chart, we've considered only two variables, but there are many others available that we could have explored further. It would be particularly beneficial to join together the GPS data with the cat characteristics data. In @fig-cats-styled-plot, we communicate only the (weak) relationship between cat age and how many hours cats spend indoors. Both are reported by the cat owners. But the number of hours a cat spends indoors doesn't necessarily tell us very much about the cat's activity levels. Are they sleeping all day when they're at home? When they're not indoors, are they running around or simply soaking up the sun? If we had joined the GPS data, we could have perhaps made a more informative plot showing the relationship between age and activity level.
 
 ::: {.content-visible when-format="html"}
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+
+The original version look at the relationship between age and ground speed (despite) the issues with the reliability of the data.
 
 ![](images/cats.gif){fig-align="center"}
 
