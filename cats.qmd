@@ -3,7 +3,6 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
-fig-width: 5
 fig-asp: 0.75
 ---
 
@@ -61,7 +60,9 @@ Let's start by digging into the geographic `cats` data. We can make a very quick
 
 ```{r}
 #| label: fig-cats-map
-#| fig-cap: "Plot"
+#| fig-cap: "Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen."
+#| echo: -1
+par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
   cats$location_long, cats$location_lat,
   xlab = "Longitude", ylab = "Latitude"
@@ -85,7 +86,9 @@ The GPS sensors also report data on the ground speed of the cats, potentially al
 
 ```{r}
 #| label: fig-cats-speed-hist
-#| fig-cap: "Plot"
+#| fig-cap: "Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds!"
+#| echo: -1
+par(mar = c(5.1, 4.1, 3.1, 2.1))
 hist(cats$ground_speed,
   xlab = "Ground speed (m/s)",
   main = "Histogram of ground speed"
@@ -98,7 +101,9 @@ Let's focus on the `cats_reference` data instead, and look at how characteristic
 
 ```{r}
 #| label: fig-cats-bar-hrs
-#| fig-cap: "Plot"
+#| fig-cap: "Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data."
+#| echo: -1
+par(mar = c(4.1, 4.1, 3.1, 2.1))
 barplot(
   table(cats_reference$hrs_indoors)
 )
@@ -108,7 +113,9 @@ We might expect that the number of hours a cat spends indoors varies with age, w
 
 ```{r}
 #| label: fig-cats-scatter
-#| fig-cap: "Scatter plot"
+#| fig-cap: "Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors. "
+#| echo: -1
+par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
   cats_reference$age_years, cats_reference$hrs_indoors,
   xlab = "Age", ylab = "Hours indoors"
@@ -186,7 +193,7 @@ The `size` legend is generated automatically, and it picks evenly spaced interva
 ```{r}
 #| label: fig-cats-base-plot-2
 #| fig-cap: "Plot"
-#| code-line-numbers: "9"
+#| source-line-numbers: "9,10"
 base_plot <- ggplot(
   data = plot_data,
   mapping = aes(
@@ -208,12 +215,12 @@ Fun and funky
 
 ```{r}
 #| label: cats-fonts
-sysfonts::font_add_google(name = "Fraunces", )
-sysfonts::font_add_google(name = "Commissioner")
+sysfonts::font_add_google(name = "Chewy")
+sysfonts::font_add_google(name = "Ubuntu")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-title_font <- "Fraunces"
-body_font <- "Commissioner"
+title_font <- "Chewy"
+body_font <- "Ubuntu"
 ```
 
 ### Adding annotations
@@ -225,7 +232,7 @@ In @sec-programming, when we constructed the subtitle, we used `glue()` to creat
 Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from {dplyr} to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
 
 ```{r}
-#| label: cats-oldest
+#| label: cats-oldest 
 annot_oldest <- cats_reference |>
   dplyr::slice_max(age_years)
 ```
@@ -337,7 +344,23 @@ As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font i
 #| file: R/load_font_awesome.R
 ```
 
+Let's go back to adding social media icons and create a function, `social_caption()` that will write the caption for us. We start by thinking about what options should be user specified:
+
+* A choice of which social media icons and handles are included. We want users to be able to update the handle that goes with a particular social media icon e.g. for switching between work and personal accounts.
+We should also give a user the option to *switch off* a specific social media icon if they want to.
+* The colors of the icons and the fonts. We might choose to force these to be the same, or allow them to be different.
+* The font of the non-icon text i.e. the social media handles. We want a user to be able to pass in their choice of font to match with the text in the rest of their chart.
+
+To construct this example `social_caption()` function, we'll include icons for LinkedIn, GitHub, and BlueSky. You might choose to include others. We'll have one argument in the function for each of these social media sites, with the default value specified as the handle that will be used most often. We also add two arguments to control the icon and font colors: `icon_color` and `font_color`. Both are set to `"black"` by default, which is consistent with other {ggplot2} text.
+
+need bg_col?
+default font
+
+Within the function, we start by putting together a list of ... for the relevant social media icons. As we did when looking for the ... icon in @sec-turbines..., we can search for e.g. the GitHub icon on ..., and look in the ... 
+
 \index{social\_caption} \index{base!list} \index{glue!glue}
+
+you could also use purrr, dplyr 
 
 [@ggtext]
 
@@ -434,6 +457,19 @@ text_plot +
       color = bg_col
     )
   )
+```
+
+We can then finally save the chart in PNG format using `ggsave()`: \index{ggplot2!ggsave}
+
+```{r}
+#| label: cats-save
+#| eval: false
+#| echo: true
+ggsave(
+  filename = "cats.png",
+  width = 5,
+  height = 0.75*5
+)
 ```
 
 ## Reflection

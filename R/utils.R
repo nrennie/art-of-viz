@@ -29,4 +29,6 @@ library(downlit)
 library(lintr)
 library(styler)
 library(maps)
+library(ragg)
+library(tidytuesdayR)
 

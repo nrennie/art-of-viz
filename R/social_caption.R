@@ -1,5 +1,4 @@
-social_caption <- function(mastodon = "fosstodon.org/@nrennie",
-                           linkedin = "nicola-rennie",
+social_caption <- function(linkedin = "nicola-rennie",
                            bluesky = "nrennie",
                            github = "nrennie",
                            icon_color = "black",
@@ -7,12 +6,10 @@ social_caption <- function(mastodon = "fosstodon.org/@nrennie",
                            bg_color = "white",
                            font_family = "sans") {
   icons <- list(
-    mastodon = "&#xf4f6", linkedin = "&#xf08c",
-    bluesky = "&#xe671", github = "&#xf09b"
+    linkedin = "&#xf08c", bluesky = "&#xe671", github = "&#xf09b"
   )
   social <- list(
-    mastodon = mastodon, linkedin = linkedin,
-    bluesky = bluesky, github = github
+    linkedin = linkedin, bluesky = bluesky, github = github
   )
   social <- social[!is.na(social)]
   caption <- ""

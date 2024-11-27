@@ -63,14 +63,19 @@ There are many different types of plot, and when we're creating . I hope you'll 
 
 ### Data exploration
 
-We can't explore every column in this chapter, but I encourage you to do so at home. So we'll start with `language_rank` - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here...). We might want to look at the `last_activity` column in relation to the rank - are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis).
+We can't explore every column in this chapter, but I encourage you to do so at home. So we'll start with `language_rank` - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here...). We might want to look at the `last_activity` column in relation to the rank - are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with `xlab` and `ylab` in @fig-languages-scatter isn't necessary if it's just you looking at these plots, but if you're sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here!
 
 ```{r}
 #| label: fig-languages-scatter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
-plot(languages$last_activity, languages$language_rank)
+plot(
+  x = languages$last_activity,
+  y = languages$language_rank,
+  xlab = "Last activity",
+  ylab = "Rank"
+)
 ```
 
 Straight away this highlights the role of data visualization in exploratory analysis. This scatter plot don't look quite right - the `last_activity` data ranges from around -1000 to just over 2000, with most of the values close to the 2000 mark. If this is supposed to be a date column, we need to think about whether these values are correct. 
@@ -626,13 +631,17 @@ There are many different options available for saving plots created with R to a 
 
 I would always recommend saving your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again!
 
-You can set the width and height in `ggsave()`: \index{ggplot2!ggsave}
+You can set the width and height in `ggsave()`, using a calculation instead of a specific value if you want a specific aspect ratio: \index{ggplot2!ggsave}
 
 ```{r}
 #| label: langauges-save
 #| eval: false
 #| echo: true
-ggsave("plot_file.png", width = 6, height = 4)
+ggsave(
+  filename = "programming-languages.png",
+  width = 5,
+  height = 0.67*5
+)
 ```
 
 By default, the width and height is given in inches (though you can change this with the `unit` argument) and the resolution (set with the `dpi` argument) is 300. If you've saved your final plot to a variable in R, you can pass this directly to `ggsave()` instead of printing the object first:
@@ -641,7 +650,12 @@ By default, the width and height is given in inches (though you can change this 
 #| label: langauges-save-2
 #| eval: false
 #| echo: true
-ggsave("plot_file.png", final_plot, width = 6, height = 4)
+ggsave(
+  filename = "programming-languages.png",
+  plot = final_plot,
+  width = 5,
+  height = 0.67*5
+)
 ```
 
 If you're creating plots with other R packages, some of those packages will also come with their own built-in *save* functions. 
