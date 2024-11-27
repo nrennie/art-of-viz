@@ -250,12 +250,6 @@ div.csl-indent {
  <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">R Packages: using images for custom facet labels</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./global-seafood.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Global Seafood: adding images, rectangles, and text with {grid}</span></span></a>
-  </div>
-</li>
       </ul>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -269,20 +263,20 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./doctors-ageing-population.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Doctors in an Ageing Population: making maps with {ggplot2}</span></span></a>
+  <a href="./doctors-aging-population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Doctors in an Aging Population: making maps with {ggplot2}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time Zones: spatial data and mapping with {sf}</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./us-house-elections.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House Elections: geography on a grid with {geofacet}</span></span></a>
   </div>
 </li>
       </ul>
@@ -290,7 +284,7 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -465,21 +459,22 @@ Figure&nbsp;7.4: Scatter plot
 <p>This categorization of data also results in many of the points being stacked on top of each other. There are 101 cats in the data, but there doesn’t appear to be 101 points in <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a>. If we were to take the visualization further, we might consider changing it from a scatter plot to a bubble plot. With bubble plots, the size of the points relates to some other variable e.g.&nbsp;the number of cats in each <code>age_years</code>-<code>hrs_indoor</code> category combination.</p>
 </section><section id="exploratory-sketches" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">7.2.2</span> Exploratory sketches</h3>
-<p>Let’s take the idea from <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> but …</p>
+<p>Let’s take the idea from <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> but develop into a much more effective visualization, making particular use of text and annotations. We’ll update the chart to make a bubble plot. But we’ll also add annotations to highlight interesting aspects of the data e.g.&nbsp;the oldest cat, or the average amount of time spent indoors. <a href="#fig-cats-sketch" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> gives a basic illustration of how we might develop it:</p>
 <div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.5: Initial sketch of a scatter plot with annotations
+Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.
 </figcaption></figure>
 </div>
 </section></section><section id="preparing-a-plot" class="level2" data-number="7.3"><h2 data-number="7.3" class="anchored" data-anchor-id="preparing-a-plot">
 <span class="header-section-number">7.3</span> Preparing a plot</h2>
+<p>In order to create <a href="#fig-cats-sketch" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> in {ggplot2}, we only need to work with two columns in the <code>cats_reference</code> data: the cat age, <code>age_years</code>, and the average number of hours per day spent indoors, <code>hrs_indoors</code>.</p>
 <section id="data-wrangling" class="level3" data-number="7.3.1"><h3 data-number="7.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">7.3.1</span> Data wrangling</h3>
-<p>There’s one cat (``) whose age is unknown, so we use. see …</p>
-<p> </p>
+<p>The <code>hrs_indoors</code> column contains five categories for time spend indoors: <code>2.5</code>, <code>7.5</code>, <code>12.5</code>, <code>17.5</code>, and <code>22.5</code>. Since these category names are numbers, they are encoded in R as numeric columns instead of categories, so we start by convert the <code>hrs_indoors</code> column to a <code><a href="https://rdrr.io/r/base/factor.html">factor()</a></code>. To know how big the <em>bubbles</em> of our plot will be, we need to know how many cats there are for each combination of age and indoor time. We <code>group_by()</code> the two relevant columns and then use <code>count()</code> from {dplyr} to count the number of each category combination, before un-grouping with <code>ungroup()</code>. </p>
+<p>There’s one cat (Johnny) whose age is unknown, so we use <code>drop_na()</code> from {tidyr} to remove this value. See <a href="bee-colony-losses.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a> for some other discussions on visualizing and dealing with missing values in your data. </p>
 <div class="cell">
 <div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age_years</span>, <span class="va">hrs_indoors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -491,18 +486,18 @@ Figure&nbsp;7.5: Initial sketch of a scatter plot with annotations
 </div>
 </section><section id="the-first-plot" class="level3" data-number="7.3.2"><h3 data-number="7.3.2" class="anchored" data-anchor-id="the-first-plot">
 <span class="header-section-number">7.3.2</span> The first plot</h3>
-<p> </p>
+<p>We pass our data into the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function as always, and then set up the aesthetic mapping with <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. As we did in <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a>, we put age on the x-axis and hours indoors on the y-axis. Here, we also map the number of cats in each category combination, <code>n</code>, to the <code>size</code> aesthetic to make the bubbles. Although we are making a bubble plot rather than a scatter plot, we still use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> since both types of plots are made from points. Scatter plots are essentially a special case of bubble plots where all of the points represent one observation and so are all the same size. </p>
 <div class="cell">
 <div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">plot_data</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">age_years</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">hrs_indoors</span>,</span>
-<span>      size <span class="op">=</span> <span class="va">n</span></span>
-<span>    <span class="op">)</span></span>
+<span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">age_years</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">hrs_indoors</span>,</span>
+<span>    size <span class="op">=</span> <span class="va">n</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -517,6 +512,7 @@ Figure&nbsp;7.6: Plot
 </div>
 </section></section><section id="advanced-styling" class="level2" data-number="7.4"><h2 data-number="7.4" class="anchored" data-anchor-id="advanced-styling">
 <span class="header-section-number">7.4</span> Advanced styling</h2>
+<p>something here</p>
 <section id="colors" class="level3" data-number="7.4.1"><h3 data-number="7.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">7.4.1</span> Colors</h3>
 <div class="cell">
@@ -524,19 +520,20 @@ Figure&nbsp;7.6: Plot
 <span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#914D76"</span></span>
 <span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"white"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p> </p>
+<p>We can update our initial <code>base_plot</code> code to change the color of the points to <code>highlight_col</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>. Remember that since this color isn’t based on a column in the data, it doesn’t need to go inside <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. </p>
+<p>The <code>size</code> legend is generated automatically, and it picks evenly spaced intervals given the range of the data. Unfortunately this sometimes results in labels that don’t quite make sense. Here, we have a label for 2.5 cats - not something that exists in the natural world! Let’s choose more appropriate breaks for the <code>size</code> legend. Here, our <code>size</code> data ranges between 1 and 9, so let’s go for <code>3</code>, <code>6</code>, and <code>9</code>. We pass these desired break points in as a vector to <code><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size()</a></code>. Note that the sizes of the points in the plot are unchanged, only the legend is updated. </p>
 <div class="cell">
-<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">plot_data</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">age_years</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">hrs_indoors</span>,</span>
-<span>      size <span class="op">=</span> <span class="va">n</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    color <span class="op">=</span> <span class="va">highlight_col</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>base_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="at">data =</span> plot_data,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
+<span id="cb9-4"><a href="#cb9-4"></a>    <span class="at">x =</span> age_years,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="at">y =</span> hrs_indoors,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>    <span class="at">size =</span> n</span>
+<span id="cb9-7"><a href="#cb9-7"></a>  )</span>
+<span id="cb9-8"><a href="#cb9-8"></a>) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> highlight_col) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>  <span class="fu">scale_size</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">9</span>))</span>
+<span id="cb9-11"><a href="#cb9-11"></a>base_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -550,6 +547,7 @@ Figure&nbsp;7.7: Plot
 </div>
 </section><section id="fonts" class="level3" data-number="7.4.2"><h3 data-number="7.4.2" class="anchored" data-anchor-id="fonts">
 <span class="header-section-number">7.4.2</span> Fonts</h3>
+<p>Fun and funky</p>
 <p> </p>
 <div class="cell">
 <div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Fraunces"</span>, <span class="op">)</span></span>
@@ -561,24 +559,27 @@ Figure&nbsp;7.7: Plot
 </div>
 </section><section id="adding-annotations" class="level3" data-number="7.4.3"><h3 data-number="7.4.3" class="anchored" data-anchor-id="adding-annotations">
 <span class="header-section-number">7.4.3</span> Adding annotations</h3>
-<p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, when we constructed the subtitle, we used the <code>glue()</code> function from {glue} to create a data-driven subtitle. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It’s a more efficient approach that’s less prone to accidental errors than <em>hard coding</em> all of the text. We can take a similar approach when adding annotations to plots.</p>
+<p>Charts are considered <em>visual</em> elements. And the quote <em>a picture is worth a thousand words</em> is often floated around as motivation for why you should visualize your data instead of describing it. But just because you’re making a <em>picture</em> doesn’t mean you can’t also use words. It’s not necessarily a weakness of a chart, if adding some textual indicators improves its clarity.</p>
+<p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, when we constructed the subtitle, we used <code>glue()</code> to create data-driven text. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It’s a more efficient approach that’s less prone to accidental errors than <em>hard coding</em> all of the text. We can take a similar approach when adding annotations to plots.</p>
 <p>Let’s say we want to add an annotation to the plot that highlights the oldest cat in the data. We’ll start by obtaining the data that relates to the oldest cat. We can use <code>slice_max()</code> from {dplyr} to obtain the row of the data where the <code>age_years</code> is highest: </p>
 <div class="cell">
 <div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annot_oldest</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span><span class="va">age_years</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When it comes to adding the annotation to the plot, there are several options: <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> which ; <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>; or <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_label()</a></code> which works similarly to <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> … . Here, annotate …</p>
-<p>However, we’re going to {ggtext} instead of … . We’ve already seen examples of using</p>
-<p><span class="citation" data-cites="ggtext">(<a href="references.html#ref-ggtext" role="doc-biblioref">C. O. Wilke and Wiernik 2022</a>)</span></p>
+<p>However, we’re going to use {ggtext} <span class="citation" data-cites="ggtext">(<a href="references.html#ref-ggtext" role="doc-biblioref">C. O. Wilke and Wiernik 2022</a>)</span> instead of just {ggplot2}. The {ggtext} package will allow us to … . We’ve already seen examples of using {ggtext} for automatically wrapping long strings, but we’re going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We’ve already seen examples of coloring sections of text in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> using the {marquee} package, but we’ll look at {ggtext} as a comparison.</p>
+<p>explain code below</p>
+<p>Although we’ve used .. <code>geom_textbox()</code>, you can …something similar in subtitle, element_textbox simple</p>
 <p> </p>
 <div class="cell">
 <div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">annot_oldest</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">age_years</span>, y <span class="op">=</span> <span class="va">hrs_indoors</span>,</span>
+<span>      x <span class="op">=</span> <span class="va">age_years</span> <span class="op">-</span> <span class="fl">2.5</span>,</span>
+<span>      y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">hrs_indoors</span><span class="op">)</span>,</span>
 <span>      label <span class="op">=</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
-<span>        <span class="st">"{animal_id}&lt;span style='font-size:4pt'&gt;&lt;br&gt;Age: {age_years} years&lt;/span&gt;"</span></span>
+<span>        <span class="st">"The oldest cat is &lt;span style='color:{highlight_col}'&gt;{animal_id}&lt;/span&gt; who is {age_years} years old."</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    halign <span class="op">=</span> <span class="fl">0.5</span>, hjust <span class="op">=</span> <span class="fl">0.5</span>,</span>
@@ -586,10 +587,11 @@ Figure&nbsp;7.7: Plot
 <span>    lineheight <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
 <span>    box.color <span class="op">=</span> <span class="va">text_col</span>,</span>
-<span>    alpha <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>    maxheight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">4</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
-<span>    minwidth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
-<span>    maxwidth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">8</span>, <span class="st">"lines"</span><span class="op">)</span></span>
+<span>    minwidth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
+<span>    maxwidth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">4</span>, <span class="st">"lines"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">annotated_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -603,17 +605,32 @@ Figure&nbsp;7.8: Plot
 </div>
 </div>
 </div>
+<div id="tip-cats-repel" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;7.2: Non-overlapping labels
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Here, we’re only positioning one annotation and so it’s reasonably easy to … adjust the position manually. If you have many textual annotations , and they … ., the {ggrepel} package <span class="citation" data-cites="ggrepel">(<a href="references.html#ref-ggrepel" role="doc-biblioref">Slowikowski 2024</a>)</span> may help. It …</p>
+</div>
+</div>
 <p> </p>
+<p>thing about factors</p>
+<p>If you want to add a straight line arrow, you can set <code>geom = "segment"</code>, but curved arrows often look less severe.</p>
 <div class="cell">
 <div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">arrow_plot</span> <span class="op">&lt;-</span> <span class="va">annotated_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
 <span>    geom <span class="op">=</span> <span class="st">"curve"</span>,</span>
-<span>    x <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>    y <span class="op">=</span> <span class="fl">12.5</span>,</span>
-<span>    xend <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>    yend <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>    x <span class="op">=</span> <span class="fl">15.1</span>,</span>
+<span>    xend <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">4.6</span>,</span>
+<span>    yend <span class="op">=</span> <span class="fl">4.9</span>,</span>
 <span>    linewidth <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>    colour <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>    curvature <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>    arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="st">"mm"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -629,26 +646,39 @@ Figure&nbsp;7.9: Plot
 </div>
 </div>
 </div>
+<div id="tip-cats-highlight" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;7.3: Highlighting observations in data
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In <a href="uk-museums.html" class="quarto-xref"><span>Chapter 3</span></a>, we used {gghighlight} <span class="citation" data-cites="gghighlight">(<a href="references.html#ref-gghighlight" role="doc-biblioref">Yutani 2023</a>)</span> to …</p>
+</div>
+</div>
 </section><section id="adding-text" class="level3" data-number="7.4.4"><h3 data-number="7.4.4" class="anchored" data-anchor-id="adding-text">
 <span class="header-section-number">7.4.4</span> Adding text</h3>
 <div class="cell">
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Do older cats spend more time indoors?"</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># title text</span></span>
+<span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Do older cats spend more time indoors?"</span></span>
 <span></span>
+<span><span class="co"># subtitle text</span></span>
 <span><span class="va">perc_indoor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span> <span class="op">==</span> <span class="st">"22.5"</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Some {perc_indoor}% of cats in the study spend more than 17.5 hours per day indoors. Cats who spend more than 17.5 hours a day indoors tend to be among the faster cats, having higher average ground speed compared to cats who spend less time indoors! Age seems to have minimal impact on speed."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Around {perc_indoor}% of cats in the study spend on average 22.5 hours per day indoors! There is a slight trend for cats to spend more time indoors as they age."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="custom-caption-functions" class="level3" data-number="7.4.5"><h3 data-number="7.4.5" class="anchored" data-anchor-id="custom-caption-functions">
 <span class="header-section-number">7.4.5</span> Custom caption functions</h3>
-<p>When we constructed the <code>source_caption()</code> function in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we simply passed in a character string with the … to indicate the creator of the chart. What might be more useful is a way to contact or better identify the author of the chart. This also works … to see more of their work. It’s very common in website, … to link to social meda profiles. We can do something very similar for a static chart. Instead of …, we’ll create a caption that contains social media icons and the associated handles. Since this is something we are likely to add to multiple different plots, we’ll create a function that produces this caption based on … <span class="citation" data-cites="social_icons">(<a href="references.html#ref-social_icons" role="doc-biblioref">Rennie 2023a</a>)</span></p>
-<p>But first, before we jump into writing functions, we need to get some social media icons! font awesome … The process is very similar to loading the Font Awesome Solid icons in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
-<p>When downloading the zip file of Font Awesome icons in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>,</p>
-<p><a href="https://fontawesome.com/">Font Awesome</a> is a popular icon toolkit that provides scalable vector icons and social logos (more on this in <a href="#sec-cats" class="quarto-xref"><span>Chapter 7</span></a>) <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>. You can download font files containing the freely available icons at <a href="https://fontawesome.com/download">fontawesome.com/download</a>, selecting the <strong>Free for Desktop</strong> option. This will download a zip file containing several font files. For this chart, we only need one of those files <code>Font-Awesome-6-Free-Solid-900.otf</code>. Save this <code>.otf</code> file somewhere you can find it again - such as in a project folder called <code>fonts</code>.</p>
-<p>As before, we’ll use <code>font_add()</code> from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu and See file AUTHORS for details. 2022</a>)</span> to load the font into R. The <code>family</code> argument is what we want to refer to the font as in R. The <code>regular</code> argument is the file path to the <code>.otf</code> file. We then use <code>showtext_auto()</code> and <code>showtext_opts()</code> in exactly the same way as we did for <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, to use {showtext} to render the text. </p>
-<p> </p>
+<p>When we constructed the <code>source_caption()</code> function in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we simply passed in a character string to indicate the name of the creator of the chart (e.g.&nbsp;<code>"N. Rennie"</code>). What might be more useful is a way to contact or better identify the author of the chart. This could allow readers to dig into the data or code if they choose to, and allow chart creators to more easily link to other examples of their work. It’s very common in websites, for example, to link to social media profiles. We can actually do something very similar for a static chart <span class="citation" data-cites="social_icons">(<a href="references.html#ref-social_icons" role="doc-biblioref">Rennie 2023a</a>)</span>.</p>
+<p>Instead of simply passing in a character string with a name, we’ll create a caption that contains social media icons and the associated handles. Since this is something we are likely to add to multiple different plots (and perhaps with different social media details), we’ll create a function that produces this caption based on some user inputs.</p>
+<p>But first, before we jump into writing functions, we need to get some social media icons! As we did in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we’ll again use <a href="https://fontawesome.com/">Font Awesome</a> icons <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>, but this time we’ll use the <em>Brand</em> pack of icons instead of the <em>Solid</em> icons. The process of loading the icons here is essentially the same as loading the Font Awesome icons in <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>. After you’ve downloaded zip file of freely available icons from <a href="https://fontawesome.com/download">fontawesome.com/download</a>, selecting the <strong>Free for Desktop</strong> option, you should see a file called <code>Font-Awesome-6-Brands-Regular-400.otf</code>. Again, save this <code>.otf</code> file somewhere you can find it again - such as in a project folder called <code>fonts</code>.</p>
+<p>As before, we’ll use <code>font_add()</code> from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu and See file AUTHORS for details. 2022</a>)</span> to load the font into R. The <code>family</code> argument is how we’ll refer to the font in R, and the <code>regular</code> argument is the file path to the <code>.otf</code> file. We then use <code>showtext_auto()</code> and <code>showtext_opts()</code> to use {showtext} to render the text and set the desired resolution. </p>
 <div class="cell">
 <div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add.html">font_add</a></span><span class="op">(</span></span>
 <span>  family <span class="op">=</span> <span class="st">"Font Awesome 6 Brands"</span>,</span>
-<span>  regular <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="st">"fonts"</span>, <span class="st">"Font-Awesome-6-Brands-Regular-400.otf"</span><span class="op">)</span>,</span>
+<span>  regular <span class="op">=</span> <span class="st">"fonts/Font-Awesome-6-Brands-Regular-400.otf"</span>,</span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p> </p>
@@ -681,6 +711,7 @@ Figure&nbsp;7.9: Plot
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">caption</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>We can then use the <code>social_caption()</code> function, passing in the color and font variables we’ve previously defined to their relevant arguments:</p>
 <div class="cell">
 <div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  bg_color <span class="op">=</span> <span class="va">bg_col</span>,</span>
@@ -693,7 +724,7 @@ Figure&nbsp;7.9: Plot
 <pre data-code-line-numbers=""><code>[1] "&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xf4f6;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Commissioner;color:#2F4F4F;'&gt;fosstodon.org/@nrennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xf08c;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Commissioner;color:#2F4F4F;'&gt;nicola-rennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xe671;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Commissioner;color:#2F4F4F;'&gt;nrennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;&lt;span style='font-family:\"Font Awesome 6 Brands\";color:#914D76;'&gt;&amp;#xf09b;&lt;/span&gt;&lt;span style='color:white;'&gt;.&lt;/span&gt;&lt;span style='font-family:Commissioner;color:#2F4F4F;'&gt;nrennie&lt;/span&gt;&lt;span style='color:white;'&gt;..&lt;/span&gt;"</code></pre>
 </div>
 </div>
-<p>We can then use our <code>source_caption()</code> function from <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and pass the output from the <code>social_caption()</code> function into the <code>graphic</code> argument. We also … and separate the two with … </p>
+<p>You can see that the output of the <code>social_caption()</code> is a pretty incomprehensible string that would’ve been quite tricky to type out manually - are’t we glad we built a function to do it for us! We can then use our <code>source_caption()</code> function from <a href="canadian-wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and pass the output from the <code>social_caption()</code> function into the <code>graphic</code> argument. We also place them on separate lines by using <code>&lt;br&gt;</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
 <span>  source <span class="op">=</span> <span class="st">"McDonald JL, Cole H. 2020. doi.org/10.5441/001/1.pf315732."</span>,</span>
@@ -702,6 +733,7 @@ Figure&nbsp;7.9: Plot
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The text can then be added to <a href="#fig-cats-arrow" class="quarto-xref">Figure&nbsp;<span>7.9</span></a> using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function as normal, by passing in the variables to the <code>title</code>, <code>subtitle</code>, and <code>caption</code> arguments. We also add more informative text for the title on the x and y axes, making sure to also specify the units. </p>
+<p>By default, the legend title is simply the name of the column mapped to the aesthetic in the legend. Here, the column mapped to <code>size</code> is <code>n</code> and so that’s the name of the legend, which isn’t very informative. There are several different ways to edit the name of the legend. We could have specified the <code>name</code> argument when we used <code><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size()</a></code> earlier. An alternative, is to use the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function. The title for any aesthetic can be specified in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code>, not just <code>x</code> and <code>y</code>. We simply pass the desired legend title into <code>size</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">arrow_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
@@ -709,7 +741,8 @@ Figure&nbsp;7.9: Plot
 <span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
 <span>    caption <span class="op">=</span> <span class="va">cap</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Age of cat (years)"</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Average time spend indoors (hours per day)"</span></span>
+<span>    y <span class="op">=</span> <span class="st">"Average time spend indoors (hours per day)"</span>,</span>
+<span>    size <span class="op">=</span> <span class="st">"Number of cats"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -726,34 +759,31 @@ Figure&nbsp;7.10: Plot
 </section><section id="adjusting-themes" class="level3" data-number="7.4.6"><h3 data-number="7.4.6" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">7.4.6</span> Adjusting themes</h3>
 <p> </p>
+<p>overlaying legend add outline box to distinguish between points on chart, and points in legend</p>
 <div class="cell">
 <div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span>base_family <span class="op">=</span> <span class="va">body_font</span>, base_size <span class="op">=</span> <span class="fl">6.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># legend styling</span></span>
+<span>    legend.position <span class="op">=</span> <span class="st">"inside"</span>,</span>
+<span>    legend.position.inside <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>    legend.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">bg_col</span>, <span class="fl">0.6</span><span class="op">)</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># text</span></span>
 <span>    text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">text_col</span><span class="op">)</span>,</span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
+<span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
+<span>      face <span class="op">=</span> <span class="st">"bold"</span>,</span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    plot.title.position <span class="op">=</span> <span class="st">"plot"</span>,</span>
 <span>    plot.caption.position <span class="op">=</span> <span class="st">"plot"</span>,</span>
+<span>    <span class="co"># background and grid</span></span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
-<span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
-<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
-<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
-<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
-<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    axis.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
-<span>      color <span class="op">=</span> <span class="va">text_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    axis.title.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
-<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>    panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
@@ -775,10 +805,13 @@ Figure&nbsp;7.11: Plot
 </div>
 </div>
 </div>
-<p>to do, fix annotation placing and text fix arrow</p>
 </section></section><section id="reflection" class="level2" data-number="7.5"><h2 data-number="7.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">7.5</span> Reflection</h2>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 15.1</span></a>.</p>
+<ul>
+<li>more variables</li>
+</ul>
+<p>The legend box and the annotation box currently look quite different. The legend box has square corners, compared to rounded corners, and the outline color is darker. For consistency, it would look better if both boxes appear with the same styling.</p>
+<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
@@ -786,9 +819,6 @@ Figure&nbsp;7.11: Plot
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
-<div id="ref-img_anderson" class="csl-entry" role="listitem">
-Anderson, Lance. 2017. <span>“School of Gray Fish.”</span> <a href="https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg">https://unsplash.com/photos/school-of-gray-fish-G2SDLsJp3rg</a>.
-</div>
 <div id="ref-Anscombe1973" class="csl-entry" role="listitem">
 Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
 </div>
@@ -827,9 +857,6 @@ Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another App
 </div>
 <div id="ref-remotes" class="csl-entry" role="listitem">
 Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
-</div>
-<div id="ref-seafood_data" class="csl-entry" role="listitem">
-Database, RAM Legacy Stock Assessment. 2021. <span>“RAM Legacy Stock Assessment Database V4.495.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.4824192">https://doi.org/10.5281/zenodo.4824192</a>.
 </div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
@@ -1019,6 +1046,9 @@ Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker,
 </div>
 <div id="ref-funspotr" class="csl-entry" role="listitem">
 Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-ggrepel" class="csl-entry" role="listitem">
+Slowikowski, Kamil. 2024. <em><span class="nocase">ggrepel: Automatically Position Non-Overlapping Text Labels with ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggrepel">https://CRAN.R-project.org/package=ggrepel</a>.
 </div>
 <div id="ref-visdat" class="csl-entry" role="listitem">
 Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole Data Frames</span>.”</span> <em>JOSS</em> 2 (16): 355. <a href="https://doi.org/10.21105/joss.00355">https://doi.org/10.21105/joss.00355</a>.
