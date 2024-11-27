@@ -51,7 +51,9 @@ files_to_check <- funspotr::list_files_github_repo(
   repo = "nrennie/tidytuesday",
   branch = "main"
 ) |>
-  dplyr::filter(stringr::str_detect(relative_paths, "2023"))
+  dplyr::filter(
+    stringr::str_detect(relative_paths, "2023")
+  )
 ```
 
 We then pass the `files_to_check` data frame into `spot_funs_files()` from {funspotr} to get the list of functions and packages uses in each file. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
@@ -237,10 +239,14 @@ We start our plot by passing `plot_data` into `ggplot()` to use this data as the
 We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We want our facet plots all in one line rather than arranged as a grid, so we set `nrow = 1` inside `facet_wrap()`. Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown. \index{ggplot2!facet\_wrap}
 
 ```{r}
+#| label: r-pkgs-ggplot2
+#| warning: false
+library(ggplot2)
+```
+```{r}
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
 #| warning: true
-library(ggplot2)
 base_plot <- ggplot(plot_data) +
   geom_area(
     mapping = aes(
@@ -381,7 +387,6 @@ As we've done in previous chapters, we'll use the `social_caption()` function we
 ```{r}
 #| label: r-pkgs-social
 social <- social_caption(
-  bg_color = bg_col,
   icon_color = highlight_col,
   font_color = text_col,
   font_family = body_font

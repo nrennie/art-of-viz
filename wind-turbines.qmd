@@ -38,6 +38,8 @@ Of course, we still need to know what the URL of this file is. If you visit the 
 
 We then use the `read.xlsx()` function from {openxlsx}, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
 
+::: {.content-visible when-format="html"}
+
 ```{r}
 #| label: turbines-download-1
 #| eval: false
@@ -49,6 +51,25 @@ url <- paste0(
 )
 wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
 ```
+
+:::
+
+::: {.content-visible when-format="pdf"}
+
+```{r}
+#| label: turbines-download-1-pdf
+#| eval: false
+#| echo: true
+base_url <- "https://ftp.cartes.canada.ca/"
+url <- paste0(
+  base_url,
+  "pub/nrcan_rncan/Wind-energy_Energie
+-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
+)
+wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
+```
+
+:::
 
 ::: {#tip-turbines-excel .callout-tip}
 
@@ -244,7 +265,9 @@ Now, let's use our new `extract_after_last_slash()` function! Let's start by usi
 ```{r}
 #| label: turbines-year-data
 turbines_year <- wind_turbines |>
-  dplyr::select(`Province/Territory`, Commissioning.date) |>
+  dplyr::select(
+    `Province/Territory`, Commissioning.date
+  ) |>
   dplyr::mutate(
     Year = extract_after_last_slash(Commissioning.date),
     Year = as.numeric(Year)
@@ -267,7 +290,8 @@ turbines_year_group <- turbines_year |>
   ) |>
   dplyr::mutate(
     Year_Group = factor(Year_Group, levels = c(
-      "2000 - 2004", "2005 - 2009", "2010 - 2014", "2015 - 2019"
+      "2000 - 2004", "2005 - 2009",
+      "2010 - 2014", "2015 - 2019"
     ))
   )
 ```
@@ -391,7 +415,10 @@ base_plot <- ggplot(data = plot_data) +
     size = 2.5,
     family = "Font Awesome 6"
   ) +
-  facet_wrap(~Year_Group, nrow = 1, strip.position = "bottom")
+  facet_wrap(~Year_Group,
+    nrow = 1,
+    strip.position = "bottom"
+  )
 base_plot
 ```
 
@@ -561,7 +588,12 @@ Let's fix that by passing a function into the `labels` argument of `scale_y_cont
 #| label: turbines-scale-plot
 scale_plot <- text_plot +
   scale_y_continuous(
-    labels = function(x) format(x * 10 * 20, big.mark = ","),
+    labels = function(x) {
+      format(
+        x * 10 * 20,
+        big.mark = ","
+      )
+    },
     expand = c(0, 0),
     breaks = c(0, 5, 10, 15, 20),
     limits = c(0, 20)
@@ -641,7 +673,7 @@ And we're done and ready to save a copy! \index{ggplot2!ggsave}
 ggsave(
   filename = "wind-turbines.png",
   width = 5,
-  height = 0.75*5
+  height = 0.75 * 5
 )
 ```
 

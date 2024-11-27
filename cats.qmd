@@ -175,9 +175,11 @@ base_plot
 
 ## Advanced styling
 
-something here
+We're now ready to start styling our plot, to take it from a generic, default bubble plot to something that doesn't even look like it was made with R! 
 
 ### Colors
+
+We aren't 
 
 ```{r}
 #| label: cats-colors
@@ -232,7 +234,7 @@ In @sec-programming, when we constructed the subtitle, we used `glue()` to creat
 Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from {dplyr} to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
 
 ```{r}
-#| label: cats-oldest 
+#| label: cats-oldest
 annot_oldest <- cats_reference |>
   dplyr::slice_max(age_years)
 ```
@@ -303,7 +305,9 @@ arrow_plot <- annotated_plot +
     linewidth = 0.3,
     color = text_col,
     curvature = 0.5,
-    arrow = arrow(length = unit(1.5, "mm"), type = "closed")
+    arrow = arrow(
+      length = unit(1.5, "mm"), type = "closed"
+    )
   )
 arrow_plot
 ```
@@ -375,7 +379,6 @@ We can then use the `social_caption()` function, passing in the color and font v
 ```{r}
 #| label: cats-social
 social <- social_caption(
-  bg_color = bg_col,
   icon_color = highlight_col,
   font_color = text_col,
   font_family = body_font
@@ -425,7 +428,10 @@ overlaying legend add outline box to distinguish between points on chart, and po
 #| label: fig-cats-styled-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot."
 text_plot +
-  theme_minimal(base_family = body_font, base_size = 6.5) +
+  theme_minimal(
+    base_family = body_font,
+    base_size = 6.5
+  ) +
   theme(
     # legend styling
     legend.position = "inside",
@@ -468,7 +474,7 @@ We can then finally save the chart in PNG format using `ggsave()`: \index{ggplot
 ggsave(
   filename = "cats.png",
   width = 5,
-  height = 0.75*5
+  height = 0.75 * 5
 )
 ```
 

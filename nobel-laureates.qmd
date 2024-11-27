@@ -64,6 +64,8 @@ We construct a URL in the following format: the base API URL, followed by the en
 
 Once we've constructed the URL, we simply pass it into `read.csv()` (or `read_csv()` from {readr} if you prefer) and save the output to a variable - `nobel_physics` in this case. \index{utils!read.csv} \index{readr!read\_csv} 
 
+::: {.content-visible when-format="html"}
+
 ```{r}
 #| label: nobel-api
 #| eval: false
@@ -75,6 +77,25 @@ nobel_physics <- read.csv(
   )
 )
 ```
+
+:::
+
+::: {.content-visible when-format="pdf"}
+
+```{r}
+#| label: nobel-api-pdf
+#| eval: false
+#| echo: true
+api_url <- "http://api.nobelprize.org/2.1/laureates"
+nobel_physics <- read.csv(
+  glue::glue(
+    "{api_url}?limit=250&nobelPrizeCategory
+    =phy&format=csv"
+  )
+)
+```
+
+:::
 
 We want to avoid querying the API multiple times if we don't need to. Once we've downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the `write.csv()` option to save the data to a file called `nobel_physics.csv` in an existing folder called `data` - you might choose to save it somewhere slightly different! \index{utils!write.csv}
 
@@ -121,7 +142,12 @@ Let's start by exploring the relationship between year of birth and year of awar
 #| fig-cap: "A scatter plot of awardee birth date against year of award, showing the expected increasing trend."
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
-plot(nobel_physics$birthdate, nobel_physics$year)
+plot(
+  x = nobel_physics$birthdate,
+  y = nobel_physics$year,
+  xlab = "Birth date",
+  ylab = "Year of award"
+)
 ```
 
 We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the `year()` function from {lubridate} to convert the `birthdate` into a year and subtract this from the award `year` to get an approximate age. Then plot this against the award year: \index{lubridate!year}
@@ -133,7 +159,12 @@ We might be interested in seeing whether this relationship is changing over time
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 award_age <- nobel_physics$year -
   lubridate::year(nobel_physics$birthdate)
-plot(nobel_physics$year, award_age)
+plot(
+  x = nobel_physics$year,
+  y = award_age,
+  xlab = "Year of award",
+  ylab = "Age of Nobel Laureate"
+)
 ```
 
 It looks like the age of awardees might be increasing slightly - this could be interesting to explore further. But let's also look at the gender split for Nobel Laureates in Physics. We can calculate the number of `"male"` and `"female"` values in the `gender` column using the `table()` function, then plot it using `barplot()`: \index{base!table} \index{graphics!barplot} 
@@ -398,7 +429,6 @@ We'll later use {ggtext} again to apply Markdown formatting to the caption, and 
 ```{r}
 #| label: nobel-text
 social <- social_caption(
-  bg_color = bg_col,
   icon_color = primary_col,
   font_color = primary_col,
   font_family = body_font
@@ -539,7 +569,6 @@ category_plot <- function(
     )
   # Text
   social <- social_caption(
-    bg_color = bg_col,
     icon_color = primary_col,
     font_color = primary_col,
     font_family = body_font
@@ -611,6 +640,8 @@ category_plot <- function(
 
 Now let's test if our function works with a completely different set of data! Let's use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use `nobelPrizeCategory=pea` (`pea` for *peace*) and then save the output to a CSV file, just as we did before for the physics data. \index{utils!write.csv} \index{utils!read.csv}
 
+::: {.content-visible when-format="html"}
+
 ```{r}
 #| label: nobel-download-peace
 #| eval: false
@@ -626,6 +657,29 @@ write.csv(
   row.names = FALSE
 )
 ```
+
+:::
+
+::: {.content-visible when-format="pdf"}
+
+```{r}
+#| label: nobel-download-peace-pdf
+#| eval: false
+#| echo: true
+nobel_peace <- read.csv(
+  glue::glue(
+    "{api_url}?limit=250&nobelPrizeCategory
+    =pea&format=csv"
+  )
+)
+write.csv(
+  nobel_peace,
+  "data/nobel_peace.csv",
+  row.names = FALSE
+)
+```
+
+:::
 
 Again, we can either keep working with the loaded data from the API, or read in the data from the CSV file: \index{readr!read\_csv}
 
