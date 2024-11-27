@@ -244,10 +244,7 @@ When it comes to adding the annotation to the plot, there are several choices we
 
 Any combination of these choices could likely work for the annotations we plan to add. However, we're going to use {ggtext} [@ggtext] instead of just {ggplot2}. The {ggtext} package will allow us to perform further customization of the labels more easily. We've already seen examples of using {ggtext} for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've previously described coloring sections of text in @sec-turbines using the {marquee} package, but we'll look at {ggtext} as a comparison.
 
-explain code below
-
-
-\index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
+From {ggtext}, we can use the `geom_textbox()` function to add an annotation. Like the `element_textbox_simple()` we've been using from {ggtext} for the subtitle in previous chapters, `geom_textbox()` will automatically wrap the text to some pre-specified textbox size. The `label` aesthetic uses `glue()` to the cat's name and age into the text. We can wrap sections of text inside some `<span>` tags. This lets us specify how we want to style the font within the tags using CSS. We also use `glue()` to insert the `highlight_col` into the `style` for the font used for the cat's name. You may notice some similarity with the colored text code in @sec-turbines that uses {marquee} instead of {ggtext}. Additional arguments of `geom_textbox()` allow you to control the color of the text, box outline, and background color as well as the size and alignment of the text. \index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
 
 ```{r}
 #| label: fig-cats-annot-1
@@ -262,7 +259,8 @@ annotated_plot <- base_plot +
         "The oldest cat is <span style='color:{highlight_col}'>{animal_id}</span> who is {age_years} years old."
       )
     ),
-    halign = 0.5, hjust = 0.5,
+    halign = 0.5,
+    hjust = 0.5,
     size = 2.5,
     lineheight = 0.5,
     family = body_font,
@@ -324,11 +322,12 @@ In @sec-museums, we used {gghighlight} [@gghighlight] to highlight individual li
 
 ### Adding text
 
+Let's start to add some other, more standard text, to the chart and define some variables to store the title and subtitle text. For the subtitle, we again take a data-driven approach by using `glue()` as we did in @sec-programming to paste in pre-calculated values from the data to the text. \index{glue!glue}
+
 ```{r}
 #| label: cats-text-1
 # title text
 title <- "Do older cats spend more time indoors?"
-
 # subtitle text
 perc_indoor <- round(100 * sum(cats_reference$hrs_indoors == "22.5") / nrow(cats_reference))
 st <- glue::glue("Around {perc_indoor}% of cats in the study spend on average 22.5 hours per day indoors! There is a slight trend for cats to spend more time indoors as they age.")
@@ -361,11 +360,9 @@ To construct this example `social_caption()` function, we'll include icons for L
 
 Within the function, we start by putting together a `data.frame` that maps the values a user has input for the social media handles to the correct icon. We're going to be using {ggtext} [@ggtext] to process the caption, meaning we can write HTML code to join together icons, text, and text formatting. We also need to know which Unicode characters map to each social media icons so that we can pass them into some HTML code.
 
-Take the GitHub icon as an example. You can search for the icon you want at [fontawesome.com/icons](https://fontawesome.com/icons), and you’ll see the Unicode icon in the top right of the screen (although a Google search or ChatGPT would likely work equally well!) The Unicode for the GitHub icon is `f09b`, and to use this in HTML code we can write it as `&#xf09b`. We repeat this for the other icons we want to use. 
+Take the GitHub icon as an example. You can search for the icon you want at [fontawesome.com/icons](https://fontawesome.com/icons), and you’ll see the Unicode icon in the top right of the screen (although a Google search or ChatGPT would likely work equally well!) The Unicode for the GitHub icon is `f09b`, and to use this in HTML code we can write it as `&#xf09b` [@social_icons]. We repeat this for the other icons we want to use. 
 
 We then use `na.omit()` to remove any rows of our `data.frame` that contain `NA` values. Since we've set default arguments for each social media handle, there won't be any default values in our `data.frame` be default either. However, if a user wants to exclude a particular icon and handle from the caption, the can do so by setting that argument in the function to `NA`. 
-
-The glue_icon function creates a styled HTML snippet for a social media icon and its associated text, using the glue package for string interpolation. It combines two spans: one for the icon (styled with the "Font Awesome 6 Brands" font and a customizable icon_color) and another for the social media text (styled with customizable font_family and font_color), separated by spaces (&nbsp;) and followed by extra spacing (&emsp;).
 
 Rather than trying to immediately write a function that joins together many icons and handles, we'll start by writing a function that joins one icon and one social media handle. The inner function, `glue_icon()`, creates a styled HTML snippet using the `glue()` to join together the icon Unicode and the text within the snippet. The HTML snippet contains two spans: one for the icon (styled with the `"Font Awesome 6 Brands"` font and our chosen `icon_color`) and another for the social media text (styled with our chosen `font_family` and `font_color`). We also add a space between the icon and the handle with `&nbsp;`, and a larger space at the end to separate multiple icons using `&emsp;`. These are special strings for adding spaces to HTML. Note that because we have quotation marks inside quotation marks inside quotation marks, we need to escape the inner ones using `\"`. \index{glue!glue}
 
@@ -421,11 +418,9 @@ text_plot
 
 ### Adjusting themes
 
+You'll notice that in @fig-cats-text-plot, the social media caption that we worked so hard to create isn't properly formatted and it simply appears as the raw HTML code we wrote. The reason it doesn’t look quite as we’d hoped is because {ggplot2} doesn’t natively understand how to parse the HTML code. That's where {ggtext} comes in. {ggtext} is designed to improve text rendering in {ggplot2}, including providing support for using Markdown and HTML inside text elements. We haven't actually used {ggtext} for our caption yet! Much like with {marquee} in @sec-turbines, we need to edit the `plot.caption` argument of `theme()` to tell it to use {ggtext} to process the HTML code. We can use `element_textbox_simple()` to do this (as we've been doing to wrap the subtitle text anyway). It had similar arguments to `element_text()` in {ggplot2} but we don't actually need to specify any additional arguments here. You could also use `element_textbox()` which works very similarly but has slightly different default values or `element_markdown()`, if you’d prefer [@social_icons]. \index{ggplot2!theme} \index{ggplot2!element\_text} \index{ggtext!element\_textbox\_simple}
 
-\index{ggplot2!theme\_minimal} \index{ggplot2!theme} \index{ggplot2!element\_text}
-\index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_blank} \index{ggplot2!element\_rect}
-
-overlaying legend add outline box to distinguish between points on chart, and points in legend
+We make some further edits using the `theme()` function after applying `theme_minimal()` as a base theme, as we've done in previous chapters to align the plot and caption text to the plot rather than the panel, change the color of the text, and edit the background color. We also make some adjustments to the legend. It's currently taking up quite a lot of space on the right hand side, but there is plenty of available space within the plot area itself. We use `legend.position = "inside"` to move the legend inside the panel area and specify the coordinates of where we want to position it using `legend.position.inside`. For positioning the legend, `c(0, 0)` is the bottom left corner and `c(1, 1)` is the top right corner. To make sure that it's easy to distinguish between the legend and the data points, we draw a dark outline around it. \index{ggplot2!theme\_minimal} \index{ggplot2!element\_blank} \index{ggplot2!element\_rect}
 
 ```{r}
 #| label: fig-cats-styled-plot
