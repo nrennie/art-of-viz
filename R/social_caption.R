@@ -13,9 +13,7 @@ social_caption <- function(linkedin = "nicola-rennie",
   # Inner function to join icon and text
   glue_icon <- function(icon, social) {
     glue::glue(
-      "<span style='font-family:\"Font Awesome 6 Brands\";color:{icon_color};'>{icon}
-      </span>&nbsp;<span 
-      style='font-family:{font_family};color:{font_color};'>{social}</span>&emsp;"
+      "<span style='font-family:\"Font Awesome 6 Brands\"; color:{icon_color};'>{icon} </span>&nbsp; <span style='font-family:{font_family}; color:{font_color};'>{social} </span>&emsp;"
     )
   }
   

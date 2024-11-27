@@ -179,7 +179,7 @@ We're now ready to start styling our plot, to take it from a generic, default bu
 
 ### Colors
 
-We aren't 
+Since we aren't mapping any columns in the data to `color` or `fill`, we don't need to specify a color palette. Instead, we'll simply choose a text color (dark gray), background color (white), and highlight color (purple). 
 
 ```{r}
 #| label: cats-colors
@@ -209,11 +209,9 @@ base_plot <- ggplot(
 base_plot
 ```
 
-### Fonts
+### Text and fonts
 
-Fun and funky 
-
-\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+Here, we’ll use a *fun* font for the title, but keep it clean and minimal for the body font. For the `body_font`, we'll use *Ubuntu* as we did in @sec-technology. For the `title_font`, we'll use *Chewy*, an almost cartoonish font that vaguely resembles handwriting. Both are Google Fonts and so we load them using `font_add_google()` as we've done in previous chapters, and set up the relevant {showtext} options. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: cats-fonts
@@ -239,15 +237,15 @@ annot_oldest <- cats_reference |>
   dplyr::slice_max(age_years)
 ```
 
-When it comes to adding the annotation to the plot, there are several options: `annotate()` which ; `geom_text()`; or `geom_label()` which works similarly to `geom_text()` ... . Here, annotate ... 
+When it comes to adding the annotation to the plot, there are several choices we can make within {ggplot2}: 
 
-However, we're going to use {ggtext} [@ggtext] instead of just {ggplot2}. The {ggtext} package will allow us to ... . We've already seen examples of using {ggtext} for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've already seen examples of coloring sections of text in @sec-turbines using the {marquee} package, but we'll look at {ggtext} as a comparison.
+* `text` or `label`: using `text` simply adds the text while `label` adds text within a rectangular box.
+* `annotate()` or `geom_*()`: `annotate()` places objects (in this case text) at fixed, specified locations whereas `geom_*()` functions add objects based on some input data. 
+
+Any combination of these choices could likely work for the annotations we plan to add. However, we're going to use {ggtext} [@ggtext] instead of just {ggplot2}. The {ggtext} package will allow us to perform further customization of the labels more easily. We've already seen examples of using {ggtext} for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've previously described coloring sections of text in @sec-turbines using the {marquee} package, but we'll look at {ggtext} as a comparison.
 
 explain code below
 
-
-
-Although we've used .. `geom_textbox()`, you can ...something similar in subtitle, element_textbox simple 
 
 \index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
 
@@ -278,11 +276,13 @@ annotated_plot <- base_plot +
 annotated_plot
 ```
 
+Although we've used HTML code within the `geom_textbox()` function, you can also use HTML code in the title, subtitle, or caption text - although much like with {marquee} in @sec-turbines, you also need to edit the relevant `theme()` arguments to specify you are using {ggtext}.
+
 ::: {#tip-cats-repel .callout-tip}
 
 ## Non-overlapping labels
 
-Here, we're only positioning one annotation and so it's reasonably easy to ... adjust the position manually. If you have many textual annotations , and they ... ., the {ggrepel} package [@ggrepel] may help. It ...
+Here, we're only positioning one annotation and so it's reasonably easy to manually adjust the position to make sure it doesn't exceed the plot area or cover up any data points. If you have many textual annotations, it will quickly become difficult to manually adjust them to avoid overlapping. The {ggrepel} package [@ggrepel] may help. It's specifically designed to creating non-overlapping text and label annotations in {ggplot2}, and repositions the text for you.
 
 :::
 
@@ -316,7 +316,7 @@ arrow_plot
 
 ## Highlighting observations in data
 
-In @sec-museums, we used {gghighlight} [@gghighlight] to ... 
+In @sec-museums, we used {gghighlight} [@gghighlight] to highlight individual lines in facet plots. You can also use {gghighlight} to highlight and label individual data points in a more automated way. This may be an easier approach if you want to highlight multiple points based on some conditions, at the expense of more custom, aesthetically pleasing annotations.
 
 :::
 
