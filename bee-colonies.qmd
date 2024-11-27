@@ -49,10 +49,10 @@ In this chapter, we'll focus on the `colony` data, where we'll try to build a pi
 
 ### Data exploration
 
-Let's start by looking at a quick boxplot of how the number of colonies (`colony_n`) is changing over time, using the base R `boxplot()` function: \index{graphics!boxplot}
+Let's start by looking at a quick box plot of how the number of colonies (`colony_n`) is changing over time, using the base R `boxplot()` function: \index{graphics!boxplot}
 
 ```{r}
-#| label: fig-bees-boxplot
+#| label: fig-bees-box plot
 #| fig-cap: "Simple boxplot of number of bee colonies per year, showing a highly skewed distribution."
 #| fig-asp: 0.66
 #| echo: -1
@@ -66,13 +66,13 @@ boxplot(
 )
 ```
 
-@fig-bees-boxplot doesn't actually give us much information - except to suggest the distribution of the number of colonies is highly skewed and to suggest there are quite a few high values being classified as outliers. These outliers force the main section of the boxplots to be squashed on the left of the plot, making it difficult to tell if much is changing on average each year. This is also a more general problem with boxplots. There are many examples of data that illustrate the insufficiency of summary statistics, with Anscombe's quartet [@Anscombe1973] being perhaps the most famous example. Boxplots are essentially just summary statistics in disguise. Different data with identical boxplots can actually come from very different distributions [@Matejka2017].
+@fig-bees-boxplot doesn't actually give us much information - except to suggest the distribution of the number of colonies is highly skewed and to suggest there are quite a few high values being classified as outliers. These outliers force the main section of the box plots to be squashed on the left of the plot, making it difficult to tell if much is changing on average each year. This is also a more general problem with box plots. There are many examples of data that illustrate the insufficiency of summary statistics, with Anscombe's quartet [@Anscombe1973] being perhaps the most famous example. Box plots are essentially just summary statistics in disguise. Different data with identical box plots can actually come from very different distributions [@Matejka2017].
 
 Let's start by trying to understand what's causing these outliers. Are they real values? Are they mistakes in the data? Or have we made an incorrect assumption about the data? To understand this a bit better, let's zoom in on one year, 2020, and look at the number of colonies in each state to understand which states the largest outliers relate to. \index{base!subset} \index{graphics!boxplot}
 
 ```{r}
 #| fig-asp: 1.2
-#| label: fig-bees-boxplot2
+#| label: fig-bees-box plot2
 #| fig-cap: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'."
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
@@ -99,7 +99,7 @@ It's unfortunately not uncommon for a column name to suggest one thing (e.g. eac
 
 :::
 
-The other aspect of our data that boxplots don't tell us about is the missingness. Boxplots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that {ggplot2} [@ggplot2] does. So how do we plot data that doesn't exist? \index{boxplots}
+The other aspect of our data that box plots don't tell us about is the missingness. Box plots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that {ggplot2} [@ggplot2] does. So how do we plot data that doesn't exist? \index{boxplots}
 
 The {visdat} package [@visdat] is an excellent way to take a quick look at your data. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we'll start by visualising just the data for one state. We can use the `subset()` function from base R to obtain just the data fro Alabama. \index{visdat!vis\_miss} \index{base!subset}
 
@@ -144,7 +144,7 @@ Instead, we'll limit our visualization to a quarter for which we have complete d
 
 ## Avoid missing patterns about missingness
 
-By default, the {visdat} packages assumes that missing data is encoded as `NA`. This is not always true - especially when you're working with data that's been processed by other software before you receive it. It's not uncommon for missing values to be encoded using values such as `""`, `" "`, `99`, `999`, `-`, or `0`. The {naniar} package [@naniar] is very useful for summarising and wrangling missing values. The `replace_with_na()` function from {naniar} can help you to replace unusual encodings of missing values with `NA` for easier data processing in R. \index{naniar!replace\_with\_na}
+By default, the {visdat} packages assumes that missing data is encoded as `NA`. This is not always true - especially when you're working with data that's been processed by other software before you receive it. It's not uncommon for missing values to be encoded using values such as `""`, `" "`, `99`, `999`, `-`, or `0`. The {naniar} package [@naniar] is very useful for summarizing and wrangling missing values. The `replace_with_na()` function from {naniar} can help you to replace unusual encoding of missing values with `NA` for easier data processing in R. \index{naniar!replace\_with\_na}
 
 It's also important to think about the ordering of the columns and rows when visualizing missing values. For example, if there is a column which holds a date, ordering the rows by date before visualising the missing data, will allow you to identify temporal patterns in the missingness. If the rows are ordered in some other way, you might miss this pattern.
 
@@ -216,7 +216,7 @@ Now we need to generate the points that will represent the number of honey bee c
 
 Poisson disk sampling is one way of generating *blue noise*, a type pattern where the points are mostly random but are fairly evenly distributed. In Poisson disk sampling, all of the points must be at least some distance, $r$ apart i.e. you can draw a *disk* of radius $r$ around each point and no other point will be included in the disk.
 
-There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the {poissoned} package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimesions - though we'll stick to two dimensions here!
+There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the {poissoned} package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimensions - though we'll stick to two dimensions here!
 
 ::: {#tip-bees-sampling .callout-tip}
 
@@ -424,9 +424,9 @@ The last step is adjusting the remaining theme elements: \index{ggplot2!element\
 
 * Editing the background colors for the plot (`plot.background` set as yellow using `bg_col`) and grid squares (`panel.background` set as black using `highlight_col`).
 
-* The text text colour and margin for facet labels can be modified using the `strip.text` argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets). 
+* The text text color and margin for facet labels can be modified using the `strip.text` argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets). 
 
-* We change the title, subtitle, and caption text colour to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from {ggtext} to enable automatic line wrapping of the long text as described in @sec-programming.
+* We change the title, subtitle, and caption text color to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from {ggtext} to enable automatic line wrapping of the long text as described in @sec-programming.
 
 * We adjust the `plot.margin` to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.
 

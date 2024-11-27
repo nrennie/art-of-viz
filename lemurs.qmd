@@ -56,7 +56,7 @@ taxonomy <- readr::read_csv("data/taxonomy.csv")
 
 The `lemurs` data contains information on individual lemurs, and is the data set we'll mainly focus on in this chapter. The data has `r nrow(lemurs)` rows and `r `ncol(lemurs)`, making it a reasonably large dataset. The columns give information on the `taxon` code identifying the species of lemur, the name and sex of the lemur, the lemurs parents, whether they are still alive, the lemurs age and weight, and many other variables. Many of the columns give duplicated information since they express the same data in different units e.g. the lemur's age is given in five different columns: in days, weeks, months, decimal months, and years.
 
-Though there are `r nrow(lemurs)` rows of data, this doesn't mean that there are data on `r nrow(lemurs)` lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e. different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lmeurs e.g. if a lemur is still alive, there will be no `age_at_death_y` value. This also means that if we wanted to process the missing data, we'd likely need to start with rule-based approach to decide which values should be *missing* and which ones are unexpectedly missing. 
+Though there are `r nrow(lemurs)` rows of data, this doesn't mean that there are data on `r nrow(lemurs)` lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e. different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lemurs e.g. if a lemur is still alive, there will be no `age_at_death_y` value. This also means that if we wanted to process the missing data, we'd likely need to start with rule-based approach to decide which values should be *missing* and which ones are unexpectedly missing. 
 
 The `taxonomy` data is essentially a look up table for the `taxon` column in the `lemurs` data. For each `taxon` code, the `taxonomy` data provides the Latin name (`latin_name`) for the species, as well as the common name (`common_name`). If desired, the two datasets could be joined using the `taxon` column.
 
@@ -66,7 +66,7 @@ Given the size of the data and the diversity of the variables included, there ar
 
 ### Data exploration
 
-Let's focus in on the growth curve idea, and look at the relationship between lemur age and weight. We can use the base R `plot()` function to create @fig-lemurs-scatter, showing the relationship between age in months and weight in grams. As we might expect with a data set containing `r nrow(lemurs)` data points, the scatter plot doesn't clearly show any real pattern as there's too much variablity and many of the points overlap. \index{graphics!plot}
+Let's focus in on the growth curve idea, and look at the relationship between lemur age and weight. We can use the base R `plot()` function to create @fig-lemurs-scatter, showing the relationship between age in months and weight in grams. As we might expect with a data set containing `r nrow(lemurs)` data points, the scatter plot doesn't clearly show any real pattern as there's too much variability and many of the points overlap. \index{graphics!plot}
 
 ```{r}
 #| label: fig-lemurs-scatter
@@ -79,7 +79,7 @@ plot(
 )
 ```
 
-We know that there are `r nrow(taxonomy)` species of lemur in the data, and, even if you don't know much about lemurs, you might expect that the weights vary by species. A quick boxplot of weights by species using the `boxplot()` function in R confirms this, with @fig-lemurs-boxplot showing that there are big differences in lemur weights between species. \index{graphics!boxplot}
+We know that there are `r nrow(taxonomy)` species of lemur in the data, and, even if you don't know much about lemurs, you might expect that the weights vary by species. A quick box plot of weights by species using the `boxplot()` function in R confirms this, with @fig-lemurs-boxplot showing that there are big differences in lemur weights between species. \index{graphics!boxplot}
 
 ```{r}
 #| label: fig-lemurs-boxplot
@@ -101,7 +101,7 @@ boxplot(
 
 ### Exploratory sketches
 
-Given the variability in weights between species, we may wish to focus in on a single species. Let's keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating @fig-lemurs-scatter for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognisable just by their common name, we'll add an image of the lemur species in the bottom right corner to add more context to the chart.
+Given the variability in weights between species, we may wish to focus in on a single species. Let's keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating @fig-lemurs-scatter for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognizable just by their common name, we'll add an image of the lemur species in the bottom right corner to add more context to the chart.
 
 ![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center"}
 
@@ -203,9 +203,9 @@ We'll use colored text and icons in the subtitle to distinguish the two categori
 
 ### Fonts and text
 
-Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't play nicely with unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate r load font files available on your local system. 
+Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't play nicely with Unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate r load font files available on your local system. 
 
-To register a font using {systemfonts}, we use the `register_font()` function. It looks quite similarl to the `font_add()` function from {showtext} for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons using {systemfonts} as an alternative approach to the one taken in @sec-cats. \index{systemfonts!register\_font}
+To register a font using {systemfonts}, we use the `register_font()` function. It looks quite similar to the `font_add()` function from {showtext} for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons using {systemfonts} as an alternative approach to the one taken in @sec-cats. \index{systemfonts!register\_font}
 
 The first argument `name` will be the name that the font is known by in R. You can choose any name you want, but here we'll make sure to use the same name as we did for the `family` argument in @sec-cats, in order for our `social_caption()` to still work. The `plain` argument, is then the path to the font file. 
 
@@ -479,7 +479,7 @@ styled_plot <- styled_plot +
   labs(caption = cap)
 ```
 
-The {cowplot} package [@cowplot] extends {ggplot2} and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the {cowplot} functionality for adding annotations and customizations - including images.
+The {cowplot} package [@cowplot] extends {ggplot2} and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the {cowplot} functionality for adding annotations and customization - including images.
 
 ::: {#tip-lemurs-arrange .callout-tip}
 

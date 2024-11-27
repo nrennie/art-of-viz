@@ -127,7 +127,7 @@ This scatter plot highlights a few issues:
   
   This comes from the `as.numeric` transformation of the `Turbine.rated.capacity.(kW)` column. If we inspect this column more closely, you'll see that there are a few unusual values such as `"1903/2126/2221"`. If we look at the `Notes` column for an explanation, we can see that these values exist because `"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"`. Unfortunately, we don't know which individual turbines this derating applies to which makes it difficult to create a scatter plot.
 
-* The other issue with this scatter plot is that many of the observations are the same, but it's not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That's not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualised as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.
+* The other issue with this scatter plot is that many of the observations are the same, but it's not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That's not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualized as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.
 
 Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
 
@@ -170,9 +170,9 @@ As you can see from the y-axis of @fig-turbines-barplot-2, the `Commissioning.da
 
 ### Exploratory sketches
 
-There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines. in different multi-year time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
+There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines. in different multiyear time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
 
-Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualised on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart}
+Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualized on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart}
 
 Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
 
@@ -190,7 +190,7 @@ We can make two slight variations to this basic version of the chart:
 
 In order to make a draft of @fig-sketch-turbines using {ggplot2}, there are a few things we need to prepare:
 
-* The `Commissioning.date` column needs processed to deal with the multi-year labels, and grouped into 5-year categories.
+* The `Commissioning.date` column needs processed to deal with the multiyear labels, and grouped into 5-year categories.
 * We need to decide how many wind turbines each icon will represent.
 * Some of the categories in the `Province/Territory` column may need grouped together because they have very small numbers, and might have less than the number of turbines represented by each icon.
 
@@ -239,7 +239,7 @@ The `if_else()` function from {dplyr} also preserves types. If you put a `Date` 
 
 :::
 
-Now, let's use our new `extract_after_last_slash()` function! Let's start by using `select()` to keep only the columns we actually need: `Province/Territory`, and `Commissioning.date`. We then create a new column called `Year` which is the output of applying the `extract_after_last_slash()` to the `Commissioning.date` column. Initally, this column is still a character string so we convert is to a number using `as.numeric()`: \index{dplyr!mutate} \index{dplyr!select} \index{base!as.numeric}
+Now, let's use our new `extract_after_last_slash()` function! Let's start by using `select()` to keep only the columns we actually need: `Province/Territory`, and `Commissioning.date`. We then create a new column called `Year` which is the output of applying the `extract_after_last_slash()` to the `Commissioning.date` column. Initially, this column is still a character string so we convert is to a number using `as.numeric()`: \index{dplyr!mutate} \index{dplyr!select} \index{base!as.numeric}
 
 ```{r}
 #| label: turbines-year-data
