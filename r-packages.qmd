@@ -31,13 +31,13 @@ fig-asp: 0.5
 #| file: R/source_caption.R
 ```
 
-# R Packages: using images for custom facet labels {#sec-r-pkgs}
+# R packages: using images for custom facet labels {#sec-r-pkgs}
 
 In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
 
 ## Data
 
-In July 2024, TidyTuesday [@tidytuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
+In July 2024, TidyTuesday [@tidytuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets, suggested by [Bryan Shalloway](https://github.com/brshallo). The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
 
 Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from {funspotr} to get this list of files - specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to the root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
 
@@ -51,7 +51,9 @@ files_to_check <- funspotr::list_files_github_repo(
   repo = "nrennie/tidytuesday",
   branch = "main"
 ) |>
-  dplyr::filter(stringr::str_detect(relative_paths, "2023"))
+  dplyr::filter(
+    stringr::str_detect(relative_paths, "2023")
+  )
 ```
 
 We then pass the `files_to_check` data frame into `spot_funs_files()` from {funspotr} to get the list of functions and packages uses in each file. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
@@ -206,7 +208,7 @@ What might strike you about this vector of ordered packages is that there are on
 
 The first thing we want to do is include it in the ordered list of packages that we'll later use to define a factor level. Since it's only one package, we *could* just manually add it to the end of the vector with `c(pkgs_ordered, "tibble")`. However, this isn't a very robust solution. If we had data for a different year and wanted to repeat this analysis, this code wouldn't work if `"tibble"` wasn't missing, or if another package was missing. 
 
-Let's find a generalisable way to figure out which core {tidyverse} packages are not included in the `pkgs_ordered` vector. We can use the `setdiff()` function from base R here. Running `setdiff(x, y)` tells you which elements of `x` are not in `y` (so it's important to get the choices of `x` and `y` the right way around). 
+Let's find a generalizable way to figure out which core {tidyverse} packages are not included in the `pkgs_ordered` vector. We can use the `setdiff()` function from base R here. Running `setdiff(x, y)` tells you which elements of `x` are not in `y` (so it's important to get the choices of `x` and `y` the right way around). 
 
 The difference in the two vectors (in this case `"tibble"`) can then be appended to the end of the `pkgs_ordered` vector, to create a complete list of packages in order from most to least used, including zero usage:
 
@@ -237,10 +239,14 @@ We start our plot by passing `plot_data` into `ggplot()` to use this data as the
 We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We want our facet plots all in one line rather than arranged as a grid, so we set `nrow = 1` inside `facet_wrap()`. Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown. \index{ggplot2!facet\_wrap}
 
 ```{r}
+#| label: r-pkgs-ggplot2
+#| warning: false
+library(ggplot2)
+```
+```{r}
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
 #| warning: true
-library(ggplot2)
 base_plot <- ggplot(plot_data) +
   geom_area(
     mapping = aes(
@@ -333,7 +339,7 @@ bg_col <- "#3A3B3C"
 text_col <- "white"
 ```
 
-Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of th palettes in {rcartocolor} [@rcartocolor]. As we did in @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
+Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of the palettes in {rcartocolor} [@rcartocolor]. As we did in @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
 
 To keep a more consistent color theme in the plot, we define our highlight color variable, `highlight_col`, to be the first color in our chosen color palette.
 
@@ -381,7 +387,6 @@ As we've done in previous chapters, we'll use the `social_caption()` function we
 ```{r}
 #| label: r-pkgs-social
 social <- social_caption(
-  bg_color = bg_col,
   icon_color = highlight_col,
   font_color = text_col,
   font_family = body_font
@@ -595,6 +600,19 @@ img_plot +
       halign = 0.5
     )
   )
+```
+
+Lastly, use `ggsave()` to save a copy as a PNG file: \index{ggplot2!ggsave}
+
+```{r}
+#| label: r-pkgs-save
+#| eval: false
+#| echo: true
+ggsave(
+  filename = "r-packages.png",
+  width = 5,
+  height = 2.5
+)
 ```
 
 ::: {#tip-packages-axis .callout-tip}

@@ -11,20 +11,20 @@ execute:
 #| file: R/options.R
 ```
 
-# Programming Languages: dumbbell charts with {ggplot2} {#sec-programming}
+# Programming languages: dumbbell charts with {ggplot2} {#sec-programming}
 
 In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.
 
 ## Data
 
-In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopaedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
+In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
 
-The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023, meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
+The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by [Jesus M. Castagnetto](https://github.com/jmcastagnetto)), meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
 
-The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTusday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
-#| label: langauges-load-data-show
+#| label: languages-load-data-show
 #| eval: false
 #| echo: true
 tuesdata <- tidytuesdayR::tt_load("2023-03-21")
@@ -32,7 +32,7 @@ languages <- tuesdata$languages
 ```
 
 ```{r}
-#| label: langauges-load-data-hide
+#| label: languages-load-data-hide
 #| output: false
 #| echo: false
 #| eval: true
@@ -44,12 +44,12 @@ You can alternatively read the data in via {tidytuesdayR} using the year and wee
 What does the data look like? We can inspect the first six rows of the data using `head()`:
 
 ```{r}
-#| label: langauges-data-head
+#| label: languages-data-head
 #| out-width: "50%"
 head(languages)
 ```
 
-You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good plaece to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
+You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good place to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
 
 There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the `github_` columns might be related to the fact that many programming languages precede GitHub's creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn't a statistics book, so for the purposes of visualization we'll focus on columns that are mostly complete. \index{missing data}
 
@@ -59,18 +59,23 @@ So which columns should we explore first? Often when we're working with data, th
 
 Beyond looking at the data, counting the rows and columns, and inspecting the values in different columns, a key part of exploratory work is visualizing data. These initial visualizations can help you to check if there are any issues with your data (e.g. a misspelling `Monday` as `Mnoday`). They can also help to identify interesting relationships or patterns in the data, which can guide you to further avenues for exploration and appropriate modelling techniques.
 
-There are many different types of plot, and when we're creating . I hope you'll see several examples of those in this book. But often, for those initial exploratory plots, the *classic* charts are where I start: scatter plots, bar charts, box plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; boxplots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time. 
+There are many different types of plot, and when we're creating . I hope you'll see several examples of those in this book. But often, for those initial exploratory plots, the *classic* charts are where I start: scatter plots, bar charts, box plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; box plots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time. 
 
 ### Data exploration
 
-We can't explore every column in this chapter, but I encourage you to do so at home. So we'll start with `language_rank` - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here...). We might want to look at the `last_activity` column in relation to the rank - are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis).
+We can't explore every column in this chapter, but I encourage you to do so at home. So we'll start with `language_rank` - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here...). We might want to look at the `last_activity` column in relation to the rank - are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with `xlab` and `ylab` in @fig-languages-scatter isn't necessary if it's just you looking at these plots, but if you're sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here!
 
 ```{r}
 #| label: fig-languages-scatter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
-plot(languages$last_activity, languages$language_rank)
+plot(
+  x = languages$last_activity,
+  y = languages$language_rank,
+  xlab = "Last activity",
+  ylab = "Rank"
+)
 ```
 
 Straight away this highlights the role of data visualization in exploratory analysis. This scatter plot don't look quite right - the `last_activity` data ranges from around -1000 to just over 2000, with most of the values close to the 2000 mark. If this is supposed to be a date column, we need to think about whether these values are correct. 
@@ -86,7 +91,7 @@ In this case, the dates are actually given as just a year (rather than a `Date` 
 languages[order(languages$last_activity), ] |> head()
 ```
 
-Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn't true. It also includes information on query languages, stylesheet languages, and protocols, amongst other things. Including numeral systems as you can see here.
+Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn't true. It also includes information on query languages, stylesheet languages, and protocols, among other things. Including numeral systems as you can see here.
 
 Let's look at the balance between these different types of languages in the data using a bar chart created using the `barplot()` function from the {graphics} package in base R. The `barplot()` function takes a (named) vector or matrix of counts for each category. We can create this vector of counts using the `table()` function from base R. Wrapping the vector inside `sort()` means that the bars will be plotted in ascending order. \index{graphics!barplot} \index{base!table} \index{base!sort} \index{bar chart}
 
@@ -148,7 +153,7 @@ Using `#` for comments is the second most common symbol behind `//`. Is this a n
 
 The aspects of the data that we are interested in visualizing are:
 
-* when the programme language has been used (the time between `appeared` and `last_activity_date`)
+* when the programming language has been used (the time between `appeared` and `last_activity_date`)
 * what the comment symbol is
 * the ranking of the programming languages
 
@@ -166,23 +171,25 @@ To show how this differs between different comment symbols, we might create smal
 
 Dumbbell charts are essentially a combination of two things: lines and points. Although there isn't a built-in function for creating dumbbell charts in {ggplot2}, there are built-in functions for creating lines and points so we have everything we need to make a dumbbell chart. 
 
-There are a few extensions packages that can help you to make dumbbell chartsm without having to assemble the lines and points yourself. The {ggalt} package [@ggalt] which provides additional coordinate systems, geoms, statistical transformations, and scales for {ggplot2}, includes the `geom_dumbbell()` function which, as the name suggests, provides a quick and easy way to create dumbbell charts. The {dumbbell} package [@dumbbell] also provides functionality for creating dumbbell charts.
+There are a few extensions packages that can help you to make dumbbell charts without having to assemble the lines and points yourself. The {ggalt} package [@ggalt] which provides additional coordinate systems, geoms, statistical transformations, and scales for {ggplot2}, includes the `geom_dumbbell()` function which, as the name suggests, provides a quick and easy way to create dumbbell charts. The {dumbbell} package [@dumbbell] also provides functionality for creating dumbbell charts.
 
 In this chapter, we're not going to use either of those for a couple of reasons:
 
 * Extension packages are perfect for making charts more quickly and easily, and I would encourage you to try them. But it's also really useful to understand that, as long as you can break down the chart you want into lines, points, and polygons, then you can make it with {ggplot2}. That's, at least in part, what this book is about.
-* We're going to apply reasonably advanced customisations to our dumbbell chart, and it's useful to see how these work in {ggplot2} first so that you can later apply them to other plot types more easily. 
+* We're going to apply reasonably advanced customization to our dumbbell chart, and it's useful to see how these work in {ggplot2} first so that you can later apply them to other plot types more easily. 
 
 ### Data wrangling
 
-We'll start by sub-setting the data to keep only the rows relating to languages that use one of the comment symbols that we're interested in. If we want to look at only languages that use a `//`, `#`, or `;` for comments, we can use the `filter()` function from {dplyr} in conjunction with the `%in%` operator. This keeps only rows where the value in the  `line_comment_token` column is in the vector `c("//", "#", ";")`. We'll be faceting by `line_comment_token`, and we want to make sure that the title of the facet is informative - not just a `#` symbol on its own. Although we could create a labelling function to do this, it's even easier to just edit the text in the `line_comment_token` token. We use the `paste()` function to add the phrase `"Comment token:"` before each symbol and add this as a new column called `label` using `mutate()` from {dplyr}. \index{dplyr!filter} \index{dplyr!mutate} \index{base!paste}
+We'll start by sub-setting the data to keep only the rows relating to languages that use one of the comment symbols that we're interested in. If we want to look at only languages that use a `//`, `#`, or `;` for comments, we can use the `filter()` function from {dplyr} in conjunction with the `%in%` operator. This keeps only rows where the value in the  `line_comment_token` column is in the vector `c("//", "#", ";")`. We'll be faceting by `line_comment_token`, and we want to make sure that the title of the facet is informative - not just a `#` symbol on its own. Although we could create a labeling function to do this, it's even easier to just edit the text in the `line_comment_token` token. We use the `paste()` function to add the phrase `"Comment token:"` before each symbol and add this as a new column called `label` using `mutate()` from {dplyr}. \index{dplyr!filter} \index{dplyr!mutate} \index{base!paste}
 
 To keep our data tidy and manageable, we can drop the columns we no longer need using the `select()` function from {dplyr} to keep only the five columns we'll be using in the visualization. We'll also discard any rows that contain an `NA` value in any of these columns using `drop_na()` from {tidyr}. \index{dplyr!select} \index{tidyr!drop\_na}
 
 ```{r}
-#| label: langauges-data-wrangling-1
+#| label: languages-data-wrangling-1
 comment_df <- pl_df |>
-  dplyr::filter(line_comment_token %in% c("//", "#", ";")) |>
+  dplyr::filter(
+    line_comment_token %in% c("//", "#", ";")
+  ) |>
   dplyr::mutate(
     label = paste("Comment token:", line_comment_token)
   ) |>
@@ -199,7 +206,7 @@ We can extract the top 10 using `slice_min()` from {dplyr} and select the 10 wit
 To aid in plotting, we also want to reformat the data to put both year columns (`appeared` and `last_activity`) into one column. We can do this using `pivot_longer()` from {tidyr}. \index{tidyr!pivot\_longer}
 
 ```{r}
-#| label: langauges-data-wrangling-2
+#| label: languages-data-wrangling-2
 plot_data <- comment_df |>
   dplyr::group_by(label) |>
   dplyr::slice_head(n = 10) |>
@@ -217,7 +224,7 @@ plot_data <- comment_df |>
 Our `plot_data` looks like this:
 
 ```{r}
-#| label: langauges-plot-data-head
+#| label: languages-plot-data-head
 head(plot_data)
 ```
 
@@ -234,7 +241,7 @@ Next, we start adding geometries: lines and points. The order we add the geometr
 Finally, we also add `facet_wrap()` to create a small multiple plot (facet) for each category in the `label` column. Note the `~` required before the name of the column we wish to facet by.  \index{ggplot2!facet\_wrap}
 
 ```{r}
-#| label: fig-langauges-basic-plot1
+#| label: fig-languages-basic-plot1
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol."
 #| warning: false
 library(ggplot2)
@@ -250,7 +257,7 @@ In {ggplot2} (and most other plotting software) the y-axis starts with 0 at the 
 The current y-axis labels are not especially informative - it would be more useful to add in the names of the languages or the overall ranking rather than simply the numbers 1 to 10. Later, we're going to add some labels in each facet to provide this information, so we'll expand the left hand side of the x-axis to leave some space for those labels. By setting `expand = expansion(0, 0)` we remove the extra space that's automatically added by {ggplot2} at either side of the axis. 
 
 ```{r}
-#| label: fig-langauges-scales-plot
+#| label: fig-languages-scales-plot
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030."
 basic_plot +
   scale_y_discrete(limits = rev) +
@@ -286,7 +293,7 @@ The dark gray, `"gray5"`, is a pre-defined color in R. Run `colors()` to see the
 It's useful to save colors as variables because it makes it much easier to edit colors later on. We *could* just use the hex code directly in each argument where we want to use the color. But as you'll see when we start applying the colors to our chart, this can be many different arguments. If we decided we actually want to use a slightly different shade of green, we'd have to manually change all of them. By using a variable, we only need to change it once.
 
 ```{r}
-#| label: langauges-color-vars
+#| label: languages-color-vars
 bg_col <- "gray5"
 main_col <- "#66FF00"
 ```
@@ -296,7 +303,7 @@ Although you can use `update_geom_defaults()` to change the default colors used 
 The point character (`pch`) for `geom_point()` is also set to `22` - a square which allows you to color the square and its outline different colors. The outline `color` is set to our green `main_col` and the square `fill` color is set to the dark gray `bg_col`.
 
 ```{r}
-#| label: fig-langauges-basic-plot2
+#| label: fig-languages-basic-plot2
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points."
 #| source-line-numbers: "4,8,9,10"
 basic_plot <- ggplot(data = plot_data) +
@@ -328,7 +335,7 @@ Adding text to a visualization is important - a title, subtitle, and perhaps cap
 As with colors, we'll define text as variables. This helps to keep the plotting code looking a little bit cleaner. It's often easier to write the text after you've made the plot, and defining variables make it easy to add placeholder text while you're working on the plot.
 
 ```{r}
-#| label: langauges-text-vars-1
+#| label: languages-text-vars-1
 title <- "Programming Languages"
 caption <- "Data: Programming Language DataBase | Graphic: N. Rennie"
 ```
@@ -336,7 +343,7 @@ caption <- "Data: Programming Language DataBase | Graphic: N. Rennie"
 Since our visualization doesn't give information on how many languages use each comment symbol and just focuses on the top 10, we might want to instead present this information in the subtitle instead:
 
 ```{r}
-#| label: langauges-text-vars-2
+#| label: languages-text-vars-2
 subtitle <- "Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ; to define which lines are comments. 3,831 languages do not have a comment token listed."
 ```
 
@@ -355,14 +362,14 @@ If you need to use a curly bracket inside the string text, you can change the `.
 Since the values are going into a sentence we can make use of the `format()` function to add commas into the number formatting - showing `4,303` instead of `4303`: \index{base!format} \index{glue!glue}
 
 ```{r}
-#| label: langauges-text-vars-3
+#| label: languages-text-vars-3
 subtitle <- glue::glue("Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed.")
 ```
 
 Let's add the title, subtitle, and caption to the plot using the `labs()` function from {ggplot2}: \index{ggplot2!labs}
 
 ```{r}
-#| label: fig-langauges-text_plot
+#| label: fig-languages-text_plot
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added."
 text_plot <- basic_plot +
   labs(
@@ -373,14 +380,14 @@ text_plot <- basic_plot +
 text_plot
 ```
 
-You'll notice that the subtitle text runs off the edge of the plot here - we'll deal with that a little bit later. Let's first decide on a font to use in the plot. As with choosing colors, when choosing fonts it's useful to think about choosing a font that fits with the theme. Think about the fonts used in horror films posters. Isn't it quite different to the font used in marketing childrens' toys? Since we're going with a monochrome monitor theme for the colors, we can extend that to the font choice by choosing a monospace font reminiscent of early computers. 
+You'll notice that the subtitle text runs off the edge of the plot here - we'll deal with that a little bit later. Let's first decide on a font to use in the plot. As with choosing colors, when choosing fonts it's useful to think about choosing a font that fits with the theme. Think about the fonts used in horror films posters. Isn't it quite different to the font used in marketing children's toys? Since we're going with a monochrome monitor theme for the colors, we can extend that to the font choice by choosing a monospace font reminiscent of early computers. 
 
 Working with fonts in R isn't always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the `font_add_google()` function from {sysfonts} [@sysfonts]. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at [fonts.google.com](https://fonts.google.com/). The `VT323` and `Share Tech Mono` fonts both look like they'll fit in with our theme. The `font_add_google()` function looks through the Google Fonts database for the specified font `name` (e.g. `"VT323"`) and loads the font files you'll need. The second argument, `family` is how we'll refer to the font when using it to plot in R. By default it's the same as the `name` but it's often useful to change it to something else (e.g. `"vt"`), especially for long font names. \index{sysfonts} \index{sysfonts!font\_add\_google}
 
 We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the {showtext} package [@showtext] comes in. By running `showtext_auto()`, this means that the {showtext} package is automatically used to render text. We can also set `showtext_opts(dpi = 300)` to use fonts in the resolution we plan to save our image in later - see @sec-save-image for more details on image resolution. \index{showtext} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
-#| label: langauges-showtext
+#| label: languages-showtext
 sysfonts::font_add_google(
   name = "VT323", family = "vt"
 )
@@ -406,7 +413,7 @@ There are several alternatives to {showtext} for working with fonts in R. Depend
 Exactly, as we did with colors, we'll save font names as variables to make it easier to see how our plots look with different fonts. We'll save two variables: `title_font` that store the font for the title (and other important elements), and `body_font` for all other text.
 
 ```{r}
-#| label: langauges-font-vars
+#| label: languages-font-vars
 body_font <- "share"
 title_font <- "vt"
 ```
@@ -420,7 +427,7 @@ Here, we might start with `theme_minimal()` and set the `base_size` to `8`. This
 We can also set the `base_family` equal to `body_font` - the variable we defined earlier to store the name of the font we want to use for the text. \index{ggplot2!theme\_minimal}
 
 ```{r}
-#| label: langauges-minimal-theme
+#| label: languages-minimal-theme
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The default font has been changed, and the font made slightly smaller."
 theme_plot1 <- text_plot +
   theme_minimal(
@@ -440,7 +447,7 @@ We can edit the background color using the `panel.background` and `plot.backgrou
 
 #### Grid lines
 
-Grid lines in {ggplot2} fall into two categories: major and minor. Major grid lines are usually slightly bolder and correspond to the axis text labels. Minor grid lines are usually lighter and unlabelled. They can be controlled using the `panel.grid.major` and `panel.grid.minor` arguments, with finer control possible for x- and y-axis gridlines. They are all defined using `element_line()`. We can change the color of the major x-axis gridlines using the color element. To ensure the bright green color doesn't become distracting as a background element, we can make it semi-transparent using the `alpha()` function from {ggplot2} - `0` means fully transparent and `1` means fully opaque. The `linewidth` controls the width of the lines. We remove all the y-axis grid lines and all minor grid lines by setting both `panel.grid.major.y` and `panel.grid.minor` to `element_blank()` which removes the elements completely. We can also remove all axis ticks using `axis.ticks = element_blank()`.
+Grid lines in {ggplot2} fall into two categories: major and minor. Major grid lines are usually slightly bolder and correspond to the axis text labels. Minor grid lines are usually lighter and unlabeled. They can be controlled using the `panel.grid.major` and `panel.grid.minor` arguments, with finer control possible for x- and y-axis gridlines. They are all defined using `element_line()`. We can change the color of the major x-axis gridlines using the color element. To ensure the bright green color doesn't become distracting as a background element, we can make it semi-transparent using the `alpha()` function from {ggplot2} - `0` means fully transparent and `1` means fully opaque. The `linewidth` controls the width of the lines. We remove all the y-axis grid lines and all minor grid lines by setting both `panel.grid.major.y` and `panel.grid.minor` to `element_blank()` which removes the elements completely. We can also remove all axis ticks using `axis.ticks = element_blank()`.
 
 #### Text elements
 
@@ -451,7 +458,7 @@ Unfortunately, there is no `base_color` argument that allows us to change the co
 To add a little bit of space around the outside edge of the plot, we can define the `plot.margin` argument. This is specified using the `margin()` function (instead of one of the `element_*()` functions) which takes four arguments: the top, right, bottom, and left margins. A little bit of trial and error can help you to find values that look good.
 
 ```{r}
-#| label: fig-langauges-style1
+#| label: fig-languages-style1
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with a dark gray background and green text."
 theme_plot1 +
   theme(
@@ -504,7 +511,7 @@ theme_plot1 +
 We also need to deal with the fact that the subtitle text is too long and is running off the side of the page. There are a few options for this:
 
 * We can manually add line breaks by adding in `"\n"` to the subtitle string where we want the line to break. This is very much a manual approach that requires a lot of trial and error. 
-* We can use `str_wrap()` from {stringr} to split the text with a specified number of characters per line. This still involves a bit of trial and error to find the best line length. It also means you need to re-optimise the line length if you change the text size.
+* We can use `str_wrap()` from {stringr} to split the text with a specified number of characters per line. This still involves a bit of trial and error to find the best line length. It also means you need to re-optimize the line length if you change the text size.
 * One of the best solutions I've found is to use `element_textbox_simple()` from the {ggtext} package [@ggtext]. The {ggtext} package provides improved text rendering support for {ggplot2}, including support for using Markdown and HTML text which you'll see several examples of in later chapters. The `element_textbox_simple()` function enables you to places text in a box, with word wrapping. 
 
 \index{stringr!str\_wrap} \index{ggtext!element\_textbox\_simple}
@@ -512,7 +519,7 @@ We also need to deal with the fact that the subtitle text is too long and is run
 We can replace `element_text()` with `element_textbox_simple()` in the `theme()` argument for `plot.subtitle` to wrap the subtitle text at any font size:
 
 ```{r}
-#| label: fig-langauges-style2
+#| label: fig-languages-style2
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The subtitle text now wraps to the width of the page."
 #| source-line-numbers: "28,30-34"
 theme_plot2 <- theme_plot1 +
@@ -574,7 +581,7 @@ The default font size of `geom_text()` is 3.88. This is slightly confusing becau
 :::
 
 ```{r}
-#| label: fig-langauges-add-labels
+#| label: fig-languages-add-labels
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge."
 theme_plot2 +
   geom_text(
@@ -589,17 +596,19 @@ theme_plot2 +
 Although these labels are an improvement on not having any language label, they're still not as informative as they could be. There's no information about the overall rank included in the plot. There's no way to tell if the top ranked language that uses `#` as a comment symbol is also the top ranked language overall or ranked as low as 1000! Let's create a more informative label using the {glue} package again. We can create a new `rank_label` column using `mutate()` which combines the language name from the `title` column, the text `"Rank: `, and the rank from the `language_rank` column. The `\n` adds a line break between the language name and rank text. \index{dplyr!mutate} \index{glue!glue}
 
 ```{r}
-#| label: langauges-better-labels
+#| label: languages-better-labels
 plot_data <- plot_data |>
   dplyr::mutate(
-    rank_label = glue::glue("{title}\nRank: {language_rank}")
+    rank_label = glue::glue(
+      "{title}\nRank: {language_rank}"
+    )
   )
 ```
 
 Let's add these new and improved labels to our plot using `geom_text()`. Note that since we've updated the `plot_data` object, we need to pass the data in again: \index{ggplot2!geom\_text}
 
 ```{r}
-#| label: fig-langauges-add-better-labels
+#| label: fig-languages-add-better-labels
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge and rank."
 theme_plot2 +
   geom_text(
@@ -626,22 +635,31 @@ There are many different options available for saving plots created with R to a 
 
 I would always recommend saving your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again!
 
-You can set the width and height in `ggsave()`: \index{ggplot2!ggsave}
+You can set the width and height in `ggsave()`, using a calculation instead of a specific value if you want a specific aspect ratio: \index{ggplot2!ggsave}
 
 ```{r}
-#| label: langauges-save
+#| label: languages-save
 #| eval: false
 #| echo: true
-ggsave("plot_file.png", width = 6, height = 4)
+ggsave(
+  filename = "programming-languages.png",
+  width = 5,
+  height = 0.67 * 5
+)
 ```
 
 By default, the width and height is given in inches (though you can change this with the `unit` argument) and the resolution (set with the `dpi` argument) is 300. If you've saved your final plot to a variable in R, you can pass this directly to `ggsave()` instead of printing the object first:
 
 ```{r}
-#| label: langauges-save-2
+#| label: languages-save-2
 #| eval: false
 #| echo: true
-ggsave("plot_file.png", final_plot, width = 6, height = 4)
+ggsave(
+  filename = "programming-languages.png",
+  plot = final_plot,
+  width = 5,
+  height = 0.67 * 5
+)
 ```
 
 If you're creating plots with other R packages, some of those packages will also come with their own built-in *save* functions. 
@@ -652,7 +670,7 @@ If you're saving images at a different size or resolution (e.g. 300 dpi) to the 
 
 Even though we're essentially *finished* with this visualization, it's useful to get some feedback on how effective it is. You could share your visualization with a colleague or friend and ask for them to critique it. Alternatively, you can reflect on your own work with a critical eye. Reflecting on your own work is often more successful if you leave your visualization alone for a little while first. When you come back to it, think about whether your choice of plot was the best one, whether the fonts need re-sizing, or if you should use a different color scheme. So, which elements of this visualization could still be improved?
 
-When using dumbbell charts to show timeframes like this, the dots at each end are often taken as start and end time points. In this chart, that doesn't quite make sense. Imagine a programming language that was last active twenty years ago and is officially no longer maintained. Then imagine a different language that was last updated last week. The end time point (showing `last_activity`) is represented the same way in these two cases. Using an open-ended dumbbell for languages that are still actively being maintained might be more representative of what's actually happening in the data.
+When using dumbbell charts to show time frames like this, the dots at each end are often taken as start and end time points. In this chart, that doesn't quite make sense. Imagine a programming language that was last active twenty years ago and is officially no longer maintained. Then imagine a different language that was last updated last week. The end time point (showing `last_activity`) is represented the same way in these two cases. Using an open-ended dumbbell for languages that are still actively being maintained might be more representative of what's actually happening in the data.
 
 The labels showing the name and rank of the programming languages are a little bit hard to read. Each label isn't distinct enough from the labels above or below it. One option would be to change the size of the image - making the image taller would allow more space between each label. A second option would be to make the language name a slightly larger bold font, with the rank in a slightly smaller font below. This would make it clearer that there are ten labels rather than 20! We'll discuss how to add more complex formatting to text labels in @sec-cats, using the {ggtext} package. 
 

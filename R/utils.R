@@ -13,7 +13,7 @@ gg_record(
   dir = file.path("recording"),
   device = "png",
   width = 5,
-  height = 0.67*5,
+  height = 0.75*5,
   units = "in",
   dpi = 300
 )
@@ -29,4 +29,6 @@ library(downlit)
 library(lintr)
 library(styler)
 library(maps)
+library(ragg)
+library(tidytuesdayR)
 

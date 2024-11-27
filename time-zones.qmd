@@ -3,7 +3,6 @@ filters:
   - line-highlight
 execute: 
   freeze: auto
-fig-width: 5
 fig-asp: 0.92
 ---
 
@@ -25,7 +24,7 @@ fig-asp: 0.92
 #| file: R/social_caption.R
 ```
 
-# Time Zones: spatial data and mapping with {sf} {#sec-time-zones}
+# Time zones: spatial data and mapping with {sf} {#sec-time-zones}
 
 In this chapter we'll learn how to obtain map data using {rnaturalearth}, manipulate spatial data using {sf} and plot it with {ggplot2}, and add a custom bar chart legend to a map of the world. \index{sf} \index{ggplot2} \index{rnaturalearth}
 
@@ -160,7 +159,7 @@ For specified countries, the `ne_states()` function provides administrative leve
 
 :::
 
-The default output from the `ne_countries()` function is an `sf` object - where `sf` stands for *Simple Features*. Simple Features is a standardised model for representing geometric objects such as points, lines, and polygons in spatial databases and geographic information systems (GIS). The {sf} package [@sf] implements simple features in R, allowing simple features to be represented as a `data.frame` (or `tibble`). \index{sf} 
+The default output from the `ne_countries()` function is an `sf` object - where `sf` stands for *Simple Features*. Simple Features is a standardized model for representing geometric objects such as points, lines, and polygons in spatial databases and geographic information systems (GIS). The {sf} package [@sf] implements simple features in R, allowing simple features to be represented as a `data.frame` (or `tibble`). \index{sf} 
 
 Since `sf` objects in R can be thought of as fancy data.frames, this means they can be plotted using {ggplot2}. In fact, {ggplot2} has built-in capabilities for plotting `sf` objects - through the `geom_sf()` function. That means that we can build maps from `sf` objects, in the same we we build other types of charts: by starting with the `ggplot()` function, and then layering on the `geom_sf()` geometry: \index{ggplot2!ggplot} \index{ggplot2!geom\_sf}
 
@@ -470,7 +469,6 @@ We can create our custom Font Awesome icon caption, as described in @sec-cats, w
 ```{r}
 #| label: timezones-text-social
 social <- social_caption(
-  bg_color = bg_col,
   icon_color = highlight_col,
   font_color = text_col,
   font_family = body_font
@@ -566,11 +564,11 @@ Finally, we need to join the legend bar chart to our main plot. For this, we'll 
 
 ## Arranging plots with {patchwork}
 
-Although this book doesn't contain examples of arranging multiple plots side-by-side, {patchwork} makes it very easy to do so. If you have two plots `g1` and `g2`, then you can ... by simply running `g1 + g2`. More complex layouts can be achieved by specifying a grid of which plots should be placed where. The {patchwork} package also contains additional functions for adding multi-plot annotations or titles, consistent themes across all subplots, and defining plot alignment across multiple pages. Read the package documentation at [patchwork.data-imaginist.com](https://patchwork.data-imaginist.com/index.html) for examples.
+Although this book doesn't contain examples of arranging multiple plots side-by-side, {patchwork} makes it very easy to do so. If you have two plots `g1` and `g2`, then you can arrange them side-by-side by simply running `g1 + g2`. More complex layouts can be achieved by specifying a grid of which plots should be placed where. The {patchwork} package also contains additional functions for adding multiplot annotations or titles, consistent themes across all subplots, and defining plot alignment across multiple pages. Read the package documentation at [patchwork.data-imaginist.com](https://patchwork.data-imaginist.com/index.html) for examples.
 
 :::
 
-In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalised parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
+In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalized parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
 
 We also remove the added margin from around the edge of the plot using the `theme()` function and setting all of the margins to zero. Remember that when combining a `theme()` with a `patchwork` object, it's added using the `&` operator rather than `+`. \index{ggplot2!theme}
 
@@ -582,7 +580,18 @@ styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```
 
-Now our map is finished!
+Now our map is finished and we can save it with `ggsave()`! \index{ggplot2!ggsave}
+
+```{r}
+#| label: timezones-save
+#| eval: false
+#| echo: true
+ggsave(
+  filename = "time-zones.png",
+  width = 5,
+  height = 0.92*5
+)
+```
 
 ## Reflection
 
