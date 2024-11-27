@@ -1,30 +1,30 @@
-social_caption <- function(mastodon = "fosstodon.org/@nrennie",
-                           linkedin = "nicola-rennie",
+social_caption <- function(linkedin = "nicola-rennie",
                            bluesky = "nrennie",
                            github = "nrennie",
                            icon_color = "black",
                            font_color = "black",
-                           bg_color = "white",
-                           font_family = "Commissioner") {
-  icons <- list(
-    mastodon = "&#xf4f6",
-    linkedin = "&#xf08c",
-    bluesky = "&#xe671",
-    github = "&#xf09b"
+                           font_family = "sans") {
+  icon_df <- data.frame(
+    icons = c("&#xf08c;", "&#xe671;", "&#xf09b;"),
+    socials = c(linkedin, bluesky, github)
   )
-  social <- list(
-    mastodon = mastodon,
-    linkedin = linkedin,
-    bluesky = bluesky,
-    github = github
-  )
-  social <- social[!is.na(social)]
-  caption <- ""
-  for (name in names(social)) {
-    icon <- icons[name]
-    info <- social[name]
-    html <- glue::glue("<span style='font-family:\"Font Awesome 6 Brands\";color:{icon_color};'>{icon};</span><span style='color:{bg_color};'>.</span><span style='font-family:{font_family};color:{font_color};'>{info}</span><span style='color:{bg_color};'>..</span>")
-    caption <- paste0(caption, html)
+  icon_df <- na.omit(icon_df)
+  
+  # Inner function to join icon and text
+  glue_icon <- function(icon, social) {
+    glue::glue(
+      "<span style='font-family:\"Font Awesome 6 Brands\"; color:{icon_color};'>{icon} </span>&nbsp; <span style='font-family:{font_family}; color:{font_color};'>{social} </span>&emsp;"
+    )
   }
+  
+  # Map over all icons
+  caption <- purrr::map2(
+    .x = icon_df$icons,
+    .y = icon_df$socials,
+    .f = ~glue_icon(.x, .y)
+  ) |> 
+    purrr::as_vector() |> 
+    stringr::str_flatten()
+
   return(caption)
 }
