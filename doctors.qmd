@@ -74,7 +74,7 @@ doctors <- owid("physicians-per-1000-people")
 
 ## Saving data for later use
 
-You may choose to save a copy of `doctors` as a CSV file for later use, which you can read in with `read.csv` or `read_csv()` from {readr}. \index{readr!read\_csv}
+You may choose to save a copy of `doctors` as a CSV file for later use by using `write.csv()` or `write_csv()` from {readr}. This means you don't have to download the data each time you open R and don't have to worry about the data updating when you're halfway through your analysis. You can then later read in the data with `read.csv` or `read_csv()` from {readr}. \index{readr!read\_csv} \index{readr!write\_csv} \index{utils!read.csv} \index{utils!write.csv}
 
 :::
 
@@ -99,13 +99,13 @@ Often when there's a time component to data, one of the most obvious patterns to
 #| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1))
 plot(
-  x = doctors$year,
+  x = doctors$Year,
   y = doctors$`Physicians (per 1,000 people)`,
   xlab = "Year", ylab = "Physicians per 1,000 people"
 )
 ```
 
-There seems to be a general increasing trend between 1960 and 2019. The other important component of this data that we may want to explore is the spatial aspect - is there a pattern over space as well as over time? 
+There seems to be a general increasing trend between 1960 and 2020. The other important component of this data that we may want to explore is the spatial aspect - is there a pattern over space as well as over time? 
 
 ### Exploratory sketches
 
@@ -121,14 +121,15 @@ To create the map sketched out in @fig-doctors-sketch, we need to do two things 
 
 ### Data wrangling
 
-Since this data is already fairly tidy, there isn't too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don't need, and renaming a couple of columns to make them easier to work with. We can use the `rename()` function from {dplyr} to rename the `entity` column to `region` (for reasons that will become clear in the next paragraph!)\index{dplyr!rename}. We also rename the `Physicians (per 1,000 people)` column to `doctors` to make it easier to work with. The data has multiple entries for each country, spanning different years. We *could* make an animated map to show how the number of doctors is changing over time, but for now we'll keep it simple with a static map showing a snapshot at one point in time. However, there's a bit of a problem. If you inspect the data, you'll see that not every country has an entry for each year - let's use the most recent data available for each country. For each `region`, we keep the row with only the most recent year using a combination of `group_by()`\index{dplyr!group\_by} and `slice_max()`\index{dplyr!slice\_max} from {dplyr}.
+Since this data is already fairly tidy, there isn't too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don't need, and renaming a couple of columns to make them easier to work with. We can use the `rename()` function from {dplyr} to rename the `Entity` column to `region` (for reasons that will become clear in the next paragraph!)\index{dplyr!rename}. We also rename the `Physicians (per 1,000 people)` column to `doctors` to make it easier to work with, and rename `Year` to `year` for consistency. The data has multiple entries for each country, spanning different years. We *could* make an animated map to show how the number of doctors is changing over time, but for now we'll keep it simple with a static map showing a snapshot at one point in time. However, there's a bit of a problem. If you inspect the data, you'll see that not every country has an entry for each year - let's use the most recent data available for each country. For each `region`, we keep the row with only the most recent year using a combination of `group_by()`\index{dplyr!group\_by} and `slice_max()`\index{dplyr!slice\_max} from {dplyr}.
 
 ```{r}
 #| label: doctors-wrangle
 #| message: false
 doctors <- doctors |>
   dplyr::rename(
-    region = entity,
+    year = Year,
+    region = Entity,
     doctors = `Physicians (per 1,000 people)`
   ) |>
   dplyr::select(region, year, doctors) |>
@@ -152,7 +153,7 @@ Of course, it's never quite that straightforward. We need to join the `world` ma
 
 ## Renaming columns
 
-You don't need to rename columns in your data to be able to join them, but for this example, I found it a little bit easier to work with the data after renaming `entity` to `region`.
+You don't need to rename columns in your data to be able to join them, but for this example, I found it a little bit easier to work with the data after renaming `Entity` to `region`.
 
 :::
 
