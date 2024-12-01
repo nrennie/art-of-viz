@@ -21,7 +21,7 @@ In this chapter, we're going to explore the Programming Languages Database (PLDB
 
 The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by [Jesus M. Castagnetto](https://github.com/jmcastagnetto)), meaning we can also easily load the data into R using the {tidytuesdayR} R package [@tidytuesdayR]. 
 
-The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the data) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the date) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: languages-load-data-show
@@ -39,17 +39,16 @@ languages <- tuesdata$languages
 languages <- readr::read_csv("data/languages.csv")
 ```
 
-You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tidytuesdayR::tt_load(2023, week = 12)`, but personally I find remember the date much easier! You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
+You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tidytuesdayR::tt_load(2023, week = 12)`, but remembering the date is often much easier! You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
 
 What does the data look like? We can inspect the first six rows of the data using `head()`:
 
 ```{r}
 #| label: languages-data-head
-#| out-width: "50%"
 head(languages)
 ```
 
-You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The data description contained in the TidyTuesday GitHub repository ([github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md)) is often a good place to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
+You can also use `View()` to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has `r nrow(languages)` rows and `r ncol(languages)` columns - giving us many options for variables to explore further. What variables do we have? The [data description contained in the TidyTuesday GitHub repository](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md) is often a good place to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset's website at [pldb.io/csv.html](https://pldb.io/csv.html). Here, you'll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we'll stick with the smaller version for this chapter!
 
 There are many variables with missing (`NA`) values in the PLDB - few languages have an entry in the `description` column, `github_` columns, `reference` column, or `is_open_source` column. Missing values are highly important - we don't always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the `github_` columns might be related to the fact that many programming languages precede GitHub's creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn't a statistics book, so for the purposes of visualization we'll focus on columns that are mostly complete. \index{missing data}
 
@@ -59,7 +58,7 @@ So which columns should we explore first? Often when we're working with data, th
 
 Beyond looking at the data, counting the rows and columns, and inspecting the values in different columns, a key part of exploratory work is visualizing data. These initial visualizations can help you to check if there are any issues with your data (e.g. a misspelling `Monday` as `Mnoday`). They can also help to identify interesting relationships or patterns in the data, which can guide you to further avenues for exploration and appropriate modelling techniques.
 
-There are many different types of plot, and when we're creating . I hope you'll see several examples of those in this book. But often, for those initial exploratory plots, the *classic* charts are where I start: scatter plots, bar charts, box plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; box plots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time. 
+There are many different types of plot, and you'll see several different examples in this book - some you may have seen before, others you may have not. But often, for those initial exploratory plots, the *classic* charts are where I start: scatter plots, bar charts, box plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; box plots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time. 
 
 ### Data exploration
 
@@ -82,7 +81,7 @@ Straight away this highlights the role of data visualization in exploratory anal
 
 * Are these simply incorrect entries?
 * Are these missing values? It's not uncommon for missing values to be encoded as `-999` for example. This is especially true if data has been processed in some other software before it's loaded into R. Just because you have `NA` values in your data, doesn't mean you can't also have these unusually coded missing values. Values can be missing for different reasons, and sometimes they are encoded in multiple ways to demonstrate this difference. 
-* Are these values transformed in some way we don't expect? Dates can be encoded as integer values - often as number of dates since some origin time. The origin time used in R is often `"1970-01-01"`, so it's perfectly reasonable to have negative dates if you're dealing with data pre-1970. 
+* Are these values transformed in some way we don't expect? Dates can be encoded as integer values - often as number of days since some origin time. The origin time used in R is often `"1970-01-01"`, so it's perfectly reasonable to have negative dates if you're dealing with data pre-1970. 
 
 In this case, the dates are actually given as just a year (rather than a `Date` object) so the negative values are unlikely to be incorrectly transformed values. If we're going to filter out these rows, which year do we use to filter them out? Before 1500? Before 1970? Let's actually look at these rows:
 
@@ -100,7 +99,11 @@ Let's look at the balance between these different types of languages in the data
 #| fig-cap: "A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right."
 #| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1))
-barplot(sort(table(languages$type)))
+barplot(
+  height = sort(table(languages$type)),
+  las = 2,
+  cex.names = 0.5
+)
 ```
 
 Almost all of them are programming languages so let's focus on them only, and recreate our `last_activity` against `language_rank` scatter plot. We can use the `subset()` function to extract only rows of the data where the `type` is `"pl"` and save this to a new object called `pl_df`. \index{base!subset}
@@ -112,7 +115,10 @@ Almost all of them are programming languages so let's focus on them only, and re
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 pl_df <- subset(languages, type == "pl")
 plot(
-  pl_df$last_activity, pl_df$language_rank
+  x = pl_df$last_activity,
+  y = pl_df$language_rank,
+  xlab = "Last activity",
+  ylab = "Rank"
 )
 ```
 
@@ -141,9 +147,11 @@ Which other columns might we explore? In R, we write comments using the `#` symb
 #| label: fig-languages-comment-barplot
 #| fig-cap: "A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right."
 #| echo: -1
+#| dev: "ragg_png"
 par(mar = c(4.1, 4.1, 2.1, 2.1))
 barplot(
-  sort(table(pl_df$line_comment_token))
+  height = sort(table(pl_df$line_comment_token)),
+  cex.names = 0.5
 )
 ```
 
@@ -175,7 +183,7 @@ There are a few extensions packages that can help you to make dumbbell charts wi
 
 In this chapter, we're not going to use either of those for a couple of reasons:
 
-* Extension packages are perfect for making charts more quickly and easily, and I would encourage you to try them. But it's also really useful to understand that, as long as you can break down the chart you want into lines, points, and polygons, then you can make it with {ggplot2}. That's, at least in part, what this book is about.
+* Extension packages are perfect for making charts quickly and easily, and I would encourage you to try them. But it's also really useful to understand that, as long as you can break down the chart you want into lines, points, and polygons, then you can make it with {ggplot2}. That's, at least in part, what this book is about.
 * We're going to apply reasonably advanced customization to our dumbbell chart, and it's useful to see how these work in {ggplot2} first so that you can later apply them to other plot types more easily. 
 
 ### Data wrangling
@@ -199,7 +207,7 @@ comment_df <- pl_df |>
   tidyr::drop_na()
 ```
 
-In each facet, we could list all programming languages that use the comment symbol related to that facet. This would also display information about how much languages use each symbol. Alternatively, we may choose to use only the top 10 ranked languages for each symbol. 
+In each facet, we could list all programming languages that use the comment symbol related to that facet. This would also display information about how many languages use each symbol. Alternatively, we may choose to use only the top 10 ranked languages for each symbol. 
 
 We can extract the top 10 using `slice_min()` from {dplyr} and select the 10 with the smallest values in `language_rank`. Alternatively, since the data is already sorted in rank order, we can use `slice_head()` from {dplyr} to extract the first 10 rows. Since we want the top 10 rows from each comment symbol category (not just the top 10 overall), we need to `group()` the data based on the `label` column. Before we `ungroup()` the data, we also want to create a new column that defines the within-group ranking as this will help with plotting. The `row_number()` function from {dplyr} identifies the row number within each group so is used to define this within-group ranking. We add it as a new column called `n` using `mutate()`. \index{dplyr!slice\_min} \index{dplyr!slice\_head} \index{dplyr!group} \index{dplyr!mutate} \index{dplyr!row\_number}
 
@@ -278,7 +286,7 @@ There are lots of different elements of applying more advanced styling to charts
 
 Let's start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We'll come back to choosing colors for this setting in @sec-museums and @sec-lemurs. Here, it's a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements.
 
-To make visualizations that are more aesthetically pleasing, it's often useful to think about whether you can match your color choices to the theme of the data. For example, if you're creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we're creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in *green screens* - [monochrome monitors](https://en.wikipedia.org/wiki/Monochrome_monitor) that use a green phosphor screen, typically in the early days of computing. 
+To make visualizations that are more aesthetically pleasing, it's often useful to think about whether you can match your color choices to the theme of the data. For example, if you're creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we're creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in *green screens* ([monochrome monitors](https://en.wikipedia.org/wiki/Monochrome_monitor) that used a green phosphor screens) typically in the early days of computing. 
 
 We can define some variables to store our colors in: a variable called `bg_col` that's dark gray color we'll use for the background; and a variable called `main_col` that's a hex code for a bright green color we'll use for the text and other geometric elements.
 
@@ -298,7 +306,7 @@ bg_col <- "gray5"
 main_col <- "#66FF00"
 ```
 
-Although you can use `update_geom_defaults()` to change the default colors used for lines, points, and text, I'm not a fan of this approach since it changes the colors for all plots in your R session and it's quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the `aes()` function since they are not mapped to variables in the data. \index{ggplot2!aes} \index{ggplot2!update\_geom\_defaults}
+Although you can use `update_geom_defaults()` to change the default colors used for lines, points, and text, this approach also changes the colors for all future plots in your R session and it's quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the `aes()` function since they are not mapped to variables in the data. \index{ggplot2!aes} \index{ggplot2!update\_geom\_defaults}
 
 The point character (`pch`) for `geom_point()` is also set to `22` - a square which allows you to color the square and its outline different colors. The outline `color` is set to our green `main_col` and the square `fill` color is set to the dark gray `bg_col`.
 

@@ -161,7 +161,7 @@ We pass our data into the `ggplot()` function as always, and then set up the aes
 #| label: fig-cats-base-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category."
 library(ggplot2)
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = plot_data,
   mapping = aes(
     x = age_years,
@@ -170,7 +170,7 @@ base_plot <- ggplot(
   )
 ) +
   geom_point()
-base_plot
+basic_plot
 ```
 
 ## Advanced styling
@@ -188,7 +188,7 @@ highlight_col <- "#914D76"
 bg_col <- "white"
 ```
 
-We can update our initial `base_plot` code to change the color of the points to `highlight_col` inside `geom_point()`. Remember that since this color isn't based on a column in the data, it doesn't need to go inside `aes()`. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+We can update our initial `basic_plot` code to change the color of the points to `highlight_col` inside `geom_point()`. Remember that since this color isn't based on a column in the data, it doesn't need to go inside `aes()`. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 The `size` legend is generated automatically, and it picks evenly spaced intervals given the range of the data. Unfortunately this sometimes results in labels that don't quite make sense. Here, we have a label for 2.5 cats - not something that exists in the natural world! Let's choose more appropriate breaks for the `size` legend. Here, our `size` data ranges between `r min(plot_data$n)` and `r max(plot_data$n)`, so let's go for `3`, `6`, and `9`. We pass these desired break points in as a vector to `scale_size()`. Note that the sizes of the points in the plot are unchanged, only the legend is updated. \index{ggplot2!scale\_size}
 
@@ -196,7 +196,7 @@ The `size` legend is generated automatically, and it picks evenly spaced interva
 #| label: fig-cats-base-plot-2
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers."
 #| source-line-numbers: "9,10"
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = plot_data,
   mapping = aes(
     x = age_years,
@@ -206,7 +206,7 @@ base_plot <- ggplot(
 ) +
   geom_point(color = highlight_col) +
   scale_size(breaks = c(3, 6, 9))
-base_plot
+basic_plot
 ```
 
 ### Text and fonts
@@ -249,7 +249,7 @@ From {ggtext}, we can use the `geom_textbox()` function to add an annotation. Li
 ```{r}
 #| label: fig-cats-annot-1
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots'."
-annotated_plot <- base_plot +
+annotated_plot <- basic_plot +
   ggtext::geom_textbox(
     data = annot_oldest,
     mapping = aes(

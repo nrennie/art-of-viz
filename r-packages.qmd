@@ -247,7 +247,7 @@ library(ggplot2)
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
 #| warning: true
-base_plot <- ggplot(plot_data) +
+basic_plot <- ggplot(plot_data) +
   geom_area(
     mapping = aes(
       x = date,
@@ -256,7 +256,7 @@ base_plot <- ggplot(plot_data) +
     )
   ) +
   facet_wrap(~pkgs, nrow = 1, drop = FALSE)
-base_plot
+basic_plot
 ```
 
 You might notice two things here:
@@ -312,15 +312,15 @@ head(new_plot_data, n = 8)
 
 We can see that there are now quite a few `0` values included in the `n` column. Notice that `"tibble"` is now explicitly included as well, with `0` in the `n` column for all observations. This is because, by default, `complete()` uses all levels of the factor even if they aren't observed in the data.
 
-Now we need to update the data that is used in our `base_plot`. We *could* simply edit (or copy and paste) the code from above and substitute `plot_data` for `new_plot_data`. But we can alternatively use the `%+%` operator.
+Now we need to update the data that is used in our `basic_plot`. We *could* simply edit (or copy and paste) the code from above and substitute `plot_data` for `new_plot_data`. But we can alternatively use the `%+%` operator.
 
-The `%+%` operator allows you to replace the current default data frame on an existing plot. We start with our existing `base_plot`, and then use `%+%` to set `new_plot_data` as the data used in the plot.
+The `%+%` operator allows you to replace the current default data frame on an existing plot. We start with our existing `basic_plot`, and then use `%+%` to set `new_plot_data` as the data used in the plot.
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering now looks correct."
-base_plot <- base_plot %+% new_plot_data
-base_plot
+basic_plot <- basic_plot %+% new_plot_data
+basic_plot
 ```
 
 Notice that the warning message has now disappeared.
@@ -356,7 +356,7 @@ We can then pass this `col_palette` vector into `scale_fill_manual()` function t
 ```{r}
 #| label: fig-r-pkgs-col-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Each area chart is colored using a different color from the {rcartocolor} package."
-col_plot <- base_plot +
+col_plot <- basic_plot +
   scale_fill_manual(
     values = col_palette
   )

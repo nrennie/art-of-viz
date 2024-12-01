@@ -356,14 +356,14 @@ We can then re-do our line chart using the rescaled `change` data on the y-axis 
 #| label: fig-museums-basic-plot-4
 #| fig-cap: "A line chart of percentage increase in museums (compared to 1960) for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
 #| message: false
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = new_plot_data,
   mapping = aes(x = year, y = change, color = deprivation)
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
   gghighlight::gghighlight(use_direct_label = FALSE)
-base_plot
+basic_plot
 ```
 
 This is starting to look promising, but there are still ways that we can style our chart to improve it.
@@ -391,7 +391,7 @@ For the colors of the lines, we can use the {viridis} package [@viridis]. The {v
 ```{r}
 #| label: fig-museums-style-plot-1
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
-col_plot <- base_plot +
+col_plot <- basic_plot +
   viridis::scale_color_viridis(
     discrete = TRUE,
     direction = -1
