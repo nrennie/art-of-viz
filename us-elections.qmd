@@ -25,15 +25,9 @@ fig-asp: 0.5
 #| file: R/social_caption.R
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| file: R/source_caption.R
-```
-
 # US House elections: geography on a grid with {geofacet} {#sec-house}
 
-In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}. \index{geofacet} \index{patchwork}
+In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and look at another approach for creating customized legends. \index{geofacet} \index{patchwork}
 
 ## Data
 
@@ -151,21 +145,16 @@ plot_data <- house_data |>
 
 ### The first plot
 
-We've once again going to create a faceted plot, as we did in @sec-programming, @sec-museums, and @sec-technology. There are two key differences with this plot:
+We're once again going to create a faceted plot, as we did in @sec-programming, @sec-museums, and @sec-technology. There are two key differences with this plot:
 
 * Instead of arranging the plots into a rectangular shape with a specified number of rows and columns, we want to arrange the plots in a way that resembles some underlying geography.
 * There are far more facets (over 50) compared to the previous plots we've made (which have mostly had less than 10). Sometimes creating a large number of facets can be slow.
 
 It's this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.
 
-We start by passing in the ... to the `data` argument of `ggplot()`. 
+We start by passing in our `plot_data` to to the `data` argument of `ggplot()`, wrapped inside the `filter()` function from {dplyr} which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. \index{dplyr!filter} \index{ggplot2!ggplot} \index{ggplot2!aes}
 
-\index{dplyr!filter}
-
-\index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_area}
-
-
-Since we're going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of votes, we'll look at the proportion for each party. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` does this for us. \index{ggplot2!geom\_area}
+We've already seen examples of making area charts in @sec-museums and @sec-r-pkgs, but we're going to make a slight change in this chapter. Since we're going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of number of votes, we'll look at the proportion for each party. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` does this for us. \index{ggplot2!geom\_area}
 
 ```{r}
 #| label: fig-elections-single-plot
@@ -185,7 +174,7 @@ ggplot(
   )
 ```
 
-and we have ... 
+We now have a basic plot for one of the facet values.
 
 ::: {#tip-elections-piping .callout-tip}
 
@@ -217,15 +206,13 @@ Though this may arguably look neater than nesting `filter()` inside `ggplot()`, 
 
 :::
 
-Now that we have ...., we can pass the full data into `ggplot()` and add `facet_wrap()`. 
-
-\index{ggplot2!ggplot} \index{ggplot2!aes}
-\index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
+We can now pass the full data into `ggplot()` (rather than just the California subset) and add `facet_wrap()` to create an area chart for each value in `state_po`. \index{ggplot2!ggplot} \index{ggplot2!aes} index{ggplot2!geom\_area} \index{ggplot2!facet\_wrap}
 
 ```{r}
 #| label: fig-elections-basic-plot
 #| fig-cap: "Plot"
 #| warning: false
+#| source-line-numbers: "1,10"
 basic_plot <- ggplot(data = plot_data) +
   geom_area(
     mapping = aes(
@@ -239,15 +226,19 @@ basic_plot <- ggplot(data = plot_data) +
 basic_plot
 ```
 
-As you can see in @fig-elections-basic-plot ... can't see the plots, only facet labels. This is a very common problem when working with large numbers of facet categories.
+In @fig-elections-basic-plot, we can't actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We'll deal with this problem a little bit later when adjusting the plot themes. 
 
-### Packages and functions
+### Faceting with {geofacet}
 
-To arrange the faceted plots into the ... using the {geofacet} R package [@geofacet]. The `geofacet` 
+To arrange the faceted plots into a grid that resembles the underlying geography, we'll use the {geofacet} package [@geofacet]. The {geofacet} package makes it easier to arrange facets in the shape of a map. This makes it easier to compare data across regions, like states or countries, in a grid format. There are many built-in grids for different geographical regions, including the several for the United States of America. However, you can also create your own custom facet grid if you prefer a different layout, or if no grid exists for the region you are plotting.
 
-In order to map..., one of the columns must match the ... . 
+To do faceting with {geofacet}, we use `facet_geo()` instead of `facet_wrap()`. It works in essentially the same way, and we start by using a `~` to indicate which column is the faceting column. However, there are two things that are a little bit different: \index{geofacet!facet\_geo} \index{geofacet!facet\_geo}
 
-\index{geofacet!facet\_geo}
+* We need to specify which grid layout we want to use. You can use the `get_grid_names()` function in {geofacet} to get a list of all of the valid grid names. They are named sensibly based on what region the grid is for e.g. `"us_state_grid1"` and `"eu_grid1"`. Here, we'll use `"us_state_grid2"`. 
+
+* In order to map the data to the correct facet position on the grid, one of the columns in the data must align with the value in the `code` column of your chosen grid. In the `"us_state_grid2"` grid, the `code` column contains the two letter state abbreviations which matches the `state_po` column in our data. If you didn't have the two letter abbreviations, you may need to do so data joining to attach them.
+
+If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a US state column even though it isn't) or are missing some states, you can still use `geo_facet()`. However, it will only plot states listed in the facet grid, and you may get a warning message.
 
 ```{r}
 #| label: fig-elections-geofacet-plot
@@ -335,7 +326,7 @@ title <- "US House Election Results"
 st <- glue::glue("Areas indicate the percentage of votes for <span style='color:{blue_col};'>Democrat</span>, <span style='color:{red_col};'>Republican</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
-We also define our `social_caption()` described in @sec-cats \index{social\_caption}
+We also define our `social_caption()` using the function we defined in @sec-cats: \index{social\_caption}
 
 ```{r}
 #| label: elections-text-2
@@ -346,7 +337,7 @@ social <- social_caption(
 )
 ```
 
-\index{ggplot2!labs}
+We then pass our title, subtitle, and caption text intp the `labs()` function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the `tag` argument rather than `subtitle`, similar to what we did in @sec-time-zones. \index{ggplot2!labs} 
 
 ```{r}
 #| label: elections-labs
@@ -438,23 +429,26 @@ styled_plot_2
 
 ### Legend
 
-As we did in @sec-time-zones, we'll design a custom legend.
+As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer.
 
-\index{dplyr!filter}
+We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don't currently have any axes titles or labels. For example, it's not immediately clear what years are covered by the data. This doesn't need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don't rely on color alone as discussed in @sec-lemurs, we'll also add direct labels to identify the *Democrat* and *Republican* areas on the chart.
+
+Let's start by filtering the data, to select only a single state. It doesn't really matter which one we choose, although ideally one that has enough space for us to add the party labels directly on the chart. Here, we'll use California (`"CA"`) for the legend plot. \index{dplyr!filter}
+
+```{r}
+#| label: elections-legend-data
+ca_data <- dplyr::filter(plot_data, state_po == "CA")
+```
+
+direct labeling as discusses 
 \index{ggplot2!ggplot} \index{ggplot2!aes}
 \index{ggplot2!geom\_area}
 \index{ggplot2!geom\_text}
 \index{ggplot2!scale\_fill\_manual}
-\index{ggplot2!coord\_cartesian}
-\index{ggplot2!theme\_void}
 
-\index{ggplot2!theme} \index{ggplot2!element\_rect}
-
-direct labeling as discusses in @sec-lemurs
 
 ```{r}
 #| label: elections-ca-plot
-ca_data <- dplyr::filter(plot_data, state_po == "CA")
 ca_plot <- ggplot(data = ca_data) +
   geom_area(
     mapping = aes(
@@ -486,10 +480,17 @@ ca_plot <- ggplot(data = ca_data) +
   )
 ```
 
+We then use the `annotate()` function to add: \index{ggplot2!annotate}
+
+* Two labels for the start and end year of the data. To keep these within the bounds of the plot, we left align the start label on the left, and right align the end label on the right. 
+
+* Two labels for the *Republican* and *Democrat* parties. We leave the *Other* category unlabeled as it's very small, and it's obviously the only category left over. 
+
+As in the main plot, we also set `expand = FALSE` inside `coord_cartesian()` to remove the additional space around the edges. We also use `theme_void()` to remove any additional chart elements, since the annotations convey all the necessary information. \index{ggplot2!coord\_cartesian} \index{ggplot2!theme\_void}
 
 ```{r}
 #| label: fig-elections-inset-plot
-#| fig-cap: "Custom legend plot"
+#| fig-cap: "A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors."
 #| fig-asp: 1
 #| fig-width: 3
 #| fig-align: center
@@ -541,9 +542,11 @@ p_inset
 
 ### Joining with {patchwork}
 
-\index{patchwork} [@patchwork]
+Now, the last step is to join together our custom legend with the main plot. We've already left some blank space on the main plot for the legend to go in, so we'll use the `inset_element()` function from {patchwork} [@patchwork] as we did in @sec-time-zones. \index{patchwork} \index{patchwork!inset\_element}
 
-\index{patchwork!inset\_element}
+
+
+
 
 \index{ggplot2!theme} \index{ggplot2!element\_rect}
 
@@ -577,12 +580,20 @@ styled_plot_2 + inset_element(
 
 * Other category
 
-* 
+* prcent
 
 ::: {.content-visible when-format="html"}
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/elections.gif){fig-align="center"}
+
+:::
+
+## Exercises
+
+::: {.callout-caution}
+
+Exercises are coming soon!
 
 :::
