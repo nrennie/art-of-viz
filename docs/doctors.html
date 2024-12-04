@@ -331,6 +331,7 @@ div.csl-indent {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">11.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">11.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -352,10 +353,22 @@ div.csl-indent {
 </header><p>In this chapter we’ll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.</p>
 <section id="data" class="level2" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">11.1</span> Data</h2>
+<p>We’ll visualize data on <em>Medical doctors per 1,000 people</em> using the dataset from the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>) <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you’re ever looking for inspiration.</p>
+<div id="tip-doctors-open-data" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;11.1: Finding sources of data
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>There’s often a <em>Bring Your Own Data</em> week each year of TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span>, where participants are encouraged to source their own data. Some use their own data - visualising how many times they’ve gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?</p>
 <p>There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine (<a href="https://datasetsearch.research.google.com/">datasetsearch.research.google.com</a>) might also help you to identify data you’re interested in.</p>
-<p>One fantastic source of data is the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>). The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualisations if you’re ever looking for inspiration.</p>
-<p>For this chapter, we’ll visualize data on <em>Medical doctors per 1,000 people</em> using the dataset from the Our World in Data website <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. You can either download the CSV file from <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">ourworldindata.org/grapher/physicians-per-1000-people</a> manually or you can do as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and download it directly into R using the URL. Simply pass the URL into the <code>read_csv()</code> function from {readr} (or <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> from base R if you prefer). As in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. </p>
+</div>
+</div>
+<p>You can either download the CSV file from <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">ourworldindata.org/grapher/physicians-per-1000-people</a> manually or you can do as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and download it directly into R using the URL. Simply pass the URL into the <code>read_csv()</code> function from {readr} (or <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> from base R if you prefer). As in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_url</span> <span class="op">&lt;-</span> <span class="st">"https://ourworldindata.org/grapher/"</span></span>
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span></span>
@@ -370,7 +383,7 @@ div.csl-indent {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.1: Connecting to Our World in Data via R
+Tip&nbsp;11.2: Connecting to Our World in Data via R
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -387,7 +400,7 @@ Tip&nbsp;11.1: Connecting to Our World in Data via R
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.2: Saving data for later use
+Tip&nbsp;11.3: Saving data for later use
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -476,7 +489,7 @@ Figure&nbsp;11.2: Initial sketch of a map of the world, showing title enclosed i
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.3: Renaming columns
+Tip&nbsp;11.4: Renaming columns
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -530,7 +543,7 @@ Tip&nbsp;11.3: Renaming columns
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.4: Alternatives to <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code>
+Tip&nbsp;11.5: Alternatives to <code><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map()</a></code>
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -538,7 +551,7 @@ Tip&nbsp;11.4: Alternatives to <code><a href="https://ggplot2.tidyverse.org/refe
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">map_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">long</span>,</span>
@@ -548,7 +561,7 @@ Tip&nbsp;11.4: Alternatives to <code><a href="https://ggplot2.tidyverse.org/refe
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map</a></span><span class="op">(</span>map <span class="op">=</span> <span class="va">map_data</span><span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-doctors-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -572,7 +585,7 @@ Figure&nbsp;11.3: Map of the world with countries colored based on number of doc
 <p>We’ll start by considering alternative color palettes, then think about text that should be added, before finalizing the layout.</p>
 <section id="colors" class="level3" data-number="11.4.1"><h3 data-number="11.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">11.4.1</span> Colors</h3>
-<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favorite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualisations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
+<p>There are many, many color palette R packages in existence, and even more outwith the R ecosystem. In fact, the {paletteer} package is designed to give a common interface to a comprehensive collection of color palettes in R. One of my favorite is color palette R packages is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualizations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only.</p>
 <p>{MetBrewer} does have functions that interface directly with {ggplot2} (such as <code><a href="https://rdrr.io/pkg/MetBrewer/man/scale_fill_met_c.html">scale_fill_met_c()</a></code>) but we’re going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the <code>"Hokusai2"</code> palette. The <code>text_col</code> is the 18th color and <code>highlight_col</code> is the 15th color. A variable containing the background color, <code>bg_col</code>, is also defined.</p>
 <div class="cell">
 <div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
@@ -583,7 +596,7 @@ Figure&nbsp;11.3: Map of the world with countries colored based on number of doc
 </div>
 <p>These colors can then be passed into <code><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn()</a></code> from {ggplot2}. The limits of the color scale can also be set. Rather than adding labels for values on the legend, we can add text labels for <em>Fewer doctors</em> and <em>More doctors</em>. These are positioned 0.8 in from the limits of the color scale.</p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradientn</a></span><span class="op">(</span></span>
 <span>    colors <span class="op">=</span> <span class="va">col_palette</span>,</span>
 <span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span>
@@ -622,15 +635,17 @@ Figure&nbsp;11.4: Map of the world with countries colored based on number of doc
 <div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Doctors across the world"</span></span>
 <span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"This map show the number of doctors per thousand people, revealing which countries* may be more likely to struggle in providing care for a population.&lt;br&gt;&lt;br&gt;*using the most recent available data for each country."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Let’s create a custom caption that includes Font Awesome icons, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>: </p>
+<p>Let’s create a custom caption that includes Font Awesome icons, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which is passed into the <code>source_caption()</code> function we defined in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
 <span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
-<span>  <span class="st">"**Data**: Our World in Data&lt;br&gt;**Graphic**: {social}"</span></span>
+<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
+<span>  source <span class="op">=</span> <span class="st">"Our World in Data"</span>,</span>
+<span>  sep <span class="op">=</span> <span class="st">"&lt;br&gt;"</span>,</span>
+<span>  graphic <span class="op">=</span> <span class="va">social</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>These text variables can then be passed into the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function in {ggplot2}:</p>
@@ -692,7 +707,7 @@ Figure&nbsp;11.5: Map of the world with countries colored based on number of doc
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.5: Choosing a column name
+Tip&nbsp;11.6: Choosing a column name
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -818,7 +833,7 @@ Figure&nbsp;11.6: Map of the world with duplicated title in the facet strip text
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;11.6: Styling guides in {ggplot2}
+Tip&nbsp;11.7: Styling guides in {ggplot2}
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -870,10 +885,25 @@ Figure&nbsp;11.7: Final styled plot showing a map of the world, with title insid
 <span class="header-section-number">11.5</span> Reflection</h2>
 <p>The color scale in @<a href="#fig-doctors-style-plot-5" class="quarto-xref">Figure&nbsp;<span>11.7</span></a> is quite hard to interpret, so the choice was made to use <em>Fewer doctors</em> and <em>More doctors</em> labels instead. For this version, where the underlying data is simpler and easier to interpret, having the values on the legend would add more useful information. The title was also kept, but could probably be changed to something more informative.</p>
 <p>When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it’s much older. In fact, running <code>range(doctors$year)</code> shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there’s no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the different is between times. Showing uncertainty on maps is tricky, and there’s no straightforward solution here. Perhaps setting the colors to a binary scale showing whether the value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/doctors.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
+</div>
+</section><section id="exercises" class="level2" data-number="11.6"><h2 data-number="11.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">11.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Exercises are coming soon!</p>
+</div>
 </div>
 
 
@@ -1041,7 +1071,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1118,8 +1148,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
