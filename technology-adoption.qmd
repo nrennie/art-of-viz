@@ -368,6 +368,20 @@ color_plot <- basic_plot +
 color_plot
 ```
 
+When choosing colors for a visualization, it's important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color blindness comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color blindness, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can't, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable [@GAcharts]. \index{accessibility} \index{legend}
+
+There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is {colorblindr} [@colorblindr]. The {colorblindr} package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated {ggplot2} functions. At the time of writing, {colorblindr} is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
+
+```{r}
+#| label: fig-technology-cvd
+#| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types of color vision deficiency."
+#| echo: -1
+theme_set(theme_void(base_size = 2))
+colorblindr::cvd_grid(color_plot)
+```
+
+Note that the default color palette in {ggplot2} does not show any differentiation when viewed in grayscale, so it's important to think about which colors you're using for any chart.
+
 ### Text and fonts
 
 As we've seen in previous chapters, we can load in Google fonts using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` font for both the title and the body font. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
@@ -502,7 +516,7 @@ The highlights a common problem when developing charts - how big should the visu
 
 Rather than thinking about width and height, it can often be more helpful to think about aspect ratio and width (or height). This often makes the process of increasing the image size a little bit easier. \index{aspect ratio}
 
-* **Choosing an aspect ratio**: there are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you're creating a plot as part of a publication, some academic journals or magazone may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of ... 
+* **Choosing an aspect ratio**: there are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you're creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.
 
 * **Choosing a width**: often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images e.g. low and high resolution.
 
@@ -510,30 +524,16 @@ Changing the width (or resolution) of a plot, often also means changing other as
 
 :::
 
-We have a few different options for dealing with the legend. Some options  might be:
+We have a few different options for dealing with the legend. Some options might be:
 
 * Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. Repositioning the legend will be discussed in @sec-doctors.
 
-* We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-house. 
+* We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-time-zones and @sec-house. 
 
 * We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats. 
 Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the pink color represents the positive response data (percentage who have been immunized). 
 
-It's important not to rely on legends too much. More specifically, don't rely on color alone for communicating information. Color blindness comes in many different form, and different types affects how people perceive colors in different ways. One way to check if your chart is accessible to people with color blindness, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can't consider choosing different colors, or shapes and patterns to differentiate groups instead. \index{accessibility} \index{legend}
-
-There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is {colorblindr} [@colorblindr]. The {colorblindr} package allows you to create simulations of what your chart may look like to some one with color blindness. The package also includes colorblind friendly qualitative palettes with associated {ggplot2} functions. At the time of writing, {colorblindr} is not available on CRAN but can be installed from GitHub, as described in @sec-bees. \index{colorblindr!cvd\_grid}
-
-```{r}
-#| label: fig-technology-cvd
-#| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types color vision deficiency."
-#| echo: -1
-theme_set(theme_void(base_size = 2))
-colorblindr::cvd_grid(styled_plot)
-```
-
-Note that the default color palette in {ggplot2} does not show any differentiation when viewed in grayscale, and so it's important to think about which colors you're using for any chart.
-
-If you do have to use colors to differentiate groups, add direct labels to data where possible, and make sure that the order of the legend matches the order of the data [@GAcharts]. So let's remove the legend, by setting `legend.position = "none"` inside `theme()`: \index{ggplot2!theme}
+So let's remove the legend, by setting `legend.position = "none"` inside `theme()`: \index{ggplot2!theme}
 
 ```{r}
 #| label: fig-technology-style-3
@@ -569,7 +569,11 @@ Are gauge charts the most effective method of visualising this data? No. Gauge c
 
 ::: {.callout-caution}
 
-Exercises are coming soon!
+## Redesigning and rescaling charts
+
+* Redesign this visualization using a bar chart instead of a gauge chart, and add labels to show the percentage values directly on the chart.
+
+* Do you need to change the aspect ratio or coordinate system to improve the layout?
 
 :::
 
