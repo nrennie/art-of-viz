@@ -23,19 +23,31 @@ execute:
 #| file: R/social_caption.R
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| file: R/source_caption.R
+```
+
 # Doctors across the world: making maps with {ggplot2} {#sec-doctors}
 
 In this chapter we'll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.
 
 ## Data 
 
+We'll visualize data on *Medical doctors per 1,000 people* using the dataset from the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)) [@doctors_data]. The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you're ever looking for inspiration.\index{Our World in Data}
+
+::: {#tip-doctors-open-data .callout-tip}
+
+## Finding sources of data
+
 There's often a *Bring Your Own Data* week each year of TidyTuesday\index{TidyTuesday} [@tidytuesday], where participants are encouraged to source their own data. Some use their own data - visualising how many times they've gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?
 
 There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine ([datasetsearch.research.google.com](https://datasetsearch.research.google.com/)) might also help you to identify data you're interested in.
 
-One fantastic source of data is the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)). The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you're ever looking for inspiration.\index{Our World in Data}
+:::
 
-For this chapter, we'll visualize data on *Medical doctors per 1,000 people* using the dataset from the Our World in Data website [@doctors_data]. You can either download the CSV file from [ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people) manually or you can do as we did in @sec-turbines, and download it directly into R using the URL. Simply pass the URL into the `read_csv()` function from {readr} (or `read.csv()` from base R if you prefer). As in @sec-turbines, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. \index{readr!read\_csv} \index{utils!read.csv}
+ You can either download the CSV file from [ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people) manually or you can do as we did in @sec-turbines, and download it directly into R using the URL. Simply pass the URL into the `read_csv()` function from {readr} (or `read.csv()` from base R if you prefer). As in @sec-turbines, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. \index{readr!read\_csv} \index{utils!read.csv}
 
 ```{r}
 #| label: doctors-load-data-csv-show
@@ -301,7 +313,7 @@ title <- "Doctors across the world"
 subtitle <- "This map show the number of doctors per thousand people, revealing which countries* may be more likely to struggle in providing care for a population.<br><br>*using the most recent available data for each country."
 ```
 
-Let's create a custom caption that includes Font Awesome icons, as described in @sec-cats: \index{social\_caption} \index{glue!glue}
+Let's create a custom caption that includes Font Awesome icons, as described in @sec-cats, which is passed into the `source_caption()` function we defined in @sec-turbines: \index{social\_caption} \index{source\_caption}
 
 ```{r}
 #| label: technology-style-3
@@ -310,8 +322,10 @@ social <- social_caption(
   font_color = text_col,
   font_family = body_font
 )
-caption <- glue::glue(
-  "**Data**: Our World in Data<br>**Graphic**: {social}"
+caption <- source_caption(
+  source = "Our World in Data",
+  sep = "<br>",
+  graphic = social
 )
 ```
 
