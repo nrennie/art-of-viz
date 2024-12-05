@@ -31,9 +31,7 @@ In this chapter, we'll learn how to arrange faceted plots in a grid that resembl
 
 ## Data
 
-\index{tidytuesdayR!tt\_load}
-
-[@elections_data]
+The MIT Election Data and Science Lab collects, analyzes, and shares data and results about elections in the United States of America, with the aim to improve democracy in the USA. This includes data on elections to the U.S. House of Representatives, at the constituency level [@elections_data]. The data is regularly updated, and a version of this dataset containing information about elections from 1976 to 2022 was used as a [TidyTuesday dataset in November 2023](https://github.com/rfordatascience/tidytuesday/tree/main/data/2023/2023-11-07). We can again load the data in using the `tt_load()` function from {tidytuesdayR}: \index{TidyTuesday} \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: elections-load-data-show
@@ -51,22 +49,28 @@ house <- tuesdata$house
 house <- readr::read_csv("data/house.csv")
 ```
 
-\index{utils!head}
-
-Let's take a look at the first few rows of the data:
+There are `r nrow(house)` rows and `r ncol(house)` columns in the data. Let's take a look at the first few rows of the data using `head()` (or `View()` if you prefer): \index{utils!head}
 
 ```{r}
 #| label: elections-head-data
 head(house)
 ```
 
-There are many `state` columns, essentially providing similar information in different formats e.g. the `state` column provides the state name and the `state_po` column provides the state two letter abbreviation.
+There are many `state` columns, essentially providing similar information in different formats e.g. the `state` column provides the state name and the `state_po` column provides the state two-letter abbreviation. There is also a column to identify the constituency (district) within the state. The data gives information about candidates: their name, their political party affiliation, and how many votes they received in the elections they stood in. Other columns provide information about the election, including total number of votes cast, the electoral stage, whether it was a special election, and whether it was a runoff election. The `version` column contains a data which identifies which release version of the data it is.
 
 ## Exploratory work
 
+The `house` data is very granular, and it's unlikely we'll be able to visualize all of the information in one chart. Therefore we can think about different ways of subsetting or aggregating the data. We might choose to focus on:
+
+* State: Voting patterns within a specific state, or aggregating to look at state-level data instead of constituency-level
+
+* Party: We have information on which party each candidate stood for in the election, including data on fusion tickets where candidates stand for multiple parties.
+
+* Time: Data is provided from 1976 to 2022, and we might want to look at trends in vote share or vote counts over time.
+
 ### Data exploration
 
-We might be interested in whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses [@UScensuspop] so might we also expect a similar increase in votes? Let's start by having a look at the number of candidate votes over time with a quick scatter plot made with `plot()`:
+Let's start by having a quick look at whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses [@UScensuspop] so might we also expect a similar increase in votes? Let's start by having a look at the number of candidate votes over time with a quick scatter plot made with `plot()`:
 
 ```{r}
 #| label: fig-elections-scatterplot
@@ -84,7 +88,7 @@ plot(
 
 There doesn't seem to be an especially interesting pattern in votes over time, at least at first glance, in @fig-elections-scatterplot. However, it has highlighted a potential data issue. In most years, the highest values are around 300,000 but there are two observations in 2022 where the values are well over 1,000,000. We had a similar issue in @sec-bees, where some observations were the sum of other observations. This doesn't seem to be the case here. For now, let's exclude these and look at data where the number of candidate votes is below 600,000.
 
-We might also be interested in how the number of candidate votes varies by party, and we can create a box plot ...
+We might also be interested in how the number of candidate votes varies by party, and we can use the `boxplot()` function to take a explore whether or not there are big differences: \index{graphics!boxplot}
 
 ```{r}
 #| label: fig-elections-boxplot
@@ -104,26 +108,36 @@ boxplot(
 )
 ```
 
-In @fig-elections-boxplot there are a couple of interesting points to note. First, there are many, many unique `party` names because every independent candidate is listed as a different party name. This means that not all party names can actually by read off from the chart. Secondly, there is a lot
+In @fig-elections-boxplot there are a couple of interesting points to note. First, there are many, many unique `party` names because every independent candidate is listed as a different party name. This means that not all party names can actually by read off from the chart. Secondly, there are a lot of outliers shown in the data, which is highly skewed. Finally, there are a couple of parties that have a much higher numbers of votes. Inspecting the data confirms that these are, as we might guess, the Democratic Party and the Republican Party.
 
 ### Exploratory sketches
 
-![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections.png){#fig-elections-sketch fig-align="center"}
+The Democratic and Republican parties have dominated elections during this time period. It's unlikely we'd be able to draw any reliable insights about individual independent candidates because the numbers are so small, so let's group all other party candidates together into an *other* category. We can look at combining @fig-elections-scatterplot and @fig-elections-boxplot, alongside information about each state to look at whether there are changing patterns in vote share for the major parties over time and space. 
+
+We might consider creating an area chart faceted by stated showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. @fig-elections-sketch shows an example of what this might look like:
+
+![Initial sketch of a faceted area chart arranged in a grid shaped like the United States.](images/sketch-elections.png){#fig-elections-sketch fig-align="center"}
+
+Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly *busy*. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in @sec-turbines and @sec-lemurs. Though the minimalist approach may look cleaner, it can also mean that it's not as clear what's being shown on a chart. Let's add a *how to read this chart* explainer as a legend, created from a zoomed in version of one of the facet plots:
+
+![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections-2.png){#fig-elections-sketch-2 fig-align="center"}
 
 ## Preparing a plot
 
+In order to bring @fig-elections-sketch-2 to life, we need to start by aggregating the *other* parties, and calculating the number of votes per party, year, and state.
+
 ### Data wrangling
 
-\index{dplyr!mutate}
+To aggregate the *other* parties, we use `mutate()` from {dplyr} to update the existing `party` column. We create the new party categories using `case_when()` and also take the opportunity to provide slightly better, alternative labels for the two dominant parties. \index{dplyr!mutate} \index{dplyr!case\_when}
 
-\index{dplyr!case\_when} \index{dplyr!filter} \index{dplyr!group\_by} \index{dplyr!summarise} \index{dplyr!ungroup}
+The `stage` column contains information on whether the election was a general election (`"GEN"`) or primary election (`"PRI"`). To keep things simpler, we use `filter()` from {dplyr} to restrict the data to general elections only. We then use `group_by()` and `summarise()` to add up the number of votes in each year, state, and party category - remembering to `ungroup()` the data at the end! \index{dplyr!filter} \index{dplyr!group\_by} \index{dplyr!summarise} \index{dplyr!ungroup}
 
 ```{r}
 #| label: elections-wrangling
 house_data <- house |>
   dplyr::mutate(party = dplyr::case_when(
-    party == "REPUBLICAN" ~ "Republican",
-    party == "DEMOCRAT" ~ "Democrat",
+    party == "REPUBLICAN" ~ "Republican Party",
+    party == "DEMOCRAT" ~ "Democratic Party",
     TRUE ~ "Other"
   )) |>
   dplyr::filter(stage == "GEN") |>
@@ -261,20 +275,20 @@ We'll now style our charts to apply more intuitive colors, adjust the facet labe
 
 ### Colors
 
-In the USA, the Republican party is represented by the color red and the Democrat party by blue. As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into negative stereotypes (e.g. pink for girls). But it's also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we'll stick to red and blue. 
+In the USA, the Republican Party is represented by the color red and the Democratic Party by blue. As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into negative stereotypes (e.g. pink for girls). But it's also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we'll stick to red and blue. 
 
-other colors
+Since the visualization is already quite busy, we keep the background colors very simple - using only black and white.
 
 ```{r}
 #| label: elections-colors
 blue_col <- "#0015BC"
 red_col <- "#C41E3A"
 other_col <- "#AAAAAA"
-text_col <- "#202A44"
-bg_col <- "#FAFAFA"
+text_col <- "black"
+bg_col <- "white"
 ```
 
-\index{ggplot2!scale\_fill\_manual}
+We can then apply the colors to our plot using `scale_fill_manual()`, and assigning each color to the relevant party label in `values`. Since we know we're going to be creating our own legend later, we'll remove the default legend by setting `guide = "none"`. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: elections-add-colors
@@ -282,14 +296,13 @@ bg_col <- "#FAFAFA"
 col_plot <- map_plot +
   scale_fill_manual(
     values = c(
-      "Democrat" = blue_col,
-      "Republican" = red_col,
+      "Democratic Party" = blue_col,
+      "Republican Party" = red_col,
       "Other" = other_col
-    )
+    ),
+    guide = "none"
   )
 ```
-
-\index{ggplot2!scale\_fill\_manual}
 
 ### Text and fonts
 
@@ -316,14 +329,13 @@ title_font <- "carter"
 
 
 \index{glue!glue}
-\index{base!paste0}
 
 As in @sec-time-zones, we'll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. 
 
 ```{r}
 #| label: elections-text
 title <- "US House Election Results"
-st <- glue::glue("Areas indicate the percentage of votes for <span style='color:{blue_col};'>Democrat</span>, <span style='color:{red_col};'>Republican</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
+st <- glue::glue("Areas indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
 We also define our `social_caption()` using the function we defined in @sec-cats: \index{social\_caption}
@@ -395,7 +407,6 @@ styled_plot_2 <- styled_plot_1 +
       color = bg_col
     ),
     plot.margin = margin(5, 5, 5, 125),
-    legend.position = "none",
     plot.title = ggtext::element_textbox_simple(
       hjust = -0.94,
       halign = -0.94,
@@ -427,11 +438,11 @@ styled_plot_2
 ```
 
 
-### Legend
+### Developing a custom legend
 
 As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer.
 
-We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don't currently have any axes titles or labels. For example, it's not immediately clear what years are covered by the data. This doesn't need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don't rely on color alone as discussed in @sec-lemurs, we'll also add direct labels to identify the *Democrat* and *Republican* areas on the chart.
+We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don't currently have any axes titles or labels. For example, it's not immediately clear what years are covered by the data. This doesn't need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don't rely on color alone as discussed in @sec-lemurs, we'll also add direct labels to identify the *Democratic Party* and *Republican Party* areas on the chart.
 
 Let's start by filtering the data, to select only a single state. It doesn't really matter which one we choose, although ideally one that has enough space for us to add the party labels directly on the chart. Here, we'll use California (`"CA"`) for the legend plot. \index{dplyr!filter}
 
@@ -472,8 +483,8 @@ ca_plot <- ggplot(data = ca_data) +
   # colors
   scale_fill_manual(
     values = c(
-      "Democrat" = blue_col,
-      "Republican" = red_col,
+      "Democratic Party" = blue_col,
+      "Republican Party" = red_col,
       "Other" = other_col
     ),
     guide = "none"
@@ -484,7 +495,7 @@ We then use the `annotate()` function to add: \index{ggplot2!annotate}
 
 * Two labels for the start and end year of the data. To keep these within the bounds of the plot, we left align the start label on the left, and right align the end label on the right. 
 
-* Two labels for the *Republican* and *Democrat* parties. We leave the *Other* category unlabeled as it's very small, and it's obviously the only category left over. 
+* Two labels for the *Republican* and *Democratic* parties. We leave the *Other* category unlabeled as it's very small, and it's obviously the only category left over. 
 
 As in the main plot, we also set `expand = FALSE` inside `coord_cartesian()` to remove the additional space around the edges. We also use `theme_void()` to remove any additional chart elements, since the annotations convey all the necessary information. \index{ggplot2!coord\_cartesian} \index{ggplot2!theme\_void}
 
@@ -521,7 +532,7 @@ p_inset <- ca_plot +
     geom = "text",
     x = mean(range(ca_data$year)),
     y = 0.8,
-    label = "Democrat",
+    label = "Democratic Party",
     family = body_font,
     color = bg_col,
     size = 3.5
@@ -530,7 +541,7 @@ p_inset <- ca_plot +
     geom = "text",
     x = mean(range(ca_data$year)),
     y = 0.2,
-    label = "Republican",
+    label = "Republican Party",
     family = body_font,
     color = bg_col,
     size = 3.5
@@ -594,6 +605,8 @@ Each plot created during the process of developing the original version of this 
 
 ::: {.callout-caution}
 
-Exercises are coming soon!
+* Instead of using California for the custom legend plot, create a plot showing the percentage of *total* votes across all states. Do you need to update the text to explain how to interpret the charts?
+
+* Edit the visualization to show total number of votes rather than the percentage of the vote share. Do you see similar patterns?
 
 :::
