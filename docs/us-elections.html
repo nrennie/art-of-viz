@@ -329,7 +329,7 @@ div.csl-indent {
 <li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">13.4.1</span> Colors</a></li>
   <li><a href="#text-and-fonts" id="toc-text-and-fonts" class="nav-link" data-scroll-target="#text-and-fonts"><span class="header-section-number">13.4.2</span> Text and fonts</a></li>
   <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">13.4.3</span> Adjusting themes</a></li>
-  <li><a href="#legend" id="toc-legend" class="nav-link" data-scroll-target="#legend"><span class="header-section-number">13.4.4</span> Legend</a></li>
+  <li><a href="#developing-a-custom-legend" id="toc-developing-a-custom-legend" class="nav-link" data-scroll-target="#developing-a-custom-legend"><span class="header-section-number">13.4.4</span> Developing a custom legend</a></li>
   <li><a href="#joining-with-patchwork" id="toc-joining-with-patchwork" class="nav-link" data-scroll-target="#joining-with-patchwork"><span class="header-section-number">13.4.5</span> Joining with {patchwork}</a></li>
   </ul>
 </li>
@@ -356,14 +356,12 @@ div.csl-indent {
 </header><p>In this chapter, we’ll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and look at another approach for creating customized legends. </p>
 <section id="data" class="level2" data-number="13.1"><h2 data-number="13.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">13.1</span> Data</h2>
-<p></p>
-<p><span class="citation" data-cites="elections_data">(<a href="references.html#ref-elections_data" role="doc-biblioref">MIT Election Data and Science Lab 2017</a>)</span></p>
+<p>The MIT Election Data and Science Lab collects, analyzes, and shares data and results about elections in the United States of America, with the aim to improve democracy in the USA. This includes data on elections to the U.S. House of Representatives, at the constituency level <span class="citation" data-cites="elections_data">(<a href="references.html#ref-elections_data" role="doc-biblioref">MIT Election Data and Science Lab 2017</a>)</span>. The data is regularly updated, and a version of this dataset containing information about elections from 1976 to 2022 was used as a <a href="https://github.com/rfordatascience/tidytuesday/tree/main/data/2023/2023-11-07">TidyTuesday dataset in November 2023</a>. We can again load the data in using the <code>tt_load()</code> function from {tidytuesdayR}: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-11-07"</span><span class="op">)</span></span>
 <span><span class="va">house</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">house</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p></p>
-<p>Let’s take a look at the first few rows of the data:</p>
+<p>There are 32452 rows and 20 columns in the data. Let’s take a look at the first few rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> (or <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> if you prefer): </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">house</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -383,18 +381,24 @@ div.csl-indent {
 #   unofficial &lt;lgl&gt;, version &lt;dbl&gt;, fusion_ticket &lt;lgl&gt;</code></pre>
 </div>
 </div>
-<p>There are many <code>state</code> columns, essentially providing similar information in different formats e.g.&nbsp;the <code>state</code> column provides the state name and the <code>state_po</code> column provides the state two letter abbreviation.</p>
+<p>There are many <code>state</code> columns, essentially providing similar information in different formats e.g.&nbsp;the <code>state</code> column provides the state name and the <code>state_po</code> column provides the state two-letter abbreviation. There is also a column to identify the constituency (district) within the state. The data gives information about candidates: their name, their political party affiliation, and how many votes they received in the elections they stood in. Other columns provide information about the election, including total number of votes cast, the electoral stage, whether it was a special election, and whether it was a runoff election. The <code>version</code> column contains a data which identifies which release version of the data it is.</p>
 </section><section id="exploratory-work" class="level2" data-number="13.2"><h2 data-number="13.2" class="anchored" data-anchor-id="exploratory-work">
 <span class="header-section-number">13.2</span> Exploratory work</h2>
+<p>The <code>house</code> data is very granular, and it’s unlikely we’ll be able to visualize all of the information in one chart. Therefore we can think about different ways of subsetting or aggregating the data. We might choose to focus on:</p>
+<ul>
+<li><p>State: Voting patterns within a specific state, or aggregating to look at state-level data instead of constituency-level</p></li>
+<li><p>Party: We have information on which party each candidate stood for in the election, including data on fusion tickets where candidates stand for multiple parties.</p></li>
+<li><p>Time: Data is provided from 1976 to 2022, and we might want to look at trends in vote share or vote counts over time.</p></li>
+</ul>
 <section id="data-exploration" class="level3" data-number="13.2.1"><h3 data-number="13.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">13.2.1</span> Data exploration</h3>
-<p>We might be interested in whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses <span class="citation" data-cites="UScensuspop">(<a href="references.html#ref-UScensuspop" role="doc-biblioref">United States Census Bureau 2021a</a>)</span> so might we also expect a similar increase in votes? Let’s start by having a look at the number of candidate votes over time with a quick scatter plot made with <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>:</p>
+<p>Let’s start by having a quick look at whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses <span class="citation" data-cites="UScensuspop">(<a href="references.html#ref-UScensuspop" role="doc-biblioref">United States Census Bureau 2021a</a>)</span> so might we also expect a similar increase in votes? Let’s start by having a look at the number of candidate votes over time with a quick scatter plot made with <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>:</p>
 <div class="cell">
 <div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">candidatevotes</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  ylab <span class="op">=</span> <span class="st">"Candidate votes"</span></span>
+<span>  ylab <span class="op">=</span> <span class="st">"Number of candidate votes"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-elections-scatterplot" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -402,13 +406,13 @@ div.csl-indent {
 <img src="us-elections_files/figure-html/fig-elections-scatterplot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.1: Bar chart
+Figure&nbsp;13.1: Scatter plot showing the number of candidate votes over time, where it’s clear that elections take place every two years and there has been little change over time.
 </figcaption></figure>
 </div>
 </div>
 </div>
 <p>There doesn’t seem to be an especially interesting pattern in votes over time, at least at first glance, in <a href="#fig-elections-scatterplot" class="quarto-xref">Figure&nbsp;<span>13.1</span></a>. However, it has highlighted a potential data issue. In most years, the highest values are around 300,000 but there are two observations in 2022 where the values are well over 1,000,000. We had a similar issue in <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a>, where some observations were the sum of other observations. This doesn’t seem to be the case here. For now, let’s exclude these and look at data where the number of candidate votes is below 600,000.</p>
-<p>We might also be interested in how the number of candidate votes varies by party, and we can create a box plot …</p>
+<p>We might also be interested in how the number of candidate votes varies by party, and we can use the <code><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot()</a></code> function to take a explore whether or not there are big differences: </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">candidatevotes</span> <span class="op">~</span> <span class="va">party</span>,</span>
@@ -426,33 +430,45 @@ Figure&nbsp;13.1: Bar chart
 <img src="us-elections_files/figure-html/fig-elections-boxplot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.2: Box plot
+Figure&nbsp;13.2: Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes).
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>In <a href="#fig-elections-boxplot" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> there are a couple of interesting points to note. First, there are many, many unique <code>party</code> names because every independent candidate is listed as a different party name. This means that not all party names can actually by read off from the chart. Secondly, there is a lot</p>
+<p>In <a href="#fig-elections-boxplot" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> there are a couple of interesting points to note. First, there are many, many unique <code>party</code> names because every independent candidate is listed as a different party name. This means that not all party names can actually by read off from the chart. Secondly, there are a lot of outliers shown in the data, which is highly skewed. Finally, there are a couple of parties that have a much higher numbers of votes. Inspecting the data confirms that these are, as we might guess, the Democratic Party and the Republican Party.</p>
 </section><section id="exploratory-sketches" class="level3" data-number="13.2.2"><h3 data-number="13.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">13.2.2</span> Exploratory sketches</h3>
+<p>The Democratic and Republican parties have dominated elections during this time period. It’s unlikely we’d be able to draw any reliable insights about individual independent candidates because the numbers are so small, so let’s group all other party candidates together into an <em>other</em> category. We can look at combining <a href="#fig-elections-scatterplot" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> and <a href="#fig-elections-boxplot" class="quarto-xref">Figure&nbsp;<span>13.2</span></a>, alongside information about each state to look at whether there are changing patterns in vote share for the major parties over time and space.</p>
+<p>We might consider creating an area chart faceted by stated showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. <a href="#fig-elections-sketch" class="quarto-xref">Figure&nbsp;<span>13.3</span></a> shows an example of what this might look like:</p>
 <div id="fig-elections-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-elections.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.3: Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.
+Figure&nbsp;13.3: Initial sketch of a faceted area chart arranged in a grid shaped like the United States.
+</figcaption></figure>
+</div>
+<p>Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly <em>busy</em>. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Though the minimalist approach may look cleaner, it can also mean that it’s not as clear what’s being shown on a chart. Let’s add a <em>how to read this chart</em> explainer as a legend, created from a zoomed in version of one of the facet plots:</p>
+<div id="fig-elections-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-elections-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.4: Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.
 </figcaption></figure>
 </div>
 </section></section><section id="preparing-a-plot" class="level2" data-number="13.3"><h2 data-number="13.3" class="anchored" data-anchor-id="preparing-a-plot">
 <span class="header-section-number">13.3</span> Preparing a plot</h2>
+<p>In order to bring <a href="#fig-elections-sketch-2" class="quarto-xref">Figure&nbsp;<span>13.4</span></a> to life, we need to start by aggregating the <em>other</em> parties, and calculating the number of votes per party, year, and state.</p>
 <section id="data-wrangling" class="level3" data-number="13.3.1"><h3 data-number="13.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">13.3.1</span> Data wrangling</h3>
-<p></p>
-<p> </p>
+<p>To aggregate the <em>other</em> parties, we use <code>mutate()</code> from {dplyr} to update the existing <code>party</code> column. We create the new party categories using <code>case_when()</code> and also take the opportunity to provide slightly better, alternative labels for the two dominant parties. </p>
+<p>The <code>stage</code> column contains information on whether the election was a general election (<code>"GEN"</code>) or primary election (<code>"PRI"</code>). To keep things simpler, we use <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> from {dplyr} to restrict the data to general elections only. We then use <code>group_by()</code> and <code>summarise()</code> to add up the number of votes in each year, state, and party category - remembering to <code>ungroup()</code> the data at the end! </p>
 <div class="cell">
 <div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">house_data</span> <span class="op">&lt;-</span> <span class="va">house</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>party <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
-<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"REPUBLICAN"</span> <span class="op">~</span> <span class="st">"Republican"</span>,</span>
-<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"DEMOCRAT"</span> <span class="op">~</span> <span class="st">"Democrat"</span>,</span>
+<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"REPUBLICAN"</span> <span class="op">~</span> <span class="st">"Republican Party"</span>,</span>
+<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"DEMOCRAT"</span> <span class="op">~</span> <span class="st">"Democratic Party"</span>,</span>
 <span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Other"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">stage</span> <span class="op">==</span> <span class="st">"GEN"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -497,7 +513,7 @@ Figure&nbsp;13.3: Initial sketch of a faceted area chart arranged in a grid shap
 <img src="us-elections_files/figure-html/fig-elections-single-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-single-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.4: Plot
+Figure&nbsp;13.5: Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied.
 </figcaption></figure>
 </div>
 </div>
@@ -553,12 +569,12 @@ Tip&nbsp;13.1: Piping data into <code><a href="https://ggplot2.tidyverse.org/ref
 <img src="us-elections_files/figure-html/fig-elections-basic-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-basic-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.5: Plot
+Figure&nbsp;13.6: Faceted area chart arranged in a rectangular grid shaped, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>In <a href="#fig-elections-basic-plot" class="quarto-xref">Figure&nbsp;<span>13.5</span></a>, we can’t actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We’ll deal with this problem a little bit later when adjusting the plot themes.</p>
+<p>In <a href="#fig-elections-basic-plot" class="quarto-xref">Figure&nbsp;<span>13.6</span></a>, we can’t actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We’ll deal with this problem a little bit later when adjusting the plot themes.</p>
 </section><section id="faceting-with-geofacet" class="level3" data-number="13.3.3"><h3 data-number="13.3.3" class="anchored" data-anchor-id="faceting-with-geofacet">
 <span class="header-section-number">13.3.3</span> Faceting with {geofacet}</h3>
 <p>To arrange the faceted plots into a grid that resembles the underlying geography, we’ll use the {geofacet} package <span class="citation" data-cites="geofacet">(<a href="references.html#ref-geofacet" role="doc-biblioref">Hafen 2023</a>)</span>. The {geofacet} package makes it easier to arrange facets in the shape of a map. This makes it easier to compare data across regions, like states or countries, in a grid format. There are many built-in grids for different geographical regions, including the several for the United States of America. However, you can also create your own custom facet grid if you prefer a different layout, or if no grid exists for the region you are plotting.</p>
@@ -582,7 +598,7 @@ Figure&nbsp;13.5: Plot
 <img src="us-elections_files/figure-html/fig-elections-geofacet-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-geofacet-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.6: Plot
+Figure&nbsp;13.7: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels.
 </figcaption></figure>
 </div>
 </div>
@@ -593,31 +609,30 @@ Figure&nbsp;13.6: Plot
 <p>We’ll now style our charts to apply more intuitive colors, adjust the facet labels to allow the charts to be seen more easily, and create a custom legend that explains how to read this chart.</p>
 <section id="colors" class="level3" data-number="13.4.1"><h3 data-number="13.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">13.4.1</span> Colors</h3>
-<p>In the USA, the Republican party is represented by the color red and the Democrat party by blue. As we discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, when choosing which colors to use for well-known categories, it’s important not to play into negative stereotypes (e.g.&nbsp;pink for girls). But it’s also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we’ll stick to red and blue.</p>
-<p>other colors</p>
+<p>In the USA, the Republican Party is represented by the color red and the Democratic Party by blue. As we discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, when choosing which colors to use for well-known categories, it’s important not to play into negative stereotypes (e.g.&nbsp;pink for girls). But it’s also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we’ll stick to red and blue.</p>
+<p>Since the visualization is already quite busy, we keep the background colors very simple - using only black and white.</p>
 <div class="cell">
 <div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">blue_col</span> <span class="op">&lt;-</span> <span class="st">"#0015BC"</span></span>
 <span><span class="va">red_col</span> <span class="op">&lt;-</span> <span class="st">"#C41E3A"</span></span>
 <span><span class="va">other_col</span> <span class="op">&lt;-</span> <span class="st">"#AAAAAA"</span></span>
-<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"#202A44"</span></span>
-<span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#FAFAFA"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span>
+<span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"white"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p></p>
+<p>We can then apply the colors to our plot using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code>, and assigning each color to the relevant party label in <code>values</code>. Since we know we’re going to be creating our own legend later, we’ll remove the default legend by setting <code>guide = "none"</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">map_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"Democrat"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
-<span>      <span class="st">"Republican"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
+<span>      <span class="st">"Democratic Party"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
+<span>      <span class="st">"Republican Party"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
 <span>      <span class="st">"Other"</span> <span class="op">=</span> <span class="va">other_col</span></span>
-<span>    <span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p></p>
 </section><section id="text-and-fonts" class="level3" data-number="13.4.2"><h3 data-number="13.4.2" class="anchored" data-anchor-id="text-and-fonts">
 <span class="header-section-number">13.4.2</span> Text and fonts</h3>
-<p>{sysfonts} {showtext}</p>
-<p> </p>
+<p>As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. For the main font, we’ll use the <em>Roboto</em> font as we did in <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>. For the title text, we’ll use <em>Carter One</em>, a <a href="https://fonts.google.com/specimen/Carter+One">display font designed by Vernon Adams</a> inspired by fonts used in mid 20th century advertising. It’s a bold font which works well for titles of visualizations. </p>
 <div class="cell">
 <div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Roboto"</span>, family <span class="op">=</span> <span class="st">"roboto"</span></span>
@@ -630,13 +645,12 @@ Figure&nbsp;13.6: Plot
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"roboto"</span></span>
 <span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"carter"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p> </p>
-<p>As in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption.</p>
+<p>We write text for the title and subtitle, using <code>glue()</code> to add HTML styling for colored text as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. The colored text serves as a legend (though we’ll later also add our own custom legend in addition), and the subtitle text provides information about what the chart shows. As in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. </p>
 <div class="cell">
-<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"US House Election Results"</span></span>
-<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Areas indicate the percentage of votes for &lt;span style='color:{blue_col};'&gt;Democrat&lt;/span&gt;, &lt;span style='color:{red_col};'&gt;Republican&lt;/span&gt;, and &lt;span style='color:#aaaaaa;'&gt;Other&lt;/span&gt; parties in general elections between 1976 and 2022.&lt;br&gt;&lt;br&gt;**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Votes in US House Elections"</span></span>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Area charts indicate the percentage of votes for the &lt;span style='color:{blue_col};'&gt;Democratic Party&lt;/span&gt;, the &lt;span style='color:{red_col};'&gt;Republican Party&lt;/span&gt;, and &lt;span style='color:#aaaaaa;'&gt;Other&lt;/span&gt; parties in general elections between 1976 and 2022.&lt;br&gt;&lt;br&gt;**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We also define our <code>social_caption()</code> using the function we defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>: </p>
+<p>We also define our <code>social_caption()</code> using the function we defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which we’ll later add as a plot caption: </p>
 <div class="cell">
 <div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">blue_col</span>,</span>
@@ -644,7 +658,7 @@ Figure&nbsp;13.6: Plot
 <span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We then pass our title, subtitle, and caption text intp the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the <code>tag</code> argument rather than <code>subtitle</code>, similar to what we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. </p>
+<p>We then pass our title, subtitle, and caption text into the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the <code>tag</code> argument rather than <code>subtitle</code>, similar to what we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
@@ -655,10 +669,19 @@ Figure&nbsp;13.6: Plot
 </div>
 </section><section id="adjusting-themes" class="level3" data-number="13.4.3"><h3 data-number="13.4.3" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">13.4.3</span> Adjusting themes</h3>
-<p> </p>
+<p>We know that the facet labels are too large on are currently dominating the visualization as seen in <a href="#fig-elections-geofacet-plot" class="quarto-xref">Figure&nbsp;<span>13.7</span></a>. There are a few solutions to this:</p>
+<ul>
+<li><p>Make the facet labels much smaller. However, this can make them hard to read and renders the labels somewhat pointless.</p></li>
+<li><p>Increase the size of the chart. Here, we’re constrained by the physical width of the plot and can’t make it wider. Though we could make the plot taller, we’re then adding quite a lot of additional space simply for labels.</p></li>
+<li><p>Create our own custom facet labels.</p></li>
+</ul>
+<p>Here, we’re going to go for the third option. Later, we’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function to remove the default facet labels. For now, let’s think about what labels to add. To save space in the plot, the easiest way is to use inset facet labels - positioning the state label inside the area chart. This has the downside of hiding part of the data. However, we can make the text semi-transparent to allow both the state label and the area chart behind to be seen.</p>
+<p>We add text labels with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. Though we could simply use the default <code>plot_data</code>, we start by filtering the data to consider only one year and party. If we didn’t filter the data, multiple labels would be drawn on top of each other - one for each year, and party combination. Though this isn’t necessarily a problem, if we’re trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other, results in a pretty opaque label. </p>
+<p>The x-coordinate position of the text is set as the mean of the years in the data to automatically position it in the middle of the chart. The y-coordinate position is set to <code>0.5</code> i.e.&nbsp;also in the middle of the chart since the <code>position = "fill"</code> argument scales the y-axis to be between <code>0</code> and <code>1</code>. The <code><a href="https://scales.r-lib.org/reference/alpha.html">alpha()</a></code> function is used to control the transparency of the text color. </p>
 <div class="cell">
 <div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot_1</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="va">year</span> <span class="op">==</span> <span class="fl">1976</span>, <span class="va">party</span> <span class="op">==</span> <span class="st">"Other"</span><span class="op">)</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>      y <span class="op">=</span> <span class="fl">0.5</span>,</span>
@@ -667,28 +690,26 @@ Figure&nbsp;13.6: Plot
 <span>    family <span class="op">=</span> <span class="va">title_font</span>,</span>
 <span>    color <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">bg_col</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">2.5</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p></p>
-<p> </p>
+<p>As we’ve done in previous chapters we set <code>expand = FALSE</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian()</a></code> to remove the additional space around each plot panel. We also use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to remove any additional plot elements since we’re aiming for a minimal look and we’ll later design a custom legend that gives the reader all the information that would normally be conveyed by the axes labels and title. </p>
+<p>As in previous chapters we use the <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect()</a></code> function to set <code>plot.background</code> to our pre-defined background color variable. We also adjust the plot margins using <code>plot.margin</code>. Note that here we’re making the left plot margin very large, as this is where we’ll later position our custom legend. We discussed pros and cons of this approach in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. </p>
+<p>We can position the title text to the left of the plot, in the wide margin by choosing negative values for <code>hjust</code>. Remember the <code>0</code> means left-aligned and <code>1</code> means right-aligned. Negative values essentially mean <em>very left aligned</em>! This works here because the title is a single line of text, but for multi-line text the text alignment can often look odd. That means that for the subtitle text (which is a short paragraph), we’re using <code>tag</code> instead of <code>subtitle</code> text. The <code>plot.tag.position</code> allows us to specify a vectpr of co-ordinates for where we want the text to appear - with negative x-coordinates also placing the text into the widened plot margin. It takes a little bit of trial and error to ensure that the <code>title</code> and <code>tag</code> text are aligned with each otehr. We again use <code>element_textbox_simple()</code> to enable automatic text wrapping for the plot <code>tag</code> text, and for the caption to make the icons render correctly. </p>
+<p>We set both the <code>strip.background</code> and <code>strip.text</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank()</a></code> to remove all default facet labels, and use <code>panel.spacing</code> to control the amount of space between the facets and move them closer together. </p>
 <div class="cell">
 <div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot_2</span> <span class="op">&lt;-</span> <span class="va">styled_plot_1</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Background elements</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">bg_col</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
-<span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
-<span>      color <span class="op">=</span> <span class="va">bg_col</span></span>
-<span>    <span class="op">)</span>,</span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">125</span><span class="op">)</span>,</span>
-<span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Text arguments</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span></span>
 <span>      hjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.94</span>,</span>
-<span>      halign <span class="op">=</span> <span class="op">-</span><span class="fl">0.94</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      face <span class="op">=</span> <span class="st">"bold"</span>,</span>
 <span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
@@ -708,10 +729,11 @@ Figure&nbsp;13.6: Plot
 <span>      maxwidth <span class="op">=</span> <span class="fl">0.65</span>,</span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>b <span class="op">=</span> <span class="fl">0</span>, t <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
+<span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.51</span>, <span class="fl">0.74</span><span class="op">)</span>,</span>
+<span>    <span class="co"># Facet arguments</span></span>
 <span>    strip.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    panel.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="st">"lines"</span><span class="op">)</span>,</span>
-<span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.51</span>, <span class="fl">0.74</span><span class="op">)</span></span>
+<span>    panel.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="st">"lines"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">styled_plot_2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -720,20 +742,20 @@ Figure&nbsp;13.6: Plot
 <img src="us-elections_files/figure-html/fig-elections-plot-style-2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-plot-style-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.7: Plot
+Figure&nbsp;13.8: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. A large blank space appears on the left hand side, where a legend will later be placed.
 </figcaption></figure>
 </div>
 </div>
 </div>
-</section><section id="legend" class="level3" data-number="13.4.4"><h3 data-number="13.4.4" class="anchored" data-anchor-id="legend">
-<span class="header-section-number">13.4.4</span> Legend</h3>
-<p>As we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll design a custom legend. In <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a <em>how to read this chart</em> explainer.</p>
-<p>We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don’t currently have any axes titles or labels. For example, it’s not immediately clear what years are covered by the data. This doesn’t need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don’t rely on color alone as discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, we’ll also add direct labels to identify the <em>Democrat</em> and <em>Republican</em> areas on the chart.</p>
+</section><section id="developing-a-custom-legend" class="level3" data-number="13.4.4"><h3 data-number="13.4.4" class="anchored" data-anchor-id="developing-a-custom-legend">
+<span class="header-section-number">13.4.4</span> Developing a custom legend</h3>
+<p>As we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll design a custom legend. In <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a <em>how to read this chart</em> explainer. </p>
+<p>We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don’t currently have any axes titles or labels. For example, it’s not immediately clear what years are covered by the data. This doesn’t need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don’t rely on color alone as discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, we’ll also add direct labels to identify the <em>Democratic Party</em> and <em>Republican Party</em> areas on the chart.</p>
 <p>Let’s start by filtering the data, to select only a single state. It doesn’t really matter which one we choose, although ideally one that has enough space for us to add the party labels directly on the chart. Here, we’ll use California (<code>"CA"</code>) for the legend plot. </p>
 <div class="cell">
 <div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ca_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="va">state_po</span> <span class="op">==</span> <span class="st">"CA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>direct labeling as discusses </p>
+<p>We then reuse the code written for the main plot, passing in the <code>ca_data</code> to the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, then adding the aesthetic mapping and the area chart with <code><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area()</a></code>. The colors and custom state (facet) labels are added with <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> as discussed earlier in this chapter. </p>
 <div class="cell">
 <div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ca_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ca_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
@@ -758,8 +780,8 @@ Figure&nbsp;13.7: Plot
 <span>  <span class="co"># colors</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"Democrat"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
-<span>      <span class="st">"Republican"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
+<span>      <span class="st">"Democratic Party"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
+<span>      <span class="st">"Republican Party"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
 <span>      <span class="st">"Other"</span> <span class="op">=</span> <span class="va">other_col</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
@@ -768,7 +790,7 @@ Figure&nbsp;13.7: Plot
 <p>We then use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function to add: </p>
 <ul>
 <li><p>Two labels for the start and end year of the data. To keep these within the bounds of the plot, we left align the start label on the left, and right align the end label on the right.</p></li>
-<li><p>Two labels for the <em>Republican</em> and <em>Democrat</em> parties. We leave the <em>Other</em> category unlabeled as it’s very small, and it’s obviously the only category left over.</p></li>
+<li><p>Two labels for the <em>Republican</em> and <em>Democratic</em> parties. We leave the <em>Other</em> category unlabeled as it’s very small, and it’s obviously the only category left over.</p></li>
 </ul>
 <p>As in the main plot, we also set <code>expand = FALSE</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian()</a></code> to remove the additional space around the edges. We also use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to remove any additional chart elements, since the annotations convey all the necessary information. </p>
 <div class="cell" data-layout-align="center">
@@ -799,7 +821,7 @@ Figure&nbsp;13.7: Plot
 <span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
 <span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>    label <span class="op">=</span> <span class="st">"Democrat"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Democratic Party"</span>,</span>
 <span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
 <span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">3.5</span></span>
@@ -808,7 +830,7 @@ Figure&nbsp;13.7: Plot
 <span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
 <span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span>    label <span class="op">=</span> <span class="st">"Republican"</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Republican Party"</span>,</span>
 <span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
 <span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">3.5</span></span>
@@ -822,15 +844,15 @@ Figure&nbsp;13.7: Plot
 <img src="us-elections_files/figure-html/fig-elections-inset-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-inset-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.8: A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors.
+Figure&nbsp;13.9: A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors.
 </figcaption></figure>
 </div>
 </div>
 </div>
+<p>Our custom legend is now ready to add to <a href="#fig-elections-plot-style-2" class="quarto-xref">Figure&nbsp;<span>13.8</span></a>.</p>
 </section><section id="joining-with-patchwork" class="level3" data-number="13.4.5"><h3 data-number="13.4.5" class="anchored" data-anchor-id="joining-with-patchwork">
 <span class="header-section-number">13.4.5</span> Joining with {patchwork}</h3>
-<p>Now, the last step is to join together our custom legend with the main plot. We’ve already left some blank space on the main plot for the legend to go in, so we’ll use the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function from {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> as we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. </p>
-<p> </p>
+<p>Now, the last step is to join together our custom legend with the main plot. We’ve already left some blank space on the main plot for the legend to go in, so we’ll use the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function from {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> as we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. We use the <code>left</code>, <code>right</code>, <code>top</code>, and <code>bottom</code> arguments to choose where the corners of the legend appear in relation to the main plot - getting these values correct takes some trial and error! Setting <code>align_to = "full"</code> allows us to choose the coordinates relative to the full chart area, rather than just the panel area as per the default settings. </p>
 <div class="cell">
 <div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
 <span><span class="va">styled_plot_2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element</a></span><span class="op">(</span></span>
@@ -839,36 +861,24 @@ Figure&nbsp;13.8: A custom legend plot consisting of a zoomed in version of the 
 <span>  bottom <span class="op">=</span> <span class="fl">0.087</span>,</span>
 <span>  right <span class="op">=</span> <span class="fl">0.287</span>,</span>
 <span>  top <span class="op">=</span> <span class="fl">0.55</span>,</span>
-<span>  align_to <span class="op">=</span> <span class="st">"full"</span>,</span>
-<span>  clip <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
-<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
-<span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
-<span>      color <span class="op">=</span> <span class="va">bg_col</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
-<span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
-<span>      color <span class="op">=</span> <span class="va">bg_col</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  align_to <span class="op">=</span> <span class="st">"full"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-combine-plots" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-combine-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="us-elections_files/figure-html/fig-combine-plots-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-combine-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.9: Plot
+Figure&nbsp;13.10: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side.
 </figcaption></figure>
 </div>
 </div>
 </div>
 </section></section><section id="reflection" class="level2" data-number="13.5"><h2 data-number="13.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">13.5</span> Reflection</h2>
-<ul>
-<li><p>Other category</p></li>
-<li><p>prcent</p></li>
-</ul>
+<p>This visualization summarise a large amount of complex information in a way that is fairly intuitive - the colors match recognisable party colors, the grid is arranged in the a shape that is instantly recognisable, and the area charts clearly indicate vote share over time. However, there are a few more improvements that could be made and other elements we may want to consider.</p>
+<p>Though use of state two-letter abbreviations saves space and avoids excessive text, it is more difficult for a reader to easily look up the state they are interested in - especially if they are less familiar with US geography. Perhaps adding some smaller text under the abbreviations, or creating an interactive version that provides state names upon hover, would make it easier.</p>
+<p>The use of area charts to show percentages is intuitive and sensible for this, since vote share is essentially what decides an election. However, it would also be interesting to see the counts of the number of votes - especially since states can have vastly different populations. A small change in percentage for a state with a large population may result in large changes in number of votes, but this wouldn’t be seen in our version of this visualization.</p>
 <p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/elections.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
@@ -886,7 +896,10 @@ Caution
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Exercises are coming soon!</p>
+<ul>
+<li><p>Instead of using California for the custom legend plot, create a plot showing the percentage of <em>total</em> votes across all states. Do you need to update the text to explain how to interpret the charts?</p></li>
+<li><p>Edit the visualization to show total number of votes rather than the percentage of the vote share. Do you see similar patterns? How can you choose the position of the facet label for the state in an automated way?</p></li>
+</ul>
 </div>
 </div>
 
