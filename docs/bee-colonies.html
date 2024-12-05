@@ -358,6 +358,7 @@ window.Quarto = {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">4.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">4.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -682,13 +683,13 @@ Figure&nbsp;4.7: Plots comparing data generated using Poisson disk sampling and 
 <p>As we’ve done in all previous chapters, we start our plot using the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function and pass in the default data and aesthetic mappings we’ll use for all of the layers in the plot. To add the points we use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>, in the same way if we were making a traditional scatter plot. </p>
 <p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> and <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a>, we used <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create small multiple plots based on the levels of a categorical variable. Here we want to do something similar, but split based on the combination of levels from two categorical variables. We add the <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid()</a></code> function to create this grid of small multiple plots, with <code>state</code> being the rows and <code>year</code> being the columns of the grid. Setting <code>switch = "both"</code> places the facet labels on the opposite side of the grid from the default. This places labels on the left for the states, and on the bottom for the years. </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">bees_plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-bees-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -712,9 +713,9 @@ Figure&nbsp;4.8: A 6x6 grid with each grid square denoting a year between 2015-2
 <span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps <code>highlight_col</code> is not the best name to represent the <code>"black"</code> color…</p>
-<p>Let’s remake the <code>base_plot</code> from <a href="#fig-bees-base-plot" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>, but changing the <code>color</code> of the points and making them smaller using the <code>size</code> argument: </p>
+<p>Let’s remake the <code>basic_plot</code> from <a href="#fig-bees-base-plot" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>, but changing the <code>color</code> of the points and making them smaller using the <code>size</code> argument: </p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">bees_plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
@@ -723,7 +724,7 @@ Figure&nbsp;4.8: A 6x6 grid with each grid square denoting a year between 2015-2
 <span>    color <span class="op">=</span> <span class="va">bg_col</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-bees-base-plot2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -757,7 +758,7 @@ Figure&nbsp;4.9: A 6x6 grid with each grid square denoting a year between 2015-2
 </div>
 <p>We can then add this text using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function, and setting the <code>title</code>, <code>subtitle</code>, and <code>caption</code>. The x- and y- axes are meaningless for this visualization since the data is represented by the number of points rather than their locations. We remove the x- and y- axis titles by setting them both to <code>NULL</code> in <a href="#fig-bees-text-plot" class="quarto-xref">Figure&nbsp;<span>4.10</span></a>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="va">title</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
@@ -849,9 +850,27 @@ Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-
 </section></section><section id="reflection" class="level2" data-number="4.5"><h2 data-number="4.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">4.5</span> Reflection</h2>
 <p>The bee-themed colors alongside the non-standard nature of this chart make it visually intriguing and fun. However, it takes a little bit more time to understand how to interpret the chart. This is a visualization that would work better in a setting where the author has time to explain how it works. For example, in a presentation or in an article with a <em>how to read this chart</em> explainer included. It would work less well in a standalone leaflet without an explanation where a reader might struggle to understand what is being shown. It’s more difficult to see the trend over time with type of chart. A simple line chart could show the same data in a more <em>standard</em>, easy-to-interpret way. However, line charts don’t catch attention in quite the same way. It all comes down to the purpose of the chart. Is the main aim to draw attention to important data on bee colonies, and show overall trends? Or is the main aim to communicate the colony size in each year, within some accuracy range? The answers to those questions will determine whether this is an appropriate chart type.</p>
-<p>This version of the chart shows only data for six states, even though we know from our exploratory analysis that data is available for (almost) all states. Some explanation as to why these states have been chosen could be added in the subtitle, or data for all states could be shown - although this would result in a very long chart! The visualization also assigns each state equal chart area - perhaps implying that each state has an equal geographic area which is of course untrue. The chart shows there are a lot of bees in California. California is also the third largest state in terms of area <span class="citation" data-cites="UScensus">(<a href="references.html#ref-UScensus" role="doc-biblioref">United States Census Bureau 2021</a>)</span> - maybe there’s just more room for bees? Perhaps standardizing the data by state area (or state agricultural area) would provide an easier comparison between states.</p>
+<p>This version of the chart shows only data for six states, even though we know from our exploratory analysis that data is available for (almost) all states. Some explanation as to why these states have been chosen could be added in the subtitle, or data for all states could be shown - although this would result in a very long chart! The visualization also assigns each state equal chart area - perhaps implying that each state has an equal geographic area which is of course untrue. The chart shows there are a lot of bees in California. California is also the third largest state in terms of area <span class="citation" data-cites="UScensus">(<a href="references.html#ref-UScensus" role="doc-biblioref">United States Census Bureau 2021b</a>)</span> - maybe there’s just more room for bees? Perhaps standardizing the data by state area (or state agricultural area) would provide an easier comparison between states.</p>
 <p>Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger that might mean the numbers of bees isn’t changing very much. But we don’t see that when we only look at the number of colonies - we don’t get a full picture of the data by limiting the chart to only a single variable.</p>
 <p>Although this type of visualization has several disadvantages, and is far from perfect, hopefully it gives you an idea of how to think creatively about designing charts and how you might go about implementing them in R.</p>
+</section><section id="exercises" class="level2" data-number="4.6"><h2 data-number="4.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">4.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Visualizing multiple outcomes
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>Recreate the visualization from this chapter using the <code>colony_max</code> column instead of <code>colony_n</code>.</p></li>
+<li><p>How might you visualize both columns on the same chart?</p></li>
+</ul>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -1018,7 +1037,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1095,8 +1114,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.

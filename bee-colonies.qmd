@@ -308,13 +308,13 @@ In @sec-programming and @sec-museums, we used `facet_wrap()` to create small mul
 ```{r}
 #| label: fig-bees-base-plot
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other."
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = bees_plot_data,
   mapping = aes(x = x, y = y)
 ) +
   geom_point() +
   facet_grid(state ~ year, switch = "both")
-base_plot
+basic_plot
 ```
 
 You'll notice that the points in @fig-bees-base-plot are slightly too large - the points for the California data are even distinguishable as points, it simply looks like a black square! We'll reduce the size of the points in the next iteration of the plot.
@@ -335,12 +335,12 @@ highlight_col <- "black"
 
 Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color...
 
-Let's remake the `base_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
+Let's remake the `basic_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
 
 ```{r}
 #| label: fig-bees-base-plot2
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares."
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = bees_plot_data,
   mapping = aes(x = x, y = y)
 ) +
@@ -349,7 +349,7 @@ base_plot <- ggplot(
     color = bg_col
   ) +
   facet_grid(state ~ year, switch = "both")
-base_plot
+basic_plot
 ```
 
 We'll edit the background color of the facet grid squares later in @sec-bees-theme.
@@ -384,7 +384,7 @@ We can then add this text using the `labs()` function, and setting the `title`, 
 ```{r}
 #| label: fig-bees-text-plot
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page."
-text_plot <- base_plot +
+text_plot <- basic_plot +
   labs(
     title = title,
     subtitle = st,
@@ -482,3 +482,15 @@ This version of the chart shows only data for six states, even though we know fr
 Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger that might mean the numbers of bees isn't changing very much. But we don't see that when we only look at the number of colonies - we don't get a full picture of the data by limiting the chart to only a single variable.
 
 Although this type of visualization has several disadvantages, and is far from perfect, hopefully it gives you an idea of how to think creatively about designing charts and how you might go about implementing them in R. 
+
+## Exercises
+
+::: {.callout-caution}
+
+## Visualizing multiple outcomes
+
+* Recreate the visualization from this chapter using the `colony_max` column instead of `colony_n`.
+
+* How might you visualize both columns on the same chart?
+
+:::

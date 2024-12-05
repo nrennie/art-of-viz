@@ -65,7 +65,7 @@ Note that there are a few plots (including those produced by {geofacet}) that do
 #| label: other-base-plot
 #| echo: false
 #| warning: false
-base_plot <- readRDS("data/base_plot.rds")
+basic_plot <- readRDS("data/base_plot.rds")
 ```
 
 In @sec-turbines, we reflected that it would be better to use a wind turbine icons instead of the fan icon - since the data is about wind turbines! An alternative to the Font Awesome icons we used in @sec-turbines are icons from [Flaticon](https://www.flaticon.com/). You can download Flaticon icons as PNG images for free, as long as you provide attribution. More specifically, you can download a **Wind Power** icon from [www.flaticon.com/free-icon/wind-power_5670189](https://www.flaticon.com/free-icon/wind-power_5670189) [@flaticon]. Let's save it in an `images/` project directory. 
@@ -75,22 +75,22 @@ Now instead of plotting icons as fonts, we want to plot icons as images. The pro
 * we want to use the x- and y- coordinates for the icons provided by `geom_pictogram()`
 * we want to use an image instead of a font icon.
 
-These two things aren't currently compatible. We've already built the plot with `geom_pictogram()` so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `base_plot` we created in @sec-turbines. \index{ggplot2!ggplot\_build}
+These two things aren't currently compatible. We've already built the plot with `geom_pictogram()` so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `basic_plot` we created in @sec-turbines. \index{ggplot2!ggplot\_build}
 
 ```{r}
 #| label: other-build-gg-1
 #| warning: false
 library(ggplot2)
-base_build <- ggplot_build(base_plot)
+basic_built <- ggplot_build(basic_plot)
 ```
 
-You can save an `ggplot` plot as a variable, and then pass it into `ggplot_build()` to access the data associated with the plot (including data that was calculated by `geom` functions). The data is stored in the `base_build$data[[1]]` element. The `x`, `y`, and `colour` variables are all stored in their respective columns. The variable used to define the facets, `Year_Group`, is stored in the `PANEL` column and is given by numbers rather than the original category names. 
+You can save an `ggplot` plot as a variable, and then pass it into `ggplot_build()` to access the data associated with the plot (including data that was calculated by `geom` functions). The data is stored in the `basic_built$data[[1]]` element. The `x`, `y`, and `colour` variables are all stored in their respective columns. The variable used to define the facets, `Year_Group`, is stored in the `PANEL` column and is given by numbers rather than the original category names. 
 
 Unfortunately, `PANEL` is a forbidden column name for a faceting variable, so we need to start by renaming this column. We also convert this renamed column into a factor, and pass in the `Year_Group` categories from @sec-turbines as labels. \index{dplyr!rename} \index{dplyr!mutate} \index{base!factor}
 
 ```{r}
 #| label: other-build-gg-2
-new_data <- base_build$data[[1]] |>
+new_data <- basic_built$data[[1]] |>
   dplyr::rename(Year_Group = PANEL) |>
   dplyr::mutate(
     Year_Group = factor(
@@ -298,3 +298,16 @@ As you've already seen in @sec-cats, creating functions for code you reuse frequ
 \index{sysfonts!font\_add} 
 
 You can create helper functions for anything that you do often. If you don't use Font Awesome icons in your captions, you don't need to create the `social_caption()` function. But if, for example, you always save your images in a specific size with a specific background color, create a function that does that. You'll be amazed at how much time you can save. \index{social\_caption} 
+
+## Exercises
+
+::: {.callout-caution}
+
+## Telling your own data story
+
+* Browse through the available TidyTuesday datasets at [github.com/rfordatascience/tidytuesday](https://github.com/rfordatascience/tidytuesday), and choose one you find interesting.
+
+* Use the skills and techniques you've learned in this book to create your own visualization that tells a story about the data.
+
+:::
+

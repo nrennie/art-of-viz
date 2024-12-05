@@ -332,6 +332,7 @@ div.csl-indent {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">3.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">3.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -693,14 +694,14 @@ Figure&nbsp;3.5: A line chart of total number of museums open per year for each 
 </div>
 <p>We can then re-do our line chart using the rescaled <code>change</code> data on the y-axis instead:</p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">new_plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">change</span>, color <span class="op">=</span> <span class="va">deprivation</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">deprivation</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">gghighlight</span><span class="fu">::</span><span class="fu"><a href="https://yutannihilation.github.io/gghighlight/reference/gghighlight.html">gghighlight</a></span><span class="op">(</span>use_direct_label <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-museums-basic-plot-4" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-basic-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -730,7 +731,7 @@ Figure&nbsp;3.6: A line chart of percentage increase in museums (compared to 196
 </div>
 <p>For the colors of the lines, we can use the {viridis} package <span class="citation" data-cites="viridis">(<a href="references.html#ref-viridis" role="doc-biblioref">Garnier et al. 2024</a>)</span>. The {viridis} package provides multiple different color palettes which are designed to be visually pleasing, perceptually-uniform ,and colorblind friendly. The default viridis palette includes purples, blues, greens, then yellows. Viridis color palettes are most commonly used with continuous data, rather than categorical data. However, since the categories that we wish to color (levels of deprivation) are ordered, they will work well here too. The {viridis} package includes functions to add the colors to plots made with {ggplot2}. Here, we use the <code>scale_color_viridis()</code> function, specify that we want a discrete palette and that the lowest values should have the yellow colors with <code>direction = -1</code> .</p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu">viridis</span><span class="fu">::</span><span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span></span>
 <span>    discrete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
@@ -845,7 +846,22 @@ Figure&nbsp;3.8: A styled version of the previous plot - with a custom font, col
 </div>
 </div>
 </div>
-<p>And we can save it to a file using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
+<p>And we can save it to a file using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code> as we did in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>. </p>
+<div id="tip-museums-img-format" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;3.4: Choosing an image format
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, when saving our final plot to a file, we saved it as a PNG file. However, that’s not the only option. We could also have saved in as a JPG, PDF, TIFF, or SVG (to name just a few options). So how do we decide what file type to use?</p>
+<p>Formats such as PNG and JPG save <em>raster</em> images i.e.&nbsp;information is stored about each pixel. This means that they are able to capture highly detailed information. However, this also means that file sizes can be large. Raster images also don’t scale well - when you increase the size of an image, it tends to become blurry and lower in quality. Formats such as PDF or SVG are <em>vector</em> images i.e.&nbsp;information is stored about each line and shape in the image. This means it’s easier to rescale without losing quality, and file sizes can be smaller (at least for graphics that are not excessively complex).</p>
+<p>Raster images tend to be better for complex visualisations and images, or when fixed resolution is preferred such as in a website. Vector images tend to be better for graphics that are likely to need resizing or be interactive. For the remainder of this book, we’ll continue to save in PNG format for consistency in the print version of the book.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"museums.png"</span>,</span>
@@ -857,10 +873,25 @@ Figure&nbsp;3.8: A styled version of the previous plot - with a custom font, col
 <span class="header-section-number">3.5</span> Reflection</h2>
 <p>Is there anything that could still be improved about this plot? The axis text denoting the years only appears on the bottom row of faceted plots. This makes it a little bit tricky to see what’s going on in the first row without first looking at the years in the row below. It’s a fairly minor point, but adding year labels to the top row would just make it easier for a reader.</p>
 <p>We removed the legend from the plot with the reason that <em>the colors are based on the levels of deprivation, which are already labelled on the facet titles</em>. This same argument could be used to remove the colors altogether. There’s no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g.&nbsp;red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/uk-museums.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
+</div>
+</section><section id="exercises" class="level2" data-number="3.6"><h2 data-number="3.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">3.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Exercises are coming soon!</p>
+</div>
 </div>
 
 
@@ -1028,7 +1059,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1105,8 +1136,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.

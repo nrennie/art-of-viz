@@ -32,7 +32,7 @@ In this chapter we'll learn how to obtain map data using {rnaturalearth}, manipu
 
 The [IANA (Interet Assigned Numbers Authority) tz database](https://data.iana.org/time-zones/tz-link.html) contains data on the history of local time for different locations around the world [@zones_data]. The website states that *"each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970."* Many websites use the data in the IANA tz database to operate.
 
-The time zones data was used as a [TidyTuesday dataset in March 2023](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md), where the data wrangling code was adapted from code by [Davis Vaughan](https://gist.github.com/DavisVaughan). There are actually four data sets included but we'll focus on the `timezones` data for now. We can load the data in using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR]: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The time zones data was used as a [TidyTuesday dataset in March 2023](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md), where the data wrangling code was adapted from code by [Davis Vaughan](https://gist.github.com/DavisVaughan). There are actually four data sets included but we'll focus on the `timezones` data for now. We can load the data into R using the `tt_load()` function from the {tidytuesdayR} package [@tidytuesdayR]: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: load-timezones-data-show
@@ -68,7 +68,7 @@ head(timezones)
 the first thing that jumps out is the `comments` column which appears to have a lot of missing data. Let's plot it to confirm, making use of the `is.na()` function to plot only the counts of missing and non-missing data: \index{graphics!barplot} \index{base!table}  \index{base!is.na} 
 
 ```{r}
-#| label: timezones-barplot-na
+#| label: fig-timezones-barplot-na
 #| fig-cap: "A bar chart of the number of missing values in the `comments` column, where `TRUE` represents missing."
 #| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1))
@@ -95,10 +95,10 @@ timezones_data <- timezones |>
   )
 ```
 
-Now, we can explore how many time zones there are per continent: \index{graphics!barplot} \index{base!table} 
+Now, we can explore how many time zones there are per continent, again using the `barplot()` function. In @fig-timezones-barplot-loc, we can see that the first part of the time zone names don't quite map to continents since there are nine values - but they do map onto large geographic regions.   \index{graphics!barplot} \index{base!table} 
 
 ```{r}
-#| label: timezones-barplot-loc
+#| label: fig-timezones-barplot-loc
 #| fig-cap: "A bar chart of the number of defined time zones in each of nine geographic regions."
 #| echo: -1
 par(mar = c(3.1, 2.1, 1.1, 2.1))
@@ -109,8 +109,6 @@ barplot(
 )
 ```
 
-We can see that, actually, the first part of the time zone names don't quite map to continents since there are nine values - but they do map onto large geographic regions. 
-
 Of course, when we have coordinate data, the most obvious thing to do is plot those coordinates on a map!
 
 ### Exploratory sketches
@@ -119,11 +117,11 @@ Given that we have a latitude and longitude data for the principal locations (us
 
 ![Initial sketch of time zone locations as points on a world map.](images/sketch-time-zones.png){#fig-time-zones-sketch fig-align="center"}
 
-We could color the points based on the geographic region (continent) that they are within. as we've already seen, if we do this in {ggplot2}, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will shown the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn't take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).
+We could color the points based on the geographic region (continent) they belong to. As we've already seen, if we do this in {ggplot2}, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will show the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn't take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).
 
 ![Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.](images/sketch-time-zones-2.png){#fig-time-zones-sketch fig-align="center"}
 
-A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) make sit easier to read, and helps to prevent the visualisation from becoming very wide and short.
+A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) make sit easier to read, and helps to prevent the visualization from becoming very wide and short.
 
 ## Preparing a plot
 
@@ -177,9 +175,9 @@ You'll notice that there's one key difference - there's no aesthetic mapping usi
 
 ### Spatial objects with {sf}
 
-Though you can combine `geom_sf()` with other geometries, such as `geom_point()`, it's often easier to convert the other geometries to `sf` objects first. The main reason for this is to ensure the *coordinate reference system (CRS)* is the same for both geometries. Coordinate reference systems define how the three dimensional nature of the earth is mapped onto a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you're combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: `X = 492983` and `Y = 188837`. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: `Longitude (X) = 1.200235W` and `Latitude (Y) = 53.870659N`. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first. 
+Though you can combine `geom_sf()` with other functions and non-`sf` data, such as `geom_point()`, it's often easier to convert the other data to `sf` objects first. The main reason for this is to ensure the *coordinate reference system (CRS)* is the same for both geometries. Coordinate reference systems define how the Earth's three-dimensional surface is represented, either in a three-dimensional coordinate system (e.g. latitude and longitude) or as a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you're combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: `X = 492983` and `Y = 188837`. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: `Longitude (X) = 1.200235W` and `Latitude (Y) = 53.870659N`. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first. 
 
-In R, you use the {sf} to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code `4326`. This is the coordinate reference system used in the `world` data that we're using for the background map. You can check using the `st_crs()` function from {sf} which retrieves the CRS from an object: \index{sf!st\_crs}
+In R, you can use the {sf} package to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code `4326`. This is the coordinate reference system used in the `world` data that we're using for the background map. You can check using the `st_crs()` function from {sf} which retrieves the CRS from an object: \index{sf!st\_crs}
 
 ```{r}
 #| label: crs-sf
@@ -188,13 +186,15 @@ sf::st_crs(world)
 
 To make sure the CRS of the `timezones` data matches the CRS of the `world` data, we can set the CRS of the `timezones` data as `4326`. At the moment, the `timezones` data is not a spatial object - it's just a simple `data.frame` that contains two columns with latitude and longitude information. First, we need to convert it into an `sf` object using the `st_as_sf()` function from {sf}, also specifying the column names that relate to the coordinates data. \index{sf!st\_as\_sf} 
 
-The latitude and longitude coordinates given in the `timezones` data are given in the `EPSG:4326` CRS, so we don't need to convert the CRS - just set it. We know it's in `EPSG:4326` because this information is given to us with the data. We can use the `st_set_crs()` to set the coordinate reference system to `EPSG:4326` \index{sf!st\_set\_crs}.
+The latitude and longitude coordinates given in the `timezones` data are in the `EPSG:4326` CRS, so we don't need to convert the CRS - just set it. We know it's in `EPSG:4326` because this information is given to us with the data, and we can set it using the `crs` argument of `st_as_sf()`. \index{sf!st\_as\_sf} 
 
 ```{r}
 #| label: timezones-sf
 timezones_sf <- timezones_data |>
-  sf::st_as_sf(coords = c("longitude", "latitude")) |>
-  sf::st_set_crs(4326)
+  sf::st_as_sf(
+    coords = c("longitude", "latitude"),
+    crs = 4326
+  )
 ```
 
 ::: {#tip-timezones-crs .callout-tip}
@@ -202,6 +202,8 @@ timezones_sf <- timezones_data |>
 ## Dealing with an unknown CRS
 
 If you don't know which CRS your coordinates are in, the best thing to do is go back to the source of the data to see if you can find that information. Otherwise, you may wish to try the `guess_crs()` function from {crsuggest} [@crsuggest] which will *guess* potential coordinate reference systems for data that are lacking a defined CRS. \index{crsuggest!guess\_crs}
+
+You can then use the `st_set_crs()` function to set the coordinate reference system. \index{sf!st\_set\_crs}.
 
 :::
 
@@ -212,6 +214,7 @@ Since the time zones coordinates are now stored as an `sf` object, we can plot i
 ```{r}
 #| label: fig-timezones-basic-map
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map."
+#| fig-asp: 0.6
 basic_map <- bg_map +
   geom_sf(
     data = timezones_sf,
@@ -249,7 +252,7 @@ names(col_palette) <- unique(timezones_sf$continent)
 
 ### Fonts
 
-Similarly, we also load any fonts we want to use. Again, for this visualisation we're using Google Fonts, so we can make use of the `font_add_google()` function in {sysfonts}. \index{sysfonts!font\_add\_google}  For the title, we'll use the *Fraunces* font - an *old style* serif font inspired by 20th century typefaces. For the body font, we'll use *Commissioner* - a sans serif font. As we've done in previous chapters, we use `showtext_auto()` to use the {showtext} automatically for plotting fonts, and set the desired resolution using `showtext_opts()` to set the dpi. \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+Similarly, we also load any fonts we want to use. Again, for this visualization we're using Google Fonts, so we can make use of the `font_add_google()` function in {sysfonts}. \index{sysfonts!font\_add\_google}  For the title, we'll use the *Fraunces* font - an *old style* serif font inspired by 20th century typefaces. For the body font, we'll use *Commissioner* - a sans serif font. As we've done in previous chapters, we use `showtext_auto()` to use the {showtext} automatically for plotting fonts, and set the desired resolution using `showtext_opts()` to set the dpi. \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: timezones-fonts
@@ -263,9 +266,9 @@ title_font <- "Fraunces"
 
 ### Creating a custom bar chart legend
 
-There are many ways to make a bar chart in {ggplot2} - the two most often used are `geom_bar()` and `geom_col()`. What's the difference? Well, `geom_bar()` is essentially a special version of `geom_col()` that counts up how many observations are in each category for you. For this visualisation, we're going to use the category counts for other purposes besides just defining the height of the bars so we'll do the counting ourselves and use `geom_col()` instead. \index{ggplot2!geom\_col} \index{ggplot2!geom\_bar}
+There are many ways to make a bar chart in {ggplot2} - the two most often used are `geom_bar()` and `geom_col()`. What's the difference? Well, `geom_bar()` is essentially a special version of `geom_col()` that counts up how many observations are in each category for you. For this visualization, we're going to use the category counts for other purposes besides just defining the height of the bars so we'll do the counting ourselves and use `geom_col()` instead. \index{ggplot2!geom\_col} \index{ggplot2!geom\_bar}
 
-We'll use the `count()` function from {dplyr} to count how many observations of each geographical region are present in the `continent` column. We could use either the `timezones_sf` data or the `timezones_data` here as the input data. If you try both, you'll notice that, as we expect, the count column (`n`) is the same in both cases, but that the two outputs are not identical! When you run `dplyr::count(timezones_data, continent)`, you get a 2 column `data.frame`. When you run `dplyr::count(timezones_sf, continent)` you get an 3 column `data.frame` that remains an `sf` object. This is because the `geometry` column in `sf` can described as *sticky* - you often (though not always) want the `sf` class to be preserved after any operations. You can remove it using the `st_drop_geometry()` function from {sf}: \index{sf!st\_drop\_geometry} \index{dplyr!count}
+We'll use the `count()` function from {dplyr} to count how many observations of each geographical region are present in the `continent` column. We could use either the `timezones_sf` data or the `timezones_data` here as the input data. If you try both, you'll notice that, as we expect, the count column (`n`) is the same in both cases, but that the two outputs are not identical! When you run `dplyr::count(timezones_data, continent)`, you get a 2 column `data.frame`. When you run `dplyr::count(timezones_sf, continent)` you get an 3 column `data.frame` that remains an `sf` object. This is because the `geometry` column in `sf` can be described as *sticky* - you often (though not always) want the `sf` class to be preserved after any operations. You can remove it using the `st_drop_geometry()` function from {sf}: \index{sf!st\_drop\_geometry} \index{dplyr!count}
 
 ```{r}
 #| label: timezones-bar-data
@@ -321,7 +324,7 @@ bar_plot <-
 bar_plot
 ```
 
-Now we can add the text labels directly to the bars. But where should they go? It's quite common to add category labels in line with the end of the bar but that might not work well here. If we add labels within the bars, for regions with few time zones where the bars are short, the text will be very squashed. If we add labels outside the bars, for regions with many time zones where the bars are long, the text will run off the graph or extend the height of the visualisation. Neither is ideal. But maybe we could have the best of both worlds. We want to add labels under the following conditions:
+Now we can add the text labels directly to the bars. But where should they go? It's quite common to add category labels in line with the end of the bar but that might not work well here. If we add labels within the bars, for regions with few time zones where the bars are short, the text will be very squashed. If we add labels outside the bars, for regions with many time zones where the bars are long, the text will run off the graph or extend the height of the visualization. Neither is ideal. But maybe we could have the best of both worlds. We want to add labels under the following conditions:
 
 When the bars are long, text should:
 
@@ -333,7 +336,7 @@ And conversely, when the bars are short, text should:
 * appear outside the bar and be left-aligned;
 * be dark in color to contrast the light plot background;
 
-It might take a little bit of trial and error to find the value that defines a bar as being *short* or *tall*. Here, we'll use `45`. If a region has more than `45` time zones, it's classed a *tall* bar. Otherwise, it's *short*. 
+It might take a little bit of trial and error to find the value that defines a bar as being *short* or *tall*. Here, we'll use `45`. If a region has more than `45` time zones, it's classed as a *tall* bar. Otherwise, it's *short*. 
 
 We want to map the alignment and color of the text to a (transformation of) the `n` column in the data set. This sounds like something that should go into an aesthetic mapping in the `aes()` function. We already know the `color` argument can be used to map the text color. The `hjust` and `vjust` arguments are used for horizontal and vertical positioning of text. Unfortunately, within the `geom_text()` function, neither `hjust` nor `vjust` can be used inside the `aes()` function. \index{ggplot2!geom\_text} 
 
@@ -341,7 +344,7 @@ Luckily, the {ggtext} package once again comes to the rescue! We can use the `ge
 
 We'll use `case_when()` from {dplyr} to specify the settings for the `hjust` argument, depending on the value of `n`. When `n` is greater than `45`, `hjust` should be `1` to use right alignment, otherwise it should be `0` to use left alignment. If you wanted to, you could create a new column in the data instead of using `case_when()` directly inside the `aes()` function. \index{dplyr!case\_when} 
 
-When using `geom_textbox()`, we need to specify both `hjust` and `halign`. Since, the draws a box, we need to control both (i) the alignment of the box relative to the coordinates using `hjust`, and (ii) the alignment of the text within the box relative to the edges of the box using `halign`. Within `geom_textbox()` we also use `orientation = "left-rotated"` to rotate the text anti-clockwise by 90 degrees (similar to using `angle = 90` in `geom_text()`). We can remove the background fill color and box outline by setting both `fill = NA` and `box.color = NA`, and set the size and font family options using the `size` and `family` arguments (where we pass in our `body_font` variable we defined earlier).
+Since `geom_textbox()` the draws a box, we need to control both (i) the alignment of the box relative to the coordinates using `hjust`, and (ii) the alignment of the text within the box using `halign`. Within `geom_textbox()` we also use `orientation = "left-rotated"` to rotate the text anti-clockwise by 90 degrees (similar to using `angle = 90` in `geom_text()`). We can remove the background fill color and box outline by setting both `fill = NA` and `box.color = NA`, and set the size and font family options using the `size` and `family` arguments (where we pass in our `body_font` variable we defined earlier).
 
 ::: {#tip-timezones-text-align .callout-tip}
 
@@ -388,7 +391,7 @@ legend_plot <- bar_plot +
 legend_plot
 ```
 
-Now we have a much nice looking custom legend. We can apply some nicer styling to our main map before we join the two together!
+Now we have a much nicer looking custom legend. We can apply some nicer styling to our main map before we join the two together!
 
 ## Advanced styling
 
@@ -407,6 +410,7 @@ We'll also re-draw the points again with a small adjustment -  let's change the 
 ```{r}
 #| label: fig-timezones-basic-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side."
+#| fig-asp: 0.6
 basic_map <- ggplot() +
   # Apply colors to background map
   geom_sf(
@@ -450,6 +454,7 @@ It will take some (probably a lot of) trial and error to figure out exactly how 
 ```{r}
 #| label: fig-timezones-style-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map."
+#| fig-asp: 0.8
 axes_map <- col_map +
   scale_x_continuous(
     breaks = seq(-180, 180, by = 15),
@@ -464,7 +469,7 @@ axes_map
 
 ### Text 
 
-We can create our custom Font Awesome icon caption, as described in @sec-cats, which we'll later add to the top of the visualisation: \index{social\_caption}
+We can create our custom Font Awesome icon caption, as described in @sec-cats, which we'll later add to the top of the visualization: \index{social\_caption}
  
 ```{r}
 #| label: timezones-text-social
@@ -475,7 +480,7 @@ social <- social_caption(
 )
 ```
 
-As we did in @sec-turbines and @sec-cats, we can also add colored text within the subtitle to denote the categories. This might be unnecessary for this visualisation since we have our custom bar chart legend, but reinforcing the color mapping won't hurt. Here, we'll use {ggtext} as we did in @sec-cats (although you can also use {marquee} as we did in @sec-turbines if you prefer). This means we'll be writing HTML `<span></span>` tags and using `glue()` to pass in the colors from `col_palette` vector. Here, we'll take a slightly different approach of calling the variables - using each vector element name instead of the index. This approach is a little more manual, but can be useful if you want the written text to be slightly different to the category name. It's also often a little bit clearer code to read! \index{glue!glue} \index{ggtext}
+As we did in @sec-turbines and @sec-cats, we can also add colored text within the subtitle to denote the categories. This might be unnecessary for this visualization since we have our custom bar chart legend, but reinforcing the color mapping won't hurt. Here, we'll use {ggtext} as we did in @sec-cats (although you can also use {marquee} as we did in @sec-turbines if you prefer). This means we'll be writing HTML `<span></span>` tags and using `glue()` to pass in the colors from `col_palette` vector. Here, we'll take a slightly different approach of calling the variables - using each vector element name instead of the index. This approach is a little more manual, but can be useful if you want the written text to be slightly different to the category name. The code is also often a little bit clearer to read! \index{glue!glue} \index{ggtext}
  
 ```{r}
 #| label: timezones-text-1
@@ -491,7 +496,7 @@ subtitle <- glue::glue("Time zones tend to follow the boundaries between countri
 <span style='color:{col_palette[\"Pacific\"]};'>Pacific </span> zones.<br>**Data**: IANA tz database<br>")
 ```
 
-We also specify some text for the visualisation title. We're going to join together the title and subtitle and plot them as one text object, so we also use HTML `<span></span>` tags to set the font size, family, and color of the title. 
+We also specify some text for the visualization title. We're going to join together the title and subtitle and plot them as one text object, so we also use HTML `<span></span>` tags to set the font size, family, and color of the title. 
 
 ```{r}
 #| label: timezones-text-2
@@ -524,7 +529,7 @@ text_map <- axes_map +
 
 ### Adjusting themes
 
-The final step is making a few small changes to the {ggplot2} theme. We start by removing all theme elements using `theme_void()` and setting the `base_family` and `base_size` for the text. Although we don't have many text elements in our visualisation controlled by the `theme()` functions, this will still affect the `tag` text. \index{ggplot2!theme\_void}
+The final step is making a few small changes to the {ggplot2} theme. We start by removing all theme elements using `theme_void()` and setting the `base_family` and `base_size` for the text. Although we don't have many text elements in our visualization controlled by the `theme()` functions, this will still affect the `tag` text. \index{ggplot2!theme\_void}
 
 Using the `theme()` function, we make some further edit to remove the default legend, change the background color to out `bg_col` variable, and add the grid lines back in with an almost transparent `text_col` color. The position of the `tag` text can be set using the `plot.tag.position` argument to place it in the bottom left of the plot. We also use `element_textbox_simple()` from {ggtext} to format the text in the `tag` since it includes the HTML `<span></span>` tags. Within `element_textbox_simple()`, the `maxwidth` argument is used to set the width of the textbox, ensuring the only takes up the left hand side of the blank space at the bottom. The bar chart legend will go on the other side. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_rect} \index{ggplot2!element\_line} \index{ggplot2!alpha}
 
@@ -558,7 +563,7 @@ styled_map
 
 ### Joining plots with {patchwork}
 
-Finally, we need to join the legend bar chart to our main plot. For this, we'll use {patchwork} [@patchwork]. The {patchwork} package allows you to combine multiple visualisations (including {ggplot2} graphics, base R plots, or {gt} tables) into a single layout. It's very flexible, and you can add arrange plots easily into simple rows or columns, or create very complex layouts with many nested plots. The {patchwork} package also allows you to add inset plots i.e. a smaller plot placed within a larger plot to provide additional detail.
+Finally, we need to join the legend bar chart to our main plot. For this, we'll use {patchwork} [@patchwork]. The {patchwork} package allows you to combine multiple visualizations (including {ggplot2} graphics, base R plots, or {gt} tables) into a single layout. It's very flexible, and you can add arrange plots easily into simple rows or columns, or create very complex layouts with many nested plots. The {patchwork} package also allows you to add inset plots i.e. a smaller plot placed within a larger plot to provide additional detail.
 
 ::: {#tip-timezones-patchwork .callout-tip}
 
@@ -568,7 +573,7 @@ Although this book doesn't contain examples of arranging multiple plots side-by-
 
 :::
 
-In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalized parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
+In this visualization, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our `styled_map` and add the `legend_plot` on top using the `inset_element()` function. The four positions given in the `inset_element()` function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is `npc` (normalized parent coordinates). In this setting the bottom left is `(0, 0)` and the top right is `(1, 1)`. This means specifying the `left` outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. \index{patchwork!inset\_element}
 
 We also remove the added margin from around the edge of the plot using the `theme()` function and setting all of the margins to zero. Remember that when combining a `theme()` with a `patchwork` object, it's added using the `&` operator rather than `+`. \index{ggplot2!theme}
 
@@ -589,7 +594,7 @@ Now our map is finished and we can save it with `ggsave()`! \index{ggplot2!ggsav
 ggsave(
   filename = "time-zones.png",
   width = 5,
-  height = 0.92*5
+  height = 0.92 * 5
 )
 ```
 
@@ -603,8 +608,17 @@ If we're talking about improving readability of bar charts, an easy action is to
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/time-zones.gif){fig-align="center"}
 
 :::
+
+## Exercises
+
+::: {.callout-caution}
+
+Exercises are coming soon!
+
+:::
+

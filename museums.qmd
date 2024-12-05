@@ -356,14 +356,14 @@ We can then re-do our line chart using the rescaled `change` data on the y-axis 
 #| label: fig-museums-basic-plot-4
 #| fig-cap: "A line chart of percentage increase in museums (compared to 1960) for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
 #| message: false
-base_plot <- ggplot(
+basic_plot <- ggplot(
   data = new_plot_data,
   mapping = aes(x = year, y = change, color = deprivation)
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
   gghighlight::gghighlight(use_direct_label = FALSE)
-base_plot
+basic_plot
 ```
 
 This is starting to look promising, but there are still ways that we can style our chart to improve it.
@@ -391,7 +391,7 @@ For the colors of the lines, we can use the {viridis} package [@viridis]. The {v
 ```{r}
 #| label: fig-museums-style-plot-1
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
-col_plot <- base_plot +
+col_plot <- basic_plot +
   viridis::scale_color_viridis(
     discrete = TRUE,
     direction = -1
@@ -501,7 +501,19 @@ text_plot +
   )
 ```
 
-And we can save it to a file using `ggsave()`: \index{ggplot2!ggsave}
+And we can save it to a file using `ggsave()` as we did in @sec-programming. \index{ggplot2!ggsave}
+
+::: {#tip-museums-img-format .callout-tip}
+
+## Choosing an image format
+
+In @sec-programming, when saving our final plot to a file, we saved it as a PNG file. However, that's not the only option. We could also have saved in as a JPG, PDF, TIFF, or SVG (to name just a few options). So how do we decide what file type to use?
+
+Formats such as PNG and JPG save *raster* images i.e. information is stored about each pixel. This means that they are able to capture highly detailed information. However, this also means that file sizes can be large. Raster images also don't scale well - when you increase the size of an image, it tends to become blurry and lower in quality. Formats such as PDF or SVG are *vector* images i.e. information is stored about each line and shape in the image. This means it's easier to rescale without losing quality, and file sizes can be smaller (at least for graphics that are not excessively complex).
+
+Raster images tend to be better for complex visualisations and images, or when fixed resolution is preferred such as in a website. Vector images tend to be better for graphics that are likely to need resizing or be interactive. For the remainder of this book, we'll continue to save in PNG format for consistency in the print version of the book.
+
+:::
 
 ```{r}
 #| label: museums-save
@@ -522,8 +534,16 @@ We removed the legend from the plot with the reason that *the colors are based o
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualisation process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/uk-museums.gif){fig-align="center"}
+
+:::
+
+## Exercises
+
+::: {.callout-caution}
+
+Exercises are coming soon!
 
 :::

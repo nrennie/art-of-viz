@@ -337,6 +337,7 @@ div.csl-indent {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">6.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">6.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -728,7 +729,7 @@ Tip&nbsp;6.4: Installing Font Awesome icons with {waffle}
 <p>Finally, we add <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create a pictogram for each date range, placing them in a single row, and moving the facet label to the bottom of the chart. </p>
 <div class="cell">
 <div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">waffle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/waffle/man/geom_pictogram.html">geom_pictogram</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="va">Region</span>,</span>
@@ -744,7 +745,7 @@ Tip&nbsp;6.4: Installing Font Awesome icons with {waffle}
 <span>    nrow <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>    strip.position <span class="op">=</span> <span class="st">"bottom"</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-turbines-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-turbines-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -772,7 +773,7 @@ Tip&nbsp;6.5: Proportional waffle charts
 <p>What you might immediately notice about <a href="#fig-turbines-base-plot" class="quarto-xref">Figure&nbsp;<span>6.5</span></a> is that there are no icons. Instead, the plot has printed the <code>Region</code> names (even though we’ve set <code>family = "Font Awesome 6"</code>). This is because we haven’t defined which icons we want to use. To find an appropriate icon and what it’s called, we can browse the Font Awesome website at <a href="https://fontawesome.com/search">fontawesome.com/search</a> and search for related icons. For example, we might search for a <em>wind turbine</em> icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: <code>wind</code>, <code>bolt</code> (to represent energy), or <code>fan</code> to name a few. We’ll use <code>fan</code> <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>.</p>
 <p>We can add <code>scale_label_pictogram()</code> from {waffle} to our plot to specify the icons. We would normally pass in a vector of icon names to the <code>values</code> argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set <code>guide = "none"</code> to remove the legend for icons as they are all the same. Alternatively, you can later set <code>theme(legend.position = "none")</code> as we did in previous chapters to remove the legend. </p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">icons_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">icons_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu">waffle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/waffle/man/scale_label_pictogram.html">scale_label_pictogram</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="st">"fan"</span>,</span>
 <span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
@@ -1008,10 +1009,25 @@ Figure&nbsp;6.9: Pictogram showing the number of turbines per time period in eac
 <p>The colored subtitle as an alternative to a legend is effective because it uses much less space than a traditional legend - leaving more room for the data. However, there are some elements of the subtitle that could still be improved. We’ve discussed already the limitations of waffle plots and pictograms in terms of the lack of representation of categories with small numbers. This means that we had to group some regions together, and so regions with fewer turbines have less information included in the chart. Perhaps the subtitle could be updated to explain to users that each icon represents 20 turbines, and that this means regions with 10 or fewer turbines are not represented.</p>
 <p>There’s also some uncertainty around the date used, which isn’t really explained in the chart. When processing the <code>Commissioning.date</code> column, we used the most recent date but that isn’t necessarily always the best choice. A limitation of the data is that we also only have commissioning date, not installation date or date of first operation. This means that perhaps there are some values in the data that suggest a turbine exists in one time period when it hasn’t yet been built.</p>
 <p>Finally, we’ve used a <code>fan</code> icon because the Font Awesome wind turbine icon is only available in the Pro version. Using a wind turbine icon would be much clearer, and more consistent with the theme of the plot. We could look at using an alternative icon font, or we could perhaps use images instead. See <a href="other-tricks.html#sec-ggbuild" class="quarto-xref"><span>Section 14.2</span></a> for a description of how we might replace the existing <code>fan</code> icons with a wind turbine icon from a different source.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/turbines.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
+</div>
+</section><section id="exercises" class="level2" data-number="6.6"><h2 data-number="6.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">6.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Exercises are coming soon!</p>
+</div>
 </div>
 
 
@@ -1179,7 +1195,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1256,8 +1272,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.

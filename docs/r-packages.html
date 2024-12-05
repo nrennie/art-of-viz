@@ -333,6 +333,7 @@ div.csl-indent {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">10.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">10.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -354,7 +355,7 @@ div.csl-indent {
 </header><p>In this chapter, we’ll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that’s already been made, and how to use images as category labels.</p>
 <section id="data" class="level2" data-number="10.1"><h2 data-number="10.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">10.1</span> Data</h2>
-<p>In July 2024, TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> featured some examples of using the {funspotr} package <span class="citation" data-cites="funspotr">(<a href="references.html#ref-funspotr" role="doc-biblioref">Shalloway 2023</a>)</span> as datasets, suggested by <a href="https://github.com/brshallo">Bryan Shalloway</a>. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let’s try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualisations: <a href="https://github.com/nrennie/tidytuesday">github.com/nrennie/tidytuesday</a>.</p>
+<p>In July 2024, TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> featured some examples of using the {funspotr} package <span class="citation" data-cites="funspotr">(<a href="references.html#ref-funspotr" role="doc-biblioref">Shalloway 2023</a>)</span> as datasets, suggested by <a href="https://github.com/brshallo">Bryan Shalloway</a>. The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let’s try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualizations: <a href="https://github.com/nrennie/tidytuesday">github.com/nrennie/tidytuesday</a>.</p>
 <p>Let’s start by getting a list of all the files that exist in the GitHub repository. We can use the <code>list_files_github_repo()</code> function from {funspotr} to get this list of files - specifying which GitHub repository we want the list for (in the form of <code>"username/repository"</code>), and which branch of the repository we want to look at. The <code>list_files_github_repo()</code> function returns a data frame with two columns: <code>relative_paths</code> (file path relative to the root of the git repository) and <code>absolute_paths</code> (URL of each file). </p>
 <p>All of the files in this repository are named and organised based on dates in the following structure: <code>yyyy/yyyy-mm-dd/yyyymmdd.R</code> <span class="citation" data-cites="streamline">(<a href="references.html#ref-streamline" role="doc-biblioref">Rennie 2023c</a>)</span>. Since the code to extract used functions takes a while to run, let’s filter this list of files to only include files dated <code>2023</code>. We can use <code>str_detect()</code> from {stringr} to find any values in the <code>relative_paths</code> column that contain <code>"2023"</code> and then <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> from {dplyr} to keep only those rows. </p>
 <div class="cell">
@@ -539,7 +540,7 @@ Figure&nbsp;10.3: Initial sketch of a faceted area charts showing packages use o
 <div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      x <span class="op">=</span> <span class="va">date</span>,</span>
@@ -548,7 +549,7 @@ Figure&nbsp;10.3: Initial sketch of a faceted area charts showing packages use o
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">pkgs</span>, nrow <span class="op">=</span> <span class="fl">1</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre data-code-line-numbers=""><code>Warning in min(diff(unique_loc)): no non-missing arguments
 to min; returning Inf</code></pre>
@@ -620,11 +621,11 @@ Tip&nbsp;10.2: Don’t ignore the warning signs!
 </div>
 </div>
 <p>We can see that there are now quite a few <code>0</code> values included in the <code>n</code> column. Notice that <code>"tibble"</code> is now explicitly included as well, with <code>0</code> in the <code>n</code> column for all observations. This is because, by default, <code>complete()</code> uses all levels of the factor even if they aren’t observed in the data.</p>
-<p>Now we need to update the data that is used in our <code>base_plot</code>. We <em>could</em> simply edit (or copy and paste) the code from above and substitute <code>plot_data</code> for <code>new_plot_data</code>. But we can alternatively use the <code>%+%</code> operator.</p>
-<p>The <code>%+%</code> operator allows you to replace the current default data frame on an existing plot. We start with our existing <code>base_plot</code>, and then use <code>%+%</code> to set <code>new_plot_data</code> as the data used in the plot.</p>
+<p>Now we need to update the data that is used in our <code>basic_plot</code>. We <em>could</em> simply edit (or copy and paste) the code from above and substitute <code>plot_data</code> for <code>new_plot_data</code>. But we can alternatively use the <code>%+%</code> operator.</p>
+<p>The <code>%+%</code> operator allows you to replace the current default data frame on an existing plot. We start with our existing <code>basic_plot</code>, and then use <code>%+%</code> to set <code>new_plot_data</code> as the data used in the plot.</p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op"><a href="https://ggplot2.tidyverse.org/reference/gg-add.html">%+%</a></span> <span class="va">new_plot_data</span></span>
-<span><span class="va">base_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op"><a href="https://ggplot2.tidyverse.org/reference/gg-add.html">%+%</a></span> <span class="va">new_plot_data</span></span>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-r-pkgs-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -639,7 +640,7 @@ Figure&nbsp;10.5: Faceted area charts showing package use over time for each of 
 <p>Notice that the warning message has now disappeared.</p>
 </section></section><section id="advanced-styling" class="level2" data-number="10.4"><h2 data-number="10.4" class="anchored" data-anchor-id="advanced-styling">
 <span class="header-section-number">10.4</span> Advanced styling</h2>
-<p>Now that we have a first draft of the plot, it’s time to work on polishing it. We’ll make some adjustments to the colors, fonts, text, scales, and themes - before we move on to editing the facets labels to create a visualisation like <a href="#fig-packages-sketch-2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a>.</p>
+<p>Now that we have a first draft of the plot, it’s time to work on polishing it. We’ll make some adjustments to the colors, fonts, text, scales, and themes - before we move on to editing the facets labels to create a visualization like <a href="#fig-packages-sketch-2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a>.</p>
 <section id="colors" class="level3" data-number="10.4.1"><h3 data-number="10.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">10.4.1</span> Colors</h3>
 <p>Let’s go for a dark theme for our plot this time. We’ll choose a dark gray for the background color, and white for the text to ensure sufficient contrast.</p>
@@ -657,7 +658,7 @@ Figure&nbsp;10.5: Faceted area charts showing package use over time for each of 
 </div>
 <p>We can then pass this <code>col_palette</code> vector into <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> function to apply the colors to our plot: </p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">base_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="va">col_palette</span></span>
 <span>  <span class="op">)</span></span>
@@ -675,7 +676,7 @@ Figure&nbsp;10.6: Faceted area charts showing package use over time for each of 
 </div>
 </section><section id="fonts" class="level3" data-number="10.4.2"><h3 data-number="10.4.2" class="anchored" data-anchor-id="fonts">
 <span class="header-section-number">10.4.2</span> Fonts</h3>
-<p>Similar to <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, since code is the subject of the visualisation, we might want to choose a font that’s consistent with that theme. Here we’ll use <em>Source Code Pro</em>, a monospace font family originally designed specifically for coding environments. It’s loaded into R using <code>font_add_google()</code> from {sysfonts}.</p>
+<p>Similar to <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, since code is the subject of the visualization, we might want to choose a font that’s consistent with that theme. Here we’ll use <em>Source Code Pro</em>, a monospace font family originally designed specifically for coding environments. It’s loaded into R using <code>font_add_google()</code> from {sysfonts}.</p>
 <p>In this chapter, we’ll use the same font for the title and body text so we only need to define one variable, <code>body_font</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
@@ -699,7 +700,7 @@ Figure&nbsp;10.6: Faceted area charts showing package use over time for each of 
 <p>The subtitle includes a quote from the <a href="https://www.tidyverse.org/">{tidyverse} website</a>, so we’ll format it in italics using <code>*</code>. We also use the <code>source_caption()</code> function we defined in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> to create a caption with information about the data source, combined with the social icons to attribute the graphic. </p>
 <div class="cell">
 <div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"How many times did I use {tidyverse} packages for TidyTuesday?"</span></span>
-<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="st">"The tidyverse is a collection of open source R packages that *share an underlying design philosophy, grammar, and data structures*. Of the 8 core tidyverse packages, {ggplot2} was my most used package for TidyTuesday visualisations in 2023."</span></span>
+<span><span class="va">st</span> <span class="op">&lt;-</span> <span class="st">"The tidyverse is a collection of open source R packages that *share an underlying design philosophy, grammar, and data structures*. Of the 8 core tidyverse packages, {ggplot2} was my most used package for TidyTuesday visualizations in 2023."</span></span>
 <span><span class="va">source_cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
 <span>  source <span class="op">=</span> <span class="st">"github.com/nrennie/tidytuesday"</span>,</span>
 <span>  graphic <span class="op">=</span> <span class="va">social</span>,</span>
@@ -838,7 +839,7 @@ Figure&nbsp;10.8: Faceted area charts showing package use over time for each of 
 </div>
 </div>
 </div>
-<p>This visualisation is perfectly fine as it is, but we can still edit the facet labels to use hex stickers instead of text labels, as we proposed in <a href="#fig-packages-sketch-2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a>.</p>
+<p>This visualization is perfectly fine as it is, but we can still edit the facet labels to use hex stickers instead of text labels, as we proposed in <a href="#fig-packages-sketch-2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a>.</p>
 </section><section id="using-images-as-facet-labels" class="level3" data-number="10.4.5"><h3 data-number="10.4.5" class="anchored" data-anchor-id="using-images-as-facet-labels">
 <span class="header-section-number">10.4.5</span> Using images as facet labels</h3>
 <p>As we saw in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, packages such as {ggimage} <span class="citation" data-cites="ggimage">(<a href="references.html#ref-ggimage" role="doc-biblioref">Yu 2023</a>)</span> can be used to plot images within the plotting area. Here, we want to use images outside of the plotting area in the facet labels. There are several options for overlaying images on existing plots (including outside of the main plot area). The <code>inset_element()</code> function from {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> can add elements on top of existing plots (we’ll see an example in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>). Similarly, <code>draw_image()</code> function from {cowplot} <span class="citation" data-cites="cowplot">(<a href="references.html#ref-cowplot" role="doc-biblioref">C. O. Wilke 2024</a>)</span> simplifies the process of combining plots and images. However, to edit the facet labels we don’t actually need any additional packages beyond the ones we’ve already used to make the plot.</p>
@@ -937,10 +938,33 @@ Tip&nbsp;10.4: Facet label images using {marquee}
 <span class="header-section-number">10.5</span> Reflection</h2>
 <p>Overall, this plot is very effective - it clearly shows the differing levels of R package use whilst still being eye-catching. However, there are still a few improvements that can be made. Other than for {ggplot2} and {dplyr}, it’s quite hard to read the values as they are very small compared to the height of the y-axis. This is due to the high usage of {ggplot2} on a single occasions. Maybe using a log transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability.</p>
 <p>The use of color could also be improved here. The colors are used to differentiate the different packages, and so don’t provide any further information not already given by the facet labels - similar to <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a>. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the {stringr} hex sticker image is quite similar to the green used in the {dplyr} area chart - this is currently a little bit distracting.</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/r-pkgs.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
+</div>
+</section><section id="exercises" class="level2" data-number="10.6"><h2 data-number="10.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">10.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Using a different dataset
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In July 2024, TidyTuesday used the {funspotr} package to look at how <a href="https://github.com/dgrtwo/data-screencasts">David Robinson has explored TidyTuesday data</a> in his <a href="https://youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8&amp;si=jGBo0bcarEPV6cnn">YouTube screencasts</a>. You can load the data with:</p>
+<div class="cell">
+<div class="sourceCode" id="cb41" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2024-07-09"</span><span class="op">)</span></span>
+<span><span class="va">drob_funs</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">drob_funs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><p>Recreate the visualization from this chapter for this new dataset. Are the patterns similar?</p></li>
+<li><p>Choose a more appropriate color scheme for the area charts.</p></li>
+</ul>
+</div>
 </div>
 
 
@@ -1108,7 +1132,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1185,8 +1209,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.

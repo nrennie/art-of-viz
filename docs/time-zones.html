@@ -337,6 +337,7 @@ div.csl-indent {
   </ul>
 </li>
   <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">12.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">12.6</span> Exercises</a></li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -359,7 +360,7 @@ div.csl-indent {
 <section id="data" class="level2" data-number="12.1"><h2 data-number="12.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">12.1</span> Data</h2>
 <p>The <a href="https://data.iana.org/time-zones/tz-link.html">IANA (Interet Assigned Numbers Authority) tz database</a> contains data on the history of local time for different locations around the world <span class="citation" data-cites="zones_data">(<a href="references.html#ref-zones_data" role="doc-biblioref">Internet Assigned Numbers Authority 2023</a>)</span>. The website states that <em>“each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970.”</em> Many websites use the data in the IANA tz database to operate.</p>
-<p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data in using the <code>tt_load()</code> function from the {tidytuesdayR} package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
+<p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data into R using the <code>tt_load()</code> function from the {tidytuesdayR} package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-28"</span><span class="op">)</span></span>
 <span><span class="va">timezones</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">timezones</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -393,9 +394,13 @@ div.csl-indent {
 <span>  cex.names <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="time-zones_files/figure-html/timezones-barplot-na-1.png" class="img-fluid figure-img"></p>
-<figcaption>A bar chart of the number of missing values in the <code>comments</code> column, where <code>TRUE</code> represents missing.</figcaption></figure>
+<div id="fig-timezones-barplot-na" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-barplot-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-barplot-na-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-barplot-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.1: A bar chart of the number of missing values in the <code>comments</code> column, where <code>TRUE</code> represents missing.
+</figcaption></figure>
 </div>
 </div>
 </div>
@@ -411,7 +416,7 @@ div.csl-indent {
 <span>    too_many <span class="op">=</span> <span class="st">"merge"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now, we can explore how many time zones there are per continent: </p>
+<p>Now, we can explore how many time zones there are per continent, again using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function. In <a href="#fig-timezones-barplot-loc" class="quarto-xref">Figure&nbsp;<span>12.2</span></a>, we can see that the first part of the time zone names don’t quite map to continents since there are nine values - but they do map onto large geographic regions. </p>
 <div class="cell">
 <div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">timezones_data</span><span class="op">$</span><span class="va">continent</span><span class="op">)</span>,</span>
@@ -419,13 +424,16 @@ div.csl-indent {
 <span>  cex.names <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="time-zones_files/figure-html/timezones-barplot-loc-1.png" class="img-fluid figure-img"></p>
-<figcaption>A bar chart of the number of defined time zones in each of nine geographic regions.</figcaption></figure>
+<div id="fig-timezones-barplot-loc" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-barplot-loc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-barplot-loc-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-barplot-loc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.2: A bar chart of the number of defined time zones in each of nine geographic regions.
+</figcaption></figure>
 </div>
 </div>
 </div>
-<p>We can see that, actually, the first part of the time zone names don’t quite map to continents since there are nine values - but they do map onto large geographic regions.</p>
 <p>Of course, when we have coordinate data, the most obvious thing to do is plot those coordinates on a map!</p>
 </section><section id="exploratory-sketches" class="level3" data-number="12.2.2"><h3 data-number="12.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">12.2.2</span> Exploratory sketches</h3>
@@ -435,19 +443,19 @@ div.csl-indent {
 <img src="images/sketch-time-zones.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.1: Initial sketch of time zone locations as points on a world map.
+Figure&nbsp;12.3: Initial sketch of time zone locations as points on a world map.
 </figcaption></figure>
 </div>
-<p>We could color the points based on the geographic region (continent) that they are within. as we’ve already seen, if we do this in {ggplot2}, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will shown the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn’t take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).</p>
+<p>We could color the points based on the geographic region (continent) they belong to. As we’ve already seen, if we do this in {ggplot2}, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will show the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn’t take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).</p>
 <div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-time-zones-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.2: Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.
+Figure&nbsp;12.4: Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.
 </figcaption></figure>
 </div>
-<p>A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) make sit easier to read, and helps to prevent the visualisation from becoming very wide and short.</p>
+<p>A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) make sit easier to read, and helps to prevent the visualization from becoming very wide and short.</p>
 </section></section><section id="preparing-a-plot" class="level2" data-number="12.3"><h2 data-number="12.3" class="anchored" data-anchor-id="preparing-a-plot">
 <span class="header-section-number">12.3</span> Preparing a plot</h2>
 <p>To make our plot, we need to get some background map data and understand how to work with multiple spatial data files at once.</p>
@@ -490,7 +498,7 @@ Tip&nbsp;12.1: Polygons for a specific country with {rnaturalearth}
 <img src="time-zones_files/figure-html/fig-timezones-bg-map-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bg-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.3: Map of the world showing country outlines, with the default gray background.
+Figure&nbsp;12.5: Map of the world showing country outlines, with the default gray background.
 </figcaption></figure>
 </div>
 </div>
@@ -498,8 +506,8 @@ Figure&nbsp;12.3: Map of the world showing country outlines, with the default gr
 <p>You’ll notice that there’s one key difference - there’s no aesthetic mapping using the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. Since the spatial coordinates are embedded within the <code>sf</code> object, there’s no need to explicitly map the <code>x</code> and <code>y</code> variables. The <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> function can directly extract and use the embedded coordinates for plotting.</p>
 </section><section id="spatial-objects-with-sf" class="level3" data-number="12.3.2"><h3 data-number="12.3.2" class="anchored" data-anchor-id="spatial-objects-with-sf">
 <span class="header-section-number">12.3.2</span> Spatial objects with {sf}</h3>
-<p>Though you can combine <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> with other geometries, such as <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>, it’s often easier to convert the other geometries to <code>sf</code> objects first. The main reason for this is to ensure the <em>coordinate reference system (CRS)</em> is the same for both geometries. Coordinate reference systems define how the three dimensional nature of the earth is mapped onto a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you’re combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: <code>X = 492983</code> and <code>Y = 188837</code>. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: <code>Longitude (X) = 1.200235W</code> and <code>Latitude (Y) = 53.870659N</code>. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first.</p>
-<p>In R, you use the {sf} to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code <code>4326</code>. This is the coordinate reference system used in the <code>world</code> data that we’re using for the background map. You can check using the <code>st_crs()</code> function from {sf} which retrieves the CRS from an object: </p>
+<p>Though you can combine <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> with other functions and non-<code>sf</code> data, such as <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>, it’s often easier to convert the other data to <code>sf</code> objects first. The main reason for this is to ensure the <em>coordinate reference system (CRS)</em> is the same for both geometries. Coordinate reference systems define how the Earth’s three-dimensional surface is represented, either in a three-dimensional coordinate system (e.g.&nbsp;latitude and longitude) or as a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you’re combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: <code>X = 492983</code> and <code>Y = 188837</code>. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: <code>Longitude (X) = 1.200235W</code> and <code>Latitude (Y) = 53.870659N</code>. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first.</p>
+<p>In R, you can use the {sf} package to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code <code>4326</code>. This is the coordinate reference system used in the <code>world</code> data that we’re using for the background map. You can check using the <code>st_crs()</code> function from {sf} which retrieves the CRS from an object: </p>
 <div class="cell">
 <div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_crs</a></span><span class="op">(</span><span class="va">world</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -523,11 +531,13 @@ GEOGCRS["WGS 84",
 </div>
 </div>
 <p>To make sure the CRS of the <code>timezones</code> data matches the CRS of the <code>world</code> data, we can set the CRS of the <code>timezones</code> data as <code>4326</code>. At the moment, the <code>timezones</code> data is not a spatial object - it’s just a simple <code>data.frame</code> that contains two columns with latitude and longitude information. First, we need to convert it into an <code>sf</code> object using the <code>st_as_sf()</code> function from {sf}, also specifying the column names that relate to the coordinates data. </p>
-<p>The latitude and longitude coordinates given in the <code>timezones</code> data are given in the <code>EPSG:4326</code> CRS, so we don’t need to convert the CRS - just set it. We know it’s in <code>EPSG:4326</code> because this information is given to us with the data. We can use the <code>st_set_crs()</code> to set the coordinate reference system to <code>EPSG:4326</code> .</p>
+<p>The latitude and longitude coordinates given in the <code>timezones</code> data are in the <code>EPSG:4326</code> CRS, so we don’t need to convert the CRS - just set it. We know it’s in <code>EPSG:4326</code> because this information is given to us with the data, and we can set it using the <code>crs</code> argument of <code>st_as_sf()</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">timezones_sf</span> <span class="op">&lt;-</span> <span class="va">timezones_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_set_crs</a></span><span class="op">(</span><span class="fl">4326</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span></span>
+<span>    coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span>,</span>
+<span>    crs <span class="op">=</span> <span class="fl">4326</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tip-timezones-crs" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -540,6 +550,7 @@ Tip&nbsp;12.2: Dealing with an unknown CRS
 </div>
 <div class="callout-body-container callout-body">
 <p>If you don’t know which CRS your coordinates are in, the best thing to do is go back to the source of the data to see if you can find that information. Otherwise, you may wish to try the <code>guess_crs()</code> function from {crsuggest} <span class="citation" data-cites="crsuggest">(<a href="references.html#ref-crsuggest" role="doc-biblioref">Walker 2022</a>)</span> which will <em>guess</em> potential coordinate reference systems for data that are lacking a defined CRS. </p>
+<p>You can then use the <code>st_set_crs()</code> function to set the coordinate reference system. .</p>
 </div>
 </div>
 </section><section id="the-first-plot" class="level3" data-number="12.3.3"><h3 data-number="12.3.3" class="anchored" data-anchor-id="the-first-plot">
@@ -558,7 +569,7 @@ Tip&nbsp;12.2: Dealing with an unknown CRS
 <img src="time-zones_files/figure-html/fig-timezones-basic-map-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-basic-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.4: Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map.
+Figure&nbsp;12.6: Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map.
 </figcaption></figure>
 </div>
 </div>
@@ -584,7 +595,7 @@ Figure&nbsp;12.4: Points representing different time zone locations on a world m
 </div>
 </section><section id="fonts" class="level3" data-number="12.3.5"><h3 data-number="12.3.5" class="anchored" data-anchor-id="fonts">
 <span class="header-section-number">12.3.5</span> Fonts</h3>
-<p>Similarly, we also load any fonts we want to use. Again, for this visualisation we’re using Google Fonts, so we can make use of the <code>font_add_google()</code> function in {sysfonts}. For the title, we’ll use the <em>Fraunces</em> font - an <em>old style</em> serif font inspired by 20th century typefaces. For the body font, we’ll use <em>Commissioner</em> - a sans serif font. As we’ve done in previous chapters, we use <code>showtext_auto()</code> to use the {showtext} automatically for plotting fonts, and set the desired resolution using <code>showtext_opts()</code> to set the dpi. </p>
+<p>Similarly, we also load any fonts we want to use. Again, for this visualization we’re using Google Fonts, so we can make use of the <code>font_add_google()</code> function in {sysfonts}. For the title, we’ll use the <em>Fraunces</em> font - an <em>old style</em> serif font inspired by 20th century typefaces. For the body font, we’ll use <em>Commissioner</em> - a sans serif font. As we’ve done in previous chapters, we use <code>showtext_auto()</code> to use the {showtext} automatically for plotting fonts, and set the desired resolution using <code>showtext_opts()</code> to set the dpi. </p>
 <div class="cell">
 <div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Commissioner"</span><span class="op">)</span></span>
 <span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Fraunces"</span><span class="op">)</span></span>
@@ -595,8 +606,8 @@ Figure&nbsp;12.4: Points representing different time zone locations on a world m
 </div>
 </section><section id="creating-a-custom-bar-chart-legend" class="level3" data-number="12.3.6"><h3 data-number="12.3.6" class="anchored" data-anchor-id="creating-a-custom-bar-chart-legend">
 <span class="header-section-number">12.3.6</span> Creating a custom bar chart legend</h3>
-<p>There are many ways to make a bar chart in {ggplot2} - the two most often used are <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code>. What’s the difference? Well, <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> is essentially a special version of <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> that counts up how many observations are in each category for you. For this visualisation, we’re going to use the category counts for other purposes besides just defining the height of the bars so we’ll do the counting ourselves and use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> instead. </p>
-<p>We’ll use the <code>count()</code> function from {dplyr} to count how many observations of each geographical region are present in the <code>continent</code> column. We could use either the <code>timezones_sf</code> data or the <code>timezones_data</code> here as the input data. If you try both, you’ll notice that, as we expect, the count column (<code>n</code>) is the same in both cases, but that the two outputs are not identical! When you run <code>dplyr::count(timezones_data, continent)</code>, you get a 2 column <code>data.frame</code>. When you run <code>dplyr::count(timezones_sf, continent)</code> you get an 3 column <code>data.frame</code> that remains an <code>sf</code> object. This is because the <code>geometry</code> column in <code>sf</code> can described as <em>sticky</em> - you often (though not always) want the <code>sf</code> class to be preserved after any operations. You can remove it using the <code>st_drop_geometry()</code> function from {sf}: </p>
+<p>There are many ways to make a bar chart in {ggplot2} - the two most often used are <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code>. What’s the difference? Well, <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> is essentially a special version of <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> that counts up how many observations are in each category for you. For this visualization, we’re going to use the category counts for other purposes besides just defining the height of the bars so we’ll do the counting ourselves and use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> instead. </p>
+<p>We’ll use the <code>count()</code> function from {dplyr} to count how many observations of each geographical region are present in the <code>continent</code> column. We could use either the <code>timezones_sf</code> data or the <code>timezones_data</code> here as the input data. If you try both, you’ll notice that, as we expect, the count column (<code>n</code>) is the same in both cases, but that the two outputs are not identical! When you run <code>dplyr::count(timezones_data, continent)</code>, you get a 2 column <code>data.frame</code>. When you run <code>dplyr::count(timezones_sf, continent)</code> you get an 3 column <code>data.frame</code> that remains an <code>sf</code> object. This is because the <code>geometry</code> column in <code>sf</code> can be described as <em>sticky</em> - you often (though not always) want the <code>sf</code> class to be preserved after any operations. You can remove it using the <code>st_drop_geometry()</code> function from {sf}: </p>
 <div class="cell">
 <div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bar_data</span> <span class="op">&lt;-</span> <span class="va">timezones_sf</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">continent</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -615,7 +626,7 @@ Figure&nbsp;12.4: Points representing different time zone locations on a world m
 <img src="time-zones_files/figure-html/fig-timezones-bar-plot-0-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-0-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.5: Bar chart showing the number of time zone locations in each continent.
+Figure&nbsp;12.7: Bar chart showing the number of time zone locations in each continent.
 </figcaption></figure>
 </div>
 </div>
@@ -659,12 +670,12 @@ Tip&nbsp;12.3: Adding color to bar charts
 <img src="time-zones_files/figure-html/fig-timezones-bar-plot-1-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.6: Bar chart showing the number of time zone locations in each geographical region, with different colors for each region.
+Figure&nbsp;12.8: Bar chart showing the number of time zone locations in each geographical region, with different colors for each region.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Now we can add the text labels directly to the bars. But where should they go? It’s quite common to add category labels in line with the end of the bar but that might not work well here. If we add labels within the bars, for regions with few time zones where the bars are short, the text will be very squashed. If we add labels outside the bars, for regions with many time zones where the bars are long, the text will run off the graph or extend the height of the visualisation. Neither is ideal. But maybe we could have the best of both worlds. We want to add labels under the following conditions:</p>
+<p>Now we can add the text labels directly to the bars. But where should they go? It’s quite common to add category labels in line with the end of the bar but that might not work well here. If we add labels within the bars, for regions with few time zones where the bars are short, the text will be very squashed. If we add labels outside the bars, for regions with many time zones where the bars are long, the text will run off the graph or extend the height of the visualization. Neither is ideal. But maybe we could have the best of both worlds. We want to add labels under the following conditions:</p>
 <p>When the bars are long, text should:</p>
 <ul>
 <li>appear inside the bar and be right-aligned;</li>
@@ -675,11 +686,11 @@ Figure&nbsp;12.6: Bar chart showing the number of time zone locations in each ge
 <li>appear outside the bar and be left-aligned;</li>
 <li>be dark in color to contrast the light plot background;</li>
 </ul>
-<p>It might take a little bit of trial and error to find the value that defines a bar as being <em>short</em> or <em>tall</em>. Here, we’ll use <code>45</code>. If a region has more than <code>45</code> time zones, it’s classed a <em>tall</em> bar. Otherwise, it’s <em>short</em>.</p>
+<p>It might take a little bit of trial and error to find the value that defines a bar as being <em>short</em> or <em>tall</em>. Here, we’ll use <code>45</code>. If a region has more than <code>45</code> time zones, it’s classed as a <em>tall</em> bar. Otherwise, it’s <em>short</em>.</p>
 <p>We want to map the alignment and color of the text to a (transformation of) the <code>n</code> column in the data set. This sounds like something that should go into an aesthetic mapping in the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. We already know the <code>color</code> argument can be used to map the text color. The <code>hjust</code> and <code>vjust</code> arguments are used for horizontal and vertical positioning of text. Unfortunately, within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, neither <code>hjust</code> nor <code>vjust</code> can be used inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. </p>
 <p>Luckily, the {ggtext} package once again comes to the rescue! We can use the <code>geom_textbox()</code> function from {ggtext} instead of <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. It works very similarly to <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> but it allows us to map variables to <code>hjust</code> and <code>vjust</code>. </p>
 <p>We’ll use <code>case_when()</code> from {dplyr} to specify the settings for the <code>hjust</code> argument, depending on the value of <code>n</code>. When <code>n</code> is greater than <code>45</code>, <code>hjust</code> should be <code>1</code> to use right alignment, otherwise it should be <code>0</code> to use left alignment. If you wanted to, you could create a new column in the data instead of using <code>case_when()</code> directly inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. </p>
-<p>When using <code>geom_textbox()</code>, we need to specify both <code>hjust</code> and <code>halign</code>. Since, the draws a box, we need to control both (i) the alignment of the box relative to the coordinates using <code>hjust</code>, and (ii) the alignment of the text within the box relative to the edges of the box using <code>halign</code>. Within <code>geom_textbox()</code> we also use <code>orientation = "left-rotated"</code> to rotate the text anti-clockwise by 90 degrees (similar to using <code>angle = 90</code> in <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>). We can remove the background fill color and box outline by setting both <code>fill = NA</code> and <code>box.color = NA</code>, and set the size and font family options using the <code>size</code> and <code>family</code> arguments (where we pass in our <code>body_font</code> variable we defined earlier).</p>
+<p>Since <code>geom_textbox()</code> the draws a box, we need to control both (i) the alignment of the box relative to the coordinates using <code>hjust</code>, and (ii) the alignment of the text within the box using <code>halign</code>. Within <code>geom_textbox()</code> we also use <code>orientation = "left-rotated"</code> to rotate the text anti-clockwise by 90 degrees (similar to using <code>angle = 90</code> in <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>). We can remove the background fill color and box outline by setting both <code>fill = NA</code> and <code>box.color = NA</code>, and set the size and font family options using the <code>size</code> and <code>family</code> arguments (where we pass in our <code>body_font</code> variable we defined earlier).</p>
 <div id="tip-timezones-text-align" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -729,12 +740,12 @@ Tip&nbsp;12.4: Alignment of text
 <img src="time-zones_files/figure-html/fig-timezones-bar-plot-2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.7: A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent.
+Figure&nbsp;12.9: A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Now we have a much nice looking custom legend. We can apply some nicer styling to our main map before we join the two together!</p>
+<p>Now we have a much nicer looking custom legend. We can apply some nicer styling to our main map before we join the two together!</p>
 </section></section><section id="advanced-styling" class="level2" data-number="12.4"><h2 data-number="12.4" class="anchored" data-anchor-id="advanced-styling">
 <span class="header-section-number">12.4</span> Advanced styling</h2>
 <p>We have multiple elements of our plots that we need to improve:</p>
@@ -776,7 +787,7 @@ Figure&nbsp;12.7: A minimalist bar chart showing the number of time zone locatio
 <img src="time-zones_files/figure-html/fig-timezones-basic-map-2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-basic-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.8: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side.
+Figure&nbsp;12.10: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side.
 </figcaption></figure>
 </div>
 </div>
@@ -809,14 +820,14 @@ Figure&nbsp;12.8: Points representing different time zone locations on a world m
 <img src="time-zones_files/figure-html/fig-timezones-style-map-2-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-style-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.9: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map.
+Figure&nbsp;12.11: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map.
 </figcaption></figure>
 </div>
 </div>
 </div>
 </section><section id="text" class="level3" data-number="12.4.3"><h3 data-number="12.4.3" class="anchored" data-anchor-id="text">
 <span class="header-section-number">12.4.3</span> Text</h3>
-<p>We can create our custom Font Awesome icon caption, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which we’ll later add to the top of the visualisation: </p>
+<p>We can create our custom Font Awesome icon caption, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which we’ll later add to the top of the visualization: </p>
 <div class="cell">
 <div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
@@ -824,7 +835,7 @@ Figure&nbsp;12.9: Points representing different time zone locations on a world m
 <span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>As we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, we can also add colored text within the subtitle to denote the categories. This might be unnecessary for this visualisation since we have our custom bar chart legend, but reinforcing the color mapping won’t hurt. Here, we’ll use {ggtext} as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> (although you can also use {marquee} as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> if you prefer). This means we’ll be writing HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags and using <code>glue()</code> to pass in the colors from <code>col_palette</code> vector. Here, we’ll take a slightly different approach of calling the variables - using each vector element name instead of the index. This approach is a little more manual, but can be useful if you want the written text to be slightly different to the category name. It’s also often a little bit clearer code to read! </p>
+<p>As we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, we can also add colored text within the subtitle to denote the categories. This might be unnecessary for this visualization since we have our custom bar chart legend, but reinforcing the color mapping won’t hurt. Here, we’ll use {ggtext} as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> (although you can also use {marquee} as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> if you prefer). This means we’ll be writing HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags and using <code>glue()</code> to pass in the colors from <code>col_palette</code> vector. Here, we’ll take a slightly different approach of calling the variables - using each vector element name instead of the index. This approach is a little more manual, but can be useful if you want the written text to be slightly different to the category name. The code is also often a little bit clearer to read! </p>
 <div class="cell">
 <div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colors show which time zones are in</span></span>
 <span><span class="st">&lt;span style='color:{col_palette[\"Africa\"]};'&gt;Africa &lt;/span&gt;,</span></span>
@@ -837,7 +848,7 @@ Figure&nbsp;12.9: Points representing different time zone locations on a world m
 <span><span class="st">&lt;span style='color:{col_palette[\"Indian\"]};'&gt;Indian &lt;/span&gt;, and</span></span>
 <span><span class="st">&lt;span style='color:{col_palette[\"Pacific\"]};'&gt;Pacific &lt;/span&gt; zones.&lt;br&gt;**Data**: IANA tz database&lt;br&gt;"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We also specify some text for the visualisation title. We’re going to join together the title and subtitle and plot them as one text object, so we also use HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags to set the font size, family, and color of the title.</p>
+<p>We also specify some text for the visualization title. We’re going to join together the title and subtitle and plot them as one text object, so we also use HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags to set the font size, family, and color of the title.</p>
 <div class="cell">
 <div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"&lt;span style='font-size:12pt; font-family:{title_font}; color:{text_col};'&gt;Time Zones of the World&lt;/span&gt;&lt;br&gt;"</span><span class="op">)</span></span>
 <span><span class="va">title_text</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"{title}{subtitle}"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -863,7 +874,7 @@ Figure&nbsp;12.9: Points representing different time zone locations on a world m
 </div>
 </section><section id="adjusting-themes" class="level3" data-number="12.4.4"><h3 data-number="12.4.4" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">12.4.4</span> Adjusting themes</h3>
-<p>The final step is making a few small changes to the {ggplot2} theme. We start by removing all theme elements using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> and setting the <code>base_family</code> and <code>base_size</code> for the text. Although we don’t have many text elements in our visualisation controlled by the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> functions, this will still affect the <code>tag</code> text. </p>
+<p>The final step is making a few small changes to the {ggplot2} theme. We start by removing all theme elements using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> and setting the <code>base_family</code> and <code>base_size</code> for the text. Although we don’t have many text elements in our visualization controlled by the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> functions, this will still affect the <code>tag</code> text. </p>
 <p>Using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function, we make some further edit to remove the default legend, change the background color to out <code>bg_col</code> variable, and add the grid lines back in with an almost transparent <code>text_col</code> color. The position of the <code>tag</code> text can be set using the <code>plot.tag.position</code> argument to place it in the bottom left of the plot. We also use <code>element_textbox_simple()</code> from {ggtext} to format the text in the <code>tag</code> since it includes the HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags. Within <code>element_textbox_simple()</code>, the <code>maxwidth</code> argument is used to set the width of the textbox, ensuring the only takes up the left hand side of the blank space at the bottom. The bar chart legend will go on the other side. </p>
 <div class="cell">
 <div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_map</span> <span class="op">&lt;-</span> <span class="va">text_map</span> <span class="op">+</span></span>
@@ -895,14 +906,14 @@ Figure&nbsp;12.9: Points representing different time zone locations on a world m
 <img src="time-zones_files/figure-html/fig-timezones-style-map-4-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-style-map-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.10: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left.
+Figure&nbsp;12.12: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left.
 </figcaption></figure>
 </div>
 </div>
 </div>
 </section><section id="joining-plots-with-patchwork" class="level3" data-number="12.4.5"><h3 data-number="12.4.5" class="anchored" data-anchor-id="joining-plots-with-patchwork">
 <span class="header-section-number">12.4.5</span> Joining plots with {patchwork}</h3>
-<p>Finally, we need to join the legend bar chart to our main plot. For this, we’ll use {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>. The {patchwork} package allows you to combine multiple visualisations (including {ggplot2} graphics, base R plots, or {gt} tables) into a single layout. It’s very flexible, and you can add arrange plots easily into simple rows or columns, or create very complex layouts with many nested plots. The {patchwork} package also allows you to add inset plots i.e.&nbsp;a smaller plot placed within a larger plot to provide additional detail.</p>
+<p>Finally, we need to join the legend bar chart to our main plot. For this, we’ll use {patchwork} <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>. The {patchwork} package allows you to combine multiple visualizations (including {ggplot2} graphics, base R plots, or {gt} tables) into a single layout. It’s very flexible, and you can add arrange plots easily into simple rows or columns, or create very complex layouts with many nested plots. The {patchwork} package also allows you to add inset plots i.e.&nbsp;a smaller plot placed within a larger plot to provide additional detail.</p>
 <div id="tip-timezones-patchwork" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -916,7 +927,7 @@ Tip&nbsp;12.5: Arranging plots with {patchwork}
 <p>Although this book doesn’t contain examples of arranging multiple plots side-by-side, {patchwork} makes it very easy to do so. If you have two plots <code>g1</code> and <code>g2</code>, then you can arrange them side-by-side by simply running <code>g1 + g2</code>. More complex layouts can be achieved by specifying a grid of which plots should be placed where. The {patchwork} package also contains additional functions for adding multiplot annotations or titles, consistent themes across all subplots, and defining plot alignment across multiple pages. Read the package documentation at <a href="https://patchwork.data-imaginist.com/index.html">patchwork.data-imaginist.com</a> for examples.</p>
 </div>
 </div>
-<p>In this visualisation, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our <code>styled_map</code> and add the <code>legend_plot</code> on top using the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function. The four positions given in the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is <code>npc</code> (normalized parent coordinates). In this setting the bottom left is <code>(0, 0)</code> and the top right is <code>(1, 1)</code>. This means specifying the <code>left</code> outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. </p>
+<p>In this visualization, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our <code>styled_map</code> and add the <code>legend_plot</code> on top using the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function. The four positions given in the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is <code>npc</code> (normalized parent coordinates). In this setting the bottom left is <code>(0, 0)</code> and the top right is <code>(1, 1)</code>. This means specifying the <code>left</code> outer bound as 0.55 tells {patchwork} to start the left hand side of the inset plot 55% of the way in from the left of the main plot. </p>
 <p>We also remove the added margin from around the edge of the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function and setting all of the margins to zero. Remember that when combining a <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> with a <code>patchwork</code> object, it’s added using the <code>&amp;</code> operator rather than <code>+</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
@@ -928,7 +939,7 @@ Tip&nbsp;12.5: Arranging plots with {patchwork}
 <img src="time-zones_files/figure-html/fig-timezones-final-plot-1.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-final-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.11: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend.
+Figure&nbsp;12.13: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend.
 </figcaption></figure>
 </div>
 </div>
@@ -938,7 +949,7 @@ Figure&nbsp;12.11: Points representing different time zone locations on a world 
 <div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"time-zones.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  height <span class="op">=</span> <span class="fl">0.92</span><span class="op">*</span><span class="fl">5</span></span>
+<span>  height <span class="op">=</span> <span class="fl">0.92</span> <span class="op">*</span> <span class="fl">5</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="reflection" class="level2" data-number="12.5"><h2 data-number="12.5" class="anchored" data-anchor-id="reflection">
@@ -946,10 +957,25 @@ Figure&nbsp;12.11: Points representing different time zone locations on a world 
 <p>What could still be improved about this plot?</p>
 <p>Although the bar chart legend is an improvement on a boring, traditional legend, it could do with some further improvement. For example, it’s not immediately clear what the bar chart shows. With a little bit of time, readers probably put together the number of dots with the height of the bars but it could be more obvious. Adding numbers to the bar chart would also improve readability. Perhaps this could be with a traditional y-axis, or perhaps as more informative labels. For example, instead of a label that reads <code>"Africa"</code>, it could read <code>"Africa (18 time zones)"</code>.</p>
 <p>If we’re talking about improving readability of bar charts, an easy action is to make the bars (and therefore text) horizontal - it’s much easier to read text that’s the right way up!</p>
-<p>Each plot created during the process of developing the original version of this visualisation was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualisation process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="images/time-zones.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
 </figure>
+</div>
+</section><section id="exercises" class="level2" data-number="12.6"><h2 data-number="12.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">12.6</span> Exercises</h2>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Exercises are coming soon!</p>
+</div>
 </div>
 
 
@@ -1117,7 +1143,7 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-Qiu, Yixuan, and authors/contributors of the included software. See file AUTHORS for details. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
 R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
@@ -1194,8 +1220,11 @@ Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principle
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
 Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
 </div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-United States Census Bureau. 2021. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
 United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
