@@ -74,7 +74,7 @@ Let's start by having a quick look at whether or not the number of votes has cha
 
 ```{r}
 #| label: fig-elections-scatterplot
-#| fig-cap: "Bar chart "
+#| fig-cap: "Scatter plot showing the number of candidate votes over time, where it's clear that elections take place every two years and there has been little change over time."
 #| echo: -1
 #| fig-asp: 0.8
 par(mar = c(4.1, 4.1, 2.1, 2.1))
@@ -82,7 +82,7 @@ plot(
   x = house$year,
   y = house$candidatevotes,
   xlab = "",
-  ylab = "Candidate votes"
+  ylab = "Number of candidate votes"
 )
 ```
 
@@ -92,7 +92,7 @@ We might also be interested in how the number of candidate votes varies by party
 
 ```{r}
 #| label: fig-elections-boxplot
-#| fig-cap: "Box plot "
+#| fig-cap: "Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes)."
 #| fig-asp: 1.2
 #| echo: -1
 par(mar = c(4.1, 6.1, 1.1, 1.1))
@@ -172,7 +172,7 @@ We've already seen examples of making area charts in @sec-museums and @sec-r-pkg
 
 ```{r}
 #| label: fig-elections-single-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied."
 #| warning: false
 library(ggplot2)
 ggplot(
@@ -224,7 +224,7 @@ We can now pass the full data into `ggplot()` (rather than just the California s
 
 ```{r}
 #| label: fig-elections-basic-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Faceted area chart arranged in a rectangular grid shaped, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
 #| warning: false
 #| source-line-numbers: "1,10"
 basic_plot <- ggplot(data = plot_data) +
@@ -256,7 +256,7 @@ If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a U
 
 ```{r}
 #| label: fig-elections-geofacet-plot
-#| fig-cap: "Plot"
+#| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
 #| warning: false
 library(geofacet)
 map_plot <- basic_plot +
@@ -306,12 +306,7 @@ col_plot <- map_plot +
 
 ### Text and fonts
 
-{sysfonts}\index{sysfonts}
-{showtext}\index{showtext}
-
-\index{sysfonts!font\_add\_google}
-\index{showtext!showtext\_auto}
-\index{showtext!showtext\_opts}
+As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. For the main font, we'll use the *Roboto* font as we did in @sec-doctors. For the title text, we'll use *Carter One*, a [display font designed by Vernon Adams](https://fonts.google.com/specimen/Carter+One) inspired by fonts used in mid 20th century advertising. It's a bold font which works well for titles of visualizations. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: elections-fonts
@@ -327,18 +322,15 @@ body_font <- "roboto"
 title_font <- "carter"
 ```
 
-
-\index{glue!glue}
-
-As in @sec-time-zones, we'll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. 
+We write text for the title and subtitle, using `glue()` to add HTML styling for colored text as we did in @sec-cats and @sec-lemurs. The colored text serves as a legend (though we'll later also add our own custom legend in addition), and the subtitle text provides information about what the chart shows. As in @sec-time-zones, we'll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. \index{glue!glue}
 
 ```{r}
 #| label: elections-text
-title <- "US House Election Results"
-st <- glue::glue("Areas indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
+title <- "Votes in US House Elections"
+st <- glue::glue("Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
-We also define our `social_caption()` using the function we defined in @sec-cats: \index{social\_caption}
+We also define our `social_caption()` using the function we defined in @sec-cats, which we'll later add as a plot caption: \index{social\_caption}
 
 ```{r}
 #| label: elections-text-2
@@ -349,7 +341,7 @@ social <- social_caption(
 )
 ```
 
-We then pass our title, subtitle, and caption text intp the `labs()` function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the `tag` argument rather than `subtitle`, similar to what we did in @sec-time-zones. \index{ggplot2!labs} 
+We then pass our title, subtitle, and caption text into the `labs()` function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the `tag` argument rather than `subtitle`, similar to what we did in @sec-time-zones. \index{ggplot2!labs} 
 
 ```{r}
 #| label: elections-labs
@@ -361,18 +353,28 @@ text_plot <- col_plot +
   )
 ```
 
-
 ### Adjusting themes
 
-\index{ggplot2!geom\_text} \index{ggplot2!coord\_cartesian}
-\index{ggplot2!aes} \index{ggplot2!alpha}
+We know that the facet labels are too large on are currently dominating the visualization as seen in @fig-elections-geofacet-plot. There are a few solutions to this:
+
+* Make the facet labels much smaller. However, this can make them hard to read and renders the labels somewhat pointless.
+
+* Increase the size of the chart. Here, we're constrained by the physical width of the plot and can't make it wider. Though we could make the plot taller, we're then adding quite a lot of additional space simply for labels. 
+
+* Create our own custom facet labels. 
+
+Here, we're going to go for the third option. Later, we'll use the `theme()` function to remove the default facet labels. For now, let's think about what labels to add. To save space in the plot, the easiest way is to use inset facet labels - positioning the state label inside the area chart. This has the downside of hiding part of the data. However, we can make the text semi-transparent to allow both the state label and the area chart behind to be seen.
+
+We add text labels with `geom_text()`. Though we could simply use the default `plot_data`, we start by filtering the data to consider only one year and party. If we didn't filter the data, multiple labels would be drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other, results in a pretty opaque label. \index{ggplot2!geom\_text} 
+
+The x-coordinate position of the text is set as the mean of the years in the data to automatically position it in the middle of the chart. The y-coordinate position is set to `0.5` i.e. also in the middle of the chart since the `position = "fill"` argument scales the y-axis to be between `0` and `1`. The `alpha()` function is used to control the transparency of the text color. \index{ggplot2!aes} \index{ggplot2!alpha}
 
 ```{r}
-#| label: fig-elections-geofacet-style-1
-#| fig-cap: "Plot"
+#| label: elections-geofacet-style-1
 #| warning: false
 styled_plot_1 <- text_plot +
   geom_text(
+    data = dplyr::filter(plot_data, year == 1976, party == "Other"),
     mapping = aes(
       x = mean(range(year)),
       y = 0.5,
@@ -382,34 +384,34 @@ styled_plot_1 <- text_plot +
     color = alpha(bg_col, 0.5),
     size = 2.5
   ) +
-  coord_cartesian(expand = FALSE)
+  
 ```
 
-\index{ggplot2!theme\_void}
+As we've done in previous chapters we set `expand = FALSE` inside `coord_cartesian()` to remove the additional space around each plot panel. We also use `theme_void()` to remove any additional plot elements since we're aiming for a minimal look and we'll later design a custom legend that gives the reader all the information that would normally be conveyed by the axes labels and title. \index{ggplot2!theme\_void} \index{ggplot2!coord\_cartesian}
 
-\index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!margin}
-\index{ggplot2!element\_blank} \index{ggtext!element\_textbox\_simple}
-\index{ggplot2!unit} \index{ggplot2!rel}
+As in previous chapters we use the `element_rect()` function to set `plot.background` to our pre-defined background color variable. We also adjust the plot margins using `plot.margin`. Note that here we're making the left plot margin very large, as this is where we'll later position our custom legend. We discussed pros and cons of this approach in @sec-lemurs. \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!margin} \index{ggplot2!unit} \index{ggplot2!rel}
+
+We can position the title text to the left of the plot, in the wide margin by choosing negative values for `hjust`. Remember the `0` means left-aligned and `1` means right-aligned. Negative values essentially mean *very left aligned*! This works here because the title is a single line of text, but for multi-line text the text alignment can often look odd. That means that for the subtitle text (which is a short paragraph), we're using `tag` instead of `subtitle` text. The `plot.tag.position` allows us to specify a vectpr of co-ordinates for where we want the text to appear - with negative x-coordinates also placing the text into the widened plot margin. It takes a little bit of trial and error to ensure that the `title` and `tag` text are aligned with each otehr. We again use `element_textbox_simple()` to enable automatic text wrapping for the plot `tag` text, and for the caption to make the icons render correctly. \index{ggtext!element\_textbox\_simple}
+
+We set both the `strip.background` and `strip.text` arguments to `element_blank()` to remove all default facet labels, and use `panel.spacing` to control the amount of space between the facets and move them closer together. \index{ggplot2!element\_blank} 
 
 ```{r}
 #| label: fig-elections-plot-style-2
-#| fig-cap: "Plot"
+#| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. A large blank space appears on the left hand side, where a legend will later be placed."
 #| warning: false
 styled_plot_2 <- styled_plot_1 +
+  coord_cartesian(expand = FALSE) +
   theme_void(base_size = 6, base_family = body_font) +
   theme(
+    # Background elements
     plot.background = element_rect(
       fill = bg_col,
       color = bg_col
     ),
-    panel.background = element_rect(
-      fill = bg_col,
-      color = bg_col
-    ),
     plot.margin = margin(5, 5, 5, 125),
-    plot.title = ggtext::element_textbox_simple(
+    # Text arguments
+    plot.title = element_text(
       hjust = -0.94,
-      halign = -0.94,
       color = text_col,
       face = "bold",
       family = title_font,
@@ -429,10 +431,11 @@ styled_plot_2 <- styled_plot_1 +
       maxwidth = 0.65,
       margin = margin(b = 0, t = 10)
     ),
+    plot.tag.position = c(-0.51, 0.74),
+    # Facet arguments
     strip.background = element_blank(),
     strip.text = element_blank(),
-    panel.spacing = unit(0.05, "lines"),
-    plot.tag.position = c(-0.51, 0.74)
+    panel.spacing = unit(0.05, "lines")
   )
 styled_plot_2
 ```
@@ -440,7 +443,7 @@ styled_plot_2
 
 ### Developing a custom legend
 
-As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer.
+As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer. \index{legends}
 
 We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don't currently have any axes titles or labels. For example, it's not immediately clear what years are covered by the data. This doesn't need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don't rely on color alone as discussed in @sec-lemurs, we'll also add direct labels to identify the *Democratic Party* and *Republican Party* areas on the chart.
 
@@ -451,12 +454,7 @@ Let's start by filtering the data, to select only a single state. It doesn't rea
 ca_data <- dplyr::filter(plot_data, state_po == "CA")
 ```
 
-direct labeling as discusses 
-\index{ggplot2!ggplot} \index{ggplot2!aes}
-\index{ggplot2!geom\_area}
-\index{ggplot2!geom\_text}
-\index{ggplot2!scale\_fill\_manual}
-
+We then reuse the code written for the main plot, passing in the `ca_data` to the `ggplot()` function, then adding the aesthetic mapping and the area chart with `geom_area()`. The colors and custom state (facet) labels are added with `scale_fill_manual()` and `geom_text()` as discussed earlier in this chapter. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_area} \index{ggplot2!geom\_text} \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: elections-ca-plot
@@ -491,7 +489,7 @@ ca_plot <- ggplot(data = ca_data) +
   )
 ```
 
-We then use the `annotate()` function to add: \index{ggplot2!annotate}
+We then use the `annotate()` function to add: \index{ggplot2!annotate} \index{annotations}
 
 * Two labels for the start and end year of the data. To keep these within the bounds of the plot, we left align the start label on the left, and right align the end label on the right. 
 
@@ -551,19 +549,16 @@ p_inset <- ca_plot +
 p_inset
 ```
 
+Our custom legend is now ready to add to @fig-elections-plot-style-2.
+
 ### Joining with {patchwork}
 
-Now, the last step is to join together our custom legend with the main plot. We've already left some blank space on the main plot for the legend to go in, so we'll use the `inset_element()` function from {patchwork} [@patchwork] as we did in @sec-time-zones. \index{patchwork} \index{patchwork!inset\_element}
-
-
-
-
-
-\index{ggplot2!theme} \index{ggplot2!element\_rect}
+Now, the last step is to join together our custom legend with the main plot. We've already left some blank space on the main plot for the legend to go in, so we'll use the `inset_element()` function from {patchwork} [@patchwork] as we did in @sec-time-zones. We use the `left`, `right`, `top`, and `bottom` arguments to choose where the corners of the legend appear in relation to the main plot -  getting these values correct takes some trial and error! Setting `align_to = "full"` allows us to choose the coordinates relative to the full chart area, rather than just the panel area as per the default settings. \index{patchwork} \index{patchwork!inset\_element}
 
 ```{r}
 #| label: fig-combine-plots
-#| fig-cap: "Plot"
+#| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side."
+#| warning: false
 library(patchwork)
 styled_plot_2 + inset_element(
   p = p_inset,
@@ -571,27 +566,17 @@ styled_plot_2 + inset_element(
   bottom = 0.087,
   right = 0.287,
   top = 0.55,
-  align_to = "full",
-  clip = FALSE
-) +
-  theme(
-    plot.background = element_rect(
-      fill = bg_col,
-      color = bg_col
-    ),
-    panel.background = element_rect(
-      fill = bg_col,
-      color = bg_col
-    )
-  )
+  align_to = "full"
+)
 ```
-
 
 ## Reflection
 
-* Other category
+This visualization summarise a large amount of complex information in a way that is fairly intuitive - the colors match recognisable party colors, the grid is arranged in the a shape that is instantly recognisable, and the area charts clearly indicate vote share over time. However, there are a few more improvements that could be made and other elements we may want to consider. 
 
-* prcent
+Though use of state two-letter abbreviations saves space and avoids excessive text, it is more difficult for a reader to easily look up the state they are interested in - especially if they are less familiar with US geography. Perhaps adding some smaller text under the abbreviations, or creating an interactive version that provides state names upon hover, would make it easier. 
+
+The use of area charts to show percentages is intuitive and sensible for this, since vote share is essentially what decides an election. However, it would also be interesting to see the counts of the number of votes - especially since states can have vastly different populations. A small change in percentage for a state with a large population may result in large changes in number of votes, but this wouldn't be seen in our version of this visualization. 
 
 ::: {.content-visible when-format="html"}
 
@@ -607,6 +592,6 @@ Each plot created during the process of developing the original version of this 
 
 * Instead of using California for the custom legend plot, create a plot showing the percentage of *total* votes across all states. Do you need to update the text to explain how to interpret the charts?
 
-* Edit the visualization to show total number of votes rather than the percentage of the vote share. Do you see similar patterns?
+* Edit the visualization to show total number of votes rather than the percentage of the vote share. Do you see similar patterns? How can you choose the position of the facet label for the state in an automated way?
 
 :::
