@@ -180,9 +180,7 @@ ggplot(
 ) +
   geom_area(
     mapping = aes(
-      x = year,
-      y = votes,
-      fill = party
+      x = year, y = votes, fill = party
     ),
     position = "fill"
   )
@@ -205,9 +203,7 @@ plot_data |>
   ggplot() +
   geom_area(
     mapping = aes(
-      x = year,
-      y = votes,
-      fill = party
+      x = year, y = votes, fill = party
     ),
     position = "fill"
   )
@@ -230,9 +226,7 @@ We can now pass the full data into `ggplot()` (rather than just the California s
 basic_plot <- ggplot(data = plot_data) +
   geom_area(
     mapping = aes(
-      x = year,
-      y = votes,
-      fill = party
+      x = year, y = votes, fill = party
     ),
     position = "fill"
   ) +
@@ -367,16 +361,20 @@ Here, we're going to go for the third option. Later, we'll use the `theme()` fun
 
 We add text labels with `geom_text()`. Though we could simply use the default `plot_data`, we start by filtering the data to consider only one year and party. If we didn't filter the data, multiple labels would be drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other, results in a pretty opaque label. \index{ggplot2!geom\_text} 
 
-The x-coordinate position of the text is set as the mean of the years in the data to automatically position it in the middle of the chart. The y-coordinate position is set to `0.5` i.e. also in the middle of the chart since the `position = "fill"` argument scales the y-axis to be between `0` and `1`. The `alpha()` function is used to control the transparency of the text color. \index{ggplot2!aes} \index{ggplot2!alpha}
+The x-coordinate position of the text is set as the mean of the years in the full `plot_data` data to automatically position it in the middle of the chart. The y-coordinate position is set to `0.5` i.e. also in the middle of the chart since the `position = "fill"` argument scales the y-axis to be between `0` and `1`. The `alpha()` function is used to control the transparency of the text color. \index{ggplot2!aes} \index{ggplot2!alpha}
 
 ```{r}
 #| label: elections-geofacet-style-1
 #| warning: false
 styled_plot_1 <- text_plot +
   geom_text(
-    data = dplyr::filter(plot_data, year == 1976, party == "Other"),
+    data = dplyr::filter(
+      plot_data,
+      year == 1976,
+      party == "Other"
+    ),
     mapping = aes(
-      x = mean(range(year)),
+      x = mean(range(plot_data$year)),
       y = 0.5,
       label = state_po
     ),
@@ -410,7 +408,7 @@ styled_plot_2 <- styled_plot_1 +
     plot.margin = margin(5, 5, 5, 125),
     # Text arguments
     plot.title = element_text(
-      hjust = -0.94,
+      hjust = -0.95,
       color = text_col,
       face = "bold",
       family = title_font,
@@ -430,7 +428,7 @@ styled_plot_2 <- styled_plot_1 +
       maxwidth = 0.65,
       margin = margin(b = 0, t = 10)
     ),
-    plot.tag.position = c(-0.51, 0.74),
+    plot.tag.position = c(-0.49, 0.74),
     # Facet arguments
     strip.background = element_blank(),
     strip.text = element_blank(),
@@ -442,7 +440,7 @@ styled_plot_2
 
 ### Developing a custom legend
 
-As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer. \index{legends}
+As we did in @sec-time-zones, we'll design a custom legend. In @sec-time-zones, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a *how to read this chart* explainer. \index{legend}
 
 We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don't currently have any axes titles or labels. For example, it's not immediately clear what years are covered by the data. This doesn't need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don't rely on color alone as discussed in @sec-lemurs, we'll also add direct labels to identify the *Democratic Party* and *Republican Party* areas on the chart.
 
@@ -507,7 +505,7 @@ p_inset <- ca_plot +
   annotate(
     geom = "text",
     x = min(ca_data$year),
-    y = 0.1,
+    y = 0.05,
     label = min(ca_data$year),
     family = body_font,
     color = bg_col,
@@ -517,7 +515,7 @@ p_inset <- ca_plot +
   annotate(
     geom = "text",
     x = max(ca_data$year),
-    y = 0.1,
+    y = 0.05,
     label = max(ca_data$year),
     family = body_font,
     color = bg_col,
@@ -561,9 +559,9 @@ Now, the last step is to join together our custom legend with the main plot. We'
 library(patchwork)
 styled_plot_2 + inset_element(
   p = p_inset,
-  left = 0.027,
+  left = 0.029,
   bottom = 0.087,
-  right = 0.287,
+  right = 0.289,
   top = 0.55,
   align_to = "full"
 )
@@ -588,6 +586,8 @@ Each plot created during the process of developing the original version of this 
 ## Exercises
 
 ::: {.callout-caution}
+
+## Showing aggregated data and counts
 
 * Instead of using California for the custom legend plot, create a plot showing the percentage of *total* votes across all states. Do you need to update the text to explain how to interpret the charts?
 
