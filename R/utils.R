@@ -32,3 +32,14 @@ library(maps)
 library(ragg)
 library(tidytuesdayR)
 
+
+# Get quarto dependencies -------------------------------------------------
+
+get_chapter_deps <- function(file) {
+  deps <- attachment::att_from_qmd(file) |> 
+    sort() |> 
+    stringr::str_flatten(', ') |> 
+    stringr::str_replace_all(", ", "', '") 
+  deps <- paste0("c('", deps, "')")
+  return(deps)
+}
