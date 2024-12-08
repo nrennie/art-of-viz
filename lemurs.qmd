@@ -36,6 +36,7 @@ In this chapter, we'll cover how to load and manipulate images in R using the {m
 
 ```{r}
 #| label: lemurs-pkgs-req
+#| eval: false
 c(
   "cowplot", "dplyr", "ggplot2", "ggtext",
   "glue", "imager", "magick", "systemfonts",
@@ -65,7 +66,14 @@ lemurs <- readr::read_csv("data/lemur_data.csv")
 taxonomy <- readr::read_csv("data/taxonomy.csv")
 ```
 
-The `lemurs` data contains information on individual lemurs, and is the data set we'll mainly focus on in this chapter. The data has `r nrow(lemurs)` rows and `r `ncol(lemurs)`, making it a reasonably large dataset. The columns give information on the `taxon` code identifying the species of lemur, the name and sex of the lemur, the lemurs parents, whether they are still alive, the lemurs age and weight, and many other variables. Many of the columns give duplicated information since they express the same data in different units e.g. the lemur's age is given in five different columns: in days, weeks, months, decimal months, and years.
+The `lemurs` data contains information on individual lemurs, and is the data set we'll mainly focus on in this chapter. The data has `r nrow(lemurs)` rows and `r ncol(lemurs)` columns, making it a reasonably large dataset. The first few rows can be inspected with `head()`:
+
+```{r}
+#| label: lemurs-head
+head(lemurs)
+```
+
+The columns give information on the `taxon` code identifying the species of lemur, the name and sex of the lemur, the lemurs parents, whether they are still alive, the lemurs age and weight, and many other variables. Many of the columns give duplicated information since they express the same data in different units e.g. the lemur's age is given in five different columns: in days, weeks, months, decimal months, and years.
 
 Though there are `r nrow(lemurs)` rows of data, this doesn't mean that there are data on `r nrow(lemurs)` lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e. different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lemurs e.g. if a lemur is still alive, there will be no `age_at_death_y` value. This also means that if we wanted to process the missing data, we'd likely need to start with rule-based approach to decide which values should be *missing* and which ones are unexpectedly missing. 
 
@@ -82,6 +90,7 @@ Let's focus in on the growth curve idea, and look at the relationship between le
 ```{r}
 #| label: fig-lemurs-scatter
 #| fig-cap: "Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
@@ -97,15 +106,14 @@ We know that there are `r nrow(taxonomy)` species of lemur in the data, and, eve
 ```{r}
 #| label: fig-lemurs-boxplot
 #| fig-cap: "Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species."
+#| fig-alt: ""
 #| fig-asp: 1.2
 #| echo: -1
-par(mar = c(3.1, 3.1, 2.1, 2.1))
+par(mar = c(3.1, 3.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 boxplot(
   weight_g ~ taxon,
   data = lemurs,
   horizontal = TRUE,
-  cex.axis = 0.5,
-  cex.names = 0.5,
   las = 1,
   xlab = "Weight",
   ylab = NULL
@@ -116,7 +124,7 @@ boxplot(
 
 Given the variability in weights between species, we may wish to focus in on a single species. Let's keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating @fig-lemurs-scatter for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognizable just by their common name, we'll add an image of the lemur species in the bottom right corner to add more context to the chart.
 
-![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center"}
+![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center" fig-alt=""}
 
 ## Preparing a plot
 
@@ -155,13 +163,15 @@ Starting with the `ggplot()` function, we pass in the subset of our data on red 
 ```{r}
 #| label: fig-lemurs-base-plot
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping."
+#| fig-alt: ""
 #| message: false
 library(ggplot2)
 basic_plot <- ggplot() +
   geom_point(
     data = vrub_lemurs,
     mapping = aes(
-      x = age_at_wt_mo, y = weight_g,
+      x = age_at_wt_mo,
+      y = weight_g,
       color = sex
     )
   )
@@ -173,12 +183,16 @@ Even though the data shown in @fig-lemurs-base-plot is a subset of the full data
 ```{r}
 #| label: fig-lemurs-base-plot-2
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent."
+#| fig-alt: ""
+#| source-line-numbers: "8,10,11"
 basic_plot <- ggplot() +
   geom_point(
     data = vrub_lemurs,
     mapping = aes(
-      x = age_at_wt_mo, y = weight_g,
-      color = sex, shape = sex
+      x = age_at_wt_mo,
+      y = weight_g,
+      color = sex,
+      shape = sex
     ),
     alpha = 0.6,
     size = 0.8
@@ -214,7 +228,7 @@ col_plot <- basic_plot +
 
 We'll use colored text and icons in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we'll remove the legend by setting `legend.position = "none"` inside the `theme()` function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend e.g. color, we could set `guide = "none"` inside `scale_color_manual()`. This would result in a legend for shape only with the shapes shown in black be default. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
 
-### Fonts and text
+### Text and fonts
 
 Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't play nicely with Unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate r load font files available on your local system. 
 
@@ -300,6 +314,7 @@ The title, subtitle, and caption text can then be added to the plot using the `l
 ```{r}
 #| label: fig-lemurs-labels
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text."
+#| fig-alt: ""
 text_plot <- col_plot +
   labs(
     title = title,
@@ -321,6 +336,7 @@ Setting `plot.title.position` and `plot.caption.position` to `"plot"` aligns the
 ```{r}
 #| label: fig-lemurs-style-1
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption."
+#| fig-alt: ""
 theme_plot <- text_plot +
   theme_minimal(base_size = 6, base_family = body_font) +
   theme(
@@ -356,6 +372,7 @@ We're going to add the image to the right hand side of the plot. The approach we
 ```{r}
 #| label: fig-lemurs-margin-1
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text."
+#| fig-alt: ""
 theme_plot +
   theme(
     plot.margin = margin(5, 90, 5, 5)
@@ -375,6 +392,7 @@ We also remove the title by setting `axis.title.y.right` to `element_blank()`. \
 ```{r}
 #| label: fig-lemurs-margin-2
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width."
+#| fig-alt: ""
 styled_plot <- theme_plot +
   scale_y_continuous(sec.axis = dup_axis()) +
   theme(
@@ -414,6 +432,7 @@ We're going to start with the {imager} package and use it to read the image into
 ```{r}
 #| label: fig-lemurs-imager-read
 #| fig-cap: "Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(3.1, 4.1, 2.1, 2.1))
 lemur_img <- imager::load.image("images/lemur.jpg")
@@ -444,6 +463,7 @@ It takes a little bit of trial and error to choose the best values for these arg
 ```{r}
 #| label: fig-lemurs-img-outline
 #| fig-cap: "Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background."
+#| fig-alt: ""
 #| fig-show: hold
 #| echo: -1
 par(mar = c(3.1, 4.1, 2.1, 2.1))
@@ -455,7 +475,25 @@ detect_outline <- imager::px.flood(
 )
 plot(lemur_img)
 imager::highlight(detect_outline)
-lemur_img[detect_outline] <- 0
+```
+
+You can see in @fig-lemurs-img-outline that the lemur's white collar has been classified as part of the background. We can edit the `x`, `y`, and `sigma` arguments to select this part of the image separately:
+
+```{r}
+#| label: lemurs-img-outline-2
+detect_outline_2 <- imager::px.flood(
+  im = lemur_img,
+  x = 430,
+  y = 220,
+  sigma = 0.063
+)
+```
+
+To make it easier to create a transparent background, we turn the areas outside of the selected pixel sets to black. We do this by setting the pixel values to `0` i.e. no color. 
+
+```{r}
+#| label: lemurs-img-outline-3
+lemur_img[detect_outline & !detect_outline_2] <- 0
 ```
 
 We now want to turn the sections of the image that are pure black into transparent sections. The easiest way to do this is through the `image_transparent()` function from {magick}. However, our `lemur_img` image is currently of a format designed to work with {imager}, and won't work out of the box with {magick}. Luckily, the `cimg2magick()` function in the {imager} package converts it to a format that is compatible with {magick}. For some reason, the `cimg2magick()` also causes the image to be flipped horizontally. We can turn it back to the correct orientation using the `image_flop()` function in {magick}. \index{imager!cimg2magick} \index{magick!image\_flop} 
@@ -465,13 +503,14 @@ Note that since the image is always the first argument of the `image_*()` functi
 ```{r}
 #| label: fig-lemurs-img-rmbg
 #| fig-cap: "Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar."
+#| fig-alt: ""
 lemur_nobg <- imager::cimg2magick(lemur_img) |>
   magick::image_flop() |>
   magick::image_transparent("black")
 lemur_nobg
 ```
 
-When you print the image with {magick}, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white *collar* of the lemur has also been removed. It's also a process that requires a lot of trial and error to find the right combination of argument values. 
+When you print the image with {magick}, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white *collar* of the lemur has still been partially removed. It's also a process that requires a lot of trial and error to find the right combination of argument values. 
 
 ### Adding images to plots with {cowplot}
 
@@ -506,6 +545,7 @@ With {cowplot}, we start by using the `ggdraw()` function which sets up a layer 
 ```{r}
 #| label: fig-lemurs-img-plot
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner."
+#| fig-alt: ""
 #| warning: false
 final_plot <- cowplot::ggdraw(styled_plot) +
   cowplot::draw_image(

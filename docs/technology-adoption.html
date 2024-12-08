@@ -380,17 +380,25 @@ window.Quarto = {
 
 
 </header><p>In this chapter we’ll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.</p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"colorblindr"</span>, <span class="st">"dplyr"</span>, <span class="st">"ggforce"</span>, <span class="st">"ggplot2"</span>,</span>
+<span>  <span class="st">"ggtext"</span>, <span class="st">"scales"</span>, <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span>,</span>
+<span>  <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">5.1</span> Data</h2>
 <p>The Cross‐country Historical Adoption of Technology (CHAT) dataset <span class="citation" data-cites="technology_data">(<a href="references.html#ref-technology_data" role="doc-biblioref">Comin and Hobijn 2009</a>)</span> contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing <em>as broad a definition of technology as possible</em> <span class="citation" data-cites="technology_data">(<a href="references.html#ref-technology_data" role="doc-biblioref">Comin and Hobijn 2009</a>)</span>.</p>
 <p>The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), so let’s start by reading in the data using the <code>tidytuesdayR</code> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-07-19"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-07-19"</span><span class="op">)</span></span>
 <span><span class="va">technology</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">technology</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>technology</code> data is reasonably large with 491636 rows and 7 columns.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">technology</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">technology</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 7
   variable label            iso3c  year group category value
@@ -411,11 +419,8 @@ window.Quarto = {
 <span class="header-section-number">5.2.1</span> Data exploration</h3>
 <p>As in other chapters in this book, we’ll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each <code>category</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function:</p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">technology</span><span class="op">$</span><span class="va">category</span><span class="op">)</span>,</span>
-<span>  <span class="co"># make labels smaller so they fit on the page</span></span>
-<span>  cex.axis <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  horiz <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -432,7 +437,7 @@ Figure&nbsp;5.1: Bar chart of number of observations (all years, countries, and 
 </div>
 <p>We have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changed over time, using the <code><a href="https://rdrr.io/r/stats/heatmap.html">heatmap()</a></code> function in base R: </p>
 <div class="cell">
-<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/heatmap.html">heatmap</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/heatmap.html">heatmap</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">technology</span><span class="op">$</span><span class="va">category</span>, <span class="va">technology</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,</span>
 <span>  <span class="co"># prevent re-ordering</span></span>
 <span>  Rowv <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -455,14 +460,13 @@ Figure&nbsp;5.2: Heatmap of number of observations (all countries and variables)
 </div>
 <p>Let’s look into a specific variable in more detail. We need to narrow down the data we want to consider - there are 194 different questions (variables) contained in the data. You can check by running <code>length(unique(technology$label))</code>. One variable we could consider further is the percentage of children who received a measles immunization - indicated by the <code>"pctimmunizmeas"</code> level in the <code>variable</code> column. Let’s create a quick scatter plot of how this percentage has been changing over time: </p>
 <div class="cell">
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pctimmunizmeas_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pctimmunizmeas_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span></span>
 <span>  <span class="va">technology</span>, <span class="va">variable</span> <span class="op">==</span> <span class="st">"pctimmunizmeas"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">pctimmunizmeas_df</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">pctimmunizmeas_df</span><span class="op">$</span><span class="va">value</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  cex <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Percentage of children who received\na measles immunization"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -481,7 +485,7 @@ Figure&nbsp;5.3: Scatter plot of percentage children who received a measles immu
 <p>Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we’ll do here, readers get a <em>Wow, look how much things have changed!</em> message rather than the perhaps less impactful visual of a gradual trend. We can use the <code>filter</code> function from {dplyr} to filter our <code>technology</code> data set to consider only the rows showing data about the percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of <code>countries</code>.</p>
 <p>We no longer need the <code>group</code>, <code>category</code>, <code>variable</code>, or <code>label</code> columns, as these are constant for our data so we can remove these columns using <code>select()</code> from {dplyr}.</p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset of countries to look at further</span></span>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset of countries to look at further</span></span>
 <span><span class="va">countries</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"GBR"</span>, <span class="st">"USA"</span>, <span class="st">"SWE"</span>, <span class="st">"BRA"</span>, <span class="st">"NZL"</span>, <span class="st">"VEN"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># subset data for specific topic, years, and countries</span></span>
@@ -528,7 +532,7 @@ Figure&nbsp;5.4: Initial sketches of a ideas for visualising data for a single c
 <p>We <em>could</em> use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> to try to make a gauge chart natively in {ggplot2}. However, the use of polar coordinates in {ggplot2} often makes it difficult to add elements such as annotations in the position you’d like them to be in. So let’s create a gauge chart a slightly different way! </p>
 <p>The <code>value</code> in the data currently tells us the percentage of children who did have an immunization, we also need to calculate the percentage of children who did not - by subtracting <code>value</code> from 100. We can then pivot the data such that each country has two rows in the data: (i) one row for the <em>did have immunization</em> value in 1980 and 2010, and (ii) one row for the <em>did not have immunization</em> value in 1980 and 2010. We end up with something halfway in between wide and long format data. Let’s also make the <code>YN</code> column (indicating a did/did not have immunization row) into a factor.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">measles_YN</span> <span class="op">&lt;-</span> <span class="va">measles_data</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">measles_YN</span> <span class="op">&lt;-</span> <span class="va">measles_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>no_value <span class="op">=</span> <span class="fl">100</span> <span class="op">-</span> <span class="va">value</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span></span>
 <span>    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">value</span>, <span class="va">no_value</span><span class="op">)</span>,</span>
@@ -543,7 +547,7 @@ Figure&nbsp;5.4: Initial sketches of a ideas for visualising data for a single c
 </div>
 <p>To enable us to work with the percentages more easily, we can convert them into values between 0 and 1 by dividing by 100, and drop the original columns. If you think about creating a stacked bar chart, we need to know the end point of each bar (the maximum y-axis value for each bar). This isn’t the percentage of each group, it’s the cumulative percentage of each group and the ones stacked below it. We use the <code><a href="https://rdrr.io/r/base/cumsum.html">cumsum()</a></code> function to calculate the cumulative sum of the percentages across each year and country: </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">measles_YN</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">measles_YN</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    perc_1980 <span class="op">=</span> <span class="va">`1980`</span> <span class="op">/</span> <span class="fl">100</span>,</span>
 <span>    perc_2010 <span class="op">=</span> <span class="va">`2010`</span> <span class="op">/</span> <span class="fl">100</span></span>
@@ -609,7 +613,7 @@ Tip&nbsp;5.1: Just because you can doesn’t mean you should
 </div>
 <p>Let’s start with the 1980 data. We start off by creating the <code>0</code> values for the minimum in the first stacked bar using <code>rep(0, length(countries))</code> - since we need one <code>0</code> for each country in 1980. We then want to get the <code>ymax_1980</code> values from <code>plot_data</code> except the last one. We therefore use <code>slice_head()</code> to get this subset of the rows (missing the last one in each country). Remember that <code>plot_data</code> is still grouped by <code>iso3c</code>. We then stick these <code>ymax_1980</code> to the <code>0</code> we created and pass them into a new column called <code>ymin_1980</code> using <code>mutate()</code>. The code for the 2010 arc is analogous. </p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ymin_data</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ymin_data</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># start values for 1980 arc</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
@@ -644,7 +648,7 @@ Tip&nbsp;5.2: Older versions of <code>mutate()</code>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gauge_data</span> <span class="op">&lt;-</span> <span class="va">ymin_data</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gauge_data</span> <span class="op">&lt;-</span> <span class="va">ymin_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html">across</a></span><span class="op">(</span></span>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"y"</span>, ignore.case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -674,7 +678,7 @@ Tip&nbsp;5.2: Older versions of <code>mutate()</code>
 <p>We then add two arcs by using <code>geom_arc_bar()</code> twice. We set the <code>x0</code>, <code>y0</code>, <code>r0</code>, and <code>r</code> constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function because they are <em>required</em> aesthetics. We then pass the <code>ymin_*</code> and <code>ymax_*</code> columns in as the <code>start</code> and <code>end</code> aesthetics, and set the <code>fill</code> color based on the <code>YN</code> column. </p>
 <p>We also use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to draw a pair of arcs for each country in a separate facet, choosing to use <code>nrow = 2</code> to give us a nice rectangular 3x2 grid of facets for our six countries. </p>
 <div class="cell">
-<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Outer 2010 arc</span></span>
 <span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
@@ -714,14 +718,14 @@ Figure&nbsp;5.5: Initial plot created using <code>geom_arc_bar()</code> from {gg
 <span class="header-section-number">5.4.1</span> Colors</h3>
 <p>Let’s start by defining some variables for our colors. Here, we define a pink <code>highlight_col</code> which we’ll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it’s the main point we’re trying to communicate. The <code>second_col</code> will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (<code>bg_col</code>) will be a light gray, the <code>second_col</code> will be a medium gray, and the text (<code>text_col</code>) will be black.</p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#990c58"</span></span>
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#990c58"</span></span>
 <span><span class="va">second_col</span> <span class="op">&lt;-</span> <span class="st">"#949398"</span></span>
 <span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#dedede"</span></span>
 <span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Before we add the new colors to our gauge chart, let’s remove the black outline from around the segments - they’re quite thick lines which don’t add anything to the plot. There will be sufficient contrast between the segments with the new colors we’ve chosen. You can remove the outline from the arc by setting <code>color = NA</code> outside of the aesthetic mapping: </p>
 <div class="cell" data-source-line-numbers="9,18">
-<div class="sourceCode" id="cb17" data-source-line-numbers="9,18" data-code-line-numbers="9,18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="9,18" data-code-line-numbers="9,18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggforce</span><span class="fu">::</span><span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -744,7 +748,7 @@ Figure&nbsp;5.5: Initial plot created using <code>geom_arc_bar()</code> from {gg
 </div>
 <p>Now we can apply the colors using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> from {ggplot2}, setting both the color values but also more informative labels for the legend at the same time. </p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">color_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">color_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"no_value"</span><span class="op">)</span>,</span>
 <span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Immunized"</span>, <span class="st">"Not Immunized"</span><span class="op">)</span>,</span>
@@ -765,7 +769,7 @@ Figure&nbsp;5.6: Edited version of the previous plot with colors changed from de
 <p>When choosing colors for a visualization, it’s important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color blindness comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color blindness, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can’t, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable <span class="citation" data-cites="GAcharts">(<a href="references.html#ref-GAcharts" role="doc-biblioref">Government Analysis Function 2021</a>)</span>. </p>
 <p>There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is {colorblindr} <span class="citation" data-cites="colorblindr">(<a href="references.html#ref-colorblindr" role="doc-biblioref">McWhite and Wilke 2024</a>)</span>. The {colorblindr} package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated {ggplot2} functions. At the time of writing, {colorblindr} is not available on CRAN but can be installed from GitHub, using the methods described in <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">colorblindr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/colorblindr/man/cvd_grid.html">cvd_grid</a></span><span class="op">(</span><span class="va">color_plot</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">colorblindr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/colorblindr/man/cvd_grid.html">cvd_grid</a></span><span class="op">(</span><span class="va">color_plot</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-technology-cvd" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-cvd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -782,7 +786,7 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of what our chart look
 <span class="header-section-number">5.4.2</span> Text and fonts</h3>
 <p>As we’ve seen in previous chapters, we can load in Google fonts using the {sysfonts} and {showtext} packages. Here, we’ll keep it clean and minimal by using the <code>"Ubuntu"</code> font for both the title and the body font. </p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Ubuntu"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"ubuntu"</span></span>
 <span><span class="op">)</span></span>
@@ -792,13 +796,13 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of what our chart look
 </div>
 <p>Let’s define some text for the title and subtitle. Here, the title asks the reader a question, encouraging them to think and directing them to what they are looking at in the chart. The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The <code>caption</code> variable identifies the source of the data for this visualization, as well as the chart creator.</p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"What percentage of children are immunized against measles?"</span></span>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"What percentage of children are immunized against measles?"</span></span>
 <span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"The inner pink bar represents the percentage of children who received a measles immunization in 1980, whilst the outer pink bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all six countries."</span></span>
 <span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since the axis labels do not make too much sense for <code>geom_arc_bar()</code> plots, we’ll remove them later when using the <code>theme</code> functions. Instead, we can add our own labels using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to the end of the gauges. To make it easier, we can construct a small <code>data.frame</code> specifically for adding text labels. This includes the <code>x</code>, and <code>y</code> coordinates where the text should be positioned (you can read these off from the graph we already have since we haven’t yet deleted the axis labels), as well as the <code>label</code> that should appear.</p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">0.85</span><span class="op">)</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.1</span><span class="op">)</span>,</span>
 <span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1980</span>, <span class="fl">2010</span><span class="op">)</span></span>
@@ -806,7 +810,7 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of what our chart look
 </div>
 <p>We can then add this text to the existing plot by adding a layer with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, noting that we need to specify the <code>data</code> argument as using the text <code>data.frame</code> we just created. We also need to specify the font family and size directly within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, and can add the title and subtitle text created earlier using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from {ggplot2}.</p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">text_df</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
@@ -835,7 +839,7 @@ Figure&nbsp;5.8: Previous plot with additional labels indicating the year on eac
 <p>We’ll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>. We can use the <code>base_family</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to set the font family that will be used by default for any non-geom text elements that remain.</p>
 <p>You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> which forces a 1:1 aspect ratio on the plot panel.</p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">8.5</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span></span>
 <span><span class="va">theme_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -866,7 +870,7 @@ Figure&nbsp;5.9: Edited version of previous plot with fixed coordinate system to
 </ul>
 <p></p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
@@ -937,7 +941,7 @@ Tip&nbsp;5.3
 </ul>
 <p>So let’s remove the legend, by setting <code>legend.position = "none"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-technology-style-3" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -952,7 +956,7 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 </div>
 <p>Then save it with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"technology-adoption.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.7</span> <span class="op">*</span> <span class="fl">5</span></span>
@@ -967,22 +971,10 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 <li><p>Although a full, traditional legend is may be unnecessary here, the addition of some colored text may add clarification that the pink area is what represents that data. We’ll look at using colored text instead of a legend in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</p></li>
 </ul></section><section id="exercises" class="level2" data-number="5.6"><h2 data-number="5.6" class="anchored" data-anchor-id="exercises">
 <span class="header-section-number">5.6</span> Exercises</h2>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Redesigning and rescaling charts
-</div>
-</div>
-<div class="callout-body-container callout-body">
 <ul>
 <li><p>Redesign this visualization using a bar chart instead of a gauge chart, and add labels to show the percentage values directly on the chart.</p></li>
 <li><p>Do you need to change the aspect ratio or coordinate system to improve the layout?</p></li>
 </ul>
-</div>
-</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">

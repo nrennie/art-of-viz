@@ -37,6 +37,7 @@ In this chapter we'll learn how to identify open data sources, make maps with {g
 
 ```{r}
 #| label: doctors-pkgs-req
+#| eval: false
 c(
   "dplyr", "ggplot2", "ggtext", "MetBrewer",
   "readr", "showtext", "sysfonts"
@@ -46,16 +47,6 @@ c(
 ## Data 
 
 We'll visualize data on *Medical doctors per 1,000 people* using the dataset from the Our World in Data website ([ourworldindata.org](https://ourworldindata.org/)) [@doctors_data]. The aim of Our World in Data, according to their website, is to *publish the research and data to make progress against the world’s largest problems*. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you're ever looking for inspiration.\index{Our World in Data}
-
-::: {#tip-doctors-open-data .callout-tip}
-
-## Finding sources of data
-
-There's often a *Bring Your Own Data* week each year of TidyTuesday\index{TidyTuesday} [@tidytuesday], where participants are encouraged to source their own data. Some use their own data - visualising how many times they've gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?
-
-There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine ([datasetsearch.research.google.com](https://datasetsearch.research.google.com/)) might also help you to identify data you're interested in.
-
-:::
 
  You can either download the CSV file from [ourworldindata.org/grapher/physicians-per-1000-people](https://ourworldindata.org/grapher/physicians-per-1000-people) manually or you can do as we did in @sec-turbines, and download it directly into R using the URL. Simply pass the URL into the `read_csv()` function from {readr} (or `read.csv()` from base R if you prefer). As in @sec-turbines, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. \index{readr!read\_csv} \index{utils!read.csv}
 
@@ -103,6 +94,16 @@ You may choose to save a copy of `doctors` as a CSV file for later use by using 
 
 :::
 
+::: {#tip-doctors-open-data .callout-tip}
+
+## Finding sources of data
+
+There's often a *Bring Your Own Data* week each year of TidyTuesday\index{TidyTuesday} [@tidytuesday], where participants are encouraged to source their own data. Some use their own data - visualising how many times they've gone for a run over the past year, or recreating GitHub contributions graphs. Others choose to find and visualise other sources of data. So where do you find publicly available data?
+
+There are many open sources of data, covering a wide range of topics, time frames, and regions across the world. Some government organisations have data portals, some companies have APIs you can access, some academic papers have accompanying data, or the Google dataset search engine ([datasetsearch.research.google.com](https://datasetsearch.research.google.com/)) might also help you to identify data you're interested in.
+
+:::
+
 ## Exploratory work
 
 Let's start by exploring the data to see if there are interesting patterns that can be visualized. 
@@ -121,6 +122,7 @@ Often when there's a time component to data, one of the most obvious patterns to
 ```{r}
 #| label: fig-doctors-base-plot
 #| fig-cap: "Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1))
 plot(
@@ -137,7 +139,7 @@ There seems to be a general increasing trend between 1960 and 2020. The other im
 
 The most common approach to visualising spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it's very common to color the country based on the value of the variable. These are often termed *choropleth maps*.\index{choropleth map}
 
-![Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right](images/sketch-doctors.png){#fig-doctors-sketch fig-align="center"}
+![Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right](images/sketch-doctors.png){#fig-doctors-sketch fig-align="center" fig-alt=""}
 
 At this point, it's also often a good time to start thinking about the orientation and aspect ratio of the plot you'll create. This will depend a lot of where the plot is going to end up - for example, plots in a single column academic article will typically be landscape graphs. The choice of orientation and aspect ratio can also affect how clearly your data is displayed - choosing a very wide plot for time series data can stretch the series and obliterate any appearance of trend. With maps, you're a little bit more constrained because there is already an underlying aspect ratio in the plot you're creating. For this map, a landscape orientation with a 6x4 aspect ratio should work reasonably well. \index{aspect ratio} \index{orientation}
 
@@ -242,6 +244,7 @@ Note: you could also use `geom_polygon()` to plot `map_data` instead of `geom_ma
 ```{r}
 #| label: fig-doctors-basic-plot-1
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched."
+#| fig-alt: ""
 basic_plot <- ggplot(
   data = map_data,
   mapping = aes(
@@ -287,6 +290,7 @@ These colors can then be passed into `scale_fill_gradientn()` from {ggplot2}\ind
 ```{r}
 #| label: fig-doctors-style-plot-1
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme."
+#| fig-alt: ""
 col_plot <- basic_plot +
   scale_fill_gradientn(
     colors = col_palette,
@@ -303,16 +307,12 @@ As in previous chapters, fonts can be defined using the {sysfonts}\index{sysfont
 
 ```{r}
 #| label: doctors-font
-sysfonts::font_add_google(
-  name = "Roboto", family = "roboto"
-)
-sysfonts::font_add_google(
-  name = "Roboto Slab", family = "roboto_slab"
-)
+sysfonts::font_add_google(name = "Roboto")
+sysfonts::font_add_google(name = "Roboto Slab")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-body_font <- "roboto"
-title_font <- "roboto_slab"
+body_font <- "Roboto"
+title_font <- "Roboto Slab"
 ```
 
 Now, we can define some text for the title, subtitle, and caption. As in previous chapters, we'll be using {ggtext} for formatting which means we can use markdown syntax to add bold font and line breaks.
@@ -362,7 +362,7 @@ We also set the `plot.title`, `plot.subtitle`, and `plot.caption` to use `elemen
 ```{r}
 #| label: fig-doctors-style-plot-3
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together."
-library(ggtext)
+#| fig-alt: ""
 text_plot +
   theme_void(base_size = 8, base_family = body_font) +
   theme(
@@ -373,14 +373,14 @@ text_plot +
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = element_textbox_simple(
+    plot.title = ggtext::element_textbox_simple(
       color = text_col,
       family = title_font
     ),
-    plot.subtitle = element_textbox_simple(
+    plot.subtitle = ggtext::element_textbox_simple(
       color = text_col
     ),
-    plot.caption = element_textbox_simple(
+    plot.caption = ggtext::element_textbox_simple(
       hjust = 0,
       color = text_col
     )
@@ -407,6 +407,7 @@ Then we can use `facet_wrap()` and facet across the `label` column. Since there'
 ```{r}
 #| label: fig-doctors-style-plot-4
 #| fig-cap: "Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background."
+#| fig-alt: ""
 styled_plot <- ggplot(
   data = map_data,
   mapping = aes(
@@ -442,16 +443,16 @@ styled_plot <- ggplot(
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = element_textbox_simple(
+    plot.title = ggtext::element_textbox_simple(
       color = text_col,
       family = title_font,
       lineheight = 0.5
     ),
-    plot.subtitle = element_textbox_simple(
+    plot.subtitle = ggtext::element_textbox_simple(
       color = text_col,
       lineheight = 0.5
     ),
-    plot.caption = element_textbox_simple(
+    plot.caption = ggtext::element_textbox_simple(
       hjust = 0,
       color = text_col,
       lineheight = 0.5
@@ -486,21 +487,21 @@ styled_plot2 <- styled_plot +
     # move and format the tag (subtitle) text
     plot.margin = margin(0, 0, 5, 0),
     plot.tag.position = c(0.015, 0.8),
-    plot.tag = element_textbox_simple(
+    plot.tag = ggtext::element_textbox_simple(
       color = text_col,
       lineheight = 0.6,
       hjust = 0,
       maxwidth = 0.98
     ),
     # add margin for caption
-    plot.caption = element_textbox_simple(
+    plot.caption = ggtext::element_textbox_simple(
       hjust = 0,
       color = text_col,
       margin = margin(l = 5),
       lineheight = 0.6
     ),
     # change title text color
-    strip.text = element_textbox_simple(
+    strip.text = ggtext::element_textbox_simple(
       color = bg_col,
       family = title_font,
       margin = margin(7, 5, 7, 5),
@@ -531,6 +532,7 @@ The size of the legend is controlled through the `legend.key.width` and `legend.
 ```{r}
 #| label: fig-doctors-style-plot-5
 #| fig-cap: "Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page."
+#| fig-alt: ""
 styled_plot2 +
   theme(
     # legend text
@@ -575,7 +577,7 @@ When the data was processed, the choice was made to plot a map showing the value
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/doctors.gif){fig-align="center"}
+![](images/doctors.gif){fig-align="center" fig-alt=""}
 
 :::
 

@@ -20,6 +20,7 @@ In this chapter we'll discover how to create gauge charts, a type of chart not n
 
 ```{r}
 #| label: technology-pkgs-req
+#| eval: false
 c(
   "colorblindr", "dplyr", "ggforce", "ggplot2",
   "ggtext", "scales", "showtext", "sysfonts",
@@ -69,13 +70,11 @@ As in other chapters in this book, we'll start with some basic exploratory plots
 ```{r}
 #| label: fig-technology-barplot
 #| fig-cap: "Bar chart of number of observations (all years, countries, and variables) in each category."
+#| fig-alt: ""
 #| echo: -1
-par(mar = c(2.1, 8.1, 1.1, 1.1))
+par(mar = c(2.1, 8.1, 1.1, 1.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(technology$category),
-  # make labels smaller so they fit on the page
-  cex.axis = 0.5,
-  cex.names = 0.5,
   las = 1,
   horiz = TRUE
 )
@@ -86,6 +85,7 @@ We have lots of observations relating to variables in the agriculture and transp
 ```{r}
 #| label: fig-technology-heatmap
 #| fig-cap: "Heatmap of number of observations (all countries and variables) in each category, each year. An increasing number of observations are seen in recent years."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
@@ -105,8 +105,9 @@ Let's look into a specific variable in more detail. We need to narrow down the d
 ```{r}
 #| label: fig-technology-scatterplot
 #| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
+#| fig-alt: ""
 #| echo: -1
-par(mar = c(3.1, 2.1, 2.1, 2.1))
+par(mar = c(3.1, 2.1, 2.1, 2.1), cex = 0.5)
 pctimmunizmeas_df <- subset(
   technology, variable == "pctimmunizmeas"
 )
@@ -114,8 +115,7 @@ plot(
   x = pctimmunizmeas_df$year,
   y = pctimmunizmeas_df$value,
   xlab = "", ylab = "",
-  cex = 0.5,
-  main = "Percentage of children who received\na measles immunization"
+  main = "Percentage of children who received a measles immunization"
 )
 ```
 
@@ -153,7 +153,7 @@ At the time of writing, there isn't a built-in function in {ggplot2} to create g
 
 You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts. 
 
-![Initial sketches of a ideas for visualising data for a single country](images/sketch-technology.png){#fig-technology-sketch fig-align="center"}
+![Initial sketches of a ideas for visualising data for a single country.](images/sketch-technology.png){#fig-technology-sketch fig-align="center" fig-alt=""}
 
 Gauge charts often also include a dial (or needle) to highlight the value further, but that gets a little bit complicated when we have multiple gauges. So let's leave that for now. \index{gauge chart}
 
@@ -296,6 +296,7 @@ We also use `facet_wrap()` to draw a pair of arcs for each country in a separate
 ```{r}
 #| label: fig-technology-basic-plot-1
 #| fig-cap: "Initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries."
+#| fig-alt: ""
 #| warning: false
 library(ggplot2)
 basic_plot <- ggplot(data = gauge_data) +
@@ -331,9 +332,9 @@ Let's start by defining some variables for our colors. Here, we define a pink `h
 
 ```{r}
 #| label: technology-colors
-highlight_col <- "#990c58"
+highlight_col <- "#990C58"
 second_col <- "#949398"
-bg_col <- "#dedede"
+bg_col <- "#DEDEDE"
 text_col <- "black"
 ```
 
@@ -342,6 +343,7 @@ Before we add the new colors to our gauge chart, let's remove the black outline 
 ```{r}
 #| label: fig-technology-basic-plot-2
 #| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color removed."
+#| fig-alt: ""
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
   ggforce::geom_arc_bar(
@@ -370,6 +372,7 @@ Now we can apply the colors using `scale_fill_manual()` from {ggplot2}, setting 
 ```{r}
 #| label: fig-technology-color-plot
 #| fig-cap: "Edited version of the previous plot with colors changed from defaults to gray and dark pink."
+#| fig-alt: ""
 color_plot <- basic_plot +
   scale_fill_manual(
     breaks = c("value", "no_value"),
@@ -386,10 +389,12 @@ There are several packages in R that can be used to investigate the accessibilit
 ```{r}
 #| label: fig-technology-cvd
 #| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types of color vision deficiency."
+#| fig-alt: ""
+#| fig-dpi: 250
 #| echo: 3
-par(cex = 0.5)
-theme_set(theme_void(base_size = 2))
+theme_set(theme_gray(base_size = 3))
 colorblindr::cvd_grid(color_plot)
+theme_set(theme_gray(base_size = 11))
 ```
 
 Note that the default color palette in {ggplot2} does not show any differentiation when viewed in grayscale, so it's important to think about which colors you're using for any chart.
@@ -400,20 +405,16 @@ As we've seen in previous chapters, we can load in Google fonts using the {sysfo
 
 ```{r}
 #| label: technology-fonts
-sysfonts::font_add_google(
-  name = "Ubuntu",
-  family = "ubuntu"
-)
+sysfonts::font_add_google(name = "Ubuntu")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-body_font <- "ubuntu"
+body_font <- "Ubuntu"
 ```
 
 Let's define some text for the title and subtitle. Here, the title asks the reader a question, encouraging them to think and directing them to what they are looking at in the chart. The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualization, as well as the chart creator.
 
 ```{r}
 #| label: technology-text
-#| code-overflow: wrap
 title <- "What percentage of children are immunized against measles?"
 subtitle <- "The inner pink bar represents the percentage of children who received a measles immunization in 1980, whilst the outer pink bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all six countries."
 caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
@@ -435,6 +436,7 @@ We can then add this text to the existing plot by adding a layer with `geom_text
 ```{r}
 #| label: fig-technology-text
 #| fig-cap: "Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle."
+#| fig-alt: ""
 text_plot <- color_plot +
   geom_text(
     data = text_df,
@@ -459,6 +461,7 @@ You may have noticed that the current gauge plots look a bit squashed and not ex
 ```{r}
 #| label: fig-technology-style-1
 #| fig-cap: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed."
+#| fig-alt: ""
 theme_plot <- text_plot +
   coord_fixed() +
   theme_void(base_size = 8.5, base_family = body_font)
@@ -485,6 +488,7 @@ Let's fix the first two of these issues by editing the `theme()` elements:
 ```{r}
 #| label: fig-technology-style-2
 #| fig-cap: "Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title."
+#| fig-alt: ""
 styled_plot <- theme_plot +
   theme(
     plot.background = element_rect(
@@ -516,25 +520,31 @@ styled_plot <- theme_plot +
 styled_plot
 ```
 
-We're almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it's leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it. 
-
-### Alternatives to a traditional legend
-
-Although we could simply increase the height of the plot to stop the year labels from becoming squashed, an alternative approach is to address the source of the issue and edit the legend.
+We're almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it's leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it. The highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot e.g. when using `coord_fixed()` or spatial co-ordinates as we'll see in @sec-time-zones, since the wrong choice can result in cropped plots or extra white space. \index{ggplot2!coord\_fixed} 
 
 ::: {#tip-technology-aspect .callout-tip}
 
-The highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot e.g. when using `coord_fixed()` or spatial co-ordinates as we'll see in @sec-time-zones, since the wrong choice can result in cropped plots or extra white space. \index{ggplot2!coord\_fixed}
+## Choosing an aspect ratio
 
 Rather than thinking about width and height, it can often be more helpful to think about aspect ratio and width (or height). This often makes the process of increasing the image size a little bit easier. \index{aspect ratio}
 
-* **Choosing an aspect ratio**: there are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you're creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.
+There are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you're creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.
 
-* **Choosing a width**: often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images e.g. low and high resolution.
+:::
+
+::: {#tip-technology-width .callout-tip}
+
+## Choosing a width 
+
+Often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images e.g. low and high resolution.
 
 Changing the width (or resolution) of a plot, often also means changing other aspects e.g. the font sizes, which don't necessarily rescale larger. By setting a `base_size` and using `rel()` to edit individual font size elements, you minimize the amount of work. Viewing the plot in at desired size and resolution also makes it easier to set the sizes correctly. See @sec-camcorder for more information.
 
 :::
+
+### Alternatives to a traditional legend
+
+Although we could simply increase the height of the plot to stop the year labels from becoming squashed, an alternative approach is to address the source of the issue and edit the legend.
 
 We have a few different options for dealing with the legend. Some options might be:
 
@@ -550,6 +560,7 @@ So let's remove the legend, by setting `legend.position = "none"` inside `theme(
 ```{r}
 #| label: fig-technology-style-3
 #| fig-cap: "Final styling of gauge chart to remove the legend, providing more space for the chart area."
+#| fig-alt: ""
 styled_plot +
   theme(legend.position = "none")
 ```

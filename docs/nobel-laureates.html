@@ -378,6 +378,13 @@ window.Quarto = {
 
 
 </header><p>In this chapter, we’ll learn how to access data through an API, create custom text layouts, and build parameterized plot functions.</p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"lubridate"</span>,</span>
+<span>  <span class="st">"readr"</span>, <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="data" class="level2" data-number="8.1"><h2 data-number="8.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">8.1</span> Data</h2>
 <p>In this chapter, we’re going to explore Nobel Prize Laureates. Since 1901, the Nobel Prizes have been awarded to those who, during the preceding year, have conferred the greatest benefit to humankind. Awards are granted in the fields of Physics, Chemistry, Physiology or Medicine, Literature, Peace, and (since 1969) Economic Sciences.</p>
@@ -410,7 +417,7 @@ Tip&nbsp;8.1: Choosing an API Limit
 <p>We construct a URL in the following format: the base API URL, followed by the endpoint, followed by a <code>?</code>, then a list of query parameters separated by <code>&amp;</code>. Here, the base URL is <code>http://api.nobelprize.org/2.1/</code> and the endpoint is <code>laureates</code>. You can either (1) build the URL as one long character string, or (2) construct the strings separately and stick them together with <code>glue()</code> as we’ve done here. If you are making multiple, slightly different, API calls then the second approach is more appropriate since you can re-use the base URL.</p>
 <p>Once we’ve constructed the URL, we simply pass it into <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> (or <code>read_csv()</code> from {readr} if you prefer) and save the output to a variable - <code>nobel_physics</code> in this case. </p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">api_url</span> <span class="op">&lt;-</span> <span class="st">"http://api.nobelprize.org/2.1/laureates"</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">api_url</span> <span class="op">&lt;-</span> <span class="st">"http://api.nobelprize.org/2.1/laureates"</span></span>
 <span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span></span>
 <span>  <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
 <span>    <span class="st">"{api_url}?limit=250&amp;nobelPrizeCategory=phy&amp;format=csv"</span></span>
@@ -419,7 +426,7 @@ Tip&nbsp;8.1: Choosing an API Limit
 </div>
 <p>We want to avoid querying the API multiple times if we don’t need to. Once we’ve downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> option to save the data to a file called <code>nobel_physics.csv</code> in an existing folder called <code>data</code> - you might choose to save it somewhere slightly different! </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
 <span>  <span class="va">nobel_physics</span>,</span>
 <span>  <span class="st">"data/nobel_physics.csv"</span>,</span>
 <span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -427,11 +434,11 @@ Tip&nbsp;8.1: Choosing an API Limit
 </div>
 <p>We can keep using the existing <code>nobel_physics</code> object, or we can read it back in from the CSV file using <code>read_csv()</code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/nobel_physics.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/nobel_physics.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s have a quick look at the data:</p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 13
      id name         gender birthdate  birthplace deathdate 
@@ -456,7 +463,7 @@ Tip&nbsp;8.1: Choosing an API Limit
 <span class="header-section-number">8.2.1</span> Data exploration</h3>
 <p>Let’s start by exploring the relationship between year of birth and year of award. We would expect that the people born earlier in time, are also the people awarded Nobel Prizes earlier in time, and a scatter plot confirms this:</p>
 <div class="cell">
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">birthdate</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Birth date"</span>,</span>
@@ -475,7 +482,7 @@ Figure&nbsp;8.1: A scatter plot of awardee birth date against year of award, sho
 </div>
 <p>We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the <code>year()</code> function from {lubridate} to convert the <code>birthdate</code> into a year and subtract this from the award <code>year</code> to get an approximate age. Then plot this against the award year: </p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">award_age</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">year</span> <span class="op">-</span></span>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">award_age</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">year</span> <span class="op">-</span></span>
 <span>  <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">birthdate</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">year</span>,</span>
@@ -496,7 +503,7 @@ Figure&nbsp;8.2: A scatter plot showing the age of Nobel Prize awardees over tim
 </div>
 <p>It looks like the age of awardees might be increasing slightly - this could be interesting to explore further. But let’s also look at the gender split for Nobel Laureates in Physics. We can calculate the number of <code>"male"</code> and <code>"female"</code> values in the <code>gender</code> column using the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function, then plot it using <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">gender</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -535,11 +542,11 @@ Figure&nbsp;8.4: Initial sketch of text arranged perpendicularly around a circle
 <span class="header-section-number">8.3</span> Preparing a plot</h2>
 <p>So let’s start making our custom visualization! We start by defining a variable for the award category we’re interested in - Physics. This first step might seem a little odd since we’ve only queried the API for physics data anyway, but when you get to the last section of this chapter, it’ll make more sense!</p>
 <div class="cell">
-<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_category</span> <span class="op">&lt;-</span> <span class="st">"Physics"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_category</span> <span class="op">&lt;-</span> <span class="st">"Physics"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>It’s always worth double checking that we do actually only have the data we expect… </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">category</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -559,7 +566,7 @@ Figure&nbsp;8.5: A bar chart of the number of <em>Physics</em> laureates (with a
 <span class="header-section-number">8.3.1</span> Data wrangling</h3>
 <p>We’ll start by using <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> from {dplyr} to filter out any non-Physics entries, and then selecting only the columns we need for our plot: <code>name</code>, <code>gender</code>, and <code>year</code>. The data is currently arranged alphabetically based on <code>name</code>, so we’ll use the <code>arrange()</code> function to sort by year. </p>
 <div class="cell">
-<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">physics_data</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">physics_data</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">==</span> <span class="va">nobel_category</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">gender</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -578,7 +585,7 @@ Figure&nbsp;8.5: A bar chart of the number of <em>Physics</em> laureates (with a
 </ul>
 <p>Let’s start by defining a variable for the radius. It doesn’t really matter what value you choose at this point since everything else can be re-scaled around a different radius.</p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="fig-nobel-sketch-theta" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-sketch-theta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -599,7 +606,7 @@ y &amp; = r sin(\theta)
 <p>The angle of the text is a little bit more tricky. We want the text to be positioned perpendicular to the circle i.e.&nbsp;the angle of the text is different for each name. We can use the value of <code>theta</code> to calculate the angle of the text.</p>
 <p>When we later pass the angle value into {ggplot2} functions for plotting, it’s expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in <code>angle = 90</code> rather than <code>angle = pi/2</code>. So we need to transform <code>theta</code> to degrees by dividing by <span class="math inline">\(2\pi\)</span> and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. </p>
 <div class="cell">
-<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">physics_data</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">physics_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span></span>
 <span>      from <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">4</span>,</span>
@@ -613,7 +620,7 @@ y &amp; = r sin(\theta)
 </div>
 <p>Let’s have a quick look at the data:</p>
 <div class="cell">
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 7
   name                  gender  year theta     x     y angle
@@ -632,7 +639,7 @@ y &amp; = r sin(\theta)
 <p>Constructing the base plot is reasonably straightforward - we’ve done the hard work in defining the x values, y values, the angles already. Since our plot is a visualization of text data, we’ll use <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to add the text. All we have to do is tell {ggplot2} what to put where! </p>
 <p>We pass <code>plot_data</code> into the <code>data</code> argument, and then set the aesthetic mapping using <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. The mappings are as you would expect: <code>x</code> goes on the x-axis, <code>y</code> goes on the y-axis, the <code>label</code> comes from the <code>name</code> column, the text <code>angle</code> is defined by the <code>angle</code> column we created, and the <code>color</code> is based on the values in the <code>gender</code> column. This mapping could be passed into either <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> or directly into <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> as we’ve done here. Since we’ll only be using one geometry for this plot, it won’t make a difference! </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">plot_data</span>,</span>
@@ -667,7 +674,7 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 </ul>
 <p>Both fonts are provided through Google Fonts so we’ll use <code>font_add_google()</code> from {sysfonts} to load them into R. We also run <code>showtext_auto()</code> and <code>showtext_opts(dpi = 300)</code> to use {showtext} for rendering text on plots at our desired resolution. </p>
 <div class="cell">
-<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Passion One"</span>, family <span class="op">=</span> <span class="st">"Passion"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
@@ -680,7 +687,7 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 </div>
 <p>Now, let’s remake our <code>basic_plot</code> - this time also setting the font <code>famly</code> to <code>body_font</code>. We’ll also right align the text using <code>hjust = 1</code> to make the text appear around the outer edge of the circle. The text also needs to be a bit smaller to avoid overlapping between names positioned next to each other. </p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
@@ -710,13 +717,13 @@ Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semi
 <p>As we’ve done in all previous chapters, we’ll define some variables for the colors we’ll be using in the visualization. Here, we’ll define a background color, a primary color, and a secondary color.</p>
 <p>The primary color will be used to highlight the female awardees, as well as the title and caption text. The secondary color will be used to color the male awardee names. The primary color should be bolder or brighter than the secondary color - meaning a few pops of color on the chart will stand out and highlight the female awardees.</p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray95"</span></span>
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray95"</span></span>
 <span><span class="va">primary_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span>
 <span><span class="va">secondary_col</span> <span class="op">&lt;-</span> <span class="st">"gray75"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can apply these colors to the text showing the names using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code> where we manually specify which color maps to which value in the <code>gender</code> column: </p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
 <span>      <span class="st">"male"</span> <span class="op">=</span> <span class="va">secondary_col</span>,</span>
@@ -729,7 +736,7 @@ Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semi
 <p>Rather than adding a title and subtitle at the top of the plot, we’ll add them in the gap in the right hand side of the circle. We’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function from {ggplot2} to add the text. Remember that for <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code>, we need to start by specifying the type of geometry we’re annotating - in this case, <code>"text"</code>. </p>
 <p>We’ll add two separate annotations: one for the title (<em>Nobel Prize Laureates</em>) and for a subtitle indicating the award category (<em>Physics</em>). The title and subtitle should be right-aligned, so we set the x-coordinate for each annotation to be equal to 10 and set <code>hjust = 1</code>. The title is vertically aligned with the center of the circle (at <code>y = 0</code>), and the subtitle slightly below it at <code>y = -1</code>. The font family is adjusted to either the <code>body_font</code> or <code>title_font</code> using the <code>family</code> argument, and the text <code>size</code> and <code>color</code> is also adjusted.</p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"text"</span>,</span>
 <span>    x <span class="op">=</span> <span class="fl">10</span>, y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>    label <span class="op">=</span> <span class="st">"Nobel Prize Laureates"</span>,</span>
@@ -761,7 +768,7 @@ Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-sh
 <p>We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the <code>social_caption()</code> function we defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. We make both the icons and text the same color - <code>primary_col</code>. We can pass this into the <code>source_caption()</code> function defined in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
 <p>We’ll later use {ggtext} again to apply Markdown formatting to the caption, and so we add <code>**</code> to make the words <strong>Data</strong> and <strong>Graphic</strong> in bold font. The HTML line break <code>&lt;br&gt;</code> separates the data source text and the social media caption onto two separate lines. We can join the data source text with the social media caption into one character string using the <code><a href="https://rdrr.io/r/base/paste.html">paste0()</a></code> function. </p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">primary_col</span>,</span>
 <span>  font_color <span class="op">=</span> <span class="va">primary_col</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
@@ -774,7 +781,7 @@ Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-sh
 </div>
 <p>We then add this caption to our existing plot using the <code>caption</code> argument in the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function: </p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">annotated_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">annotated_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="va">cap</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="adjusting-scales-and-themes" class="level3" data-number="8.4.4"><h3 data-number="8.4.4" class="anchored" data-anchor-id="adjusting-scales-and-themes">
@@ -782,7 +789,7 @@ Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-sh
 <p>At the moment, the text isn’t arranged in a circle as such - it’s taking on more of an oval shape. To make sure it is displayed in a circle, we can use <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to make sure that one unit on the x-axis is equal to one unit on the y-axis.</p>
 <p>The limits of the plot also need to be extended. The scales are currently based on the x- and y- coordinates we passed in (the text at the inner edge of the circle) which means the text runs of the page. We can do this by extending the limits using <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous()</a></code>. We can extend the right hand side of the x-axis a little bit further to accommodate the added annotations. </p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">9</span>, <span class="fl">12</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7.5</span>, <span class="fl">7.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -807,7 +814,7 @@ Figure&nbsp;8.10: The names of Nobel Prize in Physics awardees arranged around a
 <li>using <code>element_textbox_simple()</code> from {ggtext} to format the HTML tags that add the social media icons in the caption</li>
 </ul>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
@@ -884,7 +891,7 @@ Tip&nbsp;8.3: Using fonts in functions
 </div>
 <p>Now we can stitch together all the code we’ve used in this chapter, into the function body:</p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">category_plot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">category_plot</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">nobel_category</span>,</span>
 <span>    <span class="va">nobel_data</span>,</span>
 <span>    <span class="va">r</span> <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -981,7 +988,7 @@ Tip&nbsp;8.3: Using fonts in functions
 </div>
 <p>Now let’s test if our function works with a completely different set of data! Let’s use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use <code>nobelPrizeCategory=pea</code> (<code>pea</code> for <em>peace</em>) and then save the output to a CSV file, just as we did before for the physics data. </p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_peace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_peace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span></span>
 <span>  <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
 <span>    <span class="st">"{api_url}?limit=250&amp;nobelPrizeCategory=pea&amp;format=csv"</span></span>
 <span>  <span class="op">)</span></span>
@@ -994,11 +1001,11 @@ Tip&nbsp;8.3: Using fonts in functions
 </div>
 <p>Again, we can either keep working with the loaded data from the API, or read in the data from the CSV file: </p>
 <div class="cell">
-<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_peace</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/nobel_peace.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_peace</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/nobel_peace.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then we pass the <code>"Peace"</code> category into our <code>category_plot()</code> function, alongside out newly downloaded <code>nobel_peace</code> data. The <code>nobel_peace</code> data doesn’t have quite as many observations as the <code>nobel_physics</code> data, so we can reduce the radius (<code>r</code>) slightly and start the text a little bit closer to the middle of the circle. We can also choose some different colors for the visualization (but leave the defaults for the fonts):</p>
 <div class="cell">
-<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">peace_plot</span> <span class="op">&lt;-</span> <span class="fu">category_plot</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">peace_plot</span> <span class="op">&lt;-</span> <span class="fu">category_plot</span><span class="op">(</span></span>
 <span>  <span class="st">"Peace"</span>,</span>
 <span>  <span class="va">nobel_peace</span>,</span>
 <span>  r <span class="op">=</span> <span class="fl">4</span>,</span>
@@ -1021,7 +1028,7 @@ Figure&nbsp;8.12: The names of Nobel Peace Prize awardees arranged in an anti-cl
 <p>What you might notice about this version of the chart is that a third color has appeared! In <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code>, we only specified which colors relate to <code>"male"</code> and <code>"female"</code> laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) gray text relates to organisations listed in the <code>nobel_peace</code> data.</p>
 <p>We can save a copy of the visualization using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"peace-plot.png"</span>,</span>
 <span>  plot <span class="op">=</span> <span class="va">peace_plot</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -1053,22 +1060,10 @@ Tip&nbsp;8.4: Circular text with {ggtextcircle}
 <p>Despite the shortcomings when compared to more traditional visualizations, this approach is eye-catching and it does attract attention. Sometimes it’s not about the data visualization. Sometimes it’s about the art.</p>
 </section><section id="exercises" class="level2" data-number="8.6"><h2 data-number="8.6" class="anchored" data-anchor-id="exercises">
 <span class="header-section-number">8.6</span> Exercises</h2>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Adjusting a parameterized plot function
-</div>
-</div>
-<div class="callout-body-container callout-body">
 <ul>
 <li><p>Edit the <code>category_plot()</code> to add another argument for the <code>"Organisation"</code> category. Make sure the function still works when there are no organisations in the data e.g.&nbsp;for the Physics data.</p></li>
 <li><p>Download data for another category e.g.&nbsp;Chemistry and use the <code>category_plot()</code> function again to create a version of the plot for that category.</p></li>
 </ul>
-</div>
-</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">

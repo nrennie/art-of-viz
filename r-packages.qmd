@@ -39,6 +39,7 @@ In this chapter, we'll learn about how to collect data on which packages and fun
 
 ```{r}
 #| label: r-pkgs-pkgs-req
+#| eval: false
 c(
   "dplyr", "funspotr", "ggplot2", "ggtext",
   "glue", "lubridate", "rcartocolor", "readr",
@@ -126,14 +127,12 @@ As an aside, this highlights that combining base R and {tidyverse} packages can 
 ```{r}
 #| label: fig-r-pkgs-barplot
 #| fig-cap: "Ordered bar chart showing the number of times each package was used in 2023. The 'ggplot2' package is used most."
+#| fig-alt: ""
 #| fig-asp: 1
 #| echo: -1
-par(mar = c(3.1, 4.1, 1.1, 2.1))
+par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   sort(table(r_pkgs$pkgs)),
-  # make labels smaller so they fit on the page
-  cex.axis = 0.5,
-  cex.names = 0.5,
   las = 1,
   horiz = TRUE
 )
@@ -159,11 +158,11 @@ There are currently `r length(unique(r_pkgs$pkgs))` packages listed in the data,
 
 For each package, we could create an area (or line) chart showing usage over time using facets as we did in @sec-museums. This time, the categories don't really have a natural order, so instead we'll order the facets from most to least used. It might look something like this:
 
-![Initial sketch of a faceted area charts showing packages use over time](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center"}
+![Initial sketch of a faceted area charts showing packages use over time](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center" fig-alt=""}
 
 One of the most incredible things about the R community, is our adoration of hex stickers - package logos in the shape of a hexagon. All of the core {tidyverse} packages have their own hex sticker. Rather than simply using the package name as the facet label in our plot, we could replace the labels with images of hex stickers:
 
-![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center"}
+![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center" fig-alt=""}
 
 ## Preparing a plot
 
@@ -257,6 +256,7 @@ library(ggplot2)
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
+#| fig-alt: ""
 #| warning: true
 basic_plot <- ggplot(plot_data) +
   geom_area(
@@ -293,11 +293,11 @@ This *is it a zero or is it missing?* question has highlighted a few important a
 
 * Don't simply ignore warning messages if you don't understand them. It might be tempting to ignore the warning message because you ended up with a plot that looks kind of like what you expected, and the warning message isn't very clear about what's wrong. But here, the warning was telling us that something was wrong with our assumptions about the data.
 
-* Ordering your data (sensibly) can help you to spot issues. If the facets hadn't been ordered, it would have been harder to recognize that some area were overestimated, and some were underestimated.
+* Ordering your data (sensibly) can help you to spot issues. If the facets hadn't been ordered, it would have been harder to recognize that some areas were overestimated, and some were underestimated.
 
 * Sometimes missing values are explicitly represented as `NA` values (or something else), and other times missing values are simply rows that do not exist in the data. We often think about missing values more when we see them as `NA` values. But just because you have no `NA` values in your data, doesn't mean that you don't have any missing values.
 
-* When you have missing values (whether explicit or implicit), it's important to think about why they are missing and whether they are really missing. Does a missing values mean 0? Or does it mean it's actually missing? Or does it mean something else entirely? It's important to understand the process of data collection to answer this question correctly.
+* As discussed in @sec-bees, when you have missing values (whether explicit or implicit), it's important to think about why they are missing and whether they are really missing. Does a missing values mean 0? Or does it mean it's actually missing? Or does it mean something else entirely? It's important to understand the process of data collection to answer this question correctly.
 
 :::
 
@@ -330,6 +330,7 @@ The `%+%` operator allows you to replace the current default data frame on an ex
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering now looks correct."
+#| fig-alt: ""
 basic_plot <- basic_plot %+% new_plot_data
 basic_plot
 ```
@@ -367,6 +368,7 @@ We can then pass this `col_palette` vector into `scale_fill_manual()` function t
 ```{r}
 #| label: fig-r-pkgs-col-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Each area chart is colored using a different color from the {rcartocolor} package."
+#| fig-alt: ""
 col_plot <- basic_plot +
   scale_fill_manual(
     values = col_palette
@@ -374,7 +376,7 @@ col_plot <- basic_plot +
 col_plot
 ```
 
-### Fonts
+### Text and fonts
 
 Similar to @sec-programming, since code is the subject of the visualization, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
 
@@ -390,8 +392,6 @@ showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "source"
 ```
-
-### Adding text
 
 As we've done in previous chapters, we'll use the `social_caption()` function we defined in @sec-cats to create a caption containing Font Awesome icons with social media handles: \index{social\_caption}
 
@@ -455,6 +455,7 @@ For the y-axis, we choose *nice* limits and breaks - setting the limits to betwe
 ```{r}
 #| label: fig-r-pkgs-limits-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
+#| fig-alt: ""
 limits_plot <- text_plot +
   scale_x_date(
     limits = lubridate::ymd(c("20230101", "20231231")),
@@ -508,6 +509,7 @@ We also make sure that the x- and y-axes labels and title are the correct color 
 ```{r}
 #| label: fig-r-pkgs-theme-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
+#| fig-alt: ""
 theme_plot <- init_theme_plot +
   theme(
     # title and subtitle text
@@ -604,6 +606,7 @@ We also need to tell {ggplot2} that the facet labels are using HTML tags, just a
 ```{r}
 #| label: fig-r-pkgs-final-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Hex stickers have replaced the text labels on the facets."
+#| fig-alt: ""
 img_plot +
   theme(
     strip.text.x = ggtext::element_textbox_simple(
@@ -671,7 +674,7 @@ The use of color could also be improved here. The colors are used to differentia
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/r-pkgs.gif){fig-align="center"}
+![](images/r-pkgs.gif){fig-align="center" fig-alt=""}
 
 :::
 
