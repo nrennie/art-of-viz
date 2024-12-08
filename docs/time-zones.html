@@ -379,7 +379,7 @@ div.csl-indent {
 <p>Let’s start by looking at what the <code>timezones</code> data looks like!</p>
 <section id="data-exploration" class="level3" data-number="12.2.1"><h3 data-number="12.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">12.2.1</span> Data exploration</h3>
-<p>When we inspect the first few rows of the data:</p>
+<p>Let’s inspect the first few rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>: </p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">timezones</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -394,7 +394,7 @@ div.csl-indent {
 6 Africa/Ceuta         35.9      -5.32 Ceuta, Melilla</code></pre>
 </div>
 </div>
-<p>the first thing that jumps out is the <code>comments</code> column which appears to have a lot of missing data. Let’s plot it to confirm, making use of the <code><a href="https://rdrr.io/r/base/NA.html">is.na()</a></code> function to plot only the counts of missing and non-missing data: </p>
+<p>The first thing that jumps out is the <code>comments</code> column which appears to have a lot of missing data. Let’s plot it to confirm, making use of the <code><a href="https://rdrr.io/r/base/NA.html">is.na()</a></code> function to plot only the counts of missing and non-missing data: </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">timezones</span><span class="op">$</span><span class="va">comments</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -438,18 +438,18 @@ Figure&nbsp;12.2: A bar chart of the number of defined time zones in each of nin
 </section><section id="exploratory-sketches" class="level3" data-number="12.2.2"><h3 data-number="12.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">12.2.2</span> Exploratory sketches</h3>
 <p>Given that we have a latitude and longitude data for the principal locations (usually largest cities) within each time zone, the first map idea that springs to mind is a world map with the time zone locations plotted as points:</p>
-<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-time-zones.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-time-zones.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;12.3: Initial sketch of time zone locations as points on a world map.
 </figcaption></figure>
 </div>
 <p>We could color the points based on the geographic region (continent) they belong to. As we’ve already seen, if we do this in {ggplot2}, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will show the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn’t take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).</p>
-<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-time-zones-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-time-zones-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;12.4: Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.
@@ -957,7 +957,7 @@ Figure&nbsp;12.13: Points representing different time zone locations on a world 
 <p>If we’re talking about improving readability of bar charts, an easy action is to make the bars (and therefore text) horizontal - it’s much easier to read text that’s the right way up!</p>
 <p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/time-zones.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+<figure class="figure"><p><img src="images/time-zones.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="12.6"><h2 data-number="12.6" class="anchored" data-anchor-id="exercises">
@@ -1191,6 +1191,9 @@ Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.

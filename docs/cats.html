@@ -358,7 +358,8 @@ div.csl-indent {
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"glue"</span>,</span>
-<span>  <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span>, <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span></span>
+<span>  <span class="st">"purrr"</span>, <span class="st">"showtext"</span>, <span class="st">"stringr"</span>, <span class="st">"sysfonts"</span>,</span>
+<span>  <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="data" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="data">
@@ -380,8 +381,10 @@ div.csl-indent {
 <p>Let’s start by digging into the geographic <code>cats</code> data. We can make a very quick plot of the co-ordinate data using <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">cats</span><span class="op">$</span><span class="va">location_long</span>, <span class="va">cats</span><span class="op">$</span><span class="va">location_lat</span>,</span>
-<span>  xlab <span class="op">=</span> <span class="st">"Longitude"</span>, ylab <span class="op">=</span> <span class="st">"Latitude"</span></span>
+<span>  x <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">location_long</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">location_lat</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Longitude"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Latitude"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-map" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -414,7 +417,8 @@ Tip&nbsp;7.1: Remembering latitude and longitude
 </div>
 <p>The GPS sensors also report data on the ground speed of the cats, potentially allowing us to see patterns in their activity level throughout the day. Let’s have a look at the <code>ground_speed</code> column by plotting an exploratory histogram with <code><a href="https://rdrr.io/r/graphics/hist.html">hist()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">cats</span><span class="op">$</span><span class="va">ground_speed</span>,</span>
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">ground_speed</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Ground speed (m/s)"</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Histogram of ground speed"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -432,9 +436,7 @@ Figure&nbsp;7.2: Histogram of the ground speeds recorded from GPS sensors, showi
 <p>At first glance you might not see anything of particular note about <a href="#fig-cats-speed-hist" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>. However, the data description reports that the ground speed is measured in meters per second (m/s), but the histogram goes up to 250,000. For those of you who don’t often work in m/s, that’s about 560,000 miles per hour, or 900,000 kilometers per hour! Either these are exceptionally fast cats or there’s an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don’t know what the issue is, but this is certainly a column in the data that we shouldn’t trust too much.</p>
 <p>Let’s focus on the <code>cats_reference</code> data instead, and look at how characteristics of the study cats varied. For example, we might look at how long the cats spend indoors, which is recorded as a categorical variable, <code>hrs_indoors</code>. We can calculate how many cats fall into each time indoors <em>category</em> using <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> and then use <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> to visualize it: </p>
 <div class="cell">
-<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-bar-hrs" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-bar-hrs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -470,9 +472,9 @@ Figure&nbsp;7.4: Scatter plot of the relationship between the age of pet cats an
 </section><section id="exploratory-sketches" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">7.2.2</span> Exploratory sketches</h3>
 <p>Let’s take the idea from <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> but develop into a much more effective visualization, making particular use of text and annotations. We’ll update the chart to make a bubble plot. But we’ll also add annotations to highlight interesting aspects of the data e.g.&nbsp;the oldest cat, or the average amount of time spent indoors. <a href="#fig-cats-sketch" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> gives a basic illustration of how we might develop it:</p>
-<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.
@@ -857,7 +859,7 @@ Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats an
 <p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <p>The original version look at the relationship between age and ground speed (despite) the issues with the reliability of the data.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="7.6"><h2 data-number="7.6" class="anchored" data-anchor-id="exercises">
@@ -1091,6 +1093,9 @@ Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
