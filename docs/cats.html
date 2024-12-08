@@ -354,12 +354,20 @@ div.csl-indent {
 
 
 </header><p>In this chapter, we’ll learn how to create custom captions with social media icons, and add data-driven annotations to our plots.</p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"glue"</span>,</span>
+<span>  <span class="st">"purrr"</span>, <span class="st">"showtext"</span>, <span class="st">"stringr"</span>, <span class="st">"sysfonts"</span>,</span>
+<span>  <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="data" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">7.1</span> Data</h2>
 <p>Between 2013 and 2017, <span class="citation" data-cites="kays2020">Kays et al. (<a href="references.html#ref-kays2020" role="doc-biblioref">2020</a>)</span> recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data <span class="citation" data-cites="cats_data">(<a href="references.html#ref-cats_data" role="doc-biblioref">McDonald and Cole 2020</a>)</span> was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they’re not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we’ll focus on the data from cats (and their owners!) based in the United Kingdom.</p>
 <p>The data was used as a TidyTuesday dataset in January 2023 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), and so can be loaded with the <code>tt_load()</code> function from {tidytuesdayR} <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>. There are two datasets included, which we’ll read in as <code>cats</code> and <code>cats_reference</code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-01-31"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-01-31"</span><span class="op">)</span></span>
 <span><span class="va">cats</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">cats_uk</span></span>
 <span><span class="va">cats_reference</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">cats_uk_reference</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -372,9 +380,11 @@ div.csl-indent {
 <span class="header-section-number">7.2.1</span> Data exploration</h3>
 <p>Let’s start by digging into the geographic <code>cats</code> data. We can make a very quick plot of the co-ordinate data using <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">cats</span><span class="op">$</span><span class="va">location_long</span>, <span class="va">cats</span><span class="op">$</span><span class="va">location_lat</span>,</span>
-<span>  xlab <span class="op">=</span> <span class="st">"Longitude"</span>, ylab <span class="op">=</span> <span class="st">"Latitude"</span></span>
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">location_long</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">location_lat</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Longitude"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Latitude"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-map" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -407,7 +417,8 @@ Tip&nbsp;7.1: Remembering latitude and longitude
 </div>
 <p>The GPS sensors also report data on the ground speed of the cats, potentially allowing us to see patterns in their activity level throughout the day. Let’s have a look at the <code>ground_speed</code> column by plotting an exploratory histogram with <code><a href="https://rdrr.io/r/graphics/hist.html">hist()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">cats</span><span class="op">$</span><span class="va">ground_speed</span>,</span>
+<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">cats</span><span class="op">$</span><span class="va">ground_speed</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Ground speed (m/s)"</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Histogram of ground speed"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -425,9 +436,7 @@ Figure&nbsp;7.2: Histogram of the ground speeds recorded from GPS sensors, showi
 <p>At first glance you might not see anything of particular note about <a href="#fig-cats-speed-hist" class="quarto-xref">Figure&nbsp;<span>7.2</span></a>. However, the data description reports that the ground speed is measured in meters per second (m/s), but the histogram goes up to 250,000. For those of you who don’t often work in m/s, that’s about 560,000 miles per hour, or 900,000 kilometers per hour! Either these are exceptionally fast cats or there’s an issue with the ground speed data. Perhaps the units were incorrectly recorded, or the sensors did not perform correctly. We don’t know what the issue is, but this is certainly a column in the data that we shouldn’t trust too much.</p>
 <p>Let’s focus on the <code>cats_reference</code> data instead, and look at how characteristics of the study cats varied. For example, we might look at how long the cats spend indoors, which is recorded as a categorical variable, <code>hrs_indoors</code>. We can calculate how many cats fall into each time indoors <em>category</em> using <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> and then use <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> to visualize it: </p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-bar-hrs" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-bar-hrs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -441,9 +450,11 @@ Figure&nbsp;7.3: Bar chart showing the number of cats that fall into each of the
 </div>
 <p>We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let’s use <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> to create a quick scatter plot of <code>age_years</code> against <code>hrs_indoors</code> to investigate: </p>
 <div class="cell">
-<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">cats_reference</span><span class="op">$</span><span class="va">age_years</span>, <span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span>,</span>
-<span>  xlab <span class="op">=</span> <span class="st">"Age"</span>, ylab <span class="op">=</span> <span class="st">"Hours indoors"</span></span>
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">cats_reference</span><span class="op">$</span><span class="va">age_years</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Age"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Hours indoors"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-cats-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -461,9 +472,9 @@ Figure&nbsp;7.4: Scatter plot of the relationship between the age of pet cats an
 </section><section id="exploratory-sketches" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">7.2.2</span> Exploratory sketches</h3>
 <p>Let’s take the idea from <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> but develop into a much more effective visualization, making particular use of text and annotations. We’ll update the chart to make a bubble plot. But we’ll also add annotations to highlight interesting aspects of the data e.g.&nbsp;the oldest cat, or the average amount of time spent indoors. <a href="#fig-cats-sketch" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> gives a basic illustration of how we might develop it:</p>
-<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.
@@ -477,7 +488,7 @@ Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the r
 <p>The <code>hrs_indoors</code> column contains five categories for time spend indoors: <code>2.5</code>, <code>7.5</code>, <code>12.5</code>, <code>17.5</code>, and <code>22.5</code>. Since these category names are numbers, they are encoded in R as numeric columns instead of categories, so we start by convert the <code>hrs_indoors</code> column to a <code><a href="https://rdrr.io/r/base/factor.html">factor()</a></code>. To know how big the <em>bubbles</em> of our plot will be, we need to know how many cats there are for each combination of age and indoor time. We <code>group_by()</code> the two relevant columns and then use <code>count()</code> from {dplyr} to count the number of each category combination, before un-grouping with <code>ungroup()</code>. </p>
 <p>There’s one cat (Johnny) whose age is unknown, so we use <code>drop_na()</code> from {tidyr} to remove this value. See <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a> for some other discussions on visualizing and dealing with missing values in your data. </p>
 <div class="cell">
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">age_years</span>, <span class="va">hrs_indoors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>hrs_indoors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">hrs_indoors</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">age_years</span>, <span class="va">hrs_indoors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -489,7 +500,7 @@ Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the r
 <span class="header-section-number">7.3.2</span> The first plot</h3>
 <p>We pass our data into the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function as always, and then set up the aesthetic mapping with <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. As we did in <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a>, we put age on the x-axis and hours indoors on the y-axis. Here, we also map the number of cats in each category combination, <code>n</code>, to the <code>size</code> aesthetic to make the bubbles. Although we are making a bubble plot rather than a scatter plot, we still use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> since both types of plots are made from points. Scatter plots are essentially a special case of bubble plots where all of the points represent one observation and so are all the same size. </p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
@@ -518,14 +529,14 @@ Figure&nbsp;7.6: Bubble plot of the relationship between the age of pet cats and
 <span class="header-section-number">7.4.1</span> Colors</h3>
 <p>Since we aren’t mapping any columns in the data to <code>color</code> or <code>fill</code>, we don’t need to specify a color palette. Instead, we’ll simply choose a text color (dark gray), background color (white), and highlight color (purple).</p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"#2F4F4F"</span></span>
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"#2F4F4F"</span></span>
 <span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#914D76"</span></span>
 <span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"white"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can update our initial <code>basic_plot</code> code to change the color of the points to <code>highlight_col</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>. Remember that since this color isn’t based on a column in the data, it doesn’t need to go inside <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. </p>
 <p>The <code>size</code> legend is generated automatically, and it picks evenly spaced intervals given the range of the data. Unfortunately this sometimes results in labels that don’t quite make sense. Here, we have a label for 2.5 cats - not something that exists in the natural world! Let’s choose more appropriate breaks for the <code>size</code> legend. Here, our <code>size</code> data ranges between 1 and 9, so let’s go for <code>3</code>, <code>6</code>, and <code>9</code>. We pass these desired break points in as a vector to <code><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size()</a></code>. Note that the sizes of the points in the plot are unchanged, only the legend is updated. </p>
 <div class="cell" data-source-line-numbers="9,10">
-<div class="sourceCode" id="cb9" data-source-line-numbers="9,10" data-code-line-numbers="9,10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb10" data-source-line-numbers="9,10" data-code-line-numbers="9,10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">age_years</span>,</span>
@@ -551,7 +562,7 @@ Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and
 <span class="header-section-number">7.4.2</span> Text and fonts</h3>
 <p>Here, we’ll use a <em>fun</em> font for the title, but keep it clean and minimal for the body font. For the <code>body_font</code>, we’ll use <em>Ubuntu</em> as we did in <a href="technology-adoption.html" class="quarto-xref"><span>Chapter 5</span></a>. For the <code>title_font</code>, we’ll use <em>Chewy</em>, an almost cartoonish font that vaguely resembles handwriting. Both are Google Fonts and so we load them using <code>font_add_google()</code> as we’ve done in previous chapters, and set up the relevant {showtext} options. </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Chewy"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Chewy"</span><span class="op">)</span></span>
 <span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Ubuntu"</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
@@ -564,7 +575,7 @@ Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and
 <p>In <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, when we constructed the subtitle, we used <code>glue()</code> to create data-driven text. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It’s a more efficient approach that’s less prone to accidental errors than <em>hard coding</em> all of the text. We can take a similar approach when adding annotations to plots.</p>
 <p>Let’s say we want to add an annotation to the plot that highlights the oldest cat in the data. We’ll start by obtaining the data that relates to the oldest cat. We can use <code>slice_max()</code> from {dplyr} to obtain the row of the data where the <code>age_years</code> is highest: </p>
 <div class="cell">
-<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annot_oldest</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annot_oldest</span> <span class="op">&lt;-</span> <span class="va">cats_reference</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span><span class="va">age_years</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When it comes to adding the annotation to the plot, there are several choices we can make within {ggplot2}:</p>
@@ -577,7 +588,7 @@ Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and
 <p>Any combination of these choices could likely work for the annotations we plan to add. However, we’re going to use {ggtext} <span class="citation" data-cites="ggtext">(<a href="references.html#ref-ggtext" role="doc-biblioref">C. O. Wilke and Wiernik 2022</a>)</span> instead of just {ggplot2}. The {ggtext} package will allow us to perform further customization of the labels more easily. We’ve already seen examples of using {ggtext} for automatically wrapping long strings, but we’re going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We’ve previously described coloring sections of text in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> using the {marquee} package, but we’ll look at {ggtext} as a comparison.</p>
 <p>From {ggtext}, we can use the <code>geom_textbox()</code> function to add an annotation. Like the <code>element_textbox_simple()</code> we’ve been using from {ggtext} for the subtitle in previous chapters, <code>geom_textbox()</code> will automatically wrap the text to some pre-specified textbox size. The <code>label</code> aesthetic uses <code>glue()</code> to the cat’s name and age into the text. We can wrap sections of text inside some <code>&lt;span&gt;</code> tags. This lets us specify how we want to style the font within the tags using CSS. We also use <code>glue()</code> to insert the <code>highlight_col</code> into the <code>style</code> for the font used for the cat’s name. You may notice some similarity with the colored text code in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> that uses {marquee} instead of {ggtext}. Additional arguments of <code>geom_textbox()</code> allow you to control the color of the text, box outline, and background color as well as the size and alignment of the text. </p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">annot_oldest</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
@@ -630,7 +641,7 @@ Tip&nbsp;7.2: Non-overlapping labels
 <p>Though you might expect {ggplot2} to complain when we try to place in arrow using numeric values on a discrete scale, surprisingly, it doesn’t. Since factors are essentially just ordered categories, R assigns the first level in the factor to <code>1</code>, the second level to <code>2</code>, and so on. This means you <em>can</em> convert factors to numeric variables - though be warned that the results might not always be what you expect! For our chart, we want to position the end of the arrow just below the <code>22.5</code> value which is the fifth category, so the <code>y</code> and <code>yend</code> values are slightly below <code>5</code>.</p>
 <p>We add some further styling to the line by specifying the width, the color, and how curved the line is. To add the arrow on the end of the line, we use the <code><a href="https://rdrr.io/r/grid/arrow.html">arrow()</a></code> function. This function allows us to define the length of the arrow - note this is the length of the arrowhead, rather than the entire arrow. We also specify that the type is <code>"closed"</code>, meaning that the arrowhead is a filled triangle. The default is <code>"open"</code> which, at smaller arrow sizes, sometimes looks less clear. </p>
 <div class="cell">
-<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">arrow_plot</span> <span class="op">&lt;-</span> <span class="va">annotated_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">arrow_plot</span> <span class="op">&lt;-</span> <span class="va">annotated_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
 <span>    geom <span class="op">=</span> <span class="st">"curve"</span>,</span>
 <span>    x <span class="op">=</span> <span class="fl">15.1</span>,</span>
@@ -673,7 +684,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <span class="header-section-number">7.4.4</span> Adding text</h3>
 <p>Let’s start to add some other, more standard text, to the chart and define some variables to store the title and subtitle text. For the subtitle, we again take a data-driven approach by using <code>glue()</code> as we did in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> to paste in pre-calculated values from the data to the text. </p>
 <div class="cell">
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># title text</span></span>
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># title text</span></span>
 <span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Do older cats spend more time indoors?"</span></span>
 <span><span class="co"># subtitle text</span></span>
 <span><span class="va">perc_indoor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span> <span class="op">==</span> <span class="st">"22.5"</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">)</span><span class="op">)</span></span>
@@ -686,7 +697,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <p>But first, before we jump into writing functions, we need to get some social media icons! As we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we’ll again use <a href="https://fontawesome.com/">Font Awesome</a> icons <span class="citation" data-cites="fontawesome">(<a href="references.html#ref-fontawesome" role="doc-biblioref">Font Awesome 2024</a>)</span>, but this time we’ll use the <em>Brand</em> pack of icons instead of the <em>Solid</em> icons. The process of loading the icons here is essentially the same as loading the Font Awesome icons in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>. After you’ve downloaded zip file of freely available icons from <a href="https://fontawesome.com/download">fontawesome.com/download</a>, selecting the <strong>Free for Desktop</strong> option, you should see a file called <code>Font-Awesome-6-Brands-Regular-400.otf</code>. Again, save this <code>.otf</code> file somewhere you can find it again - such as in a project folder called <code>fonts</code>.</p>
 <p>As before, we’ll use <code>font_add()</code> from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu 2022</a>)</span> to load the font into R. The <code>family</code> argument is how we’ll refer to the font in R, and the <code>regular</code> argument is the file path to the <code>.otf</code> file. We then use <code>showtext_auto()</code> and <code>showtext_opts()</code> to use {showtext} to render the text and set the desired resolution. </p>
 <div class="cell">
-<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add.html">font_add</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add.html">font_add</a></span><span class="op">(</span></span>
 <span>  family <span class="op">=</span> <span class="st">"Font Awesome 6 Brands"</span>,</span>
 <span>  regular <span class="op">=</span> <span class="st">"fonts/Font-Awesome-6-Brands-Regular-400.otf"</span>,</span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -705,7 +716,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <p>Rather than trying to immediately write a function that joins together many icons and handles, we’ll start by writing a function that joins one icon and one social media handle. The inner function, <code>glue_icon()</code>, creates a styled HTML snippet using the <code>glue()</code> to join together the icon Unicode and the text within the snippet. The HTML snippet contains two spans: one for the icon (styled with the <code>"Font Awesome 6 Brands"</code> font and our chosen <code>icon_color</code>) and another for the social media text (styled with our chosen <code>font_family</code> and <code>font_color</code>). We also add a space between the icon and the handle with <code>&amp;nbsp;</code>, and a larger space at the end to separate multiple icons using <code>&amp;emsp;</code>. These are special strings for adding spaces to HTML. Note that because we have quotation marks inside quotation marks inside quotation marks, we need to escape the inner ones using <code>\"</code>. </p>
 <p>Finally, we use <code>map2()</code> from {purrr} <span class="citation" data-cites="purrr">(<a href="references.html#ref-purrr" role="doc-biblioref">Wickham and Henry 2023</a>)</span> to apply <code>glue_icon()</code> to each row of our <code>icon_df</code> data. We then collapse the resulting list into a vector using <code>as_vector()</code> from {purrr}. We then further collapse the vector into a single character string with <code>str_flatten()</code> from {stringr}. This flattened string is our social media caption. </p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social_caption</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">linkedin</span> <span class="op">=</span> <span class="st">"nicola-rennie"</span>,</span>
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social_caption</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">linkedin</span> <span class="op">=</span> <span class="st">"nicola-rennie"</span>,</span>
 <span>                           <span class="va">bluesky</span> <span class="op">=</span> <span class="st">"nrennie"</span>,</span>
 <span>                           <span class="va">github</span> <span class="op">=</span> <span class="st">"nrennie"</span>,</span>
 <span>                           <span class="va">icon_color</span> <span class="op">=</span> <span class="st">"black"</span>,</span>
@@ -738,7 +749,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 </div>
 <p>We can then use the <code>social_caption()</code> function, passing in the color and font variables we’ve previously defined to their relevant arguments:</p>
 <div class="cell">
-<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
 <span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
@@ -750,7 +761,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 </div>
 <p>You can see that the output of the <code>social_caption()</code> is a pretty incomprehensible string that would’ve been quite tricky to type out manually - aren’t we glad we built a function to do it for us! We can then use our <code>source_caption()</code> function from <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and pass the output from the <code>social_caption()</code> function into the <code>graphic</code> argument. We also place them on separate lines by using <code>&lt;br&gt;</code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="fu">source_caption</span><span class="op">(</span></span>
 <span>  source <span class="op">=</span> <span class="st">"McDonald JL, Cole H. 2020. doi.org/10.5441/001/1.pf315732."</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">"&lt;br&gt;"</span>,</span>
 <span>  graphic <span class="op">=</span> <span class="va">social</span></span>
@@ -759,7 +770,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <p>The text can then be added to <a href="#fig-cats-arrow" class="quarto-xref">Figure&nbsp;<span>7.9</span></a> using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function as normal, by passing in the variables to the <code>title</code>, <code>subtitle</code>, and <code>caption</code> arguments. We also add more informative text for the title on the x and y axes, making sure to also specify the units. </p>
 <p>By default, the legend title is simply the name of the column mapped to the aesthetic in the legend. Here, the column mapped to <code>size</code> is <code>n</code> and so that’s the name of the legend, which isn’t very informative. There are several different ways to edit the name of the legend. We could have specified the <code>name</code> argument when we used <code><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size()</a></code> earlier. An alternative, is to use the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function. The title for any aesthetic can be specified in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code>, not just <code>x</code> and <code>y</code>. We simply pass the desired legend title into <code>size</code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">arrow_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">arrow_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="va">title</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="va">st</span>,</span>
@@ -785,7 +796,7 @@ Figure&nbsp;7.10: Bubble plot of the relationship between the age of pet cats an
 <p>You’ll notice that in <a href="#fig-cats-text-plot" class="quarto-xref">Figure&nbsp;<span>7.10</span></a>, the social media caption that we worked so hard to create isn’t properly formatted and it simply appears as the raw HTML code we wrote. The reason it doesn’t look quite as we’d hoped is because {ggplot2} doesn’t natively understand how to parse the HTML code. That’s where {ggtext} comes in. {ggtext} is designed to improve text rendering in {ggplot2}, including providing support for using Markdown and HTML inside text elements. We haven’t actually used {ggtext} for our caption yet! Much like with {marquee} in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we need to edit the <code>plot.caption</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> to tell it to use {ggtext} to process the HTML code. We can use <code>element_textbox_simple()</code> to do this (as we’ve been doing to wrap the subtitle text anyway). It had similar arguments to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code> in {ggplot2} but we don’t actually need to specify any additional arguments here. You could also use <code>element_textbox()</code> which works very similarly but has slightly different default values or <code>element_markdown()</code>, if you’d prefer <span class="citation" data-cites="social_icons">(<a href="references.html#ref-social_icons" role="doc-biblioref">Rennie 2023a</a>)</span>. </p>
 <p>We make some further edits using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function after applying <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code> as a base theme, as we’ve done in previous chapters to align the plot and caption text to the plot rather than the panel, change the color of the text, and edit the background color. We also make some adjustments to the legend. It’s currently taking up quite a lot of space on the right hand side, but there is plenty of available space within the plot area itself. We use <code>legend.position = "inside"</code> to move the legend inside the panel area and specify the coordinates of where we want to position it using <code>legend.position.inside</code>. For positioning the legend, <code>c(0, 0)</code> is the bottom left corner and <code>c(1, 1)</code> is the top right corner. To make sure that it’s easy to distinguish between the legend and the data points, we draw a dark outline around it. </p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span></span>
 <span>    base_family <span class="op">=</span> <span class="va">body_font</span>,</span>
 <span>    base_size <span class="op">=</span> <span class="fl">6.5</span></span>
@@ -834,7 +845,7 @@ Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats an
 </div>
 <p>We can then finally save the chart in PNG format using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"cats.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.75</span> <span class="op">*</span> <span class="fl">5</span></span>
@@ -848,24 +859,16 @@ Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats an
 <p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <p>The original version look at the relationship between age and ground speed (despite) the issues with the reliability of the data.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="7.6"><h2 data-number="7.6" class="anchored" data-anchor-id="exercises">
 <span class="header-section-number">7.6</span> Exercises</h2>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Caution
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Exercises are coming soon!</p>
-</div>
-</div>
+<ul>
+<li><p>Join the <code>cats</code> and the <code>cats_reference</code> datasets using the <code>tag_id</code> column. See <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a> for an example if you aren’t sure how to join two datasets together.</p></li>
+<li><p>Instead of plotting the time spent indoors on the y-axis, plot the cat’s average ground speed (ignoring that the values are very unusual!)</p></li>
+<li><p>Add another annotation that highlights the cat with the highest average speed.</p></li>
+</ul>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -1090,6 +1093,9 @@ Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.

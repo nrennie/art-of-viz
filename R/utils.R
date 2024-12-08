@@ -13,7 +13,7 @@ gg_record(
   dir = file.path("recording"),
   device = "png",
   width = 5,
-  height = 0.75*5,
+  height = 0.5*5,
   units = "in",
   dpi = 300
 )
@@ -32,3 +32,14 @@ library(maps)
 library(ragg)
 library(tidytuesdayR)
 
+
+# Get quarto dependencies -------------------------------------------------
+
+get_chapter_deps <- function(file) {
+  deps <- attachment::att_from_qmd(file) |> 
+    sort() |> 
+    stringr::str_flatten(', ') |> 
+    stringr::str_replace_all(", ", "', '") 
+  deps <- paste0("c('", deps, "')")
+  return(deps)
+}

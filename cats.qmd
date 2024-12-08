@@ -22,6 +22,18 @@ fig-asp: 0.75
 
 In this chapter, we'll learn how to create custom captions with social media icons, and add data-driven annotations to our plots. 
 
+**Packages required in this chapter**:
+
+```{r}
+#| label: cats-pkgs-req
+#| eval: false
+c(
+  "dplyr", "ggplot2", "ggtext", "glue",
+  "purrr", "showtext", "stringr", "sysfonts",
+  "tidyr", "tidytuesdayR"
+)
+```
+
 ## Data
 
 Between 2013 and 2017, @kays2020 recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data [@cats_data] was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they're not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we'll focus on the data from cats (and their owners!) based in the United Kingdom.
@@ -61,11 +73,14 @@ Let's start by digging into the geographic `cats` data. We can make a very quick
 ```{r}
 #| label: fig-cats-map
 #| fig-cap: "Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
-  cats$location_long, cats$location_lat,
-  xlab = "Longitude", ylab = "Latitude"
+  x = cats$location_long,
+  y = cats$location_lat,
+  xlab = "Longitude",
+  ylab = "Latitude"
 )
 ```
 
@@ -87,9 +102,11 @@ The GPS sensors also report data on the ground speed of the cats, potentially al
 ```{r}
 #| label: fig-cats-speed-hist
 #| fig-cap: "Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds!"
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(5.1, 4.1, 3.1, 2.1))
-hist(cats$ground_speed,
+hist(
+  x = cats$ground_speed,
   xlab = "Ground speed (m/s)",
   main = "Histogram of ground speed"
 )
@@ -102,11 +119,10 @@ Let's focus on the `cats_reference` data instead, and look at how characteristic
 ```{r}
 #| label: fig-cats-bar-hrs
 #| fig-cap: "Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 3.1, 2.1))
-barplot(
-  table(cats_reference$hrs_indoors)
-)
+barplot(table(cats_reference$hrs_indoors))
 ```
 
 We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let's use `plot()` to create a quick scatter plot of `age_years` against `hrs_indoors` to investigate: \index{graphics!plot}
@@ -114,11 +130,14 @@ We might expect that the number of hours a cat spends indoors varies with age, w
 ```{r}
 #| label: fig-cats-scatter
 #| fig-cap: "Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
-  cats_reference$age_years, cats_reference$hrs_indoors,
-  xlab = "Age", ylab = "Hours indoors"
+  x = cats_reference$age_years,
+  y = cats_reference$hrs_indoors,
+  xlab = "Age",
+  ylab = "Hours indoors"
 )
 ```
 
@@ -130,7 +149,7 @@ This categorization of data also results in many of the points being stacked on 
 
 Let's take the idea from @fig-cats-scatter but develop into a much more effective visualization, making particular use of text and annotations. We'll update the chart to make a bubble plot. But we'll also add annotations to highlight interesting aspects of the data e.g. the oldest cat, or the average amount of time spent indoors. @fig-cats-sketch gives a basic illustration of how we might develop it:
 
-![Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.](images/sketch-cats.png){#fig-cats-sketch fig-align="center"}
+![Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.](images/sketch-cats.png){#fig-cats-sketch fig-align="center" fig-alt=""}
 
 ## Preparing a plot
 
@@ -160,6 +179,7 @@ We pass our data into the `ggplot()` function as always, and then set up the aes
 ```{r}
 #| label: fig-cats-base-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category."
+#| fig-alt: ""
 library(ggplot2)
 basic_plot <- ggplot(
   data = plot_data,
@@ -195,6 +215,7 @@ The `size` legend is generated automatically, and it picks evenly spaced interva
 ```{r}
 #| label: fig-cats-base-plot-2
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers."
+#| fig-alt: ""
 #| source-line-numbers: "9,10"
 basic_plot <- ggplot(
   data = plot_data,
@@ -249,6 +270,7 @@ From {ggtext}, we can use the `geom_textbox()` function to add an annotation. Li
 ```{r}
 #| label: fig-cats-annot-1
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots'."
+#| fig-alt: ""
 annotated_plot <- basic_plot +
   ggtext::geom_textbox(
     data = annot_oldest,
@@ -295,6 +317,7 @@ We add some further styling to the line by specifying the width, the color, and 
 ```{r}
 #| label: fig-cats-arrow
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots', with an arrow pointing towards the data point for this cat."
+#| fig-alt: ""
 arrow_plot <- annotated_plot +
   annotate(
     geom = "curve",
@@ -404,6 +427,7 @@ By default, the legend title is simply the name of the column mapped to the aest
 ```{r}
 #| label: fig-cats-text-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A title, subtitle, and caption has been added, although the caption appears with raw HTML code, rather than correctly formatted."
+#| fig-alt: ""
 text_plot <- arrow_plot +
   labs(
     title = title,
@@ -425,6 +449,7 @@ We make some further edits using the `theme()` function after applying `theme_mi
 ```{r}
 #| label: fig-cats-styled-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot."
+#| fig-alt: ""
 text_plot +
   theme_minimal(
     base_family = body_font,
@@ -490,14 +515,14 @@ Each plot created during the process of developing the original version of this 
 
 The original version look at the relationship between age and ground speed (despite) the issues with the reliability of the data.
 
-![](images/cats.gif){fig-align="center"}
+![](images/cats.gif){fig-align="center" fig-alt=""}
 
 :::
 
 ## Exercises
 
-::: {.callout-caution}
+* Join the `cats` and the `cats_reference` datasets using the `tag_id` column. See @sec-doctors for an example if you aren't sure how to join two datasets together.
 
-Exercises are coming soon!
+* Instead of plotting the time spent indoors on the y-axis, plot the cat's average ground speed (ignoring that the values are very unusual!)
 
-:::
+* Add another annotation that highlights the cat with the highest average speed.

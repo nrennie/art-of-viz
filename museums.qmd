@@ -13,7 +13,19 @@ execute:
 
 # UK museums: highlighting line charts with {gghighlight} {#sec-museums}
 
-In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, with the help of the {gghighlight} extension package\index{gghighlight}.
+In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, with the help of the {gghighlight} extension package. \index{gghighlight}
+
+**Packages required in this chapter**:
+
+```{r}
+#| label: museums-pkgs-req
+#| eval: false
+c(
+  "dplyr", "gghighlight", "ggplot2", "ggtext",
+  "purrr", "showtext", "sysfonts", "tibble",
+  "tidyr", "tidytuesdayR", "viridis"
+)
+```
 
 ## Data
 
@@ -43,14 +55,6 @@ The data contains information for `r ncol(museums)` different variables on `r nr
 
 Let's start exploring what these variables look like!
 
-::: {#tip-museums-view .callout-tip}
-
-## Inspecting data
-
-Remember that you can use `View(museums)` to inspect the data in a more human-readable format.
-
-:::
-
 ### Data exploration
 
 There are many different aspects of this data we could inspect:
@@ -66,13 +70,10 @@ Given the wealth of information around deprivation indices (8 different variable
 ```{r}
 #| label: fig-museums-barplot
 #| fig-cap: "Bar chart of number of museums per level of deprivation, with higher numbers of museums shown in levels 5 and 6."
+#| fig-alt: ""
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
-barplot(
-  table(museums$Area_Deprivation_index),
-  cex.axis = 0.5,
-  cex.names = 0.5
-)
+par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
+barplot(table(museums$Area_Deprivation_index))
 ```
 
 Here, `1` is the most deprived, and `10` is the least deprived. This is quite an interesting relationship - there have been more museums in places with a moderate level of deprivation compared to higher or lower level. This might feel a little bit counter-intuitive, we might expect there to be more museums in more affluent areas. But looking at the total number of museums in the data per index of deprivation doesn't tell us the whole story. How many of these museums were open at once? How many are still open today? 
@@ -89,7 +90,7 @@ We have 10 deciles of deprivation, so we'll have 10 time series that we want to 
 
 If we go with line charts, and faceting by deprivation index, that might look something like this: 
 
-![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center"}
+![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center" fig-alt= ""}
 
 We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in @sec-programming but we haven't really thought much about the layouts of those facets. In @sec-programming, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. Here, we have a little bit more flexibility and we might want to think about controlling that layout.
 
@@ -265,6 +266,7 @@ One of most common approaches to visualising multiple time series, is to plot mu
 ```{r}
 #| label: fig-museums-basic-plot-1
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the overlapping lines resembling spaghetti!"
+#| fig-alt: ""
 #| message: false
 library(ggplot2)
 ggplot(
@@ -289,6 +291,7 @@ Let's go back to our previous idea, and try separating out the deprivation level
 ```{r}
 #| label: fig-museums-basic-plot-2
 #| fig-cap: "An area chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet."
+#| fig-alt: ""
 ggplot(
   data = plot_data,
   mapping = aes(x = year, y = museums, fill = deprivation)
@@ -314,8 +317,9 @@ The second change can be implemented easily using the {gghighlight} package [@gg
 ```{r}
 #| label: fig-museums-basic-plot-3
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
+#| fig-alt: ""
 #| message: false
-#| source-line-numbers: "7"
+#| source-line-numbers: "11"
 ggplot(
   data = plot_data,
   mapping = aes(
@@ -355,6 +359,7 @@ We can then re-do our line chart using the rescaled `change` data on the y-axis 
 ```{r}
 #| label: fig-museums-basic-plot-4
 #| fig-cap: "A line chart of percentage increase in museums (compared to 1960) for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
+#| fig-alt: ""
 #| message: false
 basic_plot <- ggplot(
   data = new_plot_data,
@@ -382,7 +387,7 @@ Let's get started with choosing some colors. As discussed in @sec-programming, w
 
 ```{r}
 #| label: museums-colors
-bg_col <- "#fafafa"
+bg_col <- "#FAFAFA"
 text_col <- "black"
 ```
 
@@ -391,6 +396,7 @@ For the colors of the lines, we can use the {viridis} package [@viridis]. The {v
 ```{r}
 #| label: fig-museums-style-plot-1
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
+#| fig-alt: ""
 col_plot <- basic_plot +
   viridis::scale_color_viridis(
     discrete = TRUE,
@@ -405,12 +411,10 @@ Let's start by loading in a different font using `font_add_google()` from {sysfo
 
 ```{r}
 #| label: museums-fonts
-sysfonts::font_add_google(
-  name = "Raleway", family = "raleway"
-)
+sysfonts::font_add_google(name = "Raleway")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
-body_font <- "raleway"
+body_font <- "Raleway"
 ```
 
 We also need to define a title, subtitle, and caption. Adding a question as a title can help guide readers towards what you want them to see, but also force them to look for themselves. Here, we ask *Are there fewer museums opening in more deprived areas?* in the title - telling readers to look at changes across the levels of deprivation, but not giving them the answer straight away. 
@@ -461,7 +465,7 @@ Now, we have our final plot:
 ```{r}
 #| label: fig-museums-style-plot-3
 #| fig-cap: "A styled version of the previous plot - with a custom font, colored background, and better spacing."
-library(ggtext)
+#| fig-alt: ""
 text_plot +
   scale_y_continuous(limits = c(0, 300)) +
   coord_cartesian(expand = FALSE) +
@@ -478,18 +482,18 @@ text_plot +
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = element_textbox_simple(
+    plot.title = ggtext::element_textbox_simple(
       color = text_col,
       lineheight = 0.5,
       size = rel(1.2),
       face = "bold",
       margin = margin(b = 5)
     ),
-    plot.subtitle = element_textbox_simple(
+    plot.subtitle = ggtext::element_textbox_simple(
       color = text_col,
       lineheight = 0.5
     ),
-    plot.caption = element_textbox_simple(
+    plot.caption = ggtext::element_textbox_simple(
       hjust = 0,
       color = text_col,
       lineheight = 0.5
@@ -501,19 +505,11 @@ text_plot +
   )
 ```
 
-And we can save it to a file using `ggsave()` as we did in @sec-programming. \index{ggplot2!ggsave}
-
-::: {#tip-museums-img-format .callout-tip}
-
-## Choosing an image format
-
-In @sec-programming, when saving our final plot to a file, we saved it as a PNG file. However, that's not the only option. We could also have saved in as a JPG, PDF, TIFF, or SVG (to name just a few options). So how do we decide what file type to use?
+And we can save it to a file using `ggsave()` as we did in @sec-programming. In @sec-programming, when saving our final plot to a file, we saved it as a PNG file. However, that's not the only option. We could also have saved in as a JPG, PDF, TIFF, or SVG (to name just a few options). So how do we decide what file type to use? \index{ggplot2!ggsave}
 
 Formats such as PNG and JPG save *raster* images i.e. information is stored about each pixel. This means that they are able to capture highly detailed information. However, this also means that file sizes can be large. Raster images also don't scale well - when you increase the size of an image, it tends to become blurry and lower in quality. Formats such as PDF or SVG are *vector* images i.e. information is stored about each line and shape in the image. This means it's easier to rescale without losing quality, and file sizes can be smaller (at least for graphics that are not excessively complex).
 
-Raster images tend to be better for complex visualisations and images, or when fixed resolution is preferred such as in a website. Vector images tend to be better for graphics that are likely to need resizing or be interactive. For the remainder of this book, we'll continue to save in PNG format for consistency in the print version of the book.
-
-:::
+Raster images tend to be better for complex visualisations and images, or when fixed resolution is preferred such as in a website. Vector images tend to be better for graphics that are likely to need resizing or be interactive. For the remainder of this book, we'll continue to save in PNG format for consistency in the print version of the book. \index{image format}
 
 ```{r}
 #| label: museums-save
@@ -536,14 +532,12 @@ We removed the legend from the plot with the reason that *the colors are based o
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/uk-museums.gif){fig-align="center"}
+![](images/uk-museums.gif){fig-align="center" fig-alt=""}
 
 :::
 
 ## Exercises
 
-::: {.callout-caution}
+* Edit the visualization to use a single color (of your choice) to highlight each line, instead of the `viridis` color palette.
 
-Exercises are coming soon!
-
-:::
+* Edit the facet labels to indicate directly on the chart which ones are the *least deprived* and *most deprived*.

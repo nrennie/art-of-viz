@@ -352,19 +352,26 @@ div.csl-indent {
 
 
 </header><p>In this chapter we’ll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.</p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"glue"</span>,</span>
+<span>  <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span>, <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="data" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">2.1</span> Data</h2>
 <p>In this chapter, we’re going to explore the Programming Languages Database (PLDB) <span class="citation" data-cites="pldb_data">(<a href="references.html#ref-pldb_data" role="doc-biblioref">PLDB contributors 2022</a>)</span>. This database is an encyclopedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn.</p>
 <p>The PLDB is <em>published to the public domain</em> and can be found online at <a href="https://pldb.io/">pldb.io</a>, where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by <a href="https://github.com/jmcastagnetto">Jesus M. Castagnetto</a>), meaning we can also easily load the data into R using the {tidytuesdayR} R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>.</p>
 <p>The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the <code>tt_load()</code> function, which loads the data from a specific week (specified by the date) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the <code>$</code> notation: </p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-21"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-21"</span><span class="op">)</span></span>
 <span><span class="va">languages</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">languages</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can alternatively read the data in via {tidytuesdayR} using the year and week. For example <code>languages &lt;- tidytuesdayR::tt_load(2023, week = 12)</code>, but remembering the date is often much easier! You can also read the data in directly from the CSV file on GitHub using <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> or <code>read_csv()</code> from {readr}.</p>
 <p>What does the data look like? We can inspect the first six rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">languages</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">languages</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 49
   pldb_id  title description type  appeared creators website
@@ -395,16 +402,16 @@ div.csl-indent {
 <span class="header-section-number">2.2.1</span> Data exploration</h3>
 <p>We can’t explore every column in this chapter, but I encourage you to do so at home. So we’ll start with <code>language_rank</code> - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here…). We might want to look at the <code>last_activity</code> column in relation to the rank - are programming languages with more recent activity also more popular? Let’s start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with <code>xlab</code> and <code>ylab</code> in <a href="#fig-languages-scatter" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> isn’t necessary if it’s just you looking at these plots, but if you’re sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here!</p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">languages</span><span class="op">$</span><span class="va">last_activity</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">languages</span><span class="op">$</span><span class="va">language_rank</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Last activity"</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"Rank"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The scatterplot shows last activity on the x-axis and rank on the y-axis. However, there seem to be some negative values on the x-axis, which might indicate an issue with the data.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-scatter-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-scatter-1.png" class="img-fluid figure-img" alt="The scatterplot shows last activity on the x-axis and rank on the y-axis. However, there seem to be some negative values on the x-axis, which might indicate an issue with the data.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.1: A basic scatter plot of how language rank varies based on last activity, showing some unusual date values.
@@ -420,7 +427,7 @@ Figure&nbsp;2.1: A basic scatter plot of how language rank varies based on last 
 </ul>
 <p>In this case, the dates are actually given as just a year (rather than a <code>Date</code> object) so the negative values are unlikely to be incorrectly transformed values. If we’re going to filter out these rows, which year do we use to filter them out? Before 1500? Before 1970? Let’s actually look at these rows:</p>
 <div class="cell">
-<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">languages</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">languages</span><span class="op">$</span><span class="va">last_activity</span><span class="op">)</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">languages</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">languages</span><span class="op">$</span><span class="va">last_activity</span><span class="op">)</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 49
   pldb_id  title description type  appeared creators website
@@ -443,15 +450,14 @@ Figure&nbsp;2.1: A basic scatter plot of how language rank varies based on last 
 <p>Though the name of the Programming Languages Database may suggest that it focuses exclusively on programming languages, this isn’t true. It also includes information on query languages, stylesheet languages, and protocols, among other things. Including numeral systems as you can see here.</p>
 <p>Let’s look at the balance between these different types of languages in the data using a bar chart created using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function from the {graphics} package in base R. The <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function takes a (named) vector or matrix of counts for each category. We can create this vector of counts using the <code><a href="https://rdrr.io/r/base/table.html">table()</a></code> function from base R. Wrapping the vector inside <code><a href="https://rdrr.io/r/base/sort.html">sort()</a></code> means that the bars will be plotted in ascending order. </p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">languages</span><span class="op">$</span><span class="va">type</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  las <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  las <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-pl-barplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-pl-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The bar plot shows various categories on the x-axis, with one category having an extremely high count compared to others. The y-axis represents the frequency, with values reaching up to 3000. This suggests a highly skewed distribution with one dominant category.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-pl-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-pl-barplot-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-pl-barplot-1.png" class="img-fluid figure-img" alt="The bar plot shows various categories on the x-axis, with one category having an extremely high count compared to others. The y-axis represents the frequency, with values reaching up to 3000. This suggests a highly skewed distribution with one dominant category.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-pl-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.2: A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right.
@@ -461,7 +467,7 @@ Figure&nbsp;2.2: A bar chart showing the number of different languages of each t
 </div>
 <p>Almost all of them are programming languages so let’s focus on them only, and recreate our <code>last_activity</code> against <code>language_rank</code> scatter plot. We can use the <code><a href="https://rdrr.io/r/base/subset.html">subset()</a></code> function to extract only rows of the data where the <code>type</code> is <code>"pl"</code> and save this to a new object called <code>pl_df</code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">languages</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"pl"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">languages</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"pl"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">pl_df</span><span class="op">$</span><span class="va">last_activity</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">pl_df</span><span class="op">$</span><span class="va">language_rank</span>,</span>
@@ -469,9 +475,9 @@ Figure&nbsp;2.2: A bar chart showing the number of different languages of each t
 <span>  ylab <span class="op">=</span> <span class="st">"Rank"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-scatter-filter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-scatter-filter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The scatterplot displays 'Last activity' on the x-axis, ranging from 1950 to 2010, and 'Rank' on the y-axis. The data points are densely clustered in certain time periods, with many ranks overlapping. This suggests temporal trends or concentrated activity during specific years.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-scatter-filter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-scatter-filter-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-scatter-filter-1.png" class="img-fluid figure-img" alt="The scatterplot displays 'Last activity' on the x-axis, ranging from 1950 to 2010, and 'Rank' on the y-axis. The data points are densely clustered in certain time periods, with many ranks overlapping. This suggests temporal trends or concentrated activity during specific years.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-scatter-filter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.3: A basic scatter plot of how language rank varies based on last activity, showing clustering of languages with last activity before and after 2000.
@@ -492,21 +498,20 @@ Tip&nbsp;2.1: Subsetting data in R
 <div class="callout-body-container callout-body">
 <p>You can also subset the data using the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function from {dplyr}, either with or without the use of the pipe operator: </p>
 <div class="cell">
-<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pl_df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">languages</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"pl"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pl_df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">languages</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"pl"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Both approaches are equally valid. For this book, if we’re plotting in {ggplot2}, we’ll prepare data using other {tidyverse} packages. But if we’re plotting in base R, we’ll prepare data using base R as well.</p>
 </div>
 </div>
 <p>Which other columns might we explore? In R, we write comments using the <code>#</code> symbol. For personal curiosity, we might be interested in how common that is. Of these programming languages, which symbols are used to denote comments? We can create a bar chart of the different <code>line_comment_token</code>s using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function again: </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">pl_df</span><span class="op">$</span><span class="va">line_comment_token</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  cex.names <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-comment-barplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-comment-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of the number of different langauges that use different comment symbols, showing quite a skewed distribution and with double forward slashes ranked top.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-comment-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-comment-barplot-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-comment-barplot-1.png" class="img-fluid figure-img" alt="Bar chart of the number of different langauges that use different comment symbols, showing quite a skewed distribution and with double forward slashes ranked top.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-comment-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.4: A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right.
@@ -538,18 +543,18 @@ Tip&nbsp;2.2: The importance of sketching
 </div>
 </div>
 <p>A dumbbell chart for the timelines of languages that use a <code>#</code> for comments might look something like this:</p>
-<div id="fig-languages-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-languages-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-languages.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-languages.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.5: Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.
 </figcaption></figure>
 </div>
 <p>To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In {ggplot2}, these are called <em>facets</em>, and might look something like this:</p>
-<div id="fig-languages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<div id="fig-languages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-languages-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+<img src="images/sketch-languages-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.
@@ -569,7 +574,7 @@ Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that 
 <p>We’ll start by sub-setting the data to keep only the rows relating to languages that use one of the comment symbols that we’re interested in. If we want to look at only languages that use a <code>//</code>, <code>#</code>, or <code>;</code> for comments, we can use the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function from {dplyr} in conjunction with the <code>%in%</code> operator. This keeps only rows where the value in the <code>line_comment_token</code> column is in the vector <code>c("//", "#", ";")</code>. We’ll be faceting by <code>line_comment_token</code>, and we want to make sure that the title of the facet is informative - not just a <code>#</code> symbol on its own. Although we could create a labeling function to do this, it’s even easier to just edit the text in the <code>line_comment_token</code> token. We use the <code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code> function to add the phrase <code>"Comment token:"</code> before each symbol and add this as a new column called <code>label</code> using <code>mutate()</code> from {dplyr}. </p>
 <p>To keep our data tidy and manageable, we can drop the columns we no longer need using the <code>select()</code> function from {dplyr} to keep only the five columns we’ll be using in the visualization. We’ll also discard any rows that contain an <code>NA</code> value in any of these columns using <code>drop_na()</code> from {tidyr}. </p>
 <div class="cell">
-<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">comment_df</span> <span class="op">&lt;-</span> <span class="va">pl_df</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">comment_df</span> <span class="op">&lt;-</span> <span class="va">pl_df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">line_comment_token</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"//"</span>, <span class="st">"#"</span>, <span class="st">";"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -585,7 +590,7 @@ Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that 
 <p>We can extract the top 10 using <code>slice_min()</code> from {dplyr} and select the 10 with the smallest values in <code>language_rank</code>. Alternatively, since the data is already sorted in rank order, we can use <code>slice_head()</code> from {dplyr} to extract the first 10 rows. Since we want the top 10 rows from each comment symbol category (not just the top 10 overall), we need to <code>group()</code> the data based on the <code>label</code> column. Before we <code>ungroup()</code> the data, we also want to create a new column that defines the within-group ranking as this will help with plotting. The <code>row_number()</code> function from {dplyr} identifies the row number within each group so is used to define this within-group ranking. We add it as a new column called <code>n</code> using <code>mutate()</code>. </p>
 <p>To aid in plotting, we also want to reformat the data to put both year columns (<code>appeared</code> and <code>last_activity</code>) into one column. We can do this using <code>pivot_longer()</code> from {tidyr}. </p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">comment_df</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">comment_df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">label</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
@@ -600,7 +605,7 @@ Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that 
 </div>
 <p>Our <code>plot_data</code> looks like this:</p>
 <div class="cell">
-<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 6
   title  label            language_rank n     type      year
@@ -621,19 +626,19 @@ Figure&nbsp;2.6: Initial sketch of a dumbbell chart showing the time frame that 
 <p>Next, we start adding geometries: lines and points. The order we add the geometries is important here. We want the points to be plotted on top of the lines so that we don’t see the lines overlapping with the points. This means we need to plot the lines first, then the points. We add geometries using the different <code>geom_*</code> functions. To add lines, we use <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line()</a></code>. Although {ggplot2} is smart, it’s not smart enough to guess which variables will be plotted on each axis. We need to specify an <em>aesthetic mapping</em> using the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function - to define which columns from the data are going on the <code>x</code> and <code>y</code> axes. We want to draw horizontal lines for our dumbbell chart, meaning that <code>year</code> goes on the <code>x</code>-axis, and the rank category, <code>n</code>, goes on the <code>y</code>-axis. By default, <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line()</a></code> draws lines between the co-ordinates in the order of the variable on the x-axis. That’s not really what we want here. We want a separate line drawn for each language, i.e.&nbsp;each rank, <code>n</code>. So we pass this into the <code>group</code> argument as well. This will still draw lines between co-ordinates in order of the variable of the x-axis, but separately for each rank category. To add points at each end of the dumbbell, we add <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> - specifying the aesthetic mapping to put the year on the x-axis and the rank on the y-axis again. We don’t need to specify a <code>group</code> here, although it won’t make any difference if we do. </p>
 <p>Finally, we also add <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create a small multiple plot (facet) for each category in the <code>label</code> column. Note the <code>~</code> required before the name of the column we wish to facet by. </p>
 <div class="cell">
-<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">n</span>, group <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">label</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-basic-plot1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-basic-plot1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The visualization tracks the usage of three comment tokens ('#', '//', and ';') from 1980 to 2020.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-basic-plot1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-basic-plot1-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-basic-plot1-1.png" class="img-fluid figure-img" alt="The visualization tracks the usage of three comment tokens ('#', '//', and ';') from 1980 to 2020.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-basic-plot1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.7: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol.
+Figure&nbsp;2.7: A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol.
 </figcaption></figure>
 </div>
 </div>
@@ -641,7 +646,7 @@ Figure&nbsp;2.7: A facetted dumbbell chart showing time between language appeara
 <p>In {ggplot2} (and most other plotting software) the y-axis starts with 0 at the bottom with increasing values going upwards. However, when we visualize rankings, we usually want to put the smallest number (highest rank) at the top. So we want to reverse the y-axis here. In {ggplot2}, for a discrete axes, we do this by passing the <code><a href="https://rdrr.io/r/base/rev.html">rev()</a></code> (short for reverse) function to the <code>limits</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html">scale_y_discrete()</a></code>. </p>
 <p>The current y-axis labels are not especially informative - it would be more useful to add in the names of the languages or the overall ranking rather than simply the numbers 1 to 10. Later, we’re going to add some labels in each facet to provide this information, so we’ll expand the left hand side of the x-axis to leave some space for those labels. By setting <code>expand = expansion(0, 0)</code> we remove the extra space that’s automatically added by {ggplot2} at either side of the axis.</p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html">scale_y_discrete</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="va">rev</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span></span>
 <span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1970</span>, <span class="fl">1990</span>, <span class="fl">2010</span>, <span class="fl">2030</span><span class="op">)</span>,</span>
@@ -649,12 +654,12 @@ Figure&nbsp;2.7: A facetted dumbbell chart showing time between language appeara
 <span>    expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html">expansion</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-scales-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-scales-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-scales-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-scales-plot-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-scales-plot-1.png" class="img-fluid figure-img" alt="The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-scales-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.8: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030.
+Figure&nbsp;2.8: A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030.
 </figcaption></figure>
 </div>
 </div>
@@ -666,7 +671,7 @@ Figure&nbsp;2.8: A facetted dumbbell chart showing time between language appeara
 <section id="colors" class="level3" data-number="2.4.1"><h3 data-number="2.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">2.4.1</span> Colors</h3>
 <p>Let’s start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We’ll come back to choosing colors for this setting in <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Here, it’s a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements.</p>
-<p>To make visualizations that are more aesthetically pleasing, it’s often useful to think about whether you can match your color choices to the theme of the data. For example, if you’re creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we’re creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in <em>green screens</em> (<a href="https://en.wikipedia.org/wiki/Monochrome_monitor">monochrome monitors</a> that used a green phosphor screens) typically in the early days of computing.</p>
+<p>To make visualizations that are more aesthetically pleasing, it’s often useful to think about whether you can match your color choices to the theme of the data. For example, if you’re creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we’re creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in <em>green screens</em> (<a href="https://en.wikipedia.org/wiki/Monochrome_monitor">monochrome monitors</a> that used green phosphor screens) typically in the early days of computing.</p>
 <p>We can define some variables to store our colors in: a variable called <code>bg_col</code> that’s dark gray color we’ll use for the background; and a variable called <code>main_col</code> that’s a hex code for a bright green color we’ll use for the text and other geometric elements.</p>
 <div id="tip-languages-colors" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -683,13 +688,13 @@ Tip&nbsp;2.3: Colors in R
 </div>
 <p>It’s useful to save colors as variables because it makes it much easier to edit colors later on. We <em>could</em> just use the hex code directly in each argument where we want to use the color. But as you’ll see when we start applying the colors to our chart, this can be many different arguments. If we decided we actually want to use a slightly different shade of green, we’d have to manually change all of them. By using a variable, we only need to change it once.</p>
 <div class="cell">
-<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray5"</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray5"</span></span>
 <span><span class="va">main_col</span> <span class="op">&lt;-</span> <span class="st">"#66FF00"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Although you can use <code><a href="https://ggplot2.tidyverse.org/reference/update_defaults.html">update_geom_defaults()</a></code> to change the default colors used for lines, points, and text, this approach also changes the colors for all future plots in your R session and it’s quite tricky to return to the previous defaults. Instead, we can simply rewrite the code we already have and add in the additional colors. Note that these colors are added outside of the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function since they are not mapped to variables in the data. </p>
 <p>The point character (<code>pch</code>) for <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> is also set to <code>22</code> - a square which allows you to color the square and its outline different colors. The outline <code>color</code> is set to our green <code>main_col</code> and the square <code>fill</code> color is set to the dark gray <code>bg_col</code>.</p>
 <div class="cell" data-source-line-numbers="4,8,9,10">
-<div class="sourceCode" id="cb18" data-source-line-numbers="4,8,9,10" data-code-line-numbers="4,8,9,10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb19" data-source-line-numbers="4,8,9,10" data-code-line-numbers="4,8,9,10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">n</span>, group <span class="op">=</span> <span class="va">n</span><span class="op">)</span>,</span>
 <span>    color <span class="op">=</span> <span class="va">main_col</span></span>
@@ -710,12 +715,12 @@ Tip&nbsp;2.3: Colors in R
 <span>  <span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-basic-plot2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-basic-plot2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-basic-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-basic-plot2-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-basic-plot2-1.png" class="img-fluid figure-img" alt="The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-basic-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.9: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points.
+Figure&nbsp;2.9: A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points.
 </figcaption></figure>
 </div>
 </div>
@@ -725,12 +730,12 @@ Figure&nbsp;2.9: A facetted dumbbell chart showing time between language appeara
 <p>Adding text to a visualization is important - a title, subtitle, and perhaps caption can add information to make it easier for a reader to understand what’s going on. A title quickly explains what the chart is about. Though more informative titles may be viewed as more aesthetically pleasing, there’s no evidence that they are more effective for conveying information <span class="citation" data-cites="Wanzer2021">(<a href="references.html#ref-Wanzer2021" role="doc-biblioref">Wanzer et al. 2021</a>)</span>. A subtitle might give some more information about the underlying data, explain how to interpret more complex charts, or state the conclusions a reader should come to. Captions are a good place to put information such as who made the graphic, what the source of the data is, or other important conditions on the data.</p>
 <p>As with colors, we’ll define text as variables. This helps to keep the plotting code looking a little bit cleaner. It’s often easier to write the text after you’ve made the plot, and defining variables make it easy to add placeholder text while you’re working on the plot.</p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Programming Languages"</span></span>
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Programming Languages"</span></span>
 <span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: Programming Language DataBase | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since our visualization doesn’t give information on how many languages use each comment symbol and just focuses on the top 10, we might want to instead present this information in the subtitle instead:</p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ; to define which lines are comments. 3,831 languages do not have a comment token listed."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"Of the 4,303 programming languages listed in the Programming Language DataBase, 205 use //, 101 use #, and 64 use ; to define which lines are comments. 3,831 languages do not have a comment token listed."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The problem with writing out the values into a text string like this is that it’s hard to update. The snapshot of data we’re working with here is from March 2023. If we updated the data to a more recent version, we’d have to recalculate these values manually then copy and paste them into the text string. A better approach is to use data-driven text - combine calculation with text.</p>
 <p>The {glue} package <span class="citation" data-cites="glue">(<a href="references.html#ref-glue" role="doc-biblioref">Hester and Bryan 2024</a>)</span> makes it easy to combine text with variable values. The <code>glue()</code> function evaluates R code inside curly brackets <code><a href="https://rdrr.io/r/base/Paren.html">{}</a></code> and inserts it into the string. Alternatively, you can use <code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code> as we did earlier for the facet labels, or <code><a href="https://rdrr.io/r/base/sprintf.html">sprintf()</a></code> in base R.</p>
@@ -749,11 +754,11 @@ Tip&nbsp;2.4: Opening and closing brackets in <code>glue()</code>
 </div>
 <p>Since the values are going into a sentence we can make use of the <code><a href="https://rdrr.io/r/base/format.html">format()</a></code> function to add commas into the number formatting - showing <code>4,303</code> instead of <code>4303</code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s add the title, subtitle, and caption to the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from {ggplot2}: </p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="va">title</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="va">subtitle</span>,</span>
@@ -761,12 +766,12 @@ Tip&nbsp;2.4: Opening and closing brackets in <code>glue()</code>
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-text_plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-text_plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;) from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-text_plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-text_plot-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-text_plot-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;) from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-text_plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.10: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added.
+Figure&nbsp;2.10: A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added.
 </figcaption></figure>
 </div>
 </div>
@@ -775,7 +780,7 @@ Figure&nbsp;2.10: A facetted dumbbell chart showing time between language appear
 <p>Working with fonts in R isn’t always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the <code>font_add_google()</code> function from {sysfonts} <span class="citation" data-cites="sysfonts">(<a href="references.html#ref-sysfonts" role="doc-biblioref">Qiu 2022</a>)</span>. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at <a href="https://fonts.google.com/">fonts.google.com</a>. The <code>VT323</code> and <code>Share Tech Mono</code> fonts both look like they’ll fit in with our theme. The <code>font_add_google()</code> function looks through the Google Fonts database for the specified font <code>name</code> (e.g.&nbsp;<code>"VT323"</code>) and loads the font files you’ll need. The second argument, <code>family</code> is how we’ll refer to the font when using it to plot in R. By default it’s the same as the <code>name</code> but it’s often useful to change it to something else (e.g.&nbsp;<code>"vt"</code>), especially for long font names. </p>
 <p>We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the {showtext} package <span class="citation" data-cites="showtext">(<a href="references.html#ref-showtext" role="doc-biblioref">Qiu 2023</a>)</span> comes in. By running <code>showtext_auto()</code>, this means that the {showtext} package is automatically used to render text. We can also set <code>showtext_opts(dpi = 300)</code> to use fonts in the resolution we plan to save our image in later - see <a href="#sec-save-image" class="quarto-xref"><span>Section 2.4.4</span></a> for more details on image resolution. </p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"VT323"</span>, family <span class="op">=</span> <span class="st">"vt"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
@@ -804,7 +809,7 @@ Tip&nbsp;2.5: Alternatives to {showtext}
 </div>
 <p>Exactly, as we did with colors, we’ll save font names as variables to make it easier to see how our plots look with different fonts. We’ll save two variables: <code>title_font</code> that store the font for the title (and other important elements), and <code>body_font</code> for all other text.</p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"share"</span></span>
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"share"</span></span>
 <span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"vt"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When it comes to styling to all of the non-geom elements of your plot (such as the background color, the font family used for the title, or how the caption is aligned) this is handled by the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function in {ggplot2}. There are several built-in themes which pre-set some of the arguments such as <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic()</a></code>, <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code>, or <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_gray()</a></code>. The default theme is <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_gray()</a></code> - this is where the default gray background comes from. </p>
@@ -812,7 +817,7 @@ Tip&nbsp;2.5: Alternatives to {showtext}
 <p>Here, we might start with <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code> and set the <code>base_size</code> to <code>8</code>. This is quite a small font size (smaller than the default size of 11) to make sure the plot fits within the width of the printed version of this book.</p>
 <p>We can also set the <code>base_family</code> equal to <code>body_font</code> - the variable we defined earlier to store the name of the font we want to use for the text. </p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot1</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot1</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span></span>
 <span>    base_size <span class="op">=</span> <span class="fl">8</span>,</span>
 <span>    base_family <span class="op">=</span> <span class="va">body_font</span></span>
@@ -820,7 +825,7 @@ Tip&nbsp;2.5: Alternatives to {showtext}
 <span><span class="va">theme_plot1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="programming-languages_files/figure-html/languages-minimal-theme-1.png" class="img-fluid figure-img"></p>
+<figure class="figure"><p><img src="programming-languages_files/figure-html/languages-minimal-theme-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods."></p>
 <figcaption>A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The default font has been changed, and the font made slightly smaller.</figcaption></figure>
 </div>
 </div>
@@ -841,7 +846,7 @@ Tip&nbsp;2.5: Alternatives to {showtext}
 <span class="header-section-number">2.4.3.4</span> Margins</h4>
 <p>To add a little bit of space around the outside edge of the plot, we can define the <code>plot.margin</code> argument. This is specified using the <code><a href="https://ggplot2.tidyverse.org/reference/element.html">margin()</a></code> function (instead of one of the <code>element_*()</code> functions) which takes four arguments: the top, right, bottom, and left margins. A little bit of trial and error can help you to find values that look good.</p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot1</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot1</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    <span class="co"># Background color</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
@@ -888,9 +893,9 @@ Tip&nbsp;2.5: Alternatives to {showtext}
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">15</span>, <span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-style1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-style1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. The background is black with green text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-style1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-style1-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-style1-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. The background is black with green text.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-style1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.11: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with a dark gray background and green text.
@@ -906,8 +911,8 @@ Figure&nbsp;2.11: A facetted dumbbell chart showing time between language appear
 </ul>
 <p> </p>
 <p>We can replace <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code> with <code>element_textbox_simple()</code> in the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> argument for <code>plot.subtitle</code> to wrap the subtitle text at any font size:</p>
-<div class="cell" data-source-line-numbers="28,30-34">
-<div class="sourceCode" id="cb27" data-source-line-numbers="28,30-34" data-code-line-numbers="28,30-34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">&lt;-</span> <span class="va">theme_plot1</span> <span class="op">+</span></span>
+<div class="cell" data-source-line-numbers="31-35">
+<div class="sourceCode" id="cb28" data-source-line-numbers="31-35" data-code-line-numbers="31-35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">&lt;-</span> <span class="va">theme_plot1</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
@@ -952,9 +957,9 @@ Figure&nbsp;2.11: A facetted dumbbell chart showing time between language appear
 <span>  <span class="op">)</span></span>
 <span><span class="va">theme_plot2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-style2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-style2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-style2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-style2-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-style2-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-style2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.12: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The subtitle text now wraps to the width of the page.
@@ -978,7 +983,7 @@ Tip&nbsp;2.6: Default font sizes in <code><a href="https://ggplot2.tidyverse.org
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1932</span>, y <span class="op">=</span> <span class="va">n</span>, label <span class="op">=</span> <span class="va">title</span><span class="op">)</span>,</span>
 <span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
@@ -987,9 +992,9 @@ Tip&nbsp;2.6: Default font sizes in <code><a href="https://ggplot2.tidyverse.org
 <span>    color <span class="op">=</span> <span class="va">main_col</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-add-labels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-add-labels" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels details the language name.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-add-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-add-labels-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-add-labels-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels details the language name.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-add-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.13: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge.
@@ -999,7 +1004,7 @@ Figure&nbsp;2.13: A facetted dumbbell chart showing time between language appear
 </div>
 <p>Although these labels are an improvement on not having any language label, they’re still not as informative as they could be. There’s no information about the overall rank included in the plot. There’s no way to tell if the top ranked language that uses <code>#</code> as a comment symbol is also the top ranked language overall or ranked as low as 1000! Let’s create a more informative label using the {glue} package again. We can create a new <code>rank_label</code> column using <code>mutate()</code> which combines the language name from the <code>title</code> column, the text <code>"Rank:</code>, and the rank from the <code>language_rank</code> column. The <code>\n</code> adds a line break between the language name and rank text. </p>
 <div class="cell">
-<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    rank_label <span class="op">=</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
 <span>      <span class="st">"{title}\nRank: {language_rank}"</span></span>
@@ -1008,7 +1013,7 @@ Figure&nbsp;2.13: A facetted dumbbell chart showing time between language appear
 </div>
 <p>Let’s add these new and improved labels to our plot using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. Note that since we’ve updated the <code>plot_data</code> object, we need to pass the data in again: </p>
 <div class="cell">
-<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot2</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1932</span>, y <span class="op">=</span> <span class="va">n</span>, label <span class="op">=</span> <span class="va">rank_label</span><span class="op">)</span>,</span>
@@ -1020,9 +1025,9 @@ Figure&nbsp;2.13: A facetted dumbbell chart showing time between language appear
 <span>    color <span class="op">=</span> <span class="va">main_col</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-languages-add-better-labels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-languages-add-better-labels" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels detail the language name and overall rank.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-add-better-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="programming-languages_files/figure-html/fig-languages-add-better-labels-1.png" class="img-fluid figure-img">
+<img src="programming-languages_files/figure-html/fig-languages-add-better-labels-1.png" class="img-fluid figure-img" alt="The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels detail the language name and overall rank.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-languages-add-better-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2.14: A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge and rank.
@@ -1040,10 +1045,9 @@ Figure&nbsp;2.14: A facetted dumbbell chart showing time between language appear
 <li>If you are using {ggplot2} to create your plots, the <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code> function is the easiest way to save your visualizations to a file. As detailed in the help file it <em>defaults to saving the last plot that you displayed, using the size of the current graphics device. It also guesses the type of graphics device from the extension.</em>
 </li>
 </ul>
-<p>I would always recommend saving your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again!</p>
-<p>You can set the width and height in <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>, using a calculation instead of a specific value if you want a specific aspect ratio: </p>
+<p>It’s recommended to save your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again! You can set the width and height in <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>, using a calculation instead of a specific value if you want a specific aspect ratio: </p>
 <div class="cell">
-<div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"programming-languages.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.67</span> <span class="op">*</span> <span class="fl">5</span></span>
@@ -1051,7 +1055,7 @@ Figure&nbsp;2.14: A facetted dumbbell chart showing time between language appear
 </div>
 <p>By default, the width and height is given in inches (though you can change this with the <code>unit</code> argument) and the resolution (set with the <code>dpi</code> argument) is 300. If you’ve saved your final plot to a variable in R, you can pass this directly to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code> instead of printing the object first:</p>
 <div class="cell">
-<div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb33" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"programming-languages.png"</span>,</span>
 <span>  plot <span class="op">=</span> <span class="va">final_plot</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -1068,24 +1072,15 @@ Figure&nbsp;2.14: A facetted dumbbell chart showing time between language appear
 <p></p>
 <p>Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you’d like to learn more about how {camcorder} can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/languages.gif" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+<figure class="figure"><p><img src="images/languages.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="2.6"><h2 data-number="2.6" class="anchored" data-anchor-id="exercises">
 <span class="header-section-number">2.6</span> Exercises</h2>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Caution
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Exercises are coming soon!</p>
-</div>
-</div>
+<ul>
+<li><p>Use open-ended dumbbells for languages that were last active in 2023 i.e.&nbsp;don’t plot a <em>closing</em> point.</p></li>
+<li><p>Instead of showing the top 10 ranked languages for these three comment symbols, recreate the visualization showing all languages that use each symbol.</p></li>
+</ul>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -1310,6 +1305,9 @@ Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.

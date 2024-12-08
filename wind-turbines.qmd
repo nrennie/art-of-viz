@@ -16,6 +16,18 @@ fig-asp: 0.75
 
 In this chapter, we'll learn how to read in data from an Excel file via a URL, create waffle plots using the {waffle} package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
 
+**Packages required in this chapter**:
+
+```{r}
+#| label: turbines-pkgs-req
+#| eval: false
+c(
+  "dplyr", "ggplot2", "glue", "marquee",
+  "openxlsx", "rcartocolor", "readr", "showtext",
+  "stringr", "sysfonts", "waffle"
+)
+```
+
 ## Data
 
 Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a [TidyTuesday dataset](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27) [@tidytuesday]. The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location [@turbines_data]. Rather than reading in the data using the {tidytuesdayR} package as we've done in previous chapters, let's read in the data directly from the [open.canada.ca](https://open.canada.ca/en) website.
@@ -24,9 +36,7 @@ Back in October 2020, data on wind turbines in Canada from the Government of Can
 
 ## Open Government data in Canada
 
-The Canadian Wind Turbine data contains information licensed under the [Open Government Licence - Canada](https://open.canada.ca/en/open-government-licence-canada).
-
-You can search for more open data at [search.open.canada.ca/opendata](https://search.open.canada.ca/opendata/). 
+The Canadian Wind Turbine data contains information licensed under the [Open Government Licence - Canada](https://open.canada.ca/en/open-government-licence-canada). You can search for more open data at [search.open.canada.ca/opendata](https://search.open.canada.ca/opendata/). See @sec-doctors for further discussion of open data sources.
 
 :::
 
@@ -71,17 +81,36 @@ wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
 
 :::
 
-::: {#tip-turbines-excel .callout-tip}
-
-## Processing Excel files
-
 There are some features of Excel files that can make them more human-friendly but less computer-friendly:
 
-* **Multiple sheets**: Excel files may contain multiple sheets of data. You can use the `sheet` argument in `read.xlsx()` to specify the name or index of the sheet you want to read in. Using the sheet name is usually a little bit more robust, as it means your code can withstand (accidental) changes to the order of sheets.
+* Multiple sheets
+* Empty rows
+* Merged cells
 
-* **Empty rows**: The `read.xlsx()` function always skips empty rows at the start of the file. However, sometimes the author of the spreadsheet may add a title row then a few empty rows before the *real* data begins. You can use the `startRow` argument to specify which rows the data actually starts on.
+Luckily, the `.xlsx` file we've downloaded is both human-friendly and computer-friendly so we don't have to deal with these issues right now.
 
-* **Merged cells**: Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they're at the top of the file (e.g. with the title information) then using `startRow` might be enough. Otherwise, setting `fillMergedCells = TRUE` in `read.xlsx()` means that *the value in a merged cell is given to all cells within the merge* [@openxlsx].
+::: {#tip-turbines-excel-1 .callout-tip}
+
+## Dealing with multiple sheets from Excel
+
+Excel files may contain multiple sheets of data. You can use the `sheet` argument in `read.xlsx()` to specify the name or index of the sheet you want to read in. Using the sheet name is usually a little bit more robust, as it means your code can withstand (accidental) changes to the order of sheets.
+
+:::
+
+::: {#tip-turbines-excel-2 .callout-tip}
+
+## Skipping empty rows from Excel
+
+The `read.xlsx()` function always skips empty rows at the start of the file. However, sometimes the author of the spreadsheet may add a title row then a few empty rows before the *real* data begins. You can use the `startRow` argument to specify which rows the data actually starts on.
+
+:::
+
+
+::: {#tip-turbines-excel-3 .callout-tip}
+
+## Processing merged cells from Excel
+
+Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they're at the top of the file (e.g. with the title information) then using `startRow` might be enough. Otherwise, setting `fillMergedCells = TRUE` in `read.xlsx()` means that *the value in a merged cell is given to all cells within the merge* [@openxlsx].
 
 :::
 
@@ -130,11 +159,14 @@ Let's start by exploring the hypothesis that wind turbines with a larger rotor d
 ```{r}
 #| label: fig-turbines-scatter
 #| fig-cap: "Scatter plot showing the relationship between rotor diameter and turbine capacity."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
-  wind_turbines$`Rotor.diameter.(m)`,
-  as.numeric(wind_turbines$`Turbine.rated.capacity.(kW)`),
+  x = wind_turbines$`Rotor.diameter.(m)`,
+  y = as.numeric(
+    wind_turbines$`Turbine.rated.capacity.(kW)`
+  ),
   xlab = "Rotor diameter (m)",
   ylab = "Turbine rated capacity (kW)"
 )
@@ -150,18 +182,44 @@ This scatter plot highlights a few issues:
 
 * The other issue with this scatter plot is that many of the observations are the same, but it's not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That's not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualized as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.
 
+::: {#tip-turbines-view .callout-tip}
+
+## Inspecting data
+
+Remember that you can use `View(wind_turbines)` to inspect the data in a more human-readable format. In addition to looking at the data, obtaining summaries of the columns, and creating exploratory graphics with base R, there are many packages available to help with exploratory data analysis. 
+
+For example, the {GGally} package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
+
+```{r}
+#| label: fig-turbines-ggally
+#| fig-cap: "A 3x3 grid of comparisons between three columns in the `wind_turbines` data relationships using correlation, density plots, bar charts, scatter plots, and box plots."
+#| fig-alt: ""
+#| fig-asp: 1
+#| message: false
+#| echo: -1
+ggplot2::theme_set(ggplot2::theme_gray(base_size = 2))
+GGally::ggpairs(
+  data = wind_turbines,
+  columns = c(
+    "Province/Territory",
+    "Hub.height.(m)",
+    "Rotor.diameter.(m)"
+  )
+)
+```
+
+:::
+
 Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
 
 ```{r}
 #| label: fig-turbines-barplot
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
+#| fig-alt: ""
 #| echo: -1
-par(mar = c(3.1, 6.6, 1.1, 2.1))
+par(mar = c(3.1, 6.6, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
-  # make labels smaller so they fit on the page
-  cex.axis = 0.5,
-  cex.names = 0.5,
   las = 1,
   horiz = TRUE
 )
@@ -172,16 +230,14 @@ Most of the turbines are located in Ontario, but has this always been the case? 
 ```{r}
 #| label: fig-turbines-barplot-2
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
+#| fig-alt: ""
 #| echo: -1
-par(mar = c(3.1, 4.1, 1.1, 2.1))
+par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(
     wind_turbines$`Province/Territory`,
     wind_turbines$Commissioning.date
   ),
-  # make labels smaller so they fit on the page
-  cex.axis = 0.5,
-  cex.names = 0.5,
   las = 1,
   horiz = TRUE
 )
@@ -197,7 +253,7 @@ Rather than making a stacked bar chart for each year, which can make it difficul
 
 Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
 
-![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-sketch-turbines fig-align="center"}
+![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-sketch-turbines fig-align="center" fig-alt=""}
 
 We can make two slight variations to this basic version of the chart:
 
@@ -244,9 +300,7 @@ extract_after_last_slash <- function(texts) {
 
 ## Comparing `if_else()` and `ifelse()`
 
-If you've used the `ifelse()` function in base R before, you might be wondering why there's a very similarly named function in {dplyr} and what's different about it. 
-
-The main difference is that `if_else()` is a bit more strict about checking whether you're doing what you think you're doing. For example, let's say we have a vector `x` of length 4 and we want to replace the values in `x` that are equal to 0 with something else. If that replacement is of length 3, that doesn't really make sense. Which value in the vector of length 3 should it use? The `if_else()` function highlights this issue with an error, the `ifelse()` function quietly uses the value in the same position. 
+If you've used the `ifelse()` function in base R before, you might be wondering why there's a very similarly named function in {dplyr} and what's different about it. The main difference is that `if_else()` is a bit more strict about checking whether you're doing what you think you're doing. For example, let's say we have a vector `x` of length 4 and we want to replace the values in `x` that are equal to 0 with something else. If that replacement is of length 3, that doesn't really make sense. Which value in the vector of length 3 should it use? The `if_else()` function highlights this issue with an error, the `ifelse()` function quietly uses the value in the same position. 
 
 ```{r}
 #| label: r-pkgs-ifelse
@@ -381,9 +435,7 @@ showtext::showtext_opts(dpi = 300)
 
 ## Installing Font Awesome icons with {waffle}
 
-The {waffle} package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to approach described here. \index{waffle!install\_fa\_fonts}
-
-Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and means you don't have to install the font system wide - you only need to load it into R.
+The {waffle} package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to approach described here. Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and means you don't have to install the font system wide - you only need to load it into R. \index{waffle!install\_fa\_fonts}
 
 :::
 
@@ -402,6 +454,10 @@ Finally, we add `facet_wrap()` to create a pictogram for each date range, placin
 ```{r}
 #| label: fig-turbines-base-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, where the region name is showing instead of the icons."
+#| fig-alt: ""
+#| message: false
+#| echo: -1
+ggplot2::theme_set(ggplot2::theme_gray(base_size = 2))
 library(ggplot2)
 basic_plot <- ggplot(data = plot_data) +
   waffle::geom_pictogram(
@@ -437,6 +493,7 @@ We can add `scale_label_pictogram()` from {waffle} to our plot to specify the ic
 ```{r}
 #| label: fig-turbines-icons-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded."
+#| fig-alt: ""
 icons_plot <- basic_plot +
   waffle::scale_label_pictogram(
     values = "fan",
@@ -455,7 +512,7 @@ Now we still need to edit the colors used in the plot, add a title and subtitle 
 
 ```{r}
 #| label: turbines-cols
-bg_col <- "#fafafa"
+bg_col <- "#FAFAFA"
 text_col <- "black"
 ```
 
@@ -466,6 +523,7 @@ In the {rcartocolor} package, categorical palettes are referred to as *qualitati
 ```{r}
 #| label: fig-turbines-rcarto
 #| fig-cap: "All qualitative color palettes with at least 6 colors in the {rcartocolor} package."
+#| fig-alt: ""
 #| fig-asp: 0.8
 #| echo: -1
 par(mar = c(2.1, 4.1, 1.1, 2.1))
@@ -564,6 +622,7 @@ We add these text elements to out plot in the normal way, by passing them into t
 ```{r}
 #| label: fig-turbines-text-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with title and caption text showing asterisks that indicate bold text."
+#| fig-alt: ""
 text_plot <- col_plot +
   labs(
     title = title,
@@ -627,6 +686,7 @@ The {marquee} package relies on some of the more recent features in the R graphi
 ```{r}
 #| label: fig-turbines-theme-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with colored text in the subtitle indicating which color maps to each region."
+#| fig-alt: ""
 scale_plot +
   theme_minimal(
     base_size = 8
@@ -689,14 +749,12 @@ Finally, we've used a `fan` icon because the Font Awesome wind turbine icon is o
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/turbines.gif){fig-align="center"}
+![](images/turbines.gif){fig-align="center" fig-alt=""}
 
 :::
 
 ## Exercises
 
-::: {.callout-caution}
+* Instead of using the icons to represent the number of turbines, recreate this visualization where the icons represent the total capacity (kW). Should you choose a different icon?
 
-Exercises are coming soon!
-
-:::
+* Can you arrange both versions (number and capacity) as a single visualization? Hint: you might want to use the {patchwork} package discussed in @sec-time-zones.

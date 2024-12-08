@@ -15,6 +15,17 @@ execute:
 
 In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.
 
+**Packages required in this chapter**:
+
+```{r}
+#| label: languages-pkgs-req
+#| eval: false
+c(
+  "dplyr", "ggplot2", "ggtext", "glue",
+  "showtext", "sysfonts", "tidyr", "tidytuesdayR"
+)
+```
+
 ## Data
 
 In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
@@ -67,6 +78,7 @@ We can't explore every column in this chapter, but I encourage you to do so at h
 ```{r}
 #| label: fig-languages-scatter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
+#| fig-alt: "The scatterplot shows last activity on the x-axis and rank on the y-axis. However, there seem to be some negative values on the x-axis, which might indicate an issue with the data."
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
@@ -97,12 +109,12 @@ Let's look at the balance between these different types of languages in the data
 ```{r}
 #| label: fig-languages-pl-barplot
 #| fig-cap: "A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right."
+#| fig-alt: "The bar plot shows various categories on the x-axis, with one category having an extremely high count compared to others. The y-axis represents the frequency, with values reaching up to 3000. This suggests a highly skewed distribution with one dominant category."
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(7.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   height = sort(table(languages$type)),
-  las = 2,
-  cex.names = 0.5
+  las = 2
 )
 ```
 
@@ -111,6 +123,7 @@ Almost all of them are programming languages so let's focus on them only, and re
 ```{r}
 #| label: fig-languages-scatter-filter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing clustering of languages with last activity before and after 2000."
+#| fig-alt: "The scatterplot displays 'Last activity' on the x-axis, ranging from 1950 to 2010, and 'Rank' on the y-axis. The data points are densely clustered in certain time periods, with many ranks overlapping. This suggests temporal trends or concentrated activity during specific years."
 #| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 pl_df <- subset(languages, type == "pl")
@@ -146,12 +159,12 @@ Which other columns might we explore? In R, we write comments using the `#` symb
 ```{r}
 #| label: fig-languages-comment-barplot
 #| fig-cap: "A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right."
+#| fig-alt: "Bar chart of the number of different langauges that use different comment symbols, showing quite a skewed distribution and with double forward slashes ranked top."
 #| echo: -1
 #| dev: "ragg_png"
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   height = sort(table(pl_df$line_comment_token)),
-  cex.names = 0.5
 )
 ```
 
@@ -177,11 +190,11 @@ Whether you choose to use pen and paper or digital drawing tools, sketching is a
 
 A dumbbell chart for the timelines of languages that use a `#` for comments might look something like this:
 
-![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages.png){#fig-languages-sketch fig-align="center"}
+![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages.png){#fig-languages-sketch fig-align="center" fig-alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change."}
 
 To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In {ggplot2}, these are called *facets*, and might look something like this:
 
-![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages-2.png){#fig-languages-sketch-2 fig-align="center"}
+![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages-2.png){#fig-languages-sketch-2 fig-align="center" fig-alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language."}
 
 ## Preparing a plot
 
@@ -258,7 +271,8 @@ Finally, we also add `facet_wrap()` to create a small multiple plot (facet) for 
 
 ```{r}
 #| label: fig-languages-basic-plot1
-#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol."
+#| fig-cap: "A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol."
+#| fig-alt: "The visualization tracks the usage of three comment tokens ('#', '//', and ';') from 1980 to 2020."
 #| warning: false
 library(ggplot2)
 basic_plot <- ggplot(data = plot_data) +
@@ -274,7 +288,8 @@ The current y-axis labels are not especially informative - it would be more usef
 
 ```{r}
 #| label: fig-languages-scales-plot
-#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030."
+#| fig-cap: "A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. High ranked languages are at the top of the chart, and the x-axis extends from 1930 to 2030."
+#| fig-alt: "The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030."
 basic_plot +
   scale_y_discrete(limits = rev) +
   scale_x_continuous(
@@ -294,7 +309,7 @@ There are lots of different elements of applying more advanced styling to charts
 
 Let's start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We'll come back to choosing colors for this setting in @sec-museums and @sec-lemurs. Here, it's a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements.
 
-To make visualizations that are more aesthetically pleasing, it's often useful to think about whether you can match your color choices to the theme of the data. For example, if you're creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we're creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in *green screens* ([monochrome monitors](https://en.wikipedia.org/wiki/Monochrome_monitor) that used a green phosphor screens) typically in the early days of computing. 
+To make visualizations that are more aesthetically pleasing, it's often useful to think about whether you can match your color choices to the theme of the data. For example, if you're creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we're creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in *green screens* ([monochrome monitors](https://en.wikipedia.org/wiki/Monochrome_monitor) that used green phosphor screens) typically in the early days of computing. 
 
 We can define some variables to store our colors in: a variable called `bg_col` that's dark gray color we'll use for the background; and a variable called `main_col` that's a hex code for a bright green color we'll use for the text and other geometric elements.
 
@@ -320,7 +335,8 @@ The point character (`pch`) for `geom_point()` is also set to `22` - a square wh
 
 ```{r}
 #| label: fig-languages-basic-plot2
-#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points."
+#| fig-cap: "A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol with green lines and green-outlined dark gray points."
+#| fig-alt: "The chart tracks the use of three comment tokens ('#', '//', and ';') from 1970 to 2030. The lines are green, showing a clear distinction between the time periods."
 #| source-line-numbers: "4,8,9,10"
 basic_plot <- ggplot(data = plot_data) +
   geom_line(
@@ -386,7 +402,8 @@ Let's add the title, subtitle, and caption to the plot using the `labs()` functi
 
 ```{r}
 #| label: fig-languages-text_plot
-#| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added."
+#| fig-cap: "A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. An unformatted title, subtitle, and caption have been added."
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;) from 1970 to 2030. The lines are green, showing a clear distinction between the time periods."
 text_plot <- basic_plot +
   labs(
     title = title,
@@ -445,6 +462,7 @@ We can also set the `base_family` equal to `body_font` - the variable we defined
 ```{r}
 #| label: languages-minimal-theme
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The default font has been changed, and the font made slightly smaller."
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods."
 theme_plot1 <- text_plot +
   theme_minimal(
     base_size = 8,
@@ -476,6 +494,7 @@ To add a little bit of space around the outside edge of the plot, we can define 
 ```{r}
 #| label: fig-languages-style1
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with a dark gray background and green text."
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. The background is black with green text."
 theme_plot1 +
   theme(
     # Background color
@@ -537,7 +556,8 @@ We can replace `element_text()` with `element_textbox_simple()` in the `theme()`
 ```{r}
 #| label: fig-languages-style2
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol. The subtitle text now wraps to the width of the page."
-#| source-line-numbers: "28,30-34"
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods."
+#| source-line-numbers: "31-35"
 theme_plot2 <- theme_plot1 +
   theme(
     plot.background = element_rect(
@@ -599,6 +619,7 @@ The default font size of `geom_text()` is 3.88. This is slightly confusing becau
 ```{r}
 #| label: fig-languages-add-labels
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge."
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels details the language name."
 theme_plot2 +
   geom_text(
     mapping = aes(x = 1932, y = n, label = title),
@@ -626,6 +647,7 @@ Let's add these new and improved labels to our plot using `geom_text()`. Note th
 ```{r}
 #| label: fig-languages-add-better-labels
 #| fig-cap: "A facetted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol, with labels added to denote the langauge and rank."
+#| fig-alt: "The chart titled 'Programming Languages' tracks the use of three comment tokens (#, //, and ;;) in 4,303 programming languages from 1970 to 2030. The lines are green, showing a clear distinction between the time periods. Labels detail the language name and overall rank."
 theme_plot2 +
   geom_text(
     data = plot_data,
@@ -649,9 +671,7 @@ There are many different options available for saving plots created with R to a 
 * The base R {grDevices} package provides several functions for saving to different file types. For example, the `png()` function enables you to save PNG files with a specific height, width, and resolution. You can also set other arguments such as the background color in the `png()` function. The {ragg} package [@ragg] provides a similar set of functions. For example, the `agg_png()` function. 
 * If you are using {ggplot2} to create your plots, the `ggsave()` function is the easiest way to save your visualizations to a file. As detailed in the help file it *defaults to saving the last plot that you displayed, using the size of the current graphics device. It also guesses the type of graphics device from the extension.*
 
-I would always recommend saving your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again!
-
-You can set the width and height in `ggsave()`, using a calculation instead of a specific value if you want a specific aspect ratio: \index{ggplot2!ggsave}
+It's recommended to save your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again! You can set the width and height in `ggsave()`, using a calculation instead of a specific value if you want a specific aspect ratio: \index{ggplot2!ggsave}
 
 ```{r}
 #| label: languages-save
@@ -696,15 +716,12 @@ The labels showing the name and rank of the programming languages are a little b
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/languages.gif){fig-align="center"}
+![](images/languages.gif){fig-align="center" fig-alt=""}
 
 :::
 
 ## Exercises
 
-::: {.callout-caution}
+* Use open-ended dumbbells for languages that were last active in 2023 i.e. don't plot a *closing* point.
 
-Exercises are coming soon!
-
-:::
-
+* Instead of showing the top 10 ranked languages for these three comment symbols, recreate the visualization showing all languages that use each symbol.

@@ -34,6 +34,17 @@ fig-asp: 0.8
 
 In this chapter, we'll learn how to access data through an API, create custom text layouts, and build parameterized plot functions. 
 
+**Packages required in this chapter**:
+
+```{r}
+#| label: nobel-pkgs-req
+#| eval: false
+c(
+  "dplyr", "ggplot2", "ggtext", "lubridate",
+  "readr", "showtext", "sysfonts"
+)
+```
+
 ## Data
 
 In this chapter, we're going to explore Nobel Prize Laureates. Since 1901, the Nobel Prizes have been awarded to those who, during the preceding year, have conferred the greatest benefit to humankind. Awards are granted in the fields of Physics, Chemistry, Physiology or Medicine, Literature, Peace, and (since 1969) Economic Sciences.
@@ -140,6 +151,7 @@ Let's start by exploring the relationship between year of birth and year of awar
 ```{r}
 #| label: fig-nobel-scatter
 #| fig-cap: "A scatter plot of awardee birth date against year of award, showing the expected increasing trend."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 plot(
@@ -155,6 +167,7 @@ We might be interested in seeing whether this relationship is changing over time
 ```{r}
 #| label: fig-nobel-hist
 #| fig-cap: "A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 award_age <- nobel_physics$year -
@@ -172,11 +185,10 @@ It looks like the age of awardees might be increasing slightly - this could be i
 ```{r}
 #| label: fig-nobel-gender-barplot
 #| fig-cap: "A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
-barplot(
-  table(nobel_physics$gender)
-)
+barplot(table(nobel_physics$gender))
 ```
 
 This is quite a significant difference! Let's find a way to communicate and highlight this disparity. 
@@ -194,7 +206,7 @@ Let's say that the purpose of the visualization is to highlight the gender dispa
 
 Instead, let's think outside of the box are present the information in a very non-standard way:
 
-![Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.](images/sketch-nobel.png){#fig-nobel-sketch fig-align="center"}
+![Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.](images/sketch-nobel.png){#fig-nobel-sketch fig-align="center" fig-alt=""}
 
 A bar chart would be a quicker, more efficient way of displaying how many male and female Nobel Laureates there are. A visualization of the names of every single Nobel Laureate might be a quicker, more efficient way of catching someone's attention. This alternative visualization doesn't sacrifice accuracy of information, but it might take a reader a little bit longer to digest the information. Whether that's a sacrifice worth making comes back to what the purpose of the visualization is.
 
@@ -212,11 +224,10 @@ It's always worth double checking that we do actually only have the data we expe
 ```{r}
 #| label: fig-nobel-barplot-category
 #| fig-cap: "A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate)."
+#| fig-alt: ""
 #| echo: -1
 par(mar = c(4.1, 4.1, 1.1, 2.1))
-barplot(
-  table(nobel_physics$category)
-)
+barplot(table(nobel_physics$category))
 ```
 
 ...because sometimes you find something unexpected!
@@ -256,7 +267,7 @@ Let's start by defining a variable for the radius. It doesn't really matter what
 r <- 5
 ```
 
-![Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.](images/sketch-nobel-theta.png){#fig-nobel-sketch-theta fig-align="center"}
+![Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.](images/sketch-nobel-theta.png){#fig-nobel-sketch-theta fig-align="center" fig-alt=""}
 
 Assuming that we know the radius and angle of a point, we can calculate the x- and y- coordinates of a point using the following equations: 
 
@@ -306,6 +317,8 @@ We pass `plot_data` into the `data` argument, and then set the aesthetic mapping
 ```{r}
 #| label: fig-nobel-base-plot
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels."
+#| fig-alt: ""
+#| message: false
 library(ggplot2)
 ggplot() +
   geom_text(
@@ -334,16 +347,12 @@ Both fonts are provided through Google Fonts so we'll use `font_add_google()` fr
 
 ```{r}
 #| label: nobel-fonts
-sysfonts::font_add_google(
-  name = "Passion One", family = "Passion"
-)
-sysfonts::font_add_google(
-  name = "Ubuntu", family = "Ubuntu"
-)
+sysfonts::font_add_google(name = "Passion One")
+sysfonts::font_add_google(name = "Ubuntu")
 showtext::showtext_auto()
 showtext::showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
-title_font <- "Passion"
+title_font <- "Passion One"
 ```
 
 Now, let's remake our `basic_plot` - this time also setting the font `famly` to `body_font`. We'll also right align the text using `hjust = 1` to make the text appear around the outer edge of the circle. The text also needs to be a bit smaller to avoid overlapping between names positioned next to each other. \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
@@ -351,6 +360,7 @@ Now, let's remake our `basic_plot` - this time also setting the font `famly` to 
 ```{r}
 #| label: fig-nobel-base-plot-2
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area."
+#| fig-alt: ""
 basic_plot <- ggplot() +
   geom_text(
     data = plot_data,
@@ -402,6 +412,7 @@ We'll add two separate annotations: one for the title (*Nobel Prize Laureates*) 
 ```{r}
 #| label: fig-nobel-annotated
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category."
+#| fig-alt: ""
 annotated_plot <- col_plot +
   annotate("text",
     x = 10, y = 0,
@@ -457,6 +468,7 @@ The limits of the plot also need to be extended. The scales are currently based 
 ```{r}
 #| label: fig-nobel-style-plot-1
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background."
+#| fig-alt: ""
 styled_plot <- text_plot +
   scale_x_continuous(limits = c(-9, 12)) +
   scale_y_continuous(limits = c(-7.5, 7.5)) +
@@ -475,6 +487,7 @@ We can some further, final customization by changing the following `theme()` ele
 ```{r}
 #| label: fig-nobel-style-plot-2
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color."
+#| fig-alt: ""
 styled_plot +
   theme_void(base_size = 6, base_family = body_font) +
   theme(
@@ -530,7 +543,7 @@ For these arguments, we can specify a default. This means that the function will
 
 ## Using fonts in functions
 
-Here, we've specified that the default title font is `"Passion"`. A similar approach is used for the body font. Usually, I'd strongly recommend against such an approach since there's no guarantee that a user will have the `"Passion"` font installed or loaded when running the function. This makes it a bad choice of default font. 
+Here, we've specified that the default title font is `"Passion One"`. A similar approach is used for the body font. Usually, I'd strongly recommend against such an approach since there's no guarantee that a user will have the `"Passion One"` font installed or loaded when running the function. This makes it a bad choice of default font. 
 
 We *could* add the `sysfonts::font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the font every time we run the function. A better option is to specify one of the integrated fonts as a default e.g. `title_font = "sans"`.
 
@@ -550,7 +563,7 @@ category_plot <- function(
     primary_col = "black",
     secondary_col = "gray70",
     body_font = "Ubuntu",
-    title_font = "Passion") {
+    title_font = "Passion One") {
   # Data wrangling
   category_data <- nobel_data |>
     dplyr::filter(category == nobel_category) |>
@@ -573,9 +586,10 @@ category_plot <- function(
     font_color = primary_col,
     font_family = body_font
   )
-  cap <- paste0(
-    "**Data**: The Nobel Foundation<br>**Graphic**: ",
-    social
+  cap <- source_caption(
+    source = "The Nobel Foundation",
+    sep = "<br>",
+    graphic = social
   )
   # Plot
   g <- ggplot() +
@@ -694,6 +708,7 @@ Then we pass the `"Peace"` category into our `category_plot()` function, alongsi
 ```{r}
 #| label: fig-nobel-peace-plot
 #| fig-cap: "The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink."
+#| fig-alt: ""
 peace_plot <- category_plot(
   "Peace",
   nobel_peace,
@@ -745,13 +760,6 @@ Despite the shortcomings when compared to more traditional visualizations, this 
 
 ## Exercises
 
-::: {.callout-caution}
-
-## Adjusting a parameterized plot function
-
 * Edit the `category_plot()` to add another argument for the `"Organisation"` category. Make sure the function still works when there are no organisations in the data e.g. for the Physics data.
 
 * Download data for another category e.g. Chemistry and use the `category_plot()` function again to create a version of the plot for that category.
-
-:::
-
