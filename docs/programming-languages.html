@@ -117,7 +117,13 @@ div.csl-indent {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1SWN5BH1PZ"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
+</script>
 </head>
 <body class="nav-sidebar floating">
 
@@ -361,14 +367,14 @@ div.csl-indent {
 </div>
 <section id="data" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">2.1</span> Data</h2>
-<p>In this chapter, we’re going to explore the Programming Languages Database (PLDB) <span class="citation" data-cites="pldb_data">(<a href="references.html#ref-pldb_data" role="doc-biblioref">PLDB contributors 2022</a>)</span>. This database is an encyclopedia of programming languages, containing information on rankings, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn.</p>
+<p>In this chapter, we’re going to explore the Programming Languages Database (PLDB) <span class="citation" data-cites="pldb_data">(<a href="references.html#ref-pldb_data" role="doc-biblioref">PLDB contributors 2022</a>)</span>. This database is an encyclopedia of programming languages, containing information on ranking, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn.</p>
 <p>The PLDB is <em>published to the public domain</em> and can be found online at <a href="https://pldb.io/">pldb.io</a>, where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by <a href="https://github.com/jmcastagnetto">Jesus M. Castagnetto</a>), meaning we can also easily load the data into R using the {tidytuesdayR} R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>.</p>
 <p>The {tidytuesdayR} R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the <code>tt_load()</code> function, which loads the data from a specific week (specified by the date) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the <code>$</code> notation: </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-21"</span><span class="op">)</span></span>
 <span><span class="va">languages</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">languages</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>You can alternatively read the data in via {tidytuesdayR} using the year and week. For example <code>languages &lt;- tidytuesdayR::tt_load(2023, week = 12)</code>, but remembering the date is often much easier! You can also read the data in directly from the CSV file on GitHub using <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> or <code>read_csv()</code> from {readr}.</p>
+<p>You can alternatively read the data in via {tidytuesdayR} using the year and week. For example <code>languages &lt;- tidytuesdayR::tt_load(2023, week = 12)</code>. You can also read the data in directly from the CSV file on GitHub using <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> or <code>read_csv()</code> from {readr}.</p>
 <p>What does the data look like? We can inspect the first six rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>:</p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">languages</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -391,16 +397,16 @@ div.csl-indent {
 #   github_repo_subscribers &lt;dbl&gt;, …</code></pre>
 </div>
 </div>
-<p>You can also use <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file - if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has 4303 rows and 49 columns - giving us many options for variables to explore further. What variables do we have? The <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md">data description contained in the TidyTuesday GitHub repository</a> is often a good place to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset’s website at <a href="https://pldb.io/csv.html">pldb.io/csv.html</a>. Here, you’ll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we’ll stick with the smaller version for this chapter!</p>
-<p>There are many variables with missing (<code>NA</code>) values in the PLDB - few languages have an entry in the <code>description</code> column, <code>github_</code> columns, <code>reference</code> column, or <code>is_open_source</code> column. Missing values are highly important - we don’t always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the <code>github_</code> columns might be related to the fact that many programming languages precede GitHub’s creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn’t a statistics book, so for the purposes of visualization we’ll focus on columns that are mostly complete. </p>
+<p>You can also use <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> to open a new tab in RStudio to inspect the data in something that resembles a non-editable spreadsheet file if you prefer a more human-readable format. Inspecting the data in this very basic way (simply looking at it with our eyes first) helps to ensure that the data has been read in correctly. This dataset has 4303 rows and 49 columns - giving us many options for variables to explore further. What variables do we have? The <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-21/readme.md">data description contained in the TidyTuesday GitHub repository</a> is often a good place to start. A table containing the column names and what the data in each column means, can help give you some more context for the data you are looking at - especially since columns are not always named intuitively! For the PLDB dataset, you can also look at an even more in-depth description of the variables on the dataset’s website at <a href="https://pldb.io/csv.html">pldb.io/csv.html</a>. Here, you’ll also notice that the TidyTuesday version of this dataset is a subset of a larger dataset which contains 356 variables - we’ll stick with the smaller version for this chapter!</p>
+<p>There are many variables with missing (<code>NA</code>) values in the data. Few languages have an entry in the <code>description</code> column, <code>github_</code> columns, <code>reference</code> column, or <code>is_open_source</code> column. Missing values are highly important. We don’t always want to simply discard rows or columns with missing values as they can often tells us a lot of important information about our data. For example, the many missing values in the <code>github_</code> columns might be related to the fact that many programming languages precede GitHub’s creation in 2008. Discarding rows if they have any missing values in these columns might mean we bias any analysis to newer programming languages. There are many methods of dealing with missing data, and which method you use will depend on what you are trying to achieve. Having said that, this isn’t a statistics book, so for the purposes of visualization we’ll focus on columns that are mostly complete. Further discussion of missing data can be found in <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>. </p>
 <p>So which columns should we explore first? Often when we’re working with data, there is some <em>outcome</em> that we’re interested in. Depending on your field, you might instead hear this called the <em>response</em> variable or the <em>dependent variable</em>. You might have multiple outcomes of interest. For example, in the PLDB data, we might be interested in what affects the ranking and/or the number of GitHub stars for a programming language. These are often the variables we want to tell a story about. However, it’s also important to think about exploring relationships between other variables to make sure that the story you’re telling is the correct one. It might seem obvious that there could be a relationship between <code>github_repo_stars</code> and <code>github_repo_forks</code>, but what exactly is that relationship? What about a less obvious connection between <code>last_activity</code> and <code>number_of_jobs</code> - is there a relationship there?</p>
 </section><section id="exploratory-work" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="exploratory-work">
 <span class="header-section-number">2.2</span> Exploratory work</h2>
 <p>Beyond looking at the data, counting the rows and columns, and inspecting the values in different columns, a key part of exploratory work is visualizing data. These initial visualizations can help you to check if there are any issues with your data (e.g.&nbsp;a misspelling <code>Monday</code> as <code>Mnoday</code>). They can also help to identify interesting relationships or patterns in the data, which can guide you to further avenues for exploration and appropriate modelling techniques.</p>
-<p>There are many different types of plot, and you’ll see several different examples in this book - some you may have seen before, others you may have not. But often, for those initial exploratory plots, the <em>classic</em> charts are where I start: scatter plots, bar charts, box plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; box plots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time.</p>
+<p>There are many different types of plot, and you’ll see several different examples in this book - some you may have seen before, others you may have not. But often, for those initial exploratory plots, the <em>classic</em> charts are a good place to start: scatter plots, bar charts, box plots, density plots, and line charts. Scatter plots are useful for exploring a relationship between two continuous variables; multiple density plots or box plots for exploring a relationship between a categorical and continuous variable; bar charts for exploring a relationship between multiple categorical variables; and line charts for how continuous variables how change over time.</p>
 <section id="data-exploration" class="level3" data-number="2.2.1"><h3 data-number="2.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">2.2.1</span> Data exploration</h3>
-<p>We can’t explore every column in this chapter, but I encourage you to do so at home. So we’ll start with <code>language_rank</code> - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here…). We might want to look at the <code>last_activity</code> column in relation to the rank - are programming languages with more recent activity also more popular? Let’s start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with <code>xlab</code> and <code>ylab</code> in <a href="#fig-languages-scatter" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> isn’t necessary if it’s just you looking at these plots, but if you’re sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here!</p>
+<p>We can’t explore every column in this chapter, but you’re encouraged to do so at home. So we’ll start with <code>language_rank</code> - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here…). We might want to look at the <code>last_activity</code> column in relation to the rank: are programming languages with more recent activity also more popular? Let’s start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with <code>xlab</code> and <code>ylab</code> in <a href="#fig-languages-scatter" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> isn’t necessary if it’s just you looking at these plots, but if you’re sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here! </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">languages</span><span class="op">$</span><span class="va">last_activity</span>,</span>
@@ -485,7 +491,7 @@ Figure&nbsp;2.3: A basic scatter plot of how language rank varies based on last 
 </div>
 </div>
 </div>
-<p>Now, our scatter plot looks much more reasonable - with the first entries in the early 1950’s. It also presents an interesting pattern where the programming languages are split into two different clusters. Languages with <code>last_activity</code> after 2000 are higher ranked (in the top 3000), and those with their last activity before the year 2000 mostly ranked below. Although this is interesting, remember we can’t really make any directional statements here. Do people prefer using languages that are more actively maintained? Or are languages more actively maintained because people prefer using them?</p>
+<p>Now, our scatter plot looks much more reasonable - with the first entries in the early 1950’s. It also presents an interesting pattern where the programming languages are split into two different clusters. Languages with <code>last_activity</code> after 2000 are higher ranked (in the top 3000), and those with their last activity before the year 2000 mostly ranked below. Although this is interesting, remember that we can’t really make any directional statements here. Do people prefer using languages that are more actively maintained? Or are languages more actively maintained because people prefer using them?</p>
 <div id="tip-languages-subset" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -503,7 +509,7 @@ Tip&nbsp;2.1: Subsetting data in R
 <p>Both approaches are equally valid. For this book, if we’re plotting in {ggplot2}, we’ll prepare data using other {tidyverse} packages. But if we’re plotting in base R, we’ll prepare data using base R as well.</p>
 </div>
 </div>
-<p>Which other columns might we explore? In R, we write comments using the <code>#</code> symbol. For personal curiosity, we might be interested in how common that is. Of these programming languages, which symbols are used to denote comments? We can create a bar chart of the different <code>line_comment_token</code>s using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function again: </p>
+<p>Which other columns might we explore? In R, we write comments using the <code>#</code> symbol. For personal curiosity, we might be interested in how common that is. Of these programming languages, which symbols are used to denote comments? We can create a bar chart of the different types of <code>line_comment_token</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function again: </p>
 <div class="cell">
 <div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">pl_df</span><span class="op">$</span><span class="va">line_comment_token</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -528,7 +534,7 @@ Figure&nbsp;2.4: A bar chart showing the number of different programming languag
 <li>what the comment symbol is</li>
 <li>the ranking of the programming languages</li>
 </ul>
-<p>To visualize the time between two things happening, e.g.&nbsp;time between <code>appeared</code> and <code>last_activity_date</code>, we could use a dumbbell chart. Essentially, a point at each of the time points and a (usually horizontal) line connecting the two - named for their resemblance to dumbbell weights. Dumbbell charts are also commonly used to show the difference between values for two categories e.g.&nbsp;heights for men and women, or blood pressure readings before and after a treatment.</p>
+<p>To visualize the time between two things happening, e.g.&nbsp;time between <code>appeared</code> and <code>last_activity_date</code>, we could use a dumbbell chart. Essentially, a point at each of the time points and a (usually horizontal) line connecting the two - named for their resemblance to dumbbell weights. Dumbbell charts are also commonly used to show the difference between values for two categories e.g.&nbsp;heights for men and women, or blood pressure readings before and after a treatment. </p>
 <div id="tip-languages-sketching" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -670,7 +676,7 @@ Figure&nbsp;2.8: A faceted dumbbell chart showing time between language appearan
 <p>There are lots of different elements of applying more advanced styling to charts, and we’ll cover a few of them in this section: colors, fonts, and themes.</p>
 <section id="colors" class="level3" data-number="2.4.1"><h3 data-number="2.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">2.4.1</span> Colors</h3>
-<p>Let’s start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We’ll come back to choosing colors for this setting in <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Here, it’s a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements.</p>
+<p>Let’s start with colors. How do you decide which colors to use? The more complex case is where color represents a variable in the data - either through a color gradient for continuous variables, or a set of distinct colors for discrete, categorical data. We’ll come back to choosing colors for this setting in <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Here, it’s a little bit easier since we only need to think about a few colors: the background color(s), the text color(s), and the colors for the different geometric elements. </p>
 <p>To make visualizations that are more aesthetically pleasing, it’s often useful to think about whether you can match your color choices to the theme of the data. For example, if you’re creating a bar chart of pumpkin sizes, you might want to use orange for the bar color. Here, we’re creating a chart about programming languages. What color do you associate with programming languages? Personally, I think of green. Specifically, the green used in <em>green screens</em> (<a href="https://en.wikipedia.org/wiki/Monochrome_monitor">monochrome monitors</a> that used green phosphor screens) typically in the early days of computing.</p>
 <p>We can define some variables to store our colors in: a variable called <code>bg_col</code> that’s dark gray color we’ll use for the background; and a variable called <code>main_col</code> that’s a hex code for a bright green color we’ll use for the text and other geometric elements.</p>
 <div id="tip-languages-colors" class="callout callout-style-default callout-tip callout-titled">
@@ -683,7 +689,7 @@ Tip&nbsp;2.3: Colors in R
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The dark gray, <code>"gray5"</code>, is a pre-defined color in R. Run <code><a href="https://rdrr.io/r/grDevices/colors.html">colors()</a></code> to see the list of all 657 pre-defined colors available.</p>
+<p>The dark gray, <code>"gray5"</code>, is a pre-defined color in R. Run <code><a href="https://rdrr.io/r/grDevices/colors.html">colors()</a></code> to see the list of all 657 pre-defined colors available. </p>
 </div>
 </div>
 <p>It’s useful to save colors as variables because it makes it much easier to edit colors later on. We <em>could</em> just use the hex code directly in each argument where we want to use the color. But as you’ll see when we start applying the colors to our chart, this can be many different arguments. If we decided we actually want to use a slightly different shade of green, we’d have to manually change all of them. By using a variable, we only need to change it once.</p>
@@ -1123,6 +1129,12 @@ Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another App
 <div id="ref-remotes" class="csl-entry" role="listitem">
 Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
 </div>
+<div id="ref-ggview" class="csl-entry" role="listitem">
+Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
+</div>
+<div id="ref-tidyplots" class="csl-entry" role="listitem">
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+</div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
@@ -1137,6 +1149,9 @@ Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessic
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
 Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-ggiraph" class="csl-entry" role="listitem">
+Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
 </div>
 <div id="ref-GAcharts" class="csl-entry" role="listitem">
 Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
@@ -1267,8 +1282,11 @@ Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span c
 <div id="ref-ggtextcircle" class="csl-entry" role="listitem">
 ———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
 </div>
+<div id="ref-nobel" class="csl-entry" role="listitem">
+———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+</div>
 <div id="ref-pkgs_data" class="csl-entry" role="listitem">
-———. 2024b. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
 </div>
 <div id="ref-signif2024a" class="csl-entry" role="listitem">
 Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
@@ -1303,6 +1321,9 @@ Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</sp
 <div id="ref-waffle" class="csl-entry" role="listitem">
 Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
 </div>
+<div id="ref-lattice" class="csl-entry" role="listitem">
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+</div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
 </div>
@@ -1314,6 +1335,9 @@ Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker,
 </div>
 <div id="ref-funspotr" class="csl-entry" role="listitem">
 Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-plotly" class="csl-entry" role="listitem">
+Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with r, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.
 </div>
 <div id="ref-ggrepel" class="csl-entry" role="listitem">
 Slowikowski, Kamil. 2024. <em><span class="nocase">ggrepel: Automatically Position Non-Overlapping Text Labels with ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggrepel">https://CRAN.R-project.org/package=ggrepel</a>.
