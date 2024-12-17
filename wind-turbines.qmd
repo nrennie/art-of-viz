@@ -247,9 +247,9 @@ As you can see from the y-axis of @fig-turbines-barplot-2, the `Commissioning.da
 
 ### Exploratory sketches
 
-There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines. in different multiyear time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
+There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines in different multiyear time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
 
-Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualized on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart}
+Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualized on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart} \index{pie chart}
 
 Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
 
@@ -284,7 +284,7 @@ Essentially, this means that:
 * If there is no `"/"` in the `Commissioning.date`, we do nothing.
 * If there is one or more `"/"` in the `Commissioning.date`, we extract whatever comes after the last one.
 
-Let's make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the {stringr} package [@stringr]. We then use `str_match()` from {stringr} in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from {dplyr}, to if there was a `"/"` then use the output from `str_match()`, otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} 
+Let's make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the {stringr} package [@stringr]. We then use `str_match()` from {stringr} in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from {dplyr}, to if there was a `"/"` then use the output from `str_match()`, otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} \index{extract\_after\_last\_slash}
 
 ```{r}
 #| label: turbines-extract
@@ -389,7 +389,7 @@ turbines_region <- turbines_year_group |>
 
 The `Region` variable will be plotted alphabetically be default, but this is rarely the most useful ordering. Instead, let's order by magnitude - with the exception of putting the `"other"` category last. 
 
-We start by using the `summarise()` function to add up the number of turbines across the different time periods, getting a total per `Region`. We then `arrange()` them in a descending order (not the `-` in front of the `n`). We then `filter()` out the `"other"` category and stick it on the end after extracting the `Region` column using `pull()`. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} 
+We start by using the `summarise()` function to add up the number of turbines across the different time periods, getting a total per `Region`. We then `arrange()` them in a descending order (note the `-` in front of the `n`). We then `filter()` out the `"other"` category and stick it on the end after extracting the `Region` column using `pull()`. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} 
 
 ```{r}
 #| label: turbines-fct-levels-1
@@ -417,7 +417,7 @@ Our data is now ready for us to plot!
 
 Before we jump into plotting, we need to do one more thing. In @fig-sketch-turbines, we decided we would use icons in the waffle chart instead of just colored grid squares. So we need to find a way of using icons in R. 
 
-In @sec-programming, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. 
+In @sec-programming, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. \index{Font Awesome} \index{fonts}
 
 Then, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use {showtext} to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
@@ -445,7 +445,7 @@ Now we're ready to plot!
 
 We're going to use the {waffle} package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with {ggplot2}. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons i.e. pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
 
-We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want to icon to vary with region - want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region and we'll later use `scale_label_pictogram()` to make them all the same icon. `values` is also a required aesthetic - we use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the `geom_pictogram()` function so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
+We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want the icon to vary with region. Instead, we want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region and we'll later use `scale_label_pictogram()` to make them all the same icon. The `values` argument is also a required aesthetic. We use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the `geom_pictogram()` function so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
 
 We also edit a few other parameters of the `geom_pictogram()` function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it's also very common to put date variables on the x-axis. Setting `flip = TRUE` will stack the pictogram categories upwards, and allow the date categories to go on the x-axis. Setting `n_rows = 10` means that each row of the pictogram will contain 10 icons (remember that we've flipped rows and columns here). We can edit the `size` of the icons in the same way we would edit the font size in `geom_text()`, for example. It might take a little bit of trial and error to find the right size to make sure icons are large enough to see, but don't overlap. We also need to state that the icons come from the Font Awesome 6 font by setting `family = "Font Awesome 6"` (the same name as the `family` argument used in `font_add()`). \index{waffle!geom\_pictogram}
 
@@ -486,7 +486,7 @@ By default, `geom_pictogram()` and `geom_waffle()` both assume that the column m
 
 :::
 
-What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at [fontawesome.com/search](https://fontawesome.com/search) and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan` to name a few. We'll use `fan` [@fontawesome]. 
+What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at [fontawesome.com/search](https://fontawesome.com/search) and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan` to name a few. We'll use `fan` [@fontawesome]. \index{Font Awesome}
 
 We can add `scale_label_pictogram()` from {waffle} to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set `guide = "none"` to remove the legend for icons as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
 
@@ -510,6 +510,8 @@ Now we still need to edit the colors used in the plot, add a title and subtitle 
 
 ### Colors with {rcartocolor}
 
+We start by defining variables for the background and text colors: \index{color}
+
 ```{r}
 #| label: turbines-cols
 bg_col <- "#FAFAFA"
@@ -532,7 +534,7 @@ rcartocolor::display_carto_all(
 )
 ```
 
-Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal}
+Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal} \index{color}
 
 We also make the `col_palette` vector a named vector by using the `names()` function, and using `region_levels` as the names. Although this isn't necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.
 
@@ -617,7 +619,13 @@ st
 
 This is the reason that we wanted the `"other"` category to be in lower case and in last position when constructing `region_levels` - to make the sentence read better.
 
-We add these text elements to out plot in the normal way, by passing them into the `labs()` function: \index{ggplot2!labs}
+We add these text elements to our plot in the normal way, by passing them into the `labs()` function: \index{ggplot2!labs}
+
+```{r}
+#| label: turbines-ragg-png
+#| echo: false
+knitr::opts_chunk$set(dev = "ragg_png")
+```
 
 ```{r}
 #| label: fig-turbines-text-plot
@@ -662,12 +670,6 @@ scale_plot <- text_plot +
 
 Let's make a few final edits to tidy up our plot by editing the theme. We'll use `theme_minimal()` as a base theme (making the font size a little bit smaller), and then make a few further edits using the `theme()` arguments. \index{ggplot2!theme\_minimal} \index{ggplot2!theme}
 
-```{r}
-#| label: turbines-ragg-png
-#| echo: false
-knitr::opts_chunk$set(dev = "ragg_png")
-```
-
 Within `theme()`, we start by setting `plot.title.position` and `plot.caption.position` to `"plot"` to align the title, subtitle, and caption text with the edge of the whole plot, rather than the start of the first panel. Some additional spacing around the edge of the plot is added using `plot.margin` and the background color is edited by using the `fill` and `color` arguments in `element_rect()` for the `plot.background` argument. The gridlines are also made slightly thinner by adjusting `panel.grid.major`. \index{ggplot2!element\_rect} \index{ggplot2!element\_line} \index{ggplot2!margin}
 
 Finally, we edit the plot, subtitle, and caption elements and specify them all using `element_marquee()`. By using `element_marquee()`, the Markdown syntax we've applied, such as the bold and colored text, will be rendered correctly. You can adjust the `color`, `size`, `margin` and `hjust` of {marquee} text in the same way you would with `element_text()`. If you have some elements of the text rendered with `element_text()` and some rendered with `element_marquee()`, you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the `size` argument. \index{marquee!element\_marquee}
@@ -679,7 +681,7 @@ The `width` argument applies text wrapping, where `width = 1` means the text wra
 
 ## Requirements for using {marquee}
 
-The {marquee} package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for {marquee} text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the {ragg} package [@ragg] are a good choice. 
+The {marquee} package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for {marquee} text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the {ragg} package [@ragg] are a good choice. \index{ragg}
 
 :::
 

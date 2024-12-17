@@ -74,7 +74,7 @@ There are many `state` columns, essentially providing similar information in dif
 
 The `house` data is very granular, and it's unlikely we'll be able to visualize all of the information in one chart. Therefore we can think about different ways of subsetting or aggregating the data. We might choose to focus on:
 
-* State: Voting patterns within a specific state, or aggregating to look at state-level data instead of constituency-level
+* State: We could look at voting patterns within a specific state, or aggregate to look at state-level data instead of constituency-level.
 
 * Party: We have information on which party each candidate stood for in the election, including data on fusion tickets where candidates stand for multiple parties.
 
@@ -90,7 +90,7 @@ Let's start by having a quick look at whether or not the number of votes has cha
 #| fig-alt: ""
 #| echo: -1
 #| fig-asp: 0.8
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.6, cex.names = 0.6)
 plot(
   x = house$year,
   y = house$candidatevotes,
@@ -99,9 +99,9 @@ plot(
 )
 ```
 
-There doesn't seem to be an especially interesting pattern in votes over time, at least at first glance, in @fig-elections-scatterplot. However, it has highlighted a potential data issue. In most years, the highest values are around 300,000 but there are two observations in 2022 where the values are well over 1,000,000. We had a similar issue in @sec-bees, where some observations were the sum of other observations. This doesn't seem to be the case here. For now, let's exclude these and look at data where the number of candidate votes is below 600,000.
+There doesn't seem to be an especially interesting pattern in votes over time in @fig-elections-scatterplot, at least at first glance. However, it has highlighted a potential data issue. In most years, the highest values are around 300,000 but there are two observations in 2022 where the values are well over 1,000,000. We had a similar issue in @sec-bees, where some observations were the sum of other observations. This doesn't seem to be the case here. For now, let's exclude these and look at data where the number of candidate votes is below 600,000.
 
-We might also be interested in how the number of candidate votes varies by party, and we can use the `boxplot()` function to take a explore whether or not there are big differences: \index{graphics!boxplot}
+We might also be interested in how the number of candidate votes varies by party, and we can use the `boxplot()` function to explore whether or not there are big differences: \index{graphics!boxplot}
 
 ```{r}
 #| label: fig-elections-boxplot
@@ -126,11 +126,11 @@ In @fig-elections-boxplot there are a couple of interesting points to note. Firs
 
 The Democratic and Republican parties have dominated elections during this time period. It's unlikely we'd be able to draw any reliable insights about individual independent candidates because the numbers are so small, so let's group all other party candidates together into an *other* category. We can look at combining @fig-elections-scatterplot and @fig-elections-boxplot, alongside information about each state to look at whether there are changing patterns in vote share for the major parties over time and space. 
 
-We might consider creating an area chart faceted by stated showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. @fig-elections-sketch shows an example of what this might look like:
+We might consider creating an area chart faceted by state showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. @fig-elections-sketch shows an example of what this might look like:
 
 ![Initial sketch of a faceted area chart arranged in a grid shaped like the United States.](images/sketch-elections.png){#fig-elections-sketch fig-align="center" fig-alt=""}
 
-Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly *busy*. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in @sec-turbines and @sec-lemurs. Though the minimalist approach may look cleaner, it can also mean that it's not as clear what's being shown on a chart. Let's add a *how to read this chart* explainer as a legend, created from a zoomed in version of one of the facet plots:
+Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly *busy*. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in @sec-turbines and @sec-lemurs. Though the minimalist approach may look cleaner, it can also mean that it's not as clear what's being shown on a chart. Let's add a *how to read this chart* explainer as a legend, created from a zoomed in version of one of the facet plots: \index{area chart}
 
 ![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections-2.png){#fig-elections-sketch-2 fig-align="center" fig-alt=""}
 
@@ -178,7 +178,7 @@ We're once again going to create a faceted plot, as we did in @sec-programming, 
 
 It's this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.
 
-We start by passing in our `plot_data` to to the `data` argument of `ggplot()`, wrapped inside the `filter()` function from {dplyr} which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. \index{dplyr!filter} \index{ggplot2!ggplot} \index{ggplot2!aes}
+We start by passing in our `plot_data` to the `data` argument of `ggplot()`, wrapped inside the `filter()` function from {dplyr} which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. \index{dplyr!filter} \index{ggplot2!ggplot} \index{ggplot2!aes}
 
 We've already seen examples of making area charts in @sec-museums and @sec-r-pkgs, but we're going to make a slight change in this chapter. Since we're going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of number of votes, we'll look at the proportion for each party. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` does this for us. \index{ggplot2!geom\_area}
 
@@ -251,7 +251,7 @@ basic_plot +
   facet_wrap(~state_po)
 ```
 
-In @fig-elections-basic-plot, we can't actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We'll deal with this problem a little bit later when adjusting the plot themes. 
+In @fig-elections-basic-plot, we can't actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We'll deal with this problem a little bit later when adjusting the plot theme. 
 
 ### Faceting with {geofacet}
 
@@ -261,7 +261,7 @@ To do faceting with {geofacet}, we use `facet_geo()` instead of `facet_wrap()`. 
 
 * We need to specify which grid layout we want to use. You can use the `get_grid_names()` function in {geofacet} to get a list of all of the valid grid names. They are named sensibly based on what region the grid is for e.g. `"us_state_grid1"` and `"eu_grid1"`. Here, we'll use `"us_state_grid2"`. 
 
-* In order to map the data to the correct facet position on the grid, one of the columns in the data must align with the value in the `code` column of your chosen grid. In the `"us_state_grid2"` grid, the `code` column contains the two letter state abbreviations which matches the `state_po` column in our data. If you didn't have the two letter abbreviations, you may need to do so data joining to attach them.
+* In order to map the data to the correct facet position on the grid, one of the columns in the data must align with the value in the `code` column of your chosen grid. In the `"us_state_grid2"` grid, the `code` column contains the two letter state abbreviations which matches the `state_po` column in our data. If you didn't have the two letter abbreviations, you may need to do some data joining to attach them.
 
 If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a US state column even though it isn't) or are missing some states, you can still use `geo_facet()`. However, it will only plot states listed in the facet grid, and you may get a warning message.
 
@@ -287,7 +287,7 @@ We'll now style our charts to apply more intuitive colors, adjust the facet labe
 
 ### Colors
 
-In the USA, the Republican Party is represented by the color red and the Democratic Party by blue. As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into negative stereotypes (e.g. pink for girls). But it's also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we'll stick to red and blue. 
+In the USA, the Republican Party is represented by the color red and the Democratic Party by blue. As we discussed in @sec-lemurs, when choosing which colors to use for well-known categories, it's important not to play into negative stereotypes (e.g. pink for girls). But it's also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we'll stick to red and blue. \index{color}
 
 Since the visualization is already quite busy, we keep the background colors very simple - using only black and white.
 
@@ -300,7 +300,7 @@ text_col <- "black"
 bg_col <- "white"
 ```
 
-We can then apply the colors to our plot using `scale_fill_manual()`, and assigning each color to the relevant party label in `values`. Since we know we're going to be creating our own legend later, we'll remove the default legend by setting `guide = "none"`. \index{ggplot2!scale\_fill\_manual}
+We can then apply the colors to our plot using `scale_fill_manual()`, and assign each color to the relevant party label in `values`. Since we know we're going to be creating our own legend later, we'll remove the default legend by setting `guide = "none"`. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: elections-add-colors
@@ -339,7 +339,7 @@ We write text for the subtitle, using `glue()` to add HTML styling for colored t
 st <- glue::glue("<span style='font-size:10pt; font-family:{title_font}; color:{text_col};'>Votes in US House Elections</span><br>Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
-We also define our `social_caption()` using the function we defined in @sec-cats, which we'll later add as a plot caption: \index{social\_caption}
+We also use our `social_caption()` function defined in @sec-cats, which we'll later add as a plot caption: \index{social\_caption}
 
 ```{r}
 #| label: elections-text-2
@@ -363,7 +363,7 @@ text_plot <- col_plot +
 
 ### Adjusting themes
 
-We know that the facet labels are too large on are currently dominating the visualization as seen in @fig-elections-geofacet-plot. There are a few solutions to this:
+We know that the facet labels are too large and are currently dominating the visualization as seen in @fig-elections-geofacet-plot. There are a few solutions to this:
 
 * Make the facet labels much smaller. However, this can make them hard to read and renders the labels somewhat pointless.
 
@@ -375,7 +375,7 @@ Here, we're going to go for the third option. Later, we'll use the `theme()` fun
 
 We add text labels with `geom_text()`. The x-coordinate position of the text is set as the mean of the years in the full `plot_data` data to automatically position it in the middle of the chart. The y-coordinate position is set to `0.5` i.e. also in the middle of the chart since the `position = "fill"` argument scales the y-axis to be between `0` and `1`. The `alpha()` function is used to control the transparency of the text color. \index{ggplot2!geom\_text}  \index{ggplot2!aes} \index{ggplot2!alpha}
 
-Note that we use a much smaller value of in `alpha()` than we normally would here. This is because there are actually multiple labels drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other, results in a pretty opaque label. Though we could filtering the data to consider only one year and party, the {geofacet} package sometimes has issues rendering the labels correctly with this approach.
+Note that we use a much smaller value of in `alpha()` than we normally would here. This is because there are actually multiple labels drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other results in a pretty opaque label. Though we could filter the data to consider only one year and party, the {geofacet} package sometimes has issues rendering the labels correctly with this approach.
 
 ```{r}
 #| label: elections-geofacet-style-1
@@ -397,7 +397,7 @@ As we've done in previous chapters we set `expand = FALSE` inside `coord_cartesi
 
 As in previous chapters we use the `element_rect()` function to set `plot.background` to our pre-defined background color variable. We also adjust the plot margins using `plot.margin`. Note that here we're making the left plot margin very large, as this is where we'll later position our custom legend. We discussed pros and cons of this approach in @sec-lemurs. \index{ggplot2!theme} \index{ggplot2!element\_rect} \index{ggplot2!margin} \index{ggplot2!unit} \index{ggplot2!rel}
 
-We can position the title text to the left of the plot, in the wide margin by choosing negative values for `hjust`. Remember the `0` means left-aligned and `1` means right-aligned. Negative values essentially mean *very left aligned*! This works here because the title is a single line of text, but for multi-line text the text alignment can often look odd. That means that for the subtitle text (which is a short paragraph), we're using `tag` instead of `subtitle` text. The `plot.tag.position` allows us to specify a vectpr of co-ordinates for where we want the text to appear - with negative x-coordinates also placing the text into the widened plot margin. It takes a little bit of trial and error to ensure that the `title` and `tag` text are aligned with each otehr. We again use `element_textbox_simple()` to enable automatic text wrapping for the plot `tag` text, and for the caption to make the icons render correctly. \index{ggtext!element\_textbox\_simple}
+We can position the title text to the left of the plot, in the wide margin by choosing negative values for `hjust`. Remember the `0` means left-aligned and `1` means right-aligned. Negative values essentially mean *very left aligned*! This works here because the title is a single line of text, but for multi-line text the text alignment can often look odd. That means that for the subtitle text (which is a short paragraph), we're using `tag` instead of `subtitle` text. The `plot.tag.position` allows us to specify a vector of co-ordinates for where we want the text to appear - with negative x-coordinates also placing the text into the widened plot margin. It takes a little bit of trial and error to ensure that the `title` and `tag` text are aligned with each other. We again use `element_textbox_simple()` to enable automatic text wrapping for the plot `tag` text, and for the caption to make the icons render correctly. \index{ggtext!element\_textbox\_simple}
 
 We set both the `strip.background` and `strip.text` arguments to `element_blank()` to remove all default facet labels, and use `panel.spacing` to control the amount of space between the facets and move them closer together. \index{ggplot2!element\_blank} 
 
@@ -591,6 +591,20 @@ ggsave(
 This visualization summarise a large amount of complex information in a way that is fairly intuitive - the colors match recognisable party colors, the grid is arranged in the a shape that is instantly recognisable, and the area charts clearly indicate vote share over time. However, there are a few more improvements that could be made and other elements we may want to consider. 
 
 Though use of state two-letter abbreviations saves space and avoids excessive text, it is more difficult for a reader to easily look up the state they are interested in - especially if they are less familiar with US geography. Perhaps adding some smaller text under the abbreviations, or creating an interactive version that provides state names upon hover, would make it easier. 
+
+::: {#tip-elections-interactive .callout-tip}
+
+## Interactive charts from {ggplot2}
+
+Though this books focuses on creating static visualizations, you may also be interested in developing interactive charts for use in web-based outputs. There are many packages in R that enable you to make interactive visualizations, and a few that are particularly useful for {ggplot2} users: \index{plotly} \index{plotly!ggplotly} \index{ggiraph}
+
+* **{plotly}** [@plotly]: allows you to build interactive graphics using the `plotly.js` JavaScript library. The `ggplotly()` function can transform a `{ggplot2} plot to a {plotly} plot as a quick way to make interactive graphics.
+
+* **{ggiraph}** [@ggiraph]: allows you to add tooltips, zooming, and clickable elements to {ggplot2} graphics.
+
+:::
+
+Though the colors are intuitive, they are not the most accessible since they are of similar intensity. If we were to use the `cvd_grid()` function from {colorblindr} as we did in @sec-technology, these colors might look much less distinguishable. Choosing a combination of a lighter blue and bright red, or lighter red and bright blue would retain the intuitiveness of the colors, but improve accessibility. \index{color} \index{accessibility} \index{colorblindr!cvd\_grid}
 
 The use of area charts to show percentages is intuitive and sensible for this, since vote share is essentially what decides an election. However, it would also be interesting to see the counts of the number of votes - especially since states can have vastly different populations. A small change in percentage for a state with a large population may result in large changes in number of votes, but this wouldn't be seen in our version of this visualization. 
 

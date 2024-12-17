@@ -63,22 +63,38 @@ There are many different aspects of this data we could inspect:
 * What types of museums are most prevalent in the UK? Does this vary based on whether the museum is accredited?
 * How is the number of open museums changing over time? Are more museums opening than closing?
 
-Some of the variables, such as `DOMUS_Subject_Matter` have quite a lot of missing values which makes it more difficult to visualise and interpret them. Although these columns definitely warrant further exploration, we'll ignore them for now.
+Some of the variables, such as `DOMUS_Subject_Matter` have quite a lot of missing values which makes it more difficult to visualize and interpret them. Although these columns definitely warrant further exploration, we'll ignore them for now.
 
 Given the wealth of information around deprivation indices (8 different variables), that's the first aspect of the data that jumps out. How does the number of museums vary by index of deprivation?
 
 ```{r}
 #| label: fig-museums-barplot
 #| fig-cap: "Bar chart of number of museums per level of deprivation, with higher numbers of museums shown in levels 5 and 6."
-#| fig-alt: ""
+#| fig-alt: "Bar chart of 10 bars, one for each level of deprivation from 1 to 10, which exhibits a bell-shaped curve with the maximum value around 600."
 #| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(table(museums$Area_Deprivation_index))
 ```
 
-Here, `1` is the most deprived, and `10` is the least deprived. This is quite an interesting relationship - there have been more museums in places with a moderate level of deprivation compared to higher or lower level. This might feel a little bit counter-intuitive, we might expect there to be more museums in more affluent areas. But looking at the total number of museums in the data per index of deprivation doesn't tell us the whole story. How many of these museums were open at once? How many are still open today? 
+Here, `1` is the most deprived, and `10` is the least deprived. This is quite an interesting relationship - there have been more museums in places with a moderate level of deprivation compared to higher or lower level. This might feel a little bit counter-intuitive, we might expect there to be more museums in more affluent areas.
 
-To get a better understanding of the relationship between deprivation and the number of museums, we could look at how the number of museums changed for each index of deprivation has changed since 1960 (the earliest date in the data set). Then we might be able to tell whether more are opening or closing, and how this varies across the different levels of deprivation.
+::: {#tip-museums-graphics .callout-tip}
+
+## Alternative graphics packages
+
+This book focuses on building graphics with {ggplot2} (and its various extension packages), in combination with using base R graphics for basic data exploration. However, these are not the only two graphics systems available for creating plots in R. \index{lattice} \index{tidyplots} 
+
+Just a few of the many alternatives:
+
+* **{lattice}** [@lattice]: provides a framework for creating *trellis graphics* (also called small multiples or facet plots).
+
+* **{tidyplots}** [@tidyplots]: a newer graphics package aiming to make it easier to create publication-ready plots for scientific papers. It allows you to pipe together different functions, and add statistical summaries more easily.
+
+Packages for interactive visualizations are also discussed in @sec-house.
+
+:::
+
+By looking at the total number of museums per index of deprivation in @fig-museums-barplot, we don't get the whole story. How many of these museums were open at once? How many are still open today? To get a better understanding of the relationship between deprivation and the number of museums, we could look at how the number of museums changed for each index of deprivation has changed since 1960 (the earliest date in the data set). Then we might be able to tell whether more are opening or closing, and how this varies across the different levels of deprivation.
 
 ### Exploratory sketches
 
@@ -90,7 +106,7 @@ We have 10 deciles of deprivation, so we'll have 10 time series that we want to 
 
 If we go with line charts, and faceting by deprivation index, that might look something like this: 
 
-![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center" fig-alt= ""}
+![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center" fig-alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text."}
 
 We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in @sec-programming but we haven't really thought much about the layouts of those facets. In @sec-programming, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. Here, we have a little bit more flexibility and we might want to think about controlling that layout.
 
@@ -266,7 +282,7 @@ One of most common approaches to visualising multiple time series, is to plot mu
 ```{r}
 #| label: fig-museums-basic-plot-1
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the overlapping lines resembling spaghetti!"
-#| fig-alt: ""
+#| fig-alt: "A line chart with 10 lines showing the number of open museums for each level of deprivation. Many of the lines overlap and are similar colors, making it difficult to read the values. Line go from 1980 to 2020 and show a general increase from around 100 to 500."
 #| message: false
 library(ggplot2)
 ggplot(
@@ -291,7 +307,7 @@ Let's go back to our previous idea, and try separating out the deprivation level
 ```{r}
 #| label: fig-museums-basic-plot-2
 #| fig-cap: "An area chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet."
-#| fig-alt: ""
+#| fig-alt: "10 area charts arranged in a 5x2 grid, each one a different color and labeled based on deprivation. A legend appears on the right hand side. Areas in level 1, 2, and 10 appear smaller."
 ggplot(
   data = plot_data,
   mapping = aes(x = year, y = museums, fill = deprivation)
@@ -317,7 +333,7 @@ The second change can be implemented easily using the {gghighlight} package [@gg
 ```{r}
 #| label: fig-museums-basic-plot-3
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
-#| fig-alt: ""
+#| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values range from around 100 to 500. A legend appears on the right hand side."
 #| message: false
 #| source-line-numbers: "11"
 ggplot(
@@ -359,7 +375,7 @@ We can then re-do our line chart using the rescaled `change` data on the y-axis 
 ```{r}
 #| label: fig-museums-basic-plot-4
 #| fig-cap: "A line chart of percentage increase in museums (compared to 1960) for each level of deprivation, with the each deprivation level in a different facet and individual lines highlighted."
-#| fig-alt: ""
+#| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side."
 #| message: false
 basic_plot <- ggplot(
   data = new_plot_data,
@@ -383,7 +399,7 @@ So what can we do to make this chart better?
 
 ### Colors
 
-Let's get started with choosing some colors. As discussed in @sec-programming, we'll save color codes as variables: either using hex codes or color names. Let's use `"black"` for text, and `"#fafafa"` for the background color. The use of a light gray rather than white for the background is primarily personal preference - it's less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text.
+Let's get started with choosing some colors. As discussed in @sec-programming, we'll save color codes as variables: either using hex codes or color names. Let's use `"black"` for text, and `"#fafafa"` for the background color. The use of a light gray rather than white for the background is primarily personal preference - it's less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text. \index{color}
 
 ```{r}
 #| label: museums-colors
@@ -396,7 +412,7 @@ For the colors of the lines, we can use the {viridis} package [@viridis]. The {v
 ```{r}
 #| label: fig-museums-style-plot-1
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
-#| fig-alt: ""
+#| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side. Lines are colored yellows, blues, and purples."
 col_plot <- basic_plot +
   viridis::scale_color_viridis(
     discrete = TRUE,
@@ -465,7 +481,7 @@ Now, we have our final plot:
 ```{r}
 #| label: fig-museums-style-plot-3
 #| fig-cap: "A styled version of the previous plot - with a custom font, colored background, and better spacing."
-#| fig-alt: ""
+#| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. Lines are colored yellows, blues, and purples. No legend appears,but title, subtitle, and caption text have appeared."
 text_plot +
   scale_y_continuous(limits = c(0, 300)) +
   coord_cartesian(expand = FALSE) +
@@ -526,13 +542,13 @@ ggsave(
 
 Is there anything that could still be improved about this plot? The axis text denoting the years only appears on the bottom row of faceted plots. This makes it a little bit tricky to see what's going on in the first row without first looking at the years in the row below. It's a fairly minor point, but adding year labels to the top row would just make it easier for a reader.
 
-We removed the legend from the plot with the reason that *the colors are based on the levels of deprivation, which are already labelled on the facet titles*. This same argument could be used to remove the colors altogether. There's no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g. red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean.
+We removed the legend from the plot with the reason that *the colors are based on the levels of deprivation, which are already labelled on the facet titles*. This same argument could be used to remove the colors altogether. There's no need to use color here to denote the deprivation levels when the deprivation levels are given by the facet titles. Especially since the yellow color is harder to see against the pale background color. Using a stronger color e.g. red for all highlighted lines, would be better for making the lines stand out, and reduce confusion about what the colors mean. \index{color}
 
 ::: {.content-visible when-format="html"}
 
 Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
 
-![](images/uk-museums.gif){fig-align="center" fig-alt=""}
+![](images/uk-museums.gif){fig-align="center" fig-alt="Gif showing the process of creating the final line chart, going through iterations of area charts first."}
 
 :::
 

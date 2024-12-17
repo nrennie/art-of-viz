@@ -117,7 +117,13 @@ div.csl-indent {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1SWN5BH1PZ"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
+</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
     // MathJax Typeset
@@ -424,6 +430,7 @@ Tip&nbsp;8.1: Choosing an API Limit
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>The data can also be accessed using the {nobel} R package <span class="citation" data-cites="nobel">(<a href="references.html#ref-nobel" role="doc-biblioref">Rennie 2024b</a>)</span> which wraps the code above into the <code>laureates()</code> function.</p>
 <p>We want to avoid querying the API multiple times if we don’t need to. Once we’ve downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> option to save the data to a file called <code>nobel_physics.csv</code> in an existing folder called <code>data</code> - you might choose to save it somewhere slightly different! </p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
@@ -666,7 +673,7 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 <ul>
 <li>
 <code>title_font</code>: a bold font that will, as the name suggests, be used for the title. We’ll use <em>Passion One</em> - a display font with thick, bold strokes which make it ideal for titles.</li>
-<li>a <code>body_font</code>: a simple font that will be used for all other text elements, including the text displaying the awardee names. This means the text will be used a quite a small font size, and so it’s important that it’s a clean and simple font. We’ll use <em>Ubuntu</em> - a sans serif font.</li>
+<li>a <code>body_font</code>: a simple font that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it’s important that it’s a clean and simple font. We’ll use <em>Ubuntu</em> - a sans serif font.</li>
 </ul>
 <p>Both fonts are provided through Google Fonts so we’ll use <code>font_add_google()</code> from {sysfonts} to load them into R. We also run <code>showtext_auto()</code> and <code>showtext_opts(dpi = 300)</code> to use {showtext} for rendering text on plots at our desired resolution. </p>
 <div class="cell">
@@ -707,7 +714,7 @@ Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semi
 </section><section id="colors" class="level3" data-number="8.4.2"><h3 data-number="8.4.2" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">8.4.2</span> Colors</h3>
 <p>As we’ve done in all previous chapters, we’ll define some variables for the colors we’ll be using in the visualization. Here, we’ll define a background color, a primary color, and a secondary color.</p>
-<p>The primary color will be used to highlight the female awardees, as well as the title and caption text. The secondary color will be used to color the male awardee names. The primary color should be bolder or brighter than the secondary color - meaning a few pops of color on the chart will stand out and highlight the female awardees.</p>
+<p>The primary color will be used to highlight the female laureates, as well as the title and caption text. The secondary color will be used to color the male laureate names. The primary color should be bolder or brighter than the secondary color - meaning a few pops of color on the chart will stand out and highlight the female laureates. </p>
 <div class="cell">
 <div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"gray95"</span></span>
 <span><span class="va">primary_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span>
@@ -835,9 +842,9 @@ Figure&nbsp;8.11: The names of Nobel Prize in Physics awardees arranged in an an
 <p>And we now have a creative way of visualizing the recipients of the Nobel Prize for Physics! How might we go about visualizing the recipients of the other prize categories in a similar way?</p>
 </section><section id="parameterized-plots" class="level3" data-number="8.4.5"><h3 data-number="8.4.5" class="anchored" data-anchor-id="parameterized-plots">
 <span class="header-section-number">8.4.5</span> Parameterized plots</h3>
-<p>Although we could copy and paste the code we already have, and change out <code>physics</code> for <code>peace</code> everywhere, for example, this isn’t a sustainable approach if we’re not just looking to create one additional plot. What if we also want to create plots for medicine, economics, chemistry, and literature? That’s a lot of copy and pasting! Instead, we might want to think about creating our own function.</p>
+<p>Although we could copy and paste the code we already have, and change out <code>physics</code> for <code>peace</code> everywhere, for example, this isn’t a sustainable approach if we’re not just looking to create one additional plot. What if we also want to create plots for medicine, economics, chemistry, and literature? That’s a lot of copy and pasting! Instead, we might want to think about creating our own function. </p>
 <p>This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let’s say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the updated title. You don’t have to rewrite the plotting code every month, you just need to call your custom plot function.</p>
-<p>Throughout this book, we’ve been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments!</p>
+<p>Throughout this book, we’ve been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments! </p>
 <p>When we’re converting our code into a function, we need to think about what a user has to tell us, in order for the code to work. In the sales histogram example above, a user would need to specify which month they want the plot for. In our example of the Nobel Prize visualizations, a user need to specify:</p>
 <ul>
 <li>which category they want to plot (we can’t read their mind or know what data they have)</li>
@@ -1046,8 +1053,8 @@ Tip&nbsp;8.4: Circular text with {ggtextcircle}
 <p>When we’re evaluating our visualizations, it’s important to remember the purpose for which we built it and evaluate how well it achieves that purposes. This visualization of the gender split of Nobel Laureates is not a standard plot that aims to communicate numbers as efficiently as possible.</p>
 <p>There are a few <em>standard</em> aspects of this visualization we may wish to improve:</p>
 <ul>
-<li><p>It’s quite a hard visualization to understand without knowing what the colors and the order of the names represents. With a little bit of time and thought, a reader will likely pick out that the pink (for the Peace category plot) text represents female awardees. However, the ordering of the names in an anti-clockwise direction showing that the number of females awardees is generally increasing over time is much more difficult to pick up on. Add some text below the existing title and category label to explain how to interpret the visualization will help interested readers get the full message.</p></li>
-<li><p>It’s a minimal visualization by design. But that means it doesn’t tell a reader the whole story. As we discussed earlier, Nobel Prizes can be awarded to multiple individuals. However, this visualization only shows awardees, and not whether they shared the prize with anyone else. Are female awardees more or less likely to share a prize than their male counterparts? You can’t tell from this visualization.</p></li>
+<li><p>It’s quite a hard visualization to understand without knowing what the colors and the order of the names represents. With a little bit of time and thought, a reader will likely pick out that the pink (for the Peace category plot) text represents female laureates. However, the ordering of the names in an anti-clockwise direction showing that the number of females laureates is generally increasing over time is much more difficult to pick up on. Add some text below the existing title and category label to explain how to interpret the visualization will help interested readers get the full message.</p></li>
+<li><p>It’s a minimal visualization by design. But that means it doesn’t tell a reader the whole story. As we discussed earlier, Nobel Prizes can be awarded to multiple individuals. However, this visualization only shows laureates, and not whether they shared the prize with anyone else. Are female laureates more or less likely to share a prize than their male counterparts? You can’t tell from this visualization.</p></li>
 <li><p>From a technical (or artistic) perspective, we might also want to consider alternative designs. For example, placing the text to the left of, or below, the circle rather than to the right. We may want to include the start and finish positions of the text around the circle as arguments to the parameterized function.</p></li>
 </ul>
 <p>Despite the shortcomings when compared to more traditional visualizations, this approach is eye-catching and it does attract attention. Sometimes it’s not about the data visualization. Sometimes it’s about the art.</p>
@@ -1099,6 +1106,12 @@ Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another App
 <div id="ref-remotes" class="csl-entry" role="listitem">
 Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
 </div>
+<div id="ref-ggview" class="csl-entry" role="listitem">
+Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
+</div>
+<div id="ref-tidyplots" class="csl-entry" role="listitem">
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+</div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
 FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
@@ -1113,6 +1126,9 @@ Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessic
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
 Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-ggiraph" class="csl-entry" role="listitem">
+Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
 </div>
 <div id="ref-GAcharts" class="csl-entry" role="listitem">
 Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
@@ -1243,8 +1259,11 @@ Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span c
 <div id="ref-ggtextcircle" class="csl-entry" role="listitem">
 ———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
 </div>
+<div id="ref-nobel" class="csl-entry" role="listitem">
+———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+</div>
 <div id="ref-pkgs_data" class="csl-entry" role="listitem">
-———. 2024b. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
 </div>
 <div id="ref-signif2024a" class="csl-entry" role="listitem">
 Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
@@ -1279,6 +1298,9 @@ Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</sp
 <div id="ref-waffle" class="csl-entry" role="listitem">
 Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
 </div>
+<div id="ref-lattice" class="csl-entry" role="listitem">
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+</div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
 </div>
@@ -1290,6 +1312,9 @@ Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker,
 </div>
 <div id="ref-funspotr" class="csl-entry" role="listitem">
 Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-plotly" class="csl-entry" role="listitem">
+Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with r, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.
 </div>
 <div id="ref-ggrepel" class="csl-entry" role="listitem">
 Slowikowski, Kamil. 2024. <em><span class="nocase">ggrepel: Automatically Position Non-Overlapping Text Labels with ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggrepel">https://CRAN.R-project.org/package=ggrepel</a>.

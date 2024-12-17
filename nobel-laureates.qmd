@@ -108,6 +108,8 @@ nobel_physics <- read.csv(
 
 :::
 
+The data can also be accessed using the {nobel} R package [@nobel] which wraps the code above into the `laureates()` function.
+
 We want to avoid querying the API multiple times if we don't need to. Once we've downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the `write.csv()` option to save the data to a file called `nobel_physics.csv` in an existing folder called `data` - you might choose to save it somewhere slightly different! \index{utils!write.csv}
 
 ```{r}
@@ -341,9 +343,9 @@ At first glance, this first plot might look like a complete mess but with a litt
 Let's start by choosing some fonts for our visualization. We're going to pick two fonts:
 
 * `title_font`: a bold font that will, as the name suggests, be used for the title. We'll use *Passion One* - a display font with thick, bold strokes which make it ideal for titles. 
-* a `body_font`: a simple font that will be used for all other text elements, including the text displaying the awardee names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple font. We'll use *Ubuntu* - a sans serif font.
+* a `body_font`: a simple font that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple font. We'll use *Ubuntu* - a sans serif font.
 
-Both fonts are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
+Both fonts are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
 
 ```{r}
 #| label: nobel-fonts
@@ -381,7 +383,7 @@ basic_plot
 
 As we've done in all previous chapters, we'll define some variables for the colors we'll be using in the visualization. Here, we'll define a background color, a primary color, and a secondary color. 
 
-The primary color will be used to highlight the female awardees, as well as the title and caption text. The secondary color will be used to color the male awardee names. The primary color should be bolder or brighter than the secondary color - meaning a few pops of color on the chart will stand out and highlight the female awardees.
+The primary color will be used to highlight the female laureates, as well as the title and caption text. The secondary color will be used to color the male laureate names. The primary color should be bolder or brighter than the secondary color - meaning a few pops of color on the chart will stand out and highlight the female laureates. \index{color}
 
 ```{r}
 #| label: nobel-color
@@ -509,11 +511,11 @@ And we now have a creative way of visualizing the recipients of the Nobel Prize 
 
 ### Parameterized plots
 
-Although we could copy and paste the code we already have, and change out `physics` for `peace` everywhere, for example, this isn't a sustainable approach if we're not just looking to create one additional plot. What if we also want to create plots for medicine, economics, chemistry, and literature? That's a lot of copy and pasting! Instead, we might want to think about creating our own function. 
+Although we could copy and paste the code we already have, and change out `physics` for `peace` everywhere, for example, this isn't a sustainable approach if we're not just looking to create one additional plot. What if we also want to create plots for medicine, economics, chemistry, and literature? That's a lot of copy and pasting! Instead, we might want to think about creating our own function. \index{parameterized plots}
 
 This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let's say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the updated title. You don't have to rewrite the plotting code every month, you just need to call your custom plot function. 
 
-Throughout this book, we've been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments!
+Throughout this book, we've been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments! \index{color}
 
 When we're converting our code into a function, we need to think about what a user has to tell us, in order for the code to work. In the sales histogram example above, a user would need to specify which month they want the plot for. In our example of the Nobel Prize visualizations, a user need to specify: 
 
@@ -750,9 +752,9 @@ When we're evaluating our visualizations, it's important to remember the purpose
 
 There are a few *standard* aspects of this visualization we may wish to improve:
 
-* It's quite a hard visualization to understand without knowing what the colors and the order of the names represents. With a little bit of time and thought, a reader will likely pick out that the pink (for the Peace category plot) text represents female awardees. However, the ordering of the names in an anti-clockwise direction showing that the number of females awardees is generally increasing over time is much more difficult to pick up on. Add some text below the existing title and category label to explain how to interpret the visualization will help interested readers get the full message. 
+* It's quite a hard visualization to understand without knowing what the colors and the order of the names represents. With a little bit of time and thought, a reader will likely pick out that the pink (for the Peace category plot) text represents female laureates. However, the ordering of the names in an anti-clockwise direction showing that the number of females laureates is generally increasing over time is much more difficult to pick up on. Add some text below the existing title and category label to explain how to interpret the visualization will help interested readers get the full message. 
 
-* It's a minimal visualization by design. But that means it doesn't tell a reader the whole story. As we discussed earlier, Nobel Prizes can be awarded to multiple individuals. However, this visualization only shows awardees, and not whether they shared the prize with anyone else. Are female awardees more or less likely to share a prize than their male counterparts? You can't tell from this visualization.
+* It's a minimal visualization by design. But that means it doesn't tell a reader the whole story. As we discussed earlier, Nobel Prizes can be awarded to multiple individuals. However, this visualization only shows laureates, and not whether they shared the prize with anyone else. Are female laureates more or less likely to share a prize than their male counterparts? You can't tell from this visualization.
 
 * From a technical (or artistic) perspective, we might also want to consider alternative designs. For example, placing the text to the left of, or below, the circle rather than to the right. We may want to include the start and finish positions of the text around the circle as arguments to the parameterized function.
 
