@@ -33,16 +33,6 @@ gg_record(
 )
 ```
 
-Have you ever spent ages tinkering with a plot you’re previewing in RStudio, before using `ggsave()` to save a higher resolution image, only to end up with the text looking ridiculously larger (or smaller) than you thought? Or do you struggle to preview plots with your desired aspect ratio? One of the nice features of using {camcorder} is the ability to preview plots with the same height, width, and resolution that you want your final plot to be in. Simply set the `height`, `width`, and `dpi` (and optionally `units`) arguments in `gg_record()` to your desired values. Then what you see is what you save!
-
-::: {#tip-other-dpi .callout-tip}
-
-## Setting the resolution of images
-
-The RStudio Plots tab shows images at 96dpi, but the default in `ggsave()` is 300dpi. This is what causes the mismatch between the sizes of text and other elements. The default dpi in `gg_record()` is also 300dpi so it integrates nicely with `ggsave()`. \index{ggplot2!ggsave}
-
-:::
-
 If you're reading the online version of this book, you will have seen several examples of gifs showing the visualization development process at the end of chapters. The `gg_playback()` function combines the previously saved images and saves them to a gif. You can set different preferences using the arguments in `gg_playback()`. For example, you can define the length of each frame in the gif, make the first and last frames longer or shorter, or set the background color. \index{camcorder!gg\_playback}
 
 ::: {#tip-other-camcorder .callout-tip}
@@ -67,6 +57,18 @@ gg_playback(
 
 Note that there are a few plots (including those produced by {geofacet}) that don't work automatically with `gg_record()`. However, you can manually run `record_polaroid()` manually to capture the image with {camcorder} and view it at your desired resolution in the *Viewer* pane. \index{camcorder!record\_polaroid}
 
+### Setting the size resolution of images
+
+Have you ever spent ages tinkering with a plot you’re previewing in RStudio, before using `ggsave()` to save a higher resolution image, only to end up with the text looking ridiculously larger (or smaller) than you thought? Or do you struggle to preview plots with your desired aspect ratio? One of the nice features of using {camcorder} is the ability to preview plots with the same height, width, and resolution that you want your final plot to be in. Simply set the `height`, `width`, and `dpi` (and optionally `units`) arguments in `gg_record()` to your desired values. Then what you see is what you save! The {ggview} [@ggview] package also provides similar functionality.
+
+::: {#tip-other-dpi .callout-tip}
+
+## Choosing a plot resolution
+
+The RStudio Plots tab shows images at 96dpi, but the default in `ggsave()` is 300dpi. This is what causes the mismatch between the sizes of text and other elements. The default dpi in `gg_record()` is also 300dpi so it integrates nicely with `ggsave()`. \index{ggplot2!ggsave}
+
+:::
+
 ## Extracting information from plots {#sec-ggbuild}
 
 ```{r}
@@ -81,9 +83,13 @@ In @sec-turbines, we reflected that it would be better to use a wind turbine ico
 Now instead of plotting icons as fonts, we want to plot icons as images. The problem is that:
 
 * we want to use the x- and y- coordinates for the icons provided by `geom_pictogram()`
-* we want to use an image instead of a font icon.
+* we want to use an image instead of a font icon
 
-These two things aren't currently compatible. We've already built the plot with `geom_pictogram()` so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `basic_plot` we created in @sec-turbines. \index{ggplot2!ggplot\_build}
+These two things aren't currently compatible.
+
+### Extracting co-ordinates
+
+We've already built the plot with `geom_pictogram()` so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `basic_plot` we created in @sec-turbines. \index{ggplot2!ggplot\_build}
 
 ```{r}
 #| label: other-build-gg-1
@@ -127,6 +133,8 @@ ggplot(
   facet_wrap(~Year_Group, nrow = 1)
 ```
 
+### Plotting with {ggpattern}
+
 Now instead of using `geom_point()` we want to plot images. We could use {ggimage} [@ggimage], or alternatively {ggpattern} [@ggpattern]. The {ggpattern} package provides more {ggplot2} `geom` functions which support filled areas with geometric or image patterns. We can use the `geom_tile_pattern()` function, and specify that we want to use an `"image"` pattern and supply the file name of the Flaticon image to `pattern_filename`. Setting `fill = "white"` gives a white background to the icons. We can also set `theme_void()` to remove all of the distracting background elements.
 
 ```{r}
@@ -154,15 +162,15 @@ One of the benefits of using {ggplot2} is that they are stored as lists, and all
 
 ## Code formatting with {lintr} and {styler} {#sec-code-style}
 
-Writing code that follows a consistent style can make it easier for other people to read, makes collaboration simpler, and can help pick up code errors in your code more quickly. In R, the {lintr} package [@lintr] checks for adherence to a specified coding style and identifies possible syntax errors, then reports them so you can take action. \index{lintr}
+Writing code that follows a consistent style can make it easier for other people to read, makes collaboration simpler, and can help pick up errors in your code more quickly. In R, the {lintr} package [@lintr] checks for adherence to a specified coding style and identifies possible syntax errors, then reports them so you can take action. \index{lintr}
 
-The {styler} package [@styler] goes one step further in terms of code styling, and actually styles your code for you. Although you may be a little bit skeptical of packages that overwrite scripts you’ve written (I certainly was initially!), it makes it quick and easy to style code. Creating a keyboard shortcut for the `style_active_file()` function means you can apply code styling easily (without having to call a function manually or click a specific button). [@streamline] \index{styler!style\_active\_file}
+The {styler} package [@styler] goes one step further in terms of code styling, and actually styles your code for you. Although you may be a little bit skeptical of packages that overwrite scripts you’ve written (I certainly was initially!), it makes it quick and easy to style code. Creating a keyboard shortcut for the `style_active_file()` function means you can apply code styling easily, without having to call a function manually or click a specific button [@streamline]. \index{styler!style\_active\_file}
 
 ## Template files for TidyTuesday {#sec-template-files}
 
 You may notice that each chapter of this book has followed a similar structure: load packages, read in some data, perform some exploratory analysis, load fonts and colors as variables, write relevant text, create a simple plot, add styling with {ggtext}, and save a PNG file. This means that for each plot, there's a lot of overlap in the structure of the .R files and the code they contain. 
 
-If you visualise data using R on a regular basis, you'll likely find yourself repeating similar steps. You might even find yourself copying and pasting code from a previous file to your new file. Like many things in the world of programming, if you find yourself copying and pasting the same thing several times, there is almost certainly a better way of doing it. And in this case there is - template files! \index{templates}
+If you visualize data using R on a regular basis, you'll likely find yourself repeating similar steps. You might even find yourself copying and pasting code from a previous file to your new file. Like many things in the world of programming, if you find yourself copying and pasting the same thing several times, there is almost certainly a better way of doing it. And in this case there is - template files! \index{templates}
 
 For each TidyTuesday visualization, an .R script with the following file can be created [@template_files]:
 
@@ -180,6 +188,9 @@ library(patchwork)
 library(camcorder)
 library(ggtext)
 library(glue)
+
+source("source_caption.R")
+source("social_caption.R")
 
 
 # Load data ----
@@ -229,8 +240,10 @@ social <- social_caption(
 )
 title <- ""
 subtitle <- ""
-caption <- paste0(
-  "**Data**: <br>**Graphic**:", social
+caption <- source_caption(
+  source = "",
+  sep = "<br>",
+  graphic = social
 )
 
 
@@ -297,13 +310,13 @@ You can also create template files for other aspects of your data visualization 
 
 ## Writing your own helper functions
 
-As you've already seen in @sec-cats, creating functions for code you reuse frequently can save time and space. In @sec-cats, we created the function `social_caption()` for adding a plot caption that contained Font Awesome icons. This function has then been used in every subsequent chapter (and therefore also the template file described in the previous section). What other helper functions might be useful? \index{social\_caption} 
+As you've already seen in @sec-turbines and @sec-cats, creating functions for code you reuse frequently can save time and space. We created the `source_caption()` and `social_caption()` functions for adding a caption with data source attribution, and to write plot caption that contained Font Awesome icons. These functions have then been used in almost every subsequent chapter (and therefore also the template file described in the previous section). What other helper functions might be useful? \index{source\_caption} \index{social\_caption} 
 
 * To use the Font Awesome icons, you need to load the Font Awesome font files. We did this using `sysfonts::font_add()` and specifying a path to the font file. You might also want to load other fonts that aren't normally available on your system or through Google Fonts. You could write a function that loads (multiple) font files that you use often. You could go one step further and place the fonts and your font loading function into an R package. 
 
-* For the template file discussed in the previous section, the date was defined as a variable at the top of the script. Instead, you could create a function that takes the date as in argument. The function could then create your .R script, insert the date where it needs to go, and save the file to the desired location. 
+* For the template file discussed in the previous section, the date was defined as a variable at the top of the script. Instead, you could create a function that takes the date as an argument. The function could then create your .R script, insert the date where it needs to go, and save the file to the desired location. 
 
-* If you're creating plots for a corporate reports, creating your own {ggplot2} theme and color palette functions can save time implementing the same styling and colors for every visualization. It can also make it easier for other people you work with to use the same styling.
+* If you're creating plots for corporate reports, creating your own {ggplot2} theme and color palette functions can save time implementing the same styling and colors for every visualization. It can also make it easier for other people you work with to use the same styling.
 
 \index{sysfonts!font\_add} 
 

@@ -99,6 +99,18 @@ We can then read the CSV back in using `read_csv()` from {readr} (or `read.csv()
 r_pkgs <- readr::read_csv("data/r_pkgs.csv")
 ```
 
+::: {.content-visible when-format="html"}
+
+The contents of the `nrennie/tidytuesday` GitHub repository have likely expanded since this chapter was written. You can download the version of the CSV file used in this chapter [here](data/r_pkgs.csv).
+
+:::
+
+::: {.content-visible when-format="pdf"}
+
+The contents of the `nrennie/tidytuesday` GitHub repository have likely expanded since this chapter was written. You can download the version of the CSV file used in this chapter from the online version of the book.
+
+:::
+
 The `r_pkgs` data has `r nrow(r_pkgs)` rows and `r ncol(r_pkgs)` columns. The `funs` column contains names of each function used, and `pkgs` has the name of the package that function comes from. The remaining two columns are the `relative_paths` and `absolute_paths` columns that identify which file the function was found in. Let's have a quick look at the data using `head()`: \index{utils!head}
 
 ```{r}
@@ -112,9 +124,9 @@ The obvious question to start with here is: which packages are used most often?
 
 ### Data exploration
 
-Let's start by counting the number of package uses with the `table()` function, and using `sort()` to arrange packages from least to most used. \index{base!table} \index{base!sort}
+Let's start by counting the number of package used with the `table()` function, and using `sort()` to arrange packages from least to most used. \index{base!table} \index{base!sort}
 
-We can then pass this into the `barplot()` function to obtain an ordered bar chart of package use - setting `horiz = TRUE` to make a horizontal bar chart. Since there is a large number of bars, we also adjust the labels to be a little smaller. We can see that `ggplot` comes out on top, closely followed by `base`! 
+We can then pass this into the `barplot()` function to obtain an ordered bar chart of package use, setting `horiz = TRUE` to make a horizontal bar chart. We can see that `ggplot` comes out on top, closely followed by `base`! 
 
 ::: {#tip-r-pkgs-showtext .callout-tip}
 
@@ -203,7 +215,7 @@ r_pkgs_date <- r_pkgs |>
   dplyr::count(date, pkgs)
 ```
 
-We want the facets in our plot to be ordered from most to least used package. so let's calculate the total number of uses for each package. Here, we can use the `summarise()` function in {dplyr}, to add up the values in the `n` column, split by `pkgs`. Here, we're using the `.by` argument in `summarise()` but you could alternatively use `group_by(pkgs)` instead. We then arrange the rows of the data based on the updated summary `n` column. By default `arrange()` sorts in ascending order, so to sort in descending order we simply sort by `-n` instead. You could alternatively use `dplyr::desc(n)`. Finally, we extract the `pkgs` column as a vector using `pull()` from {dplyr}. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull} \index{dplyr!desc} \index{dplyr!group\_by}
+We want the facets in our plot to be ordered from most to least used package, so let's calculate the total number of uses for each package. Here, we can use the `summarise()` function in {dplyr}, to add up the values in the `n` column, split by `pkgs`. Here, we're using the `.by` argument in `summarise()` but you could alternatively use `group_by(pkgs)` instead. We then arrange the rows of the data based on the updated summary `n` column. By default `arrange()` sorts in ascending order, so to sort in descending order we simply sort by `-n` instead. You could alternatively use `dplyr::desc(n)`. Finally, we extract the `pkgs` column as a vector using `pull()` from {dplyr}. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull} \index{dplyr!desc} \index{dplyr!group\_by}
 
 ```{r}
 #| label: r-pkgs-orders
@@ -214,7 +226,7 @@ pkgs_ordered <- r_pkgs_date |>
 pkgs_ordered
 ```
 
-What might strike you about this vector of ordered packages is that there are only 7 packages listed. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other {tidyverse} packages. The question now is, should it still be included in the chart? Sometimes, it's important to visualise zeroes. So how do we add it `tibble` into the data?
+What might strike you about this vector of ordered packages is that there are only 7 packages listed. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other {tidyverse} packages. The question now is, should it still be included in the chart? Sometimes, it's important to visualise zeroes. So how do we add `tibble` into the data?
 
 The first thing we want to do is include it in the ordered list of packages that we'll later use to define a factor level. Since it's only one package, we *could* just manually add it to the end of the vector with `c(pkgs_ordered, "tibble")`. However, this isn't a very robust solution. If we had data for a different year and wanted to repeat this analysis, this code wouldn't work if `"tibble"` wasn't missing, or if another package was missing. 
 
@@ -230,7 +242,7 @@ pkgs_levels <- c(
 )
 ```
 
-Then, we use `mutate()` to convert the `pkgs` column of our data from a character string to a factor (ordered category) and set he `levels` equal to our new `pkgs_levels` vector: \index{dplyr!mutate} \index{base!factor}
+Then, we use `mutate()` to convert the `pkgs` column of our data from a character string to a factor (ordered category) and set the `levels` equal to our new `pkgs_levels` vector: \index{dplyr!mutate} \index{base!factor}
 
 ```{r}
 #| label: r-pkgs-levels-2
@@ -289,7 +301,7 @@ The warning message returned from the plot is also trying to tell us about this 
 
 ## Don't ignore the warning signs!
 
-This *is it a zero or is it missing?* question has highlighted a few important aspects of plotting charts and data processing:
+This *is it a zero or is it missing?* question has highlighted a few important aspects of plotting charts and data processing: \index{missing data}
 
 * Don't simply ignore warning messages if you don't understand them. It might be tempting to ignore the warning message because you ended up with a plot that looks kind of like what you expected, and the warning message isn't very clear about what's wrong. But here, the warning was telling us that something was wrong with our assumptions about the data.
 
@@ -343,7 +355,7 @@ Now that we have a first draft of the plot, it's time to work on polishing it. W
 
 ### Colors
 
-Let's go for a dark theme for our plot this time. We'll choose a dark gray for the background color, and white for the text to ensure sufficient contrast.
+Let's go for a dark theme for our plot this time. We'll choose a dark gray for the background color, and white for the text to ensure sufficient contrast. \index{color}
 
 ```{r}
 #| label: r-pkgs-cols-1
@@ -351,7 +363,7 @@ bg_col <- "#3A3B3C"
 text_col <- "white"
 ```
 
-Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of the palettes in {rcartocolor} [@rcartocolor]. As we did in @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
+Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of the palettes in {rcartocolor} [@rcartocolor]. Again, similar to @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
 
 To keep a more consistent color theme in the plot, we define our highlight color variable, `highlight_col`, to be the first color in our chosen color palette.
 
@@ -470,7 +482,7 @@ limits_plot <- text_plot +
 limits_plot
 ```
 
-Let's edit the arguments of `theme()` to finalist out plot. There's a fairly large number of adjustments to make, so we'll do them in two stages.  \index{ggplot2!theme}
+Let's edit the arguments of `theme()` to finalise our plot. There's a fairly large number of adjustments to make, so we'll do them in two stages.  \index{ggplot2!theme}
 
 We'll start by setting the default font family and base font size in the `text` argument through `element_text()`. We also remove the legend and add a little bit of space around the edges of the plot using the `margin()` function. \index{ggplot2!element\_text} \index{ggplot2!margin} \index{grid!unit}
 
@@ -552,7 +564,7 @@ This visualization is perfectly fine as it is, but we can still edit the facet l
 
 ### Using images as facet labels
 
-As we saw in @sec-lemurs, packages such as {ggimage} [@ggimage] can be used to plot images within the plotting area. Here, we want to use images outside of the plotting area in the facet labels. There are several options for overlaying images on existing plots (including outside of the main plot area). The `inset_element()` function from {patchwork} [@patchwork] can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly, `draw_image()` function from {cowplot} [@cowplot] simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. 
+As we discussed in @sec-lemurs, packages such as {cowplot} [@cowplot], {egg} [@egg], {patchwork} [@patchwork], and {ggimage} [@ggimage] can all be used to plot images. Here, we want to use images for the facet labels, which lie outside of the plot panel. There are several good options for overlaying elements outside of the main plot area. The `inset_element()` function from {patchwork} can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly,the  `draw_image()` function from {cowplot} simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. \index{patchwork!inset\_element} \index{cowplot!draw\_image} \index{facet labels}
 
 We've used the {ggtext} package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with {ggtext} to format the facet labels!
 
@@ -666,9 +678,9 @@ However, controlling the sizing and placement of the images is (at the time of w
 
 ## Reflection
 
-Overall, this plot is very effective - it clearly shows the differing levels of R package use whilst still being eye-catching. However, there are still a few improvements that can be made. Other than for {ggplot2} and {dplyr}, it's quite hard to read the values as they are very small compared to the height of the y-axis. This is due to the high usage of {ggplot2} on a single occasions. Maybe using a log transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability. 
+Overall, this plot is very effective - it clearly shows the differing levels of R package use whilst still being eye-catching. However, there are still a few improvements that can be made. Other than for {ggplot2} and {dplyr}, it's quite hard to read the values as they are very small compared to the height of the y-axis. This is due to the high usage of {ggplot2} on a single occasion. Maybe using a logarithmic transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability. 
 
-The use of color could also be improved here. The colors are used to differentiate the different packages, and so don't provide any further information not already given by the facet labels - similar to @sec-museums. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the {stringr} hex sticker image is quite similar to the green used in the {dplyr} area chart - this is currently a little bit distracting. 
+The use of color could also be improved here. The colors are used to differentiate the different packages, and so don't provide any further information not already given by the facet labels - similar to @sec-museums. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the {stringr} hex sticker image is quite similar to the green used in the {dplyr} area chart - this is currently a little bit distracting. \index{color}
 
 ::: {.content-visible when-format="html"}
 

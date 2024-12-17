@@ -92,7 +92,7 @@ Let's focus in on the growth curve idea, and look at the relationship between le
 #| fig-cap: "Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern."
 #| fig-alt: ""
 #| echo: -1
-par(mar = c(4.1, 4.1, 2.1, 2.1))
+par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 plot(
   x = lemurs$age_at_wt_mo,
   y = lemurs$weight_g,
@@ -206,7 +206,7 @@ Now it's time to style and edit the plot to make it more aesthetically pleasing,
 
 ### Colors
 
-For the plot background and text, we'll choose colors that might be found on a red ruffed lemur such as a light beige (`bg_col`) and warn brown (`text_col`). We also need to select two colors to represent the male and female lemurs. When choosing colors for categories, it's important to choose colors that neither reinforce negative stereotypes nor contradict intuitive color choices. When choosing colors to represent gender or sex, it's very common to see the stereotypical blue for boys, and pink for girls. We don't want to reinforce the negative associations for different genders that these colors can have. Equally, we don't want to make it confusing by choosing the opposite e.g. blue for girls and pink for boys. Instead, we'll choose  . Here, we'll choose a purple for female lemurs (`f_col`) and turquoise for male lemurs (`m_col`). This is not an uncommon color combinations for representing gender, and other options are discussed in @Muth2018.
+For the plot background and text, we'll choose colors that might be found on a red ruffed lemur such as a light beige (`bg_col`) and warm brown (`text_col`). We also need to select two colors to represent the male and female lemurs. When choosing colors for categories, it's important to choose colors that neither reinforce negative stereotypes nor contradict intuitive color choices. When choosing colors to represent gender or sex, it's very common to see the stereotypical blue for boys, and pink for girls. We don't want to reinforce the negative associations for different genders that these colors can have. Equally, we don't want to make it confusing by choosing the opposite e.g. blue for girls and pink for boys. Instead, we'll choose a purple for female lemurs (`f_col`) and turquoise for male lemurs (`m_col`). This is not an uncommon color combinations for representing gender, and other good options are discussed in Lisa Muth's blog post *An Alternative to Pink & Blue: Colors for Gender Data* [@Muth2018]. \index{color}
 
 ```{r}
 #| label: lemurs-colors
@@ -226,15 +226,15 @@ col_plot <- basic_plot +
   )
 ```
 
-We'll use colored text and icons in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we'll remove the legend by setting `legend.position = "none"` inside the `theme()` function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend e.g. color, we could set `guide = "none"` inside `scale_color_manual()`. This would result in a legend for shape only with the shapes shown in black be default. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
+We'll use colored text and icons in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we'll remove the legend by setting `legend.position = "none"` inside the `theme()` function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend e.g. color, we could set `guide = "none"` inside `scale_color_manual()`. This would result in a legend for shape only with the shapes shown in black by default. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
 
-### Text and fonts
+### Working with {systemfonts}
 
-Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't play nicely with Unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate r load font files available on your local system. 
+Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't always play nicely with Unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate or load font files available on your local system. 
 
 To register a font using {systemfonts}, we use the `register_font()` function. It looks quite similar to the `font_add()` function from {showtext} for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons using {systemfonts} as an alternative approach to the one taken in @sec-cats. \index{systemfonts!register\_font}
 
-The first argument `name` will be the name that the font is known by in R. You can choose any name you want, but here we'll make sure to use the same name as we did for the `family` argument in @sec-cats, in order for our `social_caption()` to still work. The `plain` argument, is then the path to the font file. 
+The first argument `name` will be the name that the font is known by in R. You can choose any name you want, but here we'll make sure to use the same name as we did for the `family` argument in @sec-cats, in order for our `social_caption()` function to still work. The `plain` argument is the the path to the font file. 
 
 ```{r}
 #| label: lemurs-fa-font
@@ -248,17 +248,17 @@ systemfonts::register_font(
 
 ## Setting a graphics device
 
-In R, a graphics device is the system that is used to render of visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create e.g. png or pdf. The {ragg} package [@ragg] provides graphic devices for R based on the AGG library.
+In R, a graphics device is the system that is used to render visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create e.g. png or pdf. The {ragg} package [@ragg] provides graphic devices for R based on the AGG library. \index{graphics device} \index{ragg}
 
-It's recommended to use {ragg} for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with {systemfonts} may not appear correctly. To use {ragg} for the graphics devices in RStudio, go to `Tools -> Global Options -> General -> Graphics -> Backend` and select `AGG`.  In R Markdown or Quarto documents, you can add a set up chunk at the top to use ragg which includes `knitr::opts_chunk$set(dev = "ragg_png")`, or your device of choice.
+It's recommended to use {ragg} for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with {systemfonts} may not appear correctly. To use {ragg} for the graphics devices in RStudio, go to `Tools -> Global Options -> General -> Graphics -> Backend` and select `AGG`.  In R Markdown or Quarto documents, you can add a set up chunk at the top to use ragg which includes `knitr::opts_chunk$set(dev = "ragg_png")`, or your device of choice. \index{RStudio}
 
 :::
 
-We can also use `register_font()` from {systemfonts} to load the fonts we'll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. 
+We can also use `register_font()` from {systemfonts} to load the fonts we'll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. \index{systemfonts!register\_font}
 
 For the body font, we'll use *Lato*, a sans serif font designed by [Łukasz Dziedzic](http://www.latofonts.com/team/). The font files can be downloaded from [fonts.google.com/specimen/Lato](https://fonts.google.com/specimen/Lato) or [www.latofonts.com/lato-free-fonts](https://www.latofonts.com/lato-free-fonts/). For the title font, we'll use *Passion One* - a font specifically designed for large titles! It can be downloaded from [fonts.google.com/specimen/Passion+One](https://fonts.google.com/specimen/Passion+One). When you download these fonts, you'll see that you don't just download a single file, you actually download multiple files - one for each variation of the font that is available e.g. bold and italic. 
 
-In `register_font()`, you pass these different font files into the relevant argument e.g. passing the font file for the bold version into the `bold` argument. Note that not all fonts have every style available. Here, *Passion one* isn't available in italic so we simply don't pass anything into the `italic` argument when loading `Passion One`. If you're not going to use a particular font style (for example, if you know you won't write any text in bold when using Lato font) you don't need to load this style in with `register_font()`. However, it can be useful to have it available, just in case you change your mind!
+In `register_font()`, you pass these different font files into the relevant argument e.g. passing the font file for the bold version into the `bold` argument. Note that not all fonts have every style available. Here, *Passion One* isn't available in italic so we simply don't pass anything into the `italic` argument when loading `Passion One`. If you're not going to use a particular font style (for example, if you know you won't write any text in bold when using Lato font) you don't need to load this style in with `register_font()`. However, it can be useful to have it available, just in case you change your mind!
 
 ```{r}
 #| label: lemurs-fonts
@@ -280,12 +280,14 @@ title_font <- "Passion One"
 
 An alternative to using `register_font()` is to install the font on your system, by right clicking on the downloaded font file and selecting *Install*. Then {ragg} should be able to find the font automatically. However, there may be reasons why you can't or don't want to prefer install a font system wide. Using `register_font()` in a script also leaves a record of how the fonts were installed, rather than relying on other processes happening outside of R.
 
+### Adding text
+
 The title for the plot can be defined as a simple character string, which asks the reader a question and encourages them to engage with the plot. To write the subtitle text we'll use the `glue()` function from {glue} to do two things: \index{glue!glue}
 
 * Add colored text in the subtitle, as we did in @sec-cats. 
 * Create data-driven text, as we did in @sec-programming.
 
-We'll also use Unicode characters (for triangles and circles) in the subtitle to substitute the shape legend. Though the Unicode characters are not exactly identical to the shapes plotted on our chart, in the that the colors are, the shapes are similar enough for this approach to work. The `&#x25B2;` string adds a black triangle, and the `&#x25CF` string adds a black circle. Though these define *black* shapes, they will appear in the color we desire. Here, *black* triangle really just means *filled in* triangle (with *white* triangle meaning *outline only* triangle). \index{glue!glue}
+We'll also use Unicode characters (for triangles and circles) in the subtitle to substitute the shape legend. Though the Unicode characters are not exactly identical to the shapes plotted on our chart, in the way that the colors are, the shapes are similar enough for this approach to work. The `&#x25B2;` string adds a black triangle, and the `&#x25CF` string adds a black circle. Though these define *black* shapes, they will appear in the color we desire. Here, *black* triangle really just means *filled in* triangle (with *white* triangle meaning *outline only* triangle). \index{glue!glue} \index{Unicode}
 
 ```{r}
 #| label: lemurs-text
@@ -379,7 +381,7 @@ theme_plot +
   )
 ```
 
-However, as you can see in @fig-lemurs-margin-1, this approach results in the title and subtitle text also being squashed to the left hand side of the plot as it doesn't extend into the margin. This may be desirable for some plots, but it doesn't work well here. Another approach is to use the `expand` argument in `scale_x_continuous()` to increase the amount of space at the right hand side of the x-axis. However, since this extends the axis, this results in grid lines being included in the additional space. We *could* play around with the breaks and axis text to remove the unwanted components, but there's an easier (slightly *hacky*) solution: add and edit a secondary y-axis. 
+However, as you can see in @fig-lemurs-margin-1, this approach results in the title and subtitle text also being squashed to the left hand side of the plot as it doesn't extend into the margin. This may be desirable for some plots, but it doesn't work well here. Another approach is to use the `expand` argument in `scale_x_continuous()` to increase the amount of space at the right hand side of the x-axis. However, since this extends the axis, this results in grid lines being included in the additional space. We *could* play around with the breaks and axis text to remove the unwanted components, but there's an easier (slightly *hacky*) solution: add and edit a secondary y-axis. \index{secondary axes}
 
 Secondary axes are almost always a poor choice of chart due to the fact that the choice of transformation for the secondary axis is entirely arbitrary but can hugely impact how the plot is interpreted. However, we're not actually going to use the secondary axis to present data, we're only going to use it to manipulate the layout of the plot background. To add some additional margin space on the right hand side, without squashing the title or adding grid lines in the margin, we can: \index{ggplot2!scale\_y\_continuous} \index{ggplot2!margin} \index{ggplot2!dup\_axis} \index{ggplot2!sec\_axis} \index{ggplot2!element\_text} 
 
@@ -405,15 +407,17 @@ styled_plot <- theme_plot +
 styled_plot
 ```
 
+We now have an appropriate space to place an image.
+
 ## Working with images 
 
-Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you're just looking for a way to make your plot more eye catching! 
+Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you're just looking for a way to make your plot more eye catching! \index{image} 
 
-### Reading and manipulating images with {magick} and {imager}
+### Manipulating images with {magick} and {imager}
 
-The {magick} package [@magick] provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including png, jpeg, and pdf.
+The {magick} package [@magick] provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including png, jpeg, and pdf. \index{ImageMagick} \index{magick}
 
-The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. There are some operations that are easier in {imager}, and some that are easier in {magick}. In this chapter, we’re going to use both packages together to demonstrate how easy it is.
+The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. There are some operations that are easier in {imager}, and some that are easier in {magick}. In this chapter, we’re going to use both packages together to demonstrate how easy it is. \index{imager} \index{imager!cimg2magick} \index{imager!magick2cimg}
 
 ::: {#tip-lemurs-unsplash .callout-tip}
 
@@ -456,9 +460,9 @@ px <- imager::Xc(lemur_img) <= 275 &
 lemur_img[px] <- 0
 ```
 
-Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don't (the background). The `px.flood()` function from {imager} allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the `px.flood()` function to select all pixels that are similar to it. The `x` and `y` arguments are used to specify the coordinates of the initial pixel to start with. The `sigma` argument specifies how similar we want the pixels to be with lower indicating very similar, and higher values allowing less similar values to be selected. \index{imager!px.flood}
+Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don't (the background). The `px.flood()` function from {imager} allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the `px.flood()` function to select all pixels that are similar to it. The `x` and `y` arguments are used to specify the coordinates of the initial pixel to start with. The `sigma` argument specifies how different we want to allow the pixels to be with lower indicating very similar, and higher values of `sigma` allowing more different values to be selected. \index{imager!px.flood}
 
-It takes a little bit of trial and error to choose the best values for these arguments, and we can visually inspect performance by plotting the boundary lines of the pixels that are considered similar. Passing in the output from `px.flood()` into `highlight()` from {imager} draws a red outline around the *similar* pixels. You can see in @fig-lemurs-img-outline, that it's performing reasonably well, though it is missing a section of the lemur where the white fur collar on its neck is. As we did when cropping the image, we then turn the non-similar parts of the image to black by setting those pixel values to `0` as this will later enable us to make them transparent. \index{imager!highlight}
+It takes a little bit of trial and error to choose the best values for these arguments, and we can visually inspect performance by plotting the boundary lines of the pixels that are considered similar. Passing in the output from `px.flood()` into `highlight()` from {imager} draws a red outline around the *similar* pixels. \index{imager!highlight}
 
 ```{r}
 #| label: fig-lemurs-img-outline
@@ -489,7 +493,7 @@ detect_outline_2 <- imager::px.flood(
 )
 ```
 
-To make it easier to create a transparent background, we turn the areas outside of the selected pixel sets to black. We do this by setting the pixel values to `0` i.e. no color. 
+To make it easier to create a transparent background, we turn the non-similar parts of the image i.e. the areas outside of the selected pixel sets, to black. As we did when cropping the image, we do this by setting the pixel values to `0` i.e. no color. 
 
 ```{r}
 #| label: lemurs-img-outline-3
@@ -530,13 +534,13 @@ styled_plot <- styled_plot +
   labs(caption = cap)
 ```
 
-The {cowplot} package [@cowplot] extends {ggplot2} and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the {cowplot} functionality for adding annotations and customization - including images.
+The {cowplot} package [@cowplot] extends {ggplot2} and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the {cowplot} functionality for adding annotations and customization - including images. \index{cowplot}
 
 ::: {#tip-lemurs-arrange .callout-tip}
 
 ## R packages for combining plots and images
 
-There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use in @sec-time-zones and @sec-house. The {egg} package [@egg] is another popular alternative, with the `geom_custom()` function being especially useful for adding images. The {ggimage} package [@ggimage] can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g. file paths or image coordinates.
+There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use in @sec-time-zones and @sec-house. The {egg} package [@egg] is another popular alternative, with the `geom_custom()` function being especially useful for adding images. The {ggimage} package [@ggimage] can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g. file paths or image coordinates. \index{egg} \index{patchwork} \index{ggimage}
 
 :::
 
