@@ -47,8 +47,7 @@ bg_col <- "#200029"
 body_font <- "Source"
 
 padding <- 20
-height <- 864
-width <- 576
+width <- 5
 
 
 # Generate data -----------------------------------------------------------
@@ -225,8 +224,9 @@ ggplot() +
     colour = "white",
     hjust = 0,
     vjust = 1,
-    size = 4,
-    fontface = "bold"
+    size = 22,
+    fontface = "bold",
+    size.unit = "pt"
   ) +
   annotate(
     "text",
@@ -236,8 +236,9 @@ ggplot() +
     colour = "white",
     hjust = 0,
     vjust = 1,
-    size = 3,
-    fontface = "bold"
+    size = 18,
+    fontface = "bold",
+    size.unit = "pt"
   ) +
   scale_colour_identity() +
   scale_y_reverse() +
@@ -253,8 +254,7 @@ ggplot() +
 
 if (interactive()) {
   ggsave("images/cover.png",
-         height = height, width = width,
-         dpi = 300, bg = bg_col,
-         units = "px"
+         height = 1.5*width, width = width,
+         dpi = 300, bg = bg_col
   )
 }
