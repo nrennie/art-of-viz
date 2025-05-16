@@ -15,6 +15,10 @@ showtext_opts(dpi = 300)
 
 # Functions ---------------------------------------------------------------
 
+is_even <- function(x) {
+  return((x %% 2) == 0)
+}
+
 make_hex_coords <- function(x0, y0, r) {
   angles <- seq(pi / 6, 2 * pi + pi / 6, length.out = 7)
   hexagon_coords <- function(xc, yc, rad, id) {
@@ -56,7 +60,7 @@ inputs <- expand.grid(
   tibble::as_tibble() |>
   dplyr::mutate(
     x = dplyr::if_else(
-      usefunc::is_even(y),
+      is_even(y),
       x + 0.5,
       x
     )
