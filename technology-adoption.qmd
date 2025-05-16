@@ -20,12 +20,18 @@ In this chapter we'll discover how to create gauge charts, a type of chart not n
 
 ```{r}
 #| label: technology-pkgs-req
-#| eval: false
-c(
-  "colorblindr", "dplyr", "ggforce", "ggplot2",
-  "ggtext", "scales", "showtext", "sysfonts",
-  "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(colorblindr)
+library(dplyr)
+library(ggforce)
+library(ggplot2)
+library(ggtext)
+library(scales)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -38,7 +44,7 @@ The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being sug
 #| label: technology-load-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2022-07-19")
+tuesdata <- tt_load("2022-07-19")
 technology <- tuesdata$technology
 ```
 
@@ -131,12 +137,12 @@ countries <- c("GBR", "USA", "SWE", "BRA", "NZL", "VEN")
 
 # subset data for specific topic, years, and countries
 measles_data <- technology |>
-  dplyr::filter(
+  filter(
     label == "% children who received a measles immunization",
     year %in% c(1980, 2010),
     iso3c %in% countries
   ) |>
-  dplyr::select(-c(group, category, variable, label))
+  select(-c(group, category, variable, label))
 head(measles_data)
 ```
 
@@ -167,17 +173,17 @@ The `value` in the data currently tells us the percentage of children who did ha
 ```{r}
 #| label: wrangle-technology-1
 measles_YN <- measles_data |>
-  dplyr::mutate(no_value = 100 - value) |>
-  tidyr::pivot_longer(
+  mutate(no_value = 100 - value) |>
+  pivot_longer(
     cols = c(value, no_value),
     names_to = "YN",
     values_to = "perc"
   ) |>
-  tidyr::pivot_wider(
+  pivot_wider(
     names_from = "year",
     values_from = "perc"
   ) |>
-  dplyr::mutate(YN = factor(YN))
+  mutate(YN = factor(YN))
 ```
 
 To enable us to work with the percentages more easily, we can convert them into values between 0 and 1 by dividing by 100, and drop the original columns. If you think about creating a stacked bar chart, we need to know the end point of each bar (the maximum y-axis value for each bar). This isn't the percentage of each group, it's the cumulative percentage of each group and the ones stacked below it. We use the `cumsum()` function to calculate the cumulative sum of the percentages across each year and country: \index{cumsum}
@@ -185,13 +191,13 @@ To enable us to work with the percentages more easily, we can convert them into 
 ```{r}
 #| label: wrangle-technology-2
 plot_data <- measles_YN |>
-  dplyr::mutate(
+  mutate(
     perc_1980 = `1980` / 100,
     perc_2010 = `2010` / 100
   ) |>
-  dplyr::select(-c(`1980`, `2010`)) |>
-  dplyr::group_by(iso3c) |>
-  dplyr::mutate(
+  select(-c(`1980`, `2010`)) |>
+  group_by(iso3c) |>
+  mutate(
     ymax_1980 = cumsum(perc_1980),
     ymax_2010 = cumsum(perc_2010)
   )
@@ -236,21 +242,21 @@ Let's start with the 1980 data. We start off by creating the `0` values for the 
 ```{r}
 #| label: technology-gauge-data-1
 ymin_data <- plot_data |>
-  dplyr::ungroup() |>
+  ungroup() |>
   # start values for 1980 arc
-  dplyr::mutate(
+  mutate(
     ymin_1980 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |>
-        dplyr::pull(ymax_1980))
+      (slice_head(plot_data, n = -1) |>
+        pull(ymax_1980))
     ))
   ) |>
   # repeat for 2010
-  dplyr::mutate(
+  mutate(
     ymin_2010 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |>
-        dplyr::pull(ymax_2010))
+      (slice_head(plot_data, n = -1) |>
+        pull(ymax_2010))
     ))
   )
 ```
@@ -270,10 +276,10 @@ In older versions of {dplyr} (including when this plot was originally made), the
 ```{r}
 #| label: technology-gauge-data-2
 gauge_data <- ymin_data |>
-  dplyr::mutate(
-    dplyr::across(
-      dplyr::starts_with("y", ignore.case = FALSE),
-      ~ scales::rescale(.,
+  mutate(
+    across(
+      starts_with("y", ignore.case = FALSE),
+      ~ rescale(.,
         to = pi * c(-0.5, 0.5),
         from = 0:1
       )
@@ -295,10 +301,9 @@ We also use `facet_wrap()` to draw a pair of arcs for each country in a separate
 #| fig-cap: "Initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries."
 #| fig-alt: ""
 #| warning: false
-library(ggplot2)
 basic_plot <- ggplot(data = gauge_data) +
   # Outer 2010 arc
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
@@ -307,7 +312,7 @@ basic_plot <- ggplot(data = gauge_data) +
     )
   ) +
   # Inner 1980 arc
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
@@ -343,7 +348,7 @@ Before we add the new colors to our gauge chart, let's remove the black outline 
 #| fig-alt: ""
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
@@ -352,7 +357,7 @@ basic_plot <- ggplot(data = gauge_data) +
     ),
     color = NA
   ) +
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
@@ -383,14 +388,13 @@ When choosing colors for a visualization, it's important not to rely too heavily
 
 There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is {colorblindr} [@colorblindr]. The {colorblindr} package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated {ggplot2} functions. At the time of writing, {colorblindr} is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
 
-```{r}
+```{r, echo=2}
 #| label: fig-technology-cvd
 #| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types of color vision deficiency."
 #| fig-alt: ""
 #| fig-dpi: 250
-#| echo: 3
 theme_set(theme_gray(base_size = 3))
-colorblindr::cvd_grid(color_plot)
+cvd_grid(color_plot)
 theme_set(theme_gray(base_size = 11))
 ```
 
@@ -402,9 +406,9 @@ As we've seen in previous chapters, we can load in Google fonts using the {sysfo
 
 ```{r}
 #| label: technology-fonts
-sysfonts::font_add_google(name = "Ubuntu")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Ubuntu")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
 ```
 
@@ -503,7 +507,7 @@ styled_plot <- theme_plot +
       face = "bold",
       size = rel(1.2)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       margin = margin(b = 10),
       hjust = 0,
       halign = 0

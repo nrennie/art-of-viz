@@ -15,8 +15,12 @@ There are many functions within {ggplot2}, and many more within the wider commun
 
 ```{r}
 #| label: other-pkgs-req
-#| eval: false
-c("camcorder", "dplyr", "ggpattern", "ggplot2")
+#| warning: false
+#| message: false
+library(camcorder)
+library(dplyr)
+library(ggpattern)
+library(ggplot2)
 ```
 
 ## Recording gifs with {camcorder} {#sec-camcorder}
@@ -26,7 +30,6 @@ c("camcorder", "dplyr", "ggpattern", "ggplot2")
 ```{r}
 #| label: other-record
 #| eval: false
-library(camcorder)
 gg_record(
   width = 6,
   height = 4
@@ -94,7 +97,6 @@ We've already built the plot with `geom_pictogram()` so the x- and y- coordinate
 ```{r}
 #| label: other-build-gg-1
 #| warning: false
-library(ggplot2)
 basic_built <- ggplot_build(basic_plot)
 ```
 
@@ -105,8 +107,8 @@ Unfortunately, `PANEL` is a forbidden column name for a faceting variable, so we
 ```{r}
 #| label: other-build-gg-2
 new_data <- basic_built$data[[1]] |>
-  dplyr::rename(Year_Group = PANEL) |>
-  dplyr::mutate(
+  rename(Year_Group = PANEL) |>
+  mutate(
     Year_Group = factor(
       Year_Group,
       labels = c(
@@ -147,7 +149,7 @@ ggplot(
     x = x, y = y
   )
 ) +
-  ggpattern::geom_tile_pattern(
+  geom_tile_pattern(
     fill = "white",
     pattern = "image",
     pattern_filename = "images/wind-power.png"

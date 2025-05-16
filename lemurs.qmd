@@ -15,6 +15,17 @@ fig-asp: 0.67
 ```{r}
 #| echo: false
 #| eval: true
+#| message: false
+#| warning: false
+library(glue)
+library(purrr)
+library(stringr)
+library(sysfonts)
+```
+
+```{r}
+#| echo: false
+#| eval: true
 #| file: R/source_caption.R
 ```
 
@@ -36,12 +47,17 @@ In this chapter, we'll cover how to load and manipulate images in R using the {m
 
 ```{r}
 #| label: lemurs-pkgs-req
-#| eval: false
-c(
-  "cowplot", "dplyr", "ggplot2", "ggtext",
-  "glue", "imager", "magick", "systemfonts",
-  "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(cowplot)
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(imager)
+library(magick)
+library(systemfonts)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -52,7 +68,7 @@ We're going to be exploring data about lemurs from [Duke Lemur Center](https://l
 #| label: load-lemurs-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2021-08-24")
+tuesdata <- tt_load("2021-08-24")
 lemurs <- tuesdata$lemurs
 taxonomy <- tuesdata$taxonomy
 ```
@@ -149,7 +165,7 @@ There are `r nrow(taxonomy)` species of lemurs included in the data, and for the
 ```{r}
 #| label: lemurs-wrangling-1
 vrub_lemurs <- lemurs |>
-  dplyr::filter(taxon == "VRUB")
+  filter(taxon == "VRUB")
 ```
 
 This is definitely the easiest data wrangling process in this book, and we're ready to move on to creating the first draft of our plot!
@@ -163,7 +179,6 @@ Starting with the `ggplot()` function, we pass in the subset of our data on red 
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping."
 #| fig-alt: ""
 #| message: false
-library(ggplot2)
 basic_plot <- ggplot() +
   geom_point(
     data = vrub_lemurs,
@@ -237,7 +252,7 @@ The first argument `name` will be the name that the font is known by in R. You c
 ```{r}
 #| label: lemurs-fa-font
 #| eval: false
-systemfonts::register_font(
+register_font(
   name = "Font Awesome 6 Brands",
   plain = "fonts/Font-Awesome-6-Brands-Regular-400.otf"
 )
@@ -262,13 +277,13 @@ In `register_font()`, you pass these different font files into the relevant argu
 ```{r}
 #| label: lemurs-fonts
 #| eval: false
-systemfonts::register_font(
+register_font(
   name = "Lato",
   plain = "fonts/Lato/Lato-Regular.ttf",
   bold = "fonts/Lato/Lato-Bold.ttf",
   italic = "fonts/Lato/Lato-Italic.ttf"
 )
-systemfonts::register_font(
+register_font(
   name = "Passion One",
   plain = "fonts/Passion_One/PassionOne-Regular.ttf",
   bold = "fonts/Passion_One/PassionOne-Bold.ttf"
@@ -297,7 +312,7 @@ We'll also use Unicode characters (for triangles and circles) in the subtitle to
 ```{r}
 #| label: lemurs-text
 title <- "How much does a red ruffed lemur weigh?"
-subtitle <- glue::glue("At Duke Lemur Center, red ruffed lemurs live to an average of {round(mean(vrub_lemurs$age_at_death_y, na.rm = TRUE), 1)} years, and mature at about 2 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females &#x25CF;</span> tend to weigh more than <span style='color:{m_col}'>males &#x25B2;</span>, this chart does not account for pregnancy.")
+subtitle <- glue("At Duke Lemur Center, red ruffed lemurs live to an average of {round(mean(vrub_lemurs$age_at_death_y, na.rm = TRUE), 1)} years, and mature at about 2 years old. Although it may appear that, once fully-grown, <span style='color:{f_col}'>females &#x25CF;</span> tend to weigh more than <span style='color:{m_col}'>males &#x25B2;</span>, this chart does not account for pregnancy.")
 ```
 
 We'll use the `social_caption()` function defined in @sec-cats, to create a caption that includes Font Awesome icons for social media (using the colors we defined earlier). We then use the social media caption in the `source_caption()` function from @sec-turbines, and also pass in Duke Lemur Center and the data publication as the source of the data. \index{social\_caption} \index{source\_caption}
@@ -363,10 +378,10 @@ theme_plot <- text_plot +
       color = text_col,
       margin = margin(b = 5)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0, halign = 0,
       color = text_col
     )
@@ -444,7 +459,7 @@ We're going to start with the {imager} package and use it to read the image into
 #| fig-alt: ""
 #| echo: -1
 par(mar = c(3.1, 4.1, 2.1, 2.1))
-lemur_img <- imager::load.image("images/lemur.jpg")
+lemur_img <- load.image("images/lemur.jpg")
 plot(lemur_img)
 ```
 
@@ -454,14 +469,14 @@ Though this is a fun image of a lemur, overlaying it on top of the plot in its r
 
 Let's start by cropping out as much of the background as possible. In {imager}, the `Xc()` and `Yc()` functions return pixel coordinates for an image, for x- and y- coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. \index{imager!Xc} \index{imager!Yc}
 
-Running `imager::Xc(lemur_img) <= 200` creates a pixel matrix where all values with an x-coordinate less than or equal to 200 are `TRUE`, and is otherwise `FALSE`. Setting these values to `0` turns those pixels to the color black. We can do something similar to remove sections where the x-coordinate is less than 275 and the y-coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis - it goes the opposite direction of most plots! \index{imager!Xc}
+Running `Xc(lemur_img) <= 200` creates a pixel matrix where all values with an x-coordinate less than or equal to 200 are `TRUE`, and is otherwise `FALSE`. Setting these values to `0` turns those pixels to the color black. We can do something similar to remove sections where the x-coordinate is less than 275 and the y-coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis - it goes the opposite direction of most plots! \index{imager!Xc}
 
 ```{r}
 #| label: lemurs-imager-crop
-px <- imager::Xc(lemur_img) <= 200
+px <- Xc(lemur_img) <= 200
 lemur_img[px] <- 0
-px <- imager::Xc(lemur_img) <= 275 &
-  imager::Yc(lemur_img) >= 320
+px <- Xc(lemur_img) <= 275 &
+  Yc(lemur_img) >= 320
 lemur_img[px] <- 0
 ```
 
@@ -476,21 +491,21 @@ It takes a little bit of trial and error to choose the best values for these arg
 #| fig-show: hold
 #| echo: -1
 par(mar = c(3.1, 4.1, 2.1, 2.1))
-detect_outline <- imager::px.flood(
+detect_outline <- px.flood(
   im = lemur_img,
   x = 420,
   y = 200,
   sigma = 0.5
 )
 plot(lemur_img)
-imager::highlight(detect_outline)
+highlight(detect_outline)
 ```
 
 You can see in @fig-lemurs-img-outline that the lemur's white collar has been classified as part of the background. We can edit the `x`, `y`, and `sigma` arguments to select this part of the image separately:
 
 ```{r}
 #| label: lemurs-img-outline-2
-detect_outline_2 <- imager::px.flood(
+detect_outline_2 <- px.flood(
   im = lemur_img,
   x = 430,
   y = 220,
@@ -513,9 +528,9 @@ Note that since the image is always the first argument of the `image_*()` functi
 #| label: fig-lemurs-img-rmbg
 #| fig-cap: "Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar."
 #| fig-alt: ""
-lemur_nobg <- imager::cimg2magick(lemur_img) |>
-  magick::image_flop() |>
-  magick::image_transparent("black")
+lemur_nobg <- cimg2magick(lemur_img) |>
+  image_flop() |>
+  image_transparent("black")
 lemur_nobg
 ```
 
@@ -556,8 +571,8 @@ With {cowplot}, we start by using the `ggdraw()` function which sets up a layer 
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner."
 #| fig-alt: ""
 #| warning: false
-final_plot <- cowplot::ggdraw(styled_plot) +
-  cowplot::draw_image(
+final_plot <- ggdraw(styled_plot) +
+  draw_image(
     lemur_nobg,
     x = 1, y = 0,
     hjust = 1, halign = 1,

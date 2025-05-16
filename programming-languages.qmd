@@ -19,11 +19,16 @@ In this chapter we'll learn how to combine points and lines to create dumbbell c
 
 ```{r}
 #| label: languages-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "glue",
-  "showtext", "sysfonts", "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -38,7 +43,7 @@ The {tidytuesdayR} R package has several functions for helping to get data and i
 #| label: languages-load-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2023-03-21")
+tuesdata <- tt_load("2023-03-21")
 languages <- tuesdata$languages
 ```
 
@@ -50,7 +55,7 @@ languages <- tuesdata$languages
 languages <- readr::read_csv("data/languages.csv")
 ```
 
-You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tidytuesdayR::tt_load(2023, week = 12)`. You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
+You can alternatively read the data in via {tidytuesdayR} using the year and week. For example `languages <- tt_load(2023, week = 12)`. You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from {readr}. 
 
 What does the data look like? We can inspect the first six rows of the data using `head()`:
 
@@ -144,7 +149,7 @@ You can also subset the data using the `filter()` function from {dplyr}, either 
 #| label: languages-filter
 #| eval: false
 #| echo: true
-pl_df <- dplyr::filter(languages, type == "pl")
+pl_df <- filter(languages, type == "pl")
 ```
 
 Both approaches are equally valid. For this book, if we're plotting in {ggplot2}, we'll prepare data using other {tidyverse} packages. But if we're plotting in base R, we'll prepare data using base R as well.
@@ -212,16 +217,16 @@ To keep our data tidy and manageable, we can drop the columns we no longer need 
 ```{r}
 #| label: languages-data-wrangling-1
 comment_df <- pl_df |>
-  dplyr::filter(
+  filter(
     line_comment_token %in% c("//", "#", ";")
   ) |>
-  dplyr::mutate(
+  mutate(
     label = paste("Comment token:", line_comment_token)
   ) |>
-  dplyr::select(
+  select(
     title, appeared, last_activity, label, language_rank
   ) |>
-  tidyr::drop_na()
+  drop_na()
 ```
 
 In each facet, we could list all programming languages that use the comment symbol related to that facet. This would also display information about how many languages use each symbol. Alternatively, we may choose to use only the top 10 ranked languages for each symbol. 
@@ -233,13 +238,13 @@ To aid in plotting, we also want to reformat the data to put both year columns (
 ```{r}
 #| label: languages-data-wrangling-2
 plot_data <- comment_df |>
-  dplyr::group_by(label) |>
-  dplyr::slice_head(n = 10) |>
-  dplyr::mutate(
-    n = factor(dplyr::row_number(), levels = 1:10)
+  group_by(label) |>
+  slice_head(n = 10) |>
+  mutate(
+    n = factor(row_number(), levels = 1:10)
   ) |>
-  dplyr::ungroup() |>
-  tidyr::pivot_longer(
+  ungroup() |>
+  pivot_longer(
     cols = c(appeared, last_activity),
     names_to = "type",
     values_to = "year"
@@ -257,7 +262,7 @@ Now we're ready to start plotting!
 
 ### The first plot
 
-One of the especially nice features of {ggplot2} is the ability to save plots as variables, and iteratively add (using `+`) layers to it. To make the code a little bit clearer, we'll be creating each aspect of our plot in stages, and gradually adding more complex styling to it. We'll save the first plot we create as `basic_plot`. Let's start by loading {ggplot2} using the `library()` command.
+One of the especially nice features of {ggplot2} is the ability to save plots as variables, and iteratively add (using `+`) layers to it. To make the code a little bit clearer, we'll be creating each aspect of our plot in stages, and gradually adding more complex styling to it. We'll save the first plot we create as `basic_plot`. 
 
 As with most plots created with {ggplot2}, we'll start by calling the `ggplot()` function. In {ggplot2} we can define which data and aesthetic mapping we want to use either globally (in the `ggplot()` function) or in each individual layer. We'll be using the same data (`plot_data`) for all layers, so we pass it into the `data` argument of `ggplot()`. \index{ggplot2!ggplot}
 
@@ -270,7 +275,6 @@ Finally, we also add `facet_wrap()` to create a small multiple plot (facet) for 
 #| fig-cap: "A faceted dumbbell chart showing time between language appearance and last activity, for the top 10 languages that use each of #, //, and ; as a comment symbol."
 #| fig-alt: "The visualization tracks the usage of three comment tokens ('#', '//', and ';') from 1980 to 2020."
 #| warning: false
-library(ggplot2)
 basic_plot <- ggplot(data = plot_data) +
   geom_line(mapping = aes(x = year, y = n, group = n)) +
   geom_point(mapping = aes(x = year, y = n)) +
@@ -391,7 +395,7 @@ Since the values are going into a sentence we can make use of the `format()` fun
 
 ```{r}
 #| label: languages-text-vars-3
-subtitle <- glue::glue("Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed.")
+subtitle <- glue("Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed.")
 ```
 
 Let's add the title, subtitle, and caption to the plot using the `labs()` function from {ggplot2}: \index{ggplot2!labs}
@@ -417,14 +421,14 @@ We also need to make sure that whichever graphics device we are using, is able t
 
 ```{r}
 #| label: languages-showtext
-sysfonts::font_add_google(
+font_add_google(
   name = "VT323", family = "vt"
 )
-sysfonts::font_add_google(
+font_add_google(
   name = "Share Tech Mono", family = "share"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 ```
 
 ::: {#tip-languages-showtext .callout-tip}
@@ -584,7 +588,7 @@ theme_plot2 <- theme_plot1 +
       family = title_font,
       size = rel(2)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = main_col,
       margin = margin(b = 5),
       lineheight = 0.5
@@ -631,8 +635,8 @@ Although these labels are an improvement on not having any language label, they'
 ```{r}
 #| label: languages-better-labels
 plot_data <- plot_data |>
-  dplyr::mutate(
-    rank_label = glue::glue(
+  mutate(
+    rank_label = glue(
       "{title}\nRank: {language_rank}"
     )
   )

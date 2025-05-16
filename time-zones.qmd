@@ -15,6 +15,17 @@ fig-asp: 0.92
 ```{r}
 #| echo: false
 #| eval: true
+#| message: false
+#| warning: false
+library(glue)
+library(purrr)
+library(stringr)
+library(sysfonts)
+```
+
+```{r}
+#| echo: false
+#| eval: true
 #| file: R/load_font_awesome.R
 ```
 
@@ -32,12 +43,19 @@ In this chapter we'll learn how to obtain map data using {rnaturalearth}, manipu
 
 ```{r}
 #| label: time-zones-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "glue",
-  "patchwork", "rnaturalearth", "sf", "showtext",
-  "sysfonts", "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(patchwork)
+library(rnaturalearth)
+library(sf)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -50,7 +68,7 @@ The time zones data was used as a [TidyTuesday dataset in March 2023](https://gi
 #| label: load-timezones-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2023-03-28")
+tuesdata <- tt_load("2023-03-28")
 timezones <- tuesdata$timezones
 ```
 
@@ -95,8 +113,8 @@ The first column, `zone`, contains information on the timezone name - it's typic
 ```{r}
 #| label: timezones-tidy
 timezones_data <- timezones |>
-  dplyr::select(-comments) |>
-  tidyr::separate_wider_delim(
+  select(-comments) |>
+  separate_wider_delim(
     cols = zone,
     delim = "/",
     names = c("continent", "place"),
@@ -142,7 +160,7 @@ The {rnaturalearth} package allows you to interact with [Natural Earth](https://
 
 ```{r}
 #| label: timezones-map-data
-world <- rnaturalearth::ne_countries()
+world <- ne_countries()
 ```
 
 ::: {#tip-timezones-rnatearth .callout-tip}
@@ -154,7 +172,7 @@ If you wanted only the polygon(s) for a specific country or region, you can spec
 ```{r}
 #| label: timezones-ne-country
 #| eval: false
-uk <- rnaturalearth::ne_countries(
+uk <- ne_countries(
   country = "united kingdom"
 )
 ```
@@ -172,7 +190,6 @@ Since `sf` objects in R can be thought of as fancy data.frames, this means they 
 #| fig-cap: "Map of the world showing country outlines, with the default gray background."
 #| fig-alt: ""
 #| fig-asp: 0.6
-library(ggplot2)
 bg_map <- ggplot() +
   geom_sf(data = world)
 bg_map
@@ -188,7 +205,7 @@ In R, you can use the {sf} package to set or transform between different coordin
 
 ```{r}
 #| label: crs-sf
-sf::st_crs(world)
+st_crs(world)
 ```
 
 To make sure the CRS of the `timezones` data matches the CRS of the `world` data, we can set the CRS of the `timezones` data as `4326`. At the moment, the `timezones` data is not a spatial object - it's just a simple `data.frame` that contains two columns with latitude and longitude information. First, we need to convert it into an `sf` object using the `st_as_sf()` function from {sf}, also specifying the column names that relate to the coordinates data. \index{sf!st\_as\_sf} 
@@ -198,7 +215,7 @@ The latitude and longitude coordinates given in the `timezones` data are in the 
 ```{r}
 #| label: timezones-sf
 timezones_sf <- timezones_data |>
-  sf::st_as_sf(
+  st_as_sf(
     coords = c("longitude", "latitude"),
     crs = 4326
   )
@@ -264,10 +281,10 @@ Similarly, we also load any fonts we want to use. Again, for this visualization 
 
 ```{r}
 #| label: timezones-fonts
-sysfonts::font_add_google(name = "Commissioner")
-sysfonts::font_add_google(name = "Fraunces")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Commissioner")
+font_add_google(name = "Fraunces")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Commissioner"
 title_font <- "Fraunces"
 ```
@@ -276,13 +293,13 @@ title_font <- "Fraunces"
 
 There are many ways to make a bar chart in {ggplot2} - the two most often used are `geom_bar()` and `geom_col()`. What's the difference? Well, `geom_bar()` is essentially a special version of `geom_col()` that counts up how many observations are in each category for you. For this visualization, we're going to use the category counts for other purposes besides just defining the height of the bars so we'll do the counting ourselves and use `geom_col()` instead. \index{ggplot2!geom\_col} \index{ggplot2!geom\_bar}
 
-We'll use the `count()` function from {dplyr} to count how many observations of each geographical region are present in the `continent` column. We could use either the `timezones_sf` data or the `timezones_data` here as the input data. If you try both, you'll notice that, as we expect, the count column (`n`) is the same in both cases, but that the two outputs are not identical! When you run `dplyr::count(timezones_data, continent)`, you get a 2 column `data.frame`. When you run `dplyr::count(timezones_sf, continent)` you get an 3 column `data.frame` that remains an `sf` object. This is because the `geometry` column in `sf` can be described as *sticky* - you often (though not always) want the `sf` class to be preserved after any operations. You can remove it using the `st_drop_geometry()` function from {sf}: \index{sf!st\_drop\_geometry} \index{dplyr!count}
+We'll use the `count()` function from {dplyr} to count how many observations of each geographical region are present in the `continent` column. We could use either the `timezones_sf` data or the `timezones_data` here as the input data. If you try both, you'll notice that, as we expect, the count column (`n`) is the same in both cases, but that the two outputs are not identical! When you run `count(timezones_data, continent)`, you get a 2 column `data.frame`. When you run `count(timezones_sf, continent)` you get an 3 column `data.frame` that remains an `sf` object. This is because the `geometry` column in `sf` can be described as *sticky* - you often (though not always) want the `sf` class to be preserved after any operations. You can remove it using the `st_drop_geometry()` function from {sf}: \index{sf!st\_drop\_geometry} \index{dplyr!count}
 
 ```{r}
 #| label: timezones-bar-data
 bar_data <- timezones_sf |>
-  dplyr::count(continent) |>
-  sf::st_drop_geometry()
+  count(continent) |>
+  st_drop_geometry()
 ```
 
 Let's plot a basic bar chart, by starting (as we always do) with passing our new `bar_data` object into the `ggplot()` function. We also add the aesthetic mapping via the `aes()` function and place the `continent` on the x-axis and the count (`n`) on the y-axis. We then draw the columns of the bar chart using `geom_col()`: \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_col}
@@ -374,17 +391,17 @@ Finally, we can also use `theme_void()` to remove all existing theme elements, a
 #| fig-alt: ""
 #| fig-asp: 0.7
 legend_plot <- bar_plot +
-  ggtext::geom_textbox(
+  geom_textbox(
     mapping = aes(
-      hjust = dplyr::case_when(
+      hjust = case_when(
         n > 45 ~ 1,
         TRUE ~ 0
       ),
-      halign = dplyr::case_when(
+      halign = case_when(
         n > 45 ~ 1,
         TRUE ~ 0
       ),
-      color = dplyr::case_when(
+      color = case_when(
         n > 45 ~ I(bg_col),
         TRUE ~ I(text_col)
       )
@@ -459,7 +476,7 @@ col_map <- basic_map +
 
 Before we add the title and subtitle text, we need to make some space for it (and the legend that we'll add later). Let's set the limits of the x- and y- axes using `scale_x_continuous()` and `scale_y_continuous()`. We extend the lower limit of the y-axis beyond the range of the data, leaving blank space at the bottom where we can overlay the text. We also adjust the `breaks` in the x-axis scale to make the grid lines closer together. The choice of grid lines every `15` x values might seem like an odd choice, but every fifteen degrees difference in longitude (x-axis) is approximately one hour of time difference (since Earth rotates 360 degrees in 24 hours, or 15 degrees per hour)! \index{ggplot2!scale\_x\_continuous} \index{ggplot2!scale\_y\_continuous}
 
-It will take some (probably a lot of) trial and error to figure out exactly how much you need to extend the y-axis by. Here, we want the height of the blank space to be about half the height of the map area. Using `sf::st_bbox(world)` to return the bounding box of the `world` map data, you'll see that the y-axis of the world map ranges between -90 to +83.6. This means extending the y-axis by around 80 or 90 is a good starting point. We also remove the extra padding around the sides by setting `expand = FALSE` inside `coord_sf()`. \index{sf!st\_bbox} \index{ggplot2!coord\_sf}
+It will take some (probably a lot of) trial and error to figure out exactly how much you need to extend the y-axis by. Here, we want the height of the blank space to be about half the height of the map area. Using `st_bbox(world)` to return the bounding box of the `world` map data, you'll see that the y-axis of the world map ranges between -90 to +83.6. This means extending the y-axis by around 80 or 90 is a good starting point. We also remove the extra padding around the sides by setting `expand = FALSE` inside `coord_sf()`. \index{sf!st\_bbox} \index{ggplot2!coord\_sf}
 
 ```{r}
 #| label: fig-timezones-style-map-2
@@ -495,7 +512,7 @@ As we did in @sec-turbines and @sec-cats, we can also add colored text within th
  
 ```{r}
 #| label: timezones-text-1
-subtitle <- glue::glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colors show which time zones are in
+subtitle <- glue("Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colors show which time zones are in
 <span style='color:{col_palette[\"Africa\"]};'>Africa </span>,
 <span style='color:{col_palette[\"America\"]};'>America </span>,
 <span style='color:{col_palette[\"Antarctica\"]};'>Antarctica </span>,
@@ -511,8 +528,8 @@ We also specify some text for the visualization title. We're going to join toget
 
 ```{r}
 #| label: timezones-text-2
-title <- glue::glue("<span style='font-size:12pt; font-family:{title_font}; color:{text_col};'>Time Zones of the World</span><br>")
-title_text <- glue::glue("{title}{subtitle}")
+title <- glue("<span style='font-size:12pt; font-family:{title_font}; color:{text_col};'>Time Zones of the World</span><br>")
+title_text <- glue("{title}{subtitle}")
 ```
 
 We add the `social` caption to the map using the `tag` option in the `labs()` function - just as we did in @sec-doctors. When we edit the `theme` elements in the final step, we'll specify a position for the tag. \index{ggplot2!labs}
@@ -523,7 +540,7 @@ Unfortunately, we can't have two `tag`s and since we also want a non-standard po
 #| label: timezones-style-map-3
 text_map <- axes_map +
   # add social icons
-  ggtext::geom_textbox(
+  geom_textbox(
     data = data.frame(x = 0, y = 93, label = social),
     mapping = aes(x = x, y = y, label = label),
     family = body_font,
@@ -561,7 +578,7 @@ styled_map <- text_map +
     ),
     # add and position text
     plot.tag.position = c(-0.01, 0.12),
-    plot.tag = ggtext::element_textbox_simple(
+    plot.tag = element_textbox_simple(
       color = text_col,
       hjust = 0,
       maxwidth = unit(200, "pt"),
@@ -593,7 +610,6 @@ We also remove the added margin from around the edge of the plot using the `them
 #| label: fig-timezones-final-plot
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend."
 #| fig-alt: ""
-library(patchwork)
 styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```

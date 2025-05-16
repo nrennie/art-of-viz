@@ -19,12 +19,19 @@ In this chapter we'll consider different ways of visualising data that varies ov
 
 ```{r}
 #| label: museums-pkgs-req
-#| eval: false
-c(
-  "dplyr", "gghighlight", "ggplot2", "ggtext",
-  "purrr", "showtext", "sysfonts", "tibble",
-  "tidyr", "tidytuesdayR", "viridis"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(gghighlight)
+library(ggplot2)
+library(ggtext)
+library(purrr)
+library(showtext)
+library(sysfonts)
+library(tibble)
+library(tidyr)
+library(tidytuesdayR)
+library(viridis)
 ```
 
 ## Data
@@ -37,7 +44,7 @@ Let's start by reading in the data using the `tidytuesdayR` R package [@tidytues
 #| label: load-museums-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2022-11-22")
+tuesdata <- tt_load("2022-11-22")
 museums <- tuesdata$museums
 ```
 
@@ -136,22 +143,22 @@ Let's separate out these year values into four columns instead of two using the 
 ```{r}
 #| label: museums-wrangle1
 museum_subset <- museums |>
-  dplyr::select(
+  select(
     Year_opened, Year_closed, Area_Deprivation_index
   ) |>
-  tidyr::drop_na() |>
-  tidyr::separate_wider_delim(
+  drop_na() |>
+  separate_wider_delim(
     Year_opened,
     delim = ":",
     names = c("opened1", "opened2")
   ) |>
-  tidyr::separate_wider_delim(
+  separate_wider_delim(
     Year_closed,
     delim = ":",
     names = c("closed1", "closed2")
   ) |>
-  dplyr::mutate(
-    dplyr::across(
+  mutate(
+    across(
       c(opened1, opened2, closed1, closed2), as.numeric
     ),
     Area_Deprivation_index = factor(
@@ -187,21 +194,21 @@ The same approach is then applied to create another new column called `opened`. 
 ```{r}
 #| label: museums-wrangle2
 museum_data <- museum_subset |>
-  dplyr::mutate(dplyr::across(
+  mutate(across(
     c(closed1, closed2),
-    ~ dplyr::if_else(.x == 9999, NA_real_, .x)
+    ~ if_else(.x == 9999, NA_real_, .x)
   )) |>
-  dplyr::mutate(closed = dplyr::case_when(
+  mutate(closed = case_when(
     closed1 == closed2 ~ closed1,
     closed1 != closed2 ~ round((closed2 + closed1) / 2)
   )) |>
-  dplyr::mutate(opened = dplyr::case_when(
+  mutate(opened = case_when(
     opened1 == opened2 ~ opened1,
     opened1 != opened2 ~ round((opened2 + opened1) / 2)
   )) |>
-  dplyr::select(Area_Deprivation_index, opened, closed) |>
-  dplyr::rename(deprivation = Area_Deprivation_index) |>
-  dplyr::arrange(deprivation)
+  select(Area_Deprivation_index, opened, closed) |>
+  rename(deprivation = Area_Deprivation_index) |>
+  arrange(deprivation)
 ```
 
 This gives us data that looks like this:
@@ -218,7 +225,7 @@ What we want to know is how many museums were open in a given year for each leve
 ```{r}
 #| label: museums-count-function
 num_year <- function(year, dep, data = museum_data) {
-  df <- dplyr::filter(data, deprivation == dep)
+  df <- filter(data, deprivation == dep)
   num_open <- sum(df$opened <= year)
   num_closed <- sum(df$closed <= year, na.rm = TRUE)
   diff <- num_open - num_closed
@@ -239,7 +246,7 @@ There were `r num_year(1980, 3)` museums open in 1980, in an area in the third d
 #| label: museums-count-1
 all_years <- 1960:2021
 deps <- 1:10
-output <- purrr::pmap_vec(
+output <- pmap_vec(
   expand.grid(all_years, deps),
   ~ num_year(year = .x, dep = .y)
 )
@@ -262,14 +269,14 @@ We're almost ready to start plotting our data! We just need to convert this into
 ```{r}
 #| label: museums-count-3
 plot_data <- results |>
-  tibble::as_tibble() |>
-  dplyr::mutate(year = all_years) |>
-  tidyr::pivot_longer(
+  as_tibble() |>
+  mutate(year = all_years) |>
+  pivot_longer(
     -year,
     names_to = "deprivation",
     values_to = "museums"
   ) |>
-  dplyr::mutate(
+  mutate(
     deprivation = factor(deprivation, levels = 1:10)
   )
 ```
@@ -283,7 +290,6 @@ One of most common approaches to visualising multiple time series, is to plot mu
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the overlapping lines resembling spaghetti!"
 #| fig-alt: "A line chart with 10 lines showing the number of open museums for each level of deprivation. Many of the lines overlap and are similar colors, making it difficult to read the values. Line go from 1980 to 2020 and show a general increase from around 100 to 500."
 #| message: false
-library(ggplot2)
 ggplot(
   data = plot_data,
   mapping = aes(
@@ -327,7 +333,7 @@ We could solve these problems by making two changes:
 
 ### Highlighting with {gghighlight}
 
-The second change can be implemented easily using the {gghighlight} package [@gghighlight]. {gghighlight} is a {ggplot2} extension package, specifically designed for highlighting points and lines based on some conditions. Let's switch back to `geom_line()` and add `gghighlight::gghighlight()`. We set `use_direct_label = FALSE` because {gghighlight} will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it's facet label already. \index{gghighlight!gghighlight} \index{ggplot2!geom\_line} \index{line chart}
+The second change can be implemented easily using the {gghighlight} package [@gghighlight]. {gghighlight} is a {ggplot2} extension package, specifically designed for highlighting points and lines based on some conditions. Let's switch back to `geom_line()` and add `gghighlight()`. We set `use_direct_label = FALSE` because {gghighlight} will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it's facet label already. \index{gghighlight!gghighlight} \index{ggplot2!geom\_line} \index{line chart}
 
 ```{r}
 #| label: fig-museums-basic-plot-3
@@ -345,7 +351,7 @@ ggplot(
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
-  gghighlight::gghighlight(use_direct_label = FALSE)
+  gghighlight(use_direct_label = FALSE)
 ```
 
 We can also perform an additional bit of data wrangling to rescale the values by their 1960 levels. We start by filtering the data to only include data from the year 1960 and keeping only the `deprivation` and `museums` columns \index{dplyr!filter} \index{dplyr!select}. Then, we join this baseline data back to our original data based on the `deprivation` level, and for each year calculate the percentage change since 1960 and save it in a new column called `change`. \index{dplyr!mutate} \index{dplyr!rename} \index{dplyr!left\_join} \index{dplyr!select}
@@ -353,20 +359,20 @@ We can also perform an additional bit of data wrangling to rescale the values by
 ```{r}
 #| label: museums-wrangle-perc
 lookup <- plot_data |>
-  dplyr::filter(year == 1960) |>
-  dplyr::select(deprivation, museums)
+  filter(year == 1960) |>
+  select(deprivation, museums)
 
 new_plot_data <- plot_data |>
-  dplyr::left_join(lookup, by = "deprivation") |>
-  dplyr::rename(
+  left_join(lookup, by = "deprivation") |>
+  rename(
     museums = museums.x,
     museums_1960 = museums.y
   ) |>
-  dplyr::mutate(
+  mutate(
     change = (
       100 * (museums - museums_1960) / museums_1960)
   ) |>
-  dplyr::select(year, deprivation, change)
+  select(year, deprivation, change)
 ```
 
 We can then re-do our line chart using the rescaled `change` data on the y-axis instead:
@@ -382,7 +388,7 @@ basic_plot <- ggplot(
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
-  gghighlight::gghighlight(use_direct_label = FALSE)
+  gghighlight(use_direct_label = FALSE)
 basic_plot
 ```
 
@@ -413,7 +419,7 @@ For the colors of the lines, we can use the {viridis} package [@viridis]. The {v
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
 #| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side. Lines are colored yellows, blues, and purples."
 col_plot <- basic_plot +
-  viridis::scale_color_viridis(
+  scale_color_viridis(
     discrete = TRUE,
     direction = -1
   )
@@ -426,9 +432,9 @@ Let's start by loading in a different font using `font_add_google()` from {sysfo
 
 ```{r}
 #| label: museums-fonts
-sysfonts::font_add_google(name = "Raleway")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Raleway")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Raleway"
 ```
 
@@ -497,18 +503,18 @@ text_plot +
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       lineheight = 0.5,
       size = rel(1.2),
       face = "bold",
       margin = margin(b = 5)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col,
       lineheight = 0.5
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col,
       lineheight = 0.5

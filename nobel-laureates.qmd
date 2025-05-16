@@ -21,6 +21,17 @@ fig-asp: 0.8
 ```{r}
 #| echo: false
 #| eval: true
+#| message: false
+#| warning: false
+library(glue)
+library(purrr)
+library(stringr)
+library(sysfonts)
+```
+
+```{r}
+#| echo: false
+#| eval: true
 #| file: R/social_caption.R
 ```
 
@@ -38,11 +49,16 @@ In this chapter, we'll learn how to access data through an API, create custom te
 
 ```{r}
 #| label: nobel-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "lubridate",
-  "readr", "showtext", "sysfonts"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(glue)
+library(ggtext)
+library(lubridate)
+library(readr)
+library(showtext)
+library(sysfonts)
 ```
 
 ## Data
@@ -83,7 +99,7 @@ Once we've constructed the URL, we simply pass it into `read.csv()` (or `read_cs
 #| echo: true
 api_url <- "http://api.nobelprize.org/2.1/laureates"
 nobel_physics <- read.csv(
-  glue::glue(
+  glue(
     "{api_url}?limit=250&nobelPrizeCategory=phy&format=csv"
   )
 )
@@ -99,7 +115,7 @@ nobel_physics <- read.csv(
 #| echo: true
 api_url <- "http://api.nobelprize.org/2.1/laureates"
 nobel_physics <- read.csv(
-  glue::glue(
+  glue(
     "{api_url}?limit=250&nobelPrizeCategory
     =phy&format=csv"
   )
@@ -128,7 +144,7 @@ We can keep using the existing `nobel_physics` object, or we can read it back in
 ```{r}
 #| label: nobel-load-data-csv
 #| output: false
-nobel_physics <- readr::read_csv("data/nobel_physics.csv")
+nobel_physics <- read_csv("data/nobel_physics.csv")
 ```
 
 Let's have a quick look at the data:
@@ -171,7 +187,7 @@ We might be interested in seeing whether this relationship is changing over time
 #| fig-alt: ""
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 award_age <- nobel_physics$year -
-  lubridate::year(nobel_physics$birthdate)
+  year(nobel_physics$birthdate)
 plot(
   x = nobel_physics$year,
   y = award_age,
@@ -239,9 +255,9 @@ We'll start by using `filter()` from {dplyr} to filter out any non-Physics entri
 ```{r}
 #| label: nobel-physics-data
 physics_data <- nobel_physics |>
-  dplyr::filter(category == nobel_category) |>
-  dplyr::select(name, gender, year) |>
-  dplyr::arrange(year)
+  filter(category == nobel_category) |>
+  select(name, gender, year) |>
+  arrange(year)
 ```
 
 Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in {ggplot2} to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot.  \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial}
@@ -285,7 +301,7 @@ When we later pass the angle value into {ggplot2} functions for plotting, it's e
 ```{r}
 #| label: nobel-theta-data
 plot_data <- physics_data |>
-  dplyr::mutate(
+  mutate(
     theta = seq(
       from = pi / 4,
       to = (7 / 4) * pi,
@@ -317,7 +333,6 @@ We pass `plot_data` into the `data` argument, and then set the aesthetic mapping
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels."
 #| fig-alt: ""
 #| message: false
-library(ggplot2)
 ggplot() +
   geom_text(
     data = plot_data,
@@ -345,10 +360,10 @@ Both fonts are provided through Google Fonts so we'll use `font_add_google()` fr
 
 ```{r}
 #| label: nobel-fonts
-sysfonts::font_add_google(name = "Passion One")
-sysfonts::font_add_google(name = "Ubuntu")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Passion One")
+font_add_google(name = "Ubuntu")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
 title_font <- "Passion One"
 ```
@@ -493,7 +508,7 @@ styled_plot +
     plot.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       color = primary_col,
       hjust = 0,
       halign = 0,
@@ -543,7 +558,7 @@ For these arguments, we can specify a default. This means that the function will
 
 Here, we've specified that the default title font is `"Passion One"`. A similar approach is used for the body font. Usually, I'd strongly recommend against such an approach since there's no guarantee that a user will have the `"Passion One"` font installed or loaded when running the function. This makes it a bad choice of default font. 
 
-We *could* add the `sysfonts::font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the font every time we run the function. A better option is to specify one of the integrated fonts as a default e.g. `title_font = "sans"`.
+We *could* add the `font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the font every time we run the function. A better option is to specify one of the integrated fonts as a default e.g. `title_font = "sans"`.
 
 (Or at the very least, add instructions for how to load the fonts you've used as a default!)
 
@@ -564,11 +579,11 @@ category_plot <- function(
     title_font = "Passion One") {
   # Data wrangling
   category_data <- nobel_data |>
-    dplyr::filter(category == nobel_category) |>
-    dplyr::select(name, gender, year) |>
-    dplyr::arrange(year)
+    filter(category == nobel_category) |>
+    select(name, gender, year) |>
+    arrange(year)
   plot_data <- category_data |>
-    dplyr::mutate(
+    mutate(
       theta = seq(
         from = pi / 4,
         to = (7 / 4) * pi,
@@ -638,7 +653,7 @@ category_plot <- function(
       panel.background = element_rect(
         fill = bg_col, color = bg_col
       ),
-      plot.caption = ggtext::element_textbox_simple(
+      plot.caption = element_textbox_simple(
         color = primary_col,
         hjust = 0,
         halign = 0,
@@ -659,7 +674,7 @@ Now let's test if our function works with a completely different set of data! Le
 #| eval: false
 #| echo: true
 nobel_peace <- read.csv(
-  glue::glue(
+  glue(
     "{api_url}?limit=250&nobelPrizeCategory=pea&format=csv"
   )
 )
@@ -679,7 +694,7 @@ write.csv(
 #| eval: false
 #| echo: true
 nobel_peace <- read.csv(
-  glue::glue(
+  glue(
     "{api_url}?limit=250&nobelPrizeCategory
     =pea&format=csv"
   )
@@ -698,7 +713,7 @@ Again, we can either keep working with the loaded data from the API, or read in 
 ```{r}
 #| label: nobel-load-peace
 #| output: false
-nobel_peace <- readr::read_csv("data/nobel_peace.csv")
+nobel_peace <- read_csv("data/nobel_peace.csv")
 ```
 
 Then we pass the `"Peace"` category into our `category_plot()` function, alongside out newly downloaded `nobel_peace` data. The `nobel_peace` data doesn't have quite as many observations as the `nobel_physics` data, so we can reduce the radius (` r`) slightly and start the text a little bit closer to the middle of the circle. We can also choose some different colors for the visualization (but leave the defaults for the fonts):

@@ -16,6 +16,17 @@ fig-asp: 0.5
 ```{r}
 #| echo: false
 #| eval: true
+#| message: false
+#| warning: false
+library(glue)
+library(purrr)
+library(stringr)
+library(sysfonts)
+```
+
+```{r}
+#| echo: false
+#| eval: true
 #| file: R/load_font_awesome.R
 ```
 
@@ -39,12 +50,20 @@ In this chapter, we'll learn about how to collect data on which packages and fun
 
 ```{r}
 #| label: r-pkgs-pkgs-req
-#| eval: false
-c(
-  "dplyr", "funspotr", "ggplot2", "ggtext",
-  "glue", "lubridate", "rcartocolor", "readr",
-  "showtext", "stringr", "sysfonts", "tidyr"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(funspotr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(lubridate)
+library(rcartocolor)
+library(readr)
+library(showtext)
+library(stringr)
+library(sysfonts)
+library(tidyr)
 ```
 
 ## Data
@@ -59,12 +78,12 @@ All of the files in this repository are named and organised based on dates in th
 #| label: r-pkgs-load-data-1
 #| eval: false
 #| echo: true
-files_to_check <- funspotr::list_files_github_repo(
+files_to_check <- list_files_github_repo(
   repo = "nrennie/tidytuesday",
   branch = "main"
 ) |>
-  dplyr::filter(
-    stringr::str_detect(relative_paths, "2023")
+  filter(
+    str_detect(relative_paths, "2023")
   )
 ```
 
@@ -75,7 +94,7 @@ We then pass the `files_to_check` data frame into `spot_funs_files()` from {funs
 #| eval: false
 #| echo: true
 r_funs <- files_to_check |>
-  funspotr::spot_funs_files(
+  spot_funs_files(
     show_each_use = TRUE
   )
 ```
@@ -87,7 +106,7 @@ We then use the `unnest_results()` function from {funspotr} to get a row in the 
 #| eval: false
 #| echo: true
 r_pkgs <- rfuns |>
-  funspotr::unnest_results()
+  unnest_results()
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
@@ -96,7 +115,7 @@ We can then read the CSV back in using `read_csv()` from {readr} (or `read.csv()
 ```{r}
 #| label: r-pkgs-load-data-csv
 #| output: false
-r_pkgs <- readr::read_csv("data/r_pkgs.csv")
+r_pkgs <- read_csv("data/r_pkgs.csv")
 ```
 
 ::: {.content-visible when-format="html"}
@@ -154,8 +173,8 @@ One thing that you may have noticed is that, for some reason, in the data the pa
 ```{r}
 #| label: r-pkgs-pkgs
 r_pkgs <- r_pkgs |>
-  dplyr::mutate(
-    pkgs = dplyr::if_else(
+  mutate(
+    pkgs = if_else(
       pkgs == "ggplot",
       "ggplot2",
       pkgs
@@ -204,24 +223,24 @@ We also convert the `date` which is currently still a character string into a da
 ```{r}
 #| label: r-pkgs-date
 r_pkgs_date <- r_pkgs |>
-  dplyr::filter(pkgs %in% core_tidyverse) |>
-  tidyr::separate_wider_delim(
+  filter(pkgs %in% core_tidyverse) |>
+  separate_wider_delim(
     relative_paths,
     delim = "/",
     names = c(NA, "date", NA)
   ) |>
-  dplyr::mutate(date = lubridate::ymd(date)) |>
-  dplyr::count(date, pkgs)
+  mutate(date = ymd(date)) |>
+  count(date, pkgs)
 ```
 
-We want the facets in our plot to be ordered from most to least used package, so let's calculate the total number of uses for each package. Here, we can use the `summarise()` function in {dplyr}, to add up the values in the `n` column, split by `pkgs`. Here, we're using the `.by` argument in `summarise()` but you could alternatively use `group_by(pkgs)` instead. We then arrange the rows of the data based on the updated summary `n` column. By default `arrange()` sorts in ascending order, so to sort in descending order we simply sort by `-n` instead. You could alternatively use `dplyr::desc(n)`. Finally, we extract the `pkgs` column as a vector using `pull()` from {dplyr}. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull} \index{dplyr!desc} \index{dplyr!group\_by}
+We want the facets in our plot to be ordered from most to least used package, so let's calculate the total number of uses for each package. Here, we can use the `summarise()` function in {dplyr}, to add up the values in the `n` column, split by `pkgs`. Here, we're using the `.by` argument in `summarise()` but you could alternatively use `group_by(pkgs)` instead. We then arrange the rows of the data based on the updated summary `n` column. By default `arrange()` sorts in ascending order, so to sort in descending order we simply sort by `-n` instead. You could alternatively use `desc(n)`. Finally, we extract the `pkgs` column as a vector using `pull()` from {dplyr}. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull} \index{dplyr!desc} \index{dplyr!group\_by}
 
 ```{r}
 #| label: r-pkgs-orders
 pkgs_ordered <- r_pkgs_date |>
-  dplyr::summarise(n = sum(n), .by = pkgs) |>
-  dplyr::arrange(-n) |>
-  dplyr::pull(pkgs)
+  summarise(n = sum(n), .by = pkgs) |>
+  arrange(-n) |>
+  pull(pkgs)
 pkgs_ordered
 ```
 
@@ -246,7 +265,7 @@ Then, we use `mutate()` to convert the `pkgs` column of our data from a characte
 ```{r}
 #| label: r-pkgs-levels-2
 plot_data <- r_pkgs_date |>
-  dplyr::mutate(
+  mutate(
     pkgs = factor(pkgs, levels = pkgs_levels)
   )
 ```
@@ -259,11 +278,6 @@ We start our plot by passing `plot_data` into `ggplot()` to use this data as the
 
 We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We want our facet plots all in one line rather than arranged as a grid, so we set `nrow = 1` inside `facet_wrap()`. Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown. \index{ggplot2!facet\_wrap}
 
-```{r}
-#| label: r-pkgs-ggplot2
-#| warning: false
-library(ggplot2)
-```
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
@@ -319,7 +333,7 @@ We can use the `complete()` function from {tidyr} to *complete* the data. We pas
 ```{r}
 #| label: r-pkgs-new-data
 new_plot_data <- plot_data |>
-  tidyr::complete(
+  complete(
     date, pkgs,
     fill = list(n = 0)
   )
@@ -368,7 +382,7 @@ To keep a more consistent color theme in the plot, we define our highlight color
 
 ```{r}
 #| label: r-pkgs-cols-2
-col_palette <- rcartocolor::carto_pal(
+col_palette <- carto_pal(
   length(core_tidyverse) + 1, "Bold"
 )[1:length(core_tidyverse)]
 highlight_col <- col_palette[1]
@@ -395,12 +409,12 @@ In this chapter, we'll use the same font for the title and body text so we only 
 
 ```{r}
 #| label: r-pkgs-fonts
-sysfonts::font_add_google(
+font_add_google(
   name = "Source Code Pro",
   family = "source"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "source"
 ```
 
@@ -469,8 +483,8 @@ For the y-axis, we choose *nice* limits and breaks - setting the limits to betwe
 #| fig-alt: ""
 limits_plot <- text_plot +
   scale_x_date(
-    limits = lubridate::ymd(c("20230101", "20231231")),
-    breaks = lubridate::ymd(c("20230101", "20230701")),
+    limits = ymd(c("20230101", "20231231")),
+    breaks = ymd(c("20230101", "20230701")),
     labels = c("Jan", "Jul")
   ) +
   scale_y_continuous(
@@ -525,7 +539,7 @@ theme_plot <- init_theme_plot +
   theme(
     # title and subtitle text
     plot.title.position = "plot",
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       hjust = 0,
       halign = 0,
@@ -533,7 +547,7 @@ theme_plot <- init_theme_plot +
       face = "bold",
       size = rel(1.4)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col,
       hjust = 0,
       halign = 0,
@@ -578,7 +592,7 @@ Let's start with the factor levels. Currently, the factor levels are just the pa
 
 ```{r}
 #| label: r-pkgs-new-levels-1
-new_levels <- glue::glue(
+new_levels <- glue(
   "<img src='images/hex/{pkgs_levels}.png'>"
 )
 ```
@@ -587,7 +601,7 @@ We can also control how the images appear within the `<img>` tag (to some extent
 
 ```{r}
 #| label: r-pkgs-new-levels-2
-new_levels <- glue::glue(
+new_levels <- glue(
   "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs_levels}.png' width='20'>"
 )
 ```
@@ -597,10 +611,10 @@ Now we need to do the same thing to the `pkgs` column. It's important that we ov
 ```{r}
 #| label: r-pkgs-img-data
 plot_img_data <- new_plot_data |>
-  dplyr::mutate(
-    pkgs = glue::glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
+  mutate(
+    pkgs = glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
   ) |>
-  dplyr::mutate(
+  mutate(
     pkgs = factor(pkgs, levels = new_levels)
   )
 ```
@@ -620,7 +634,7 @@ We also need to tell {ggplot2} that the facet labels are using HTML tags, just a
 #| fig-alt: ""
 img_plot +
   theme(
-    strip.text.x = ggtext::element_textbox_simple(
+    strip.text.x = element_textbox_simple(
       hjust = 0.5,
       halign = 0.5
     )
@@ -651,8 +665,8 @@ You can do a very similar thing using the {marquee} package [@marquee] instead o
 #| eval: false
 #| echo: true
 plot_img_data <- new_plot_data |>
-  dplyr::mutate(
-    pkgs = glue::glue("![](images/hex/{pkgs}.png)")
+  mutate(
+    pkgs = glue("![](images/hex/{pkgs}.png)")
   )
 ```
 
@@ -662,9 +676,10 @@ Remember that you'd also need to update the factor levels and the data used in t
 #| label: r-pkgs-marquee-2
 #| eval: false
 #| echo: true
+library(marquee)
 img_plot +
   theme(
-    strip.text.x = marquee::element_marquee(
+    strip.text.x = element_marquee(
       hjust = 0.5,
       width = 1
     )
@@ -697,7 +712,8 @@ In July 2024, TidyTuesday used the {funspotr} package to look at how [David Robi
 #| label: r-pkgs-ex-data
 #| echo: true
 #| eval: false
-tuesdata <- tidytuesdayR::tt_load("2024-07-09")
+library(tidytuesdayR)
+tuesdata <- tt_load("2024-07-09")
 drob_funs <- tuesdata$drob_funs
 ```
 

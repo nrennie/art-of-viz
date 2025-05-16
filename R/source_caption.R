@@ -1,5 +1,5 @@
 source_caption <- function(source, graphic, sep = " | ") {
-  caption <- glue::glue(
+  caption <- glue(
     "**Data**: {source}{sep}**Graphic**: {graphic}"
   )
   return(caption)
