@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>12&nbsp; Time zones: spatial data and mapping with {sf} – The TidyTuesday Cookbook</title>
+<title>12&nbsp; Time zones: spatial data and mapping with {sf} – The Art of Data Visualization with {ggplot2}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -143,7 +143,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -376,7 +376,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <p>The <a href="https://data.iana.org/time-zones/tz-link.html">IANA (Interet Assigned Numbers Authority) tz database</a> contains data on the history of local time for different locations around the world <span class="citation" data-cites="zones_data">(<a href="references.html#ref-zones_data" role="doc-biblioref">Internet Assigned Numbers Authority 2023</a>)</span>. The website states that <em>“each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970.”</em> Many websites use the data in the IANA tz database to operate.</p>
 <p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data into R using the <code>tt_load()</code> function from the {tidytuesdayR} package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-28"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-28"</span><span class="op">)</span></span>
 <span><span class="va">timezones</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">timezones</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The data contains information for 4 different variables on 337 time zones. The <code>zone</code> column contains the time zone name; the <code>latitude</code> and <code>longitude</code> columns contain coordinates for the time zones <em>principal location</em> e.g.&nbsp;biggest city; and the <code>comments</code> column contains comments from the original time zone definition file.</p>
@@ -1392,8 +1392,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1504,7 +1502,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

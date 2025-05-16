@@ -37,11 +37,15 @@ In this chapter we'll learn how to identify open data sources, make maps with {g
 
 ```{r}
 #| label: doctors-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "MetBrewer",
-  "readr", "showtext", "sysfonts"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(MetBrewer)
+library(readr)
+library(showtext)
+library(sysfonts)
 ```
 
 ## Data 
@@ -59,7 +63,7 @@ url <- paste0(
   base_url,
   "physicians-per-1000-people.csv"
 )
-doctors <- readr::read_csv(url)
+doctors <- read_csv(url)
 ```
 
 ```{r}
@@ -67,7 +71,7 @@ doctors <- readr::read_csv(url)
 #| output: false
 #| echo: false
 #| eval: true
-doctors <- readr::read_csv("data/doctors.csv")
+doctors <- read_csv("data/doctors.csv")
 ```
 
 ::: {#tip-doctors-owid .callout-tip}
@@ -119,11 +123,10 @@ head(doctors)
 
 Often when there's a time component to data, one of the most obvious patterns to consider is how other variables change over time. Although line charts are probably most common for visualizing time series data, a simple scatter plot can also indicate if there's a general trend in the data. Sometimes scatter plots also look cleaner than line charts - a line for each region in this chart would very much look like a *spaghetti chart* as discussed in @sec-museums. \index{scatter plot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-doctors-base-plot
 #| fig-cap: "Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 plot(
   x = doctors$Year,
@@ -155,15 +158,15 @@ Since this data is already fairly tidy, there isn't too much data wrangling to b
 #| label: doctors-wrangle
 #| message: false
 doctors <- doctors |>
-  dplyr::rename(
+  rename(
     year = Year,
     region = Entity,
     doctors = `Physicians (per 1,000 people)`
   ) |>
-  dplyr::select(region, year, doctors) |>
-  dplyr::group_by(region) |>
-  dplyr::slice_max(year) |>
-  dplyr::ungroup()
+  select(region, year, doctors) |>
+  group_by(region) |>
+  slice_max(year) |>
+  ungroup()
 ```
 
 To plot this data on a world map, we also need data for the country borders. Luckily, the `map_data()` function built into {ggplot2}\index{ggplot2!map\_data} can help us with that! This function takes data from the {maps} package\index{maps} and turns it into an object you can plot directly with {ggplot2}.
@@ -171,7 +174,6 @@ To plot this data on a world map, we also need data for the country borders. Luc
 ```{r}
 #| label: map-doctors
 #| message: false
-library(ggplot2)
 world <- map_data("world")
 ```
 
@@ -200,9 +202,9 @@ Secondly, if you inspect the region names, you'll see that for some countries, t
 ```{r}
 #| label: map-doctors-wrangle-1
 plot_data <- doctors |>
-  dplyr::mutate(
+  mutate(
     region =
-      dplyr::recode(region,
+      recode(region,
         "United Kingdom" = "UK",
         "United States" = "USA",
         "Democratic Republic of Congo" = "Democratic Republic of the Congo",
@@ -217,12 +219,12 @@ The entries in the `region` column of `doctors` that don't correspond to countri
 
 ```{r}
 #| label: map-doctors-wrangle-2
-map_data <- dplyr::left_join(
+map_data <- left_join(
   world,
   plot_data,
   by = "region"
 ) |>
-  dplyr::filter(region != "Antarctica")
+  filter(region != "Antarctica")
 ```
 
 Now, we have everything we need to create a simple map.\index{map}
@@ -274,7 +276,7 @@ We'll start by considering alternative color palettes, then think about what tex
 
 ### Colors
 
-There are many, many color palette R packages in existence, and even more outside of the R ecosystem. In fact, the {paletteer} package [@paletteer] is designed to give a common interface to a comprehensive collection of color palettes in R. A popular color palette R package is {MetBrewer} [@MetBrewer] - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualizations. You can view all available palettes using `MetBrewer::display_all(colorblind_only = TRUE)`. Since `doctors` is a continuous variable, we'll look at the sequential palettes only. \index{paletteer} \index{MetBrewer} \index{color}
+There are many, many color palette R packages in existence, and even more outside of the R ecosystem. In fact, the {paletteer} package [@paletteer] is designed to give a common interface to a comprehensive collection of color palettes in R. A popular color palette R package is {MetBrewer} [@MetBrewer] - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualizations. You can view all available palettes using `display_all(colorblind_only = TRUE)`. Since `doctors` is a continuous variable, we'll look at the sequential palettes only. \index{paletteer} \index{MetBrewer} \index{color}
 
 {MetBrewer} does have functions that interface directly with {ggplot2} (such as `scale_fill_met_c()`) but we're going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the `"Hokusai2"` palette. The `text_col` is the 18th color and `highlight_col` is the 15th color. A variable containing the background color, `bg_col`, is also defined.
 
@@ -309,10 +311,10 @@ As in previous chapters, fonts can be defined using the {sysfonts}\index{sysfont
 
 ```{r}
 #| label: doctors-font
-sysfonts::font_add_google(name = "Roboto")
-sysfonts::font_add_google(name = "Roboto Slab")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Roboto")
+font_add_google(name = "Roboto Slab")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Roboto"
 title_font <- "Roboto Slab"
 ```
@@ -375,14 +377,14 @@ text_plot +
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       family = title_font
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col
     )
@@ -445,16 +447,16 @@ styled_plot <- ggplot(
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       family = title_font,
       lineheight = 0.5
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col,
       lineheight = 0.5
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col,
       lineheight = 0.5
@@ -489,21 +491,21 @@ styled_plot2 <- styled_plot +
     # move and format the tag (subtitle) text
     plot.margin = margin(0, 0, 5, 0),
     plot.tag.position = c(0.015, 0.8),
-    plot.tag = ggtext::element_textbox_simple(
+    plot.tag = element_textbox_simple(
       color = text_col,
       lineheight = 0.6,
       hjust = 0,
       maxwidth = 0.98
     ),
     # add margin for caption
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col,
       margin = margin(l = 5),
       lineheight = 0.6
     ),
     # change title text color
-    strip.text = ggtext::element_textbox_simple(
+    strip.text = element_textbox_simple(
       color = bg_col,
       family = title_font,
       margin = margin(7, 5, 7, 5),

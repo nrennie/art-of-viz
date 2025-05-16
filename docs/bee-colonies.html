@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>4&nbsp; Bee colony losses: visualizing quantities with Poisson disk sampling – The TidyTuesday Cookbook</title>
+<title>4&nbsp; Bee colony losses: visualizing quantities with Poisson disk sampling – The Art of Data Visualization with {ggplot2}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -168,7 +168,7 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -386,18 +386,22 @@ window.Quarto = {
 </header><p>In this chapter, we’ll learn how to explore patterns in missing data, install R packages that aren’t available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.</p>
 <p><strong>Packages required in this chapter</strong>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"poissoned"</span>,</span>
-<span>  <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span>, <span class="st">"tidyr"</span>, <span class="st">"tidytuesdayR"</span>,</span>
-<span>  <span class="st">"visdat"</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coolbutuseless/poissoned">poissoned</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/visdat/">visdat</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="data" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">4.1</span> Data</h2>
 <p>As a major pollinator, bees are a vitally important part of our planet’s ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases <span class="citation" data-cites="Brown2009">(<a href="references.html#ref-Brown2009" role="doc-biblioref">Brown, Mark J.F. and Paxton, Robert J. 2009</a>)</span>. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors <span class="citation" data-cites="bees_data">(<a href="references.html#ref-bees_data" role="doc-biblioref">United States Department of Agriculture: Economics, Statistics and Market Information System 2022</a>)</span>.</p>
 <p>The USDA honey bee colony data was used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in January 2022 (after being suggested by <a href="https://github.com/gkaramanis">Georgios Karamanis</a>), and so can be loaded in using the {tidytuesdayR} package: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-01-11"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-01-11"</span><span class="op">)</span></span>
 <span><span class="va">colony</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">colony</span></span>
 <span><span class="va">stressor</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">stressor</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -466,10 +470,10 @@ Tip&nbsp;4.1: Choose appropriate column names
 </div>
 </div>
 <p>The other aspect of our data that box plots don’t tell us about is the missingness. Box plots only plot what’s there, not what’s not there. It’s especially important to remember this step since base R graphics don’t warn you about <code>NA</code> values in the way that {ggplot2} <span class="citation" data-cites="ggplot2">(<a href="references.html#ref-ggplot2" role="doc-biblioref">Wickham 2016</a>)</span> does. So how do we plot data that doesn’t exist? </p>
-<p>The {visdat} package <span class="citation" data-cites="visdat">(<a href="references.html#ref-visdat" role="doc-biblioref">Tierney 2017</a>)</span> is an excellent way to take a quick look at your data. It includes the <code>vis_miss()</code> function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we’ll start by visualising just the data for one state. We can use the <code><a href="https://rdrr.io/r/base/subset.html">subset()</a></code> function from base R to obtain just the data fro Alabama. </p>
+<p>The {visdat} package <span class="citation" data-cites="visdat">(<a href="references.html#ref-visdat" role="doc-biblioref">Tierney 2017</a>)</span> is an excellent way to take a quick look at your data. It includes the <code><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss()</a></code> function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we’ll start by visualising just the data for one state. We can use the <code><a href="https://rdrr.io/r/base/subset.html">subset()</a></code> function from base R to obtain just the data fro Alabama. </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">colony_AL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">colony</span>, <span class="va">state</span> <span class="op">==</span> <span class="st">"Alabama"</span><span class="op">)</span></span>
-<span><span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="va">colony_AL</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="va">colony_AL</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-bees-vismiss" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -481,16 +485,15 @@ Figure&nbsp;4.3: A plot showing the missing values in the rows and columns in th
 </div>
 </div>
 </div>
-<p>You may notice that the column names in the plot generated by <code>vis_miss()</code> in <a href="#fig-bees-vismiss" class="quarto-xref">Figure&nbsp;<span>4.3</span></a> are rotated and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: </p>
+<p>You may notice that the column names in the plot generated by <code><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss()</a></code> in <a href="#fig-bees-vismiss" class="quarto-xref">Figure&nbsp;<span>4.3</span></a> are rotated and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: </p>
 <ul>
-<li>Use the <code>abbreviate_vars()</code> function from {visdat} which abbreviates column names, and makes them less likely to exceed the available space.</li>
-<li>Exploit the fact that the plot output from <code>vis_miss()</code> is made with {ggplot2}. This means we can use the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function to extend the space available in the plot’s right margin.</li>
+<li>Use the <code><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars()</a></code> function from {visdat} which abbreviates column names, and makes them less likely to exceed the available space.</li>
+<li>Exploit the fact that the plot output from <code><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss()</a></code> is made with {ggplot2}. This means we can use the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function to extend the space available in the plot’s right margin.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">colony_AL</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars</a></span><span class="op">(</span>min_length <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">visdat</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">colony_AL</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/visdat/reference/abbreviate_vars.html">abbreviate_vars</a></span><span class="op">(</span>min_length <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-bees-vismiss-tip" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -524,7 +527,7 @@ Tip&nbsp;4.2: Avoid missing patterns about missingness
 </section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
 <p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <a href="#fig-bees-sketch-blank" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
-<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
@@ -534,7 +537,7 @@ Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square repr
 </div>
 <p>Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>.</p>
 <p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
-<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
@@ -560,23 +563,23 @@ Figure&nbsp;4.6: Initial sketch showing a grid of squares, with the number of do
 <span>  <span class="st">"Texas"</span>, <span class="st">"Idaho"</span>, <span class="st">"South Dakota"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We then use the <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> function from {dplyr} to subset the data to only include rows for these states, and in our chosen time period of <code>"October-December"</code>. We also use the <code>select()</code> function to keep only the columns we actually need for our plot - the year, the state, and the number of colonies: </p>
+<p>We then use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from {dplyr} to subset the data to only include rows for these states, and in our chosen time period of <code>"October-December"</code>. We also use the <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> function to keep only the columns we actually need for our plot - the year, the state, and the number of colonies: </p>
 <div class="cell">
 <div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">colony</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">state</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">states_to_plot</span>,</span>
 <span>    <span class="va">months</span> <span class="op">==</span> <span class="st">"October-December"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
 <span>    <span class="va">year</span>, <span class="va">state</span>, <span class="va">colony_n</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>By default, the states will be ordered in alphabetical order. To make it easier to communicate patterns, we’ll order the states based on the number of colonies in the final year of the data (2020). We start by determining what that order is by filtering the data to the year <code>2020</code>, arranging the data based on the <code>colony_n</code> column in a descending order (using <code>desc()</code> from {dplyr}), and then extracting the state column using <code>pull()</code>. </p>
+<p>By default, the states will be ordered in alphabetical order. To make it easier to communicate patterns, we’ll order the states based on the number of colonies in the final year of the data (2020). We start by determining what that order is by filtering the data to the year <code>2020</code>, arranging the data based on the <code>colony_n</code> column in a descending order (using <code><a href="https://dplyr.tidyverse.org/reference/desc.html">desc()</a></code> from {dplyr}), and then extracting the state column using <code><a href="https://dplyr.tidyverse.org/reference/pull.html">pull()</a></code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">state_levels</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2020</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">colony_n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">2020</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">colony_n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We’ll convert the state column to a factor a little bit later, and this <code>state_levels</code> vector will provide us with the factor levels</p>
 <p>Now we need to generate the points that will represent the number of honey bee colonies in each grid square, as we sketched in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>. We could do something simple, such as using the <code><a href="https://rdrr.io/r/stats/Uniform.html">runif()</a></code> function to generate <code>x</code> and <code>y</code> coordinates from a uniform distribution. However, this approach is likely to lead a plot that looks a bit messy. Randomness doesn’t usually look very nice, and we would likely end up with lots of overlapping points. Instead, we want to generate points that don’t overlap and are at least some minimum distance apart. To do this, we’ll use <em>Poisson disk sampling</em>. </p>
@@ -595,34 +598,36 @@ Tip&nbsp;4.3: Installing R packages from GitHub
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Using {remotes}</strong></p>
-<p>When this chapter was first written, the {poissoned} package wasn’t available on CRAN, so it had to be installed from GitHub instead. The {remotes} package <span class="citation" data-cites="remotes">(<a href="references.html#ref-remotes" role="doc-biblioref">Csárdi et al. 2024</a>)</span> can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the <code>install_github()</code> function, passing in a character string of the form <code>"user/repository"</code>: </p>
+<p>When this chapter was first written, the {poissoned} package wasn’t available on CRAN, so it had to be installed from GitHub instead. The {remotes} package <span class="citation" data-cites="remotes">(<a href="references.html#ref-remotes" role="doc-biblioref">Csárdi et al. 2024</a>)</span> can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the <code><a href="https://remotes.r-lib.org/reference/install_github.html">install_github()</a></code> function, passing in a character string of the form <code>"user/repository"</code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Using {pak}</strong></p>
-<p>An alternative to {remotes} is the {pak} package <span class="citation" data-cites="pak">(<a href="references.html#ref-pak" role="doc-biblioref">Csárdi and Hester 2024</a>)</span>. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using {pak}, use the <code>pkg_install()</code> function and again pass in the <code>"user/repository"</code> string: </p>
+<p>An alternative to {remotes} is the {pak} package <span class="citation" data-cites="pak">(<a href="references.html#ref-pak" role="doc-biblioref">Csárdi and Hester 2024</a>)</span>. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using {pak}, use the <code><a href="https://pak.r-lib.org/reference/pkg_install.html">pkg_install()</a></code> function and again pass in the <code>"user/repository"</code> string: </p>
 <div class="cell">
-<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html">pkg_install</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://pak.r-lib.org/">pak</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html">pkg_install</a></span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The same function can be used for installing packages from CRAN e.g.&nbsp;<code>pak::pkg_install("ggplot2")</code>.</p>
+<p>The same function can be used for installing packages from CRAN e.g.&nbsp;<code>pkg_install("ggplot2")</code>.</p>
 </div>
 </div>
-<p>We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we’ll use the <code>poisson2d()</code> function from {poissoned}. Since we’re storing two coordinates (<code>x</code> and <code>y</code>) and the number of coordinate pairs will vary for each grid square, we’ll store the output in a list column. We can add list columns in the same way we would add any other new column using the <code>mutate()</code> function from {dplyr}. Since we want to generate samples according to the values of <code>state</code>, <code>year</code>, and <code>colony_n</code> in each <em>row</em> of our data, we use the <code>rowwise()</code> function from {dplyr}. Since we’re generating random data, we also need to make sure we set the random seed using <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> to ensure we get the same plot every time we run the code. </p>
-<p>We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e.&nbsp;there is an inverse relationship between <code>r</code> and <code>colony_n</code>. The default grid in <code>poisson2d()</code> goes from 0 to 10 on both axes. The values in <code>colony_n</code> range from 94000 to 770000, meaning that if we simply set the minimum radius to <code>1/colony_n</code>, we end up with points that are only 0.000001298701 apart. That’s a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set <code>r</code> to <code>200000/colony_n</code>. </p>
+<p>We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we’ll use the <code><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d()</a></code> function from {poissoned}. Since we’re storing two coordinates (<code>x</code> and <code>y</code>) and the number of coordinate pairs will vary for each grid square, we’ll store the output in a list column. We can add list columns in the same way we would add any other new column using the <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> function from {dplyr}. Since we want to generate samples according to the values of <code>state</code>, <code>year</code>, and <code>colony_n</code> in each <em>row</em> of our data, we use the <code><a href="https://dplyr.tidyverse.org/reference/rowwise.html">rowwise()</a></code> function from {dplyr}. Since we’re generating random data, we also need to make sure we set the random seed using <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> to ensure we get the same plot every time we run the code. </p>
+<p>We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e.&nbsp;there is an inverse relationship between <code>r</code> and <code>colony_n</code>. The default grid in <code><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d()</a></code> goes from 0 to 10 on both axes. The values in <code>colony_n</code> range from 94000 to 770000, meaning that if we simply set the minimum radius to <code>1/colony_n</code>, we end up with points that are only 0.000001298701 apart. That’s a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set <code>r</code> to <code>200000/colony_n</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">bees_grid</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    pts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>      <span class="fu">poissoned</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">200000</span> <span class="op">/</span> <span class="va">colony_n</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">200000</span> <span class="op">/</span> <span class="va">colony_n</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To see the difference between Poisson disk sampling and Uniform sampling, we can simulate some data and plot it: </p>
 <div class="sourceCode" id="cb13" data-code-line-numbers=""><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="co"># Poisson disk sampling</span></span>
-<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu">poissoned</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/poissoned/man/poisson2d.html">poisson2d</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">pts</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">pts</span><span class="op">$</span><span class="va">y</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Poisson disk sampling"</span></span>
@@ -662,11 +667,11 @@ Figure&nbsp;4.7: Plots comparing data generated using Poisson disk sampling and 
 </figcaption></figure>
 </div>
 <p>You can see in <a href="#fig-bees-sampling" class="quarto-xref">Figure&nbsp;<span>4.7</span></a> that the location of the points for Poisson disk sampling is not actually completely random, and is much <em>nicer</em> in appearance.</p>
-<p>Returning to our <code>bees_grid</code> data, we use <code>unnest()</code> from {tidyr} to expand the <code>pts</code> list column into separate rows and columns, and make sure that the <code>state</code> column is a factor, ordered by the <code>state_levels</code> variable we defined earlier. </p>
+<p>Returning to our <code>bees_grid</code> data, we use <code><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest()</a></code> from {tidyr} to expand the <code>pts</code> list column into separate rows and columns, and make sure that the <code>state</code> column is a factor, ordered by the <code>state_levels</code> variable we defined earlier. </p>
 <div class="cell">
 <div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bees_plot_data</span> <span class="op">&lt;-</span> <span class="va">bees_grid</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">state</span>, levels <span class="op">=</span> <span class="va">state_levels</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -751,13 +756,13 @@ Figure&nbsp;4.9: A 6x6 grid with each grid square denoting a year between 2015-2
 <p>We’ll edit the background color of the facet grid squares later in <a href="#sec-bees-theme" class="quarto-xref"><span>Section 4.4.4</span></a>.</p>
 </section><section id="fonts" class="level3" data-number="4.4.2"><h3 data-number="4.4.2" class="anchored" data-anchor-id="fonts">
 <span class="header-section-number">4.4.2</span> Fonts</h3>
-<p>Since this is already quite a visually complex chart, we’ll avoid further distractions and use the same font for all text elements in the chart. This means we define only a single font variable, <code>body_font</code>. We’ll also use a simple, easy-to-read font. The <em>Red Hat</em> fonts are sans serif fonts, with the <em>Red Hat Text</em> version designed for increased legibility, especially at smaller font sizes. Again, it’s available through Google Fonts and so can be loaded using <code>font_add_google()</code> from {sysfonts}, with <code>showtext_auto()</code> allowing plots to draw text using {showtext} automatically. </p>
+<p>Since this is already quite a visually complex chart, we’ll avoid further distractions and use the same font for all text elements in the chart. This means we define only a single font variable, <code>body_font</code>. We’ll also use a simple, easy-to-read font. The <em>Red Hat</em> fonts are sans serif fonts, with the <em>Red Hat Text</em> version designed for increased legibility, especially at smaller font sizes. Again, it’s available through Google Fonts and so can be loaded using <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> from {sysfonts}, with <code><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto()</a></code> allowing plots to draw text using {showtext} automatically. </p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Red Hat Text"</span>, family <span class="op">=</span> <span class="st">"red_hat"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"red_hat"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="adding-text" class="level3" data-number="4.4.3"><h3 data-number="4.4.3" class="anchored" data-anchor-id="adding-text">
@@ -805,7 +810,7 @@ Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-
 <ul>
 <li><p>Editing the background colors for the plot (<code>plot.background</code> set as yellow using <code>bg_col</code>) and grid squares (<code>panel.background</code> set as black using <code>highlight_col</code>).</p></li>
 <li><p>The text text color and margin for facet labels can be modified using the <code>strip.text</code> argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets).</p></li>
-<li><p>We change the title, subtitle, and caption text color to <code>highlight_col</code> and align the caption to the left using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. Though the subtitle is defined using <code>element_textbox_simple()</code> from {ggtext} to enable automatic line wrapping of the long text as described in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>.</p></li>
+<li><p>We change the title, subtitle, and caption text color to <code>highlight_col</code> and align the caption to the left using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. Though the subtitle is defined using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from {ggtext} to enable automatic line wrapping of the long text as described in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>.</p></li>
 <li><p>We adjust the <code>plot.margin</code> to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.</p></li>
 </ul>
 <div class="cell">
@@ -833,7 +838,7 @@ Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-
 <span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
 <span>      face <span class="op">=</span> <span class="st">"bold"</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>t <span class="op">=</span> <span class="fl">5</span>, b <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
@@ -1290,8 +1295,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1402,7 +1405,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

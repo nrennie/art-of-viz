@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>5&nbsp; Technology adoption: making gauge charts with {ggforce} – The TidyTuesday Cookbook</title>
+<title>5&nbsp; Technology adoption: making gauge charts with {ggforce} – The Art of Data Visualization with {ggplot2}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -168,7 +168,7 @@ window.Quarto = {
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -399,7 +399,7 @@ window.Quarto = {
 <p>The Cross‐country Historical Adoption of Technology (CHAT) dataset <span class="citation" data-cites="technology_data">(<a href="references.html#ref-technology_data" role="doc-biblioref">Comin and Hobijn 2009</a>)</span> contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing <em>as broad a definition of technology as possible</em> <span class="citation" data-cites="technology_data">(<a href="references.html#ref-technology_data" role="doc-biblioref">Comin and Hobijn 2009</a>)</span>.</p>
 <p>The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), so let’s start by reading in the data using the <code>tidytuesdayR</code> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-07-19"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-07-19"</span><span class="op">)</span></span>
 <span><span class="va">technology</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">technology</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>technology</code> data is reasonably large with 491636 rows and 7 columns.</p>
@@ -521,7 +521,7 @@ Figure&nbsp;5.3: Scatter plot of percentage children who received a measles immu
 </section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
 <p>You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
-<div id="fig-technology-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<div id="fig-technology-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-technology-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-technology.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
@@ -1406,8 +1406,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1518,7 +1516,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

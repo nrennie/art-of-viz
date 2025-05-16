@@ -81,7 +81,7 @@ output <- make_hex_coords(
 
 # Subplots ----------------------------------------------------------------
 
-ggplot() +
+g1 <- ggplot() +
   geom_col(
     data = data.frame(
       x = LETTERS[1:3],
@@ -101,7 +101,7 @@ ggplot() +
     aspect.ratio = 1
   )
 tmp_a <- tempfile()
-ggsave(tmp_a,
+ggsave(tmp_a, g1,
        device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
@@ -111,7 +111,7 @@ img_cropped_a <- crop_hex(tmp_a, bg_fill = "white")
 
 set.seed(1234)
 x <- runif(15)
-ggplot() +
+g2 <- ggplot() +
   geom_point(
     data = data.frame(
       x = x,
@@ -133,7 +133,7 @@ ggplot() +
     aspect.ratio = 1
   )
 tmp_b <- tempfile()
-ggsave(tmp_b,
+ggsave(tmp_b, g2,
        device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
@@ -141,7 +141,7 @@ ggsave(tmp_b,
 )
 img_cropped_b <- crop_hex(tmp_b, bg_fill = "white")
 
-ggplot() +
+g3 <- ggplot() +
   geom_line(
     data = data.frame(
       x = 1:10,
@@ -169,7 +169,7 @@ ggplot() +
     aspect.ratio = 1
   )
 tmp_c <- tempfile()
-ggsave(tmp_c,
+ggsave(tmp_c, g3,
        device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
@@ -251,8 +251,10 @@ ggplot() +
 
 # Save --------------------------------------------------------------------
 
-ggsave("images/cover.png",
-  height = height, width = width,
-  dpi = 300, bg = bg_col,
-  units = "px"
-)
+if (interactive()) {
+  ggsave("images/cover.png",
+         height = height, width = width,
+         dpi = 300, bg = bg_col,
+         units = "px"
+  )
+}

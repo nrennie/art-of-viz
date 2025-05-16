@@ -26,12 +26,18 @@ In this chapter, we'll learn how to create custom captions with social media ico
 
 ```{r}
 #| label: cats-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "glue",
-  "purrr", "showtext", "stringr", "sysfonts",
-  "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(purrr)
+library(showtext)
+library(stringr)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -44,7 +50,7 @@ The data was used as a TidyTuesday dataset in January 2023 (after being suggeste
 #| label: cats-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2023-01-31")
+tuesdata <- tt_load("2023-01-31")
 cats <- tuesdata$cats_uk
 cats_reference <- tuesdata$cats_uk_reference
 ```
@@ -70,11 +76,10 @@ The third option, and perhaps the most useful, is to join the two datasets toget
 
 Let's start by digging into the geographic `cats` data. We can make a very quick plot of the co-ordinate data using `plot()`. \index{graphics!plot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-cats-map
 #| fig-cap: "Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
   x = cats$location_long,
@@ -99,11 +104,10 @@ No matter how many times you plot them on a map, remembering which way round lat
 
 The GPS sensors also report data on the ground speed of the cats, potentially allowing us to see patterns in their activity level throughout the day. Let's have a look at the `ground_speed` column by plotting an exploratory histogram with `hist()`: \index{graphics!hist}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-cats-speed-hist
 #| fig-cap: "Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds!"
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(5.1, 4.1, 3.1, 2.1))
 hist(
   x = cats$ground_speed,
@@ -116,22 +120,20 @@ At first glance you might not see anything of particular note about @fig-cats-sp
 
 Let's focus on the `cats_reference` data instead, and look at how characteristics of the study cats varied. For example, we might look at how long the cats spend indoors, which is recorded as a categorical variable, `hrs_indoors`. We can calculate how many cats fall into each time indoors *category* using `table()` and then use `barplot()` to visualize it: \index{graphics!barplot} \index{base!table}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-cats-bar-hrs
 #| fig-cap: "Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(4.1, 4.1, 3.1, 2.1))
 barplot(table(cats_reference$hrs_indoors))
 ```
 
 We might expect that the number of hours a cat spends indoors varies with age, with older cats spending more time indoors due to health problems or energy levels. Let's use `plot()` to create a quick scatter plot of `age_years` against `hrs_indoors` to investigate: \index{graphics!plot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-cats-scatter
 #| fig-cap: "Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1))
 plot(
   x = cats_reference$age_years,
@@ -164,12 +166,12 @@ There's one cat (`r cats_reference$animal_id[is.na(cats_reference$age_years)]`) 
 ```{r}
 #| label: cats-wrangling
 plot_data <- cats_reference |>
-  dplyr::select(age_years, hrs_indoors) |>
-  dplyr::mutate(hrs_indoors = factor(hrs_indoors)) |>
-  dplyr::group_by(age_years, hrs_indoors) |>
-  dplyr::count() |>
-  dplyr::ungroup() |>
-  tidyr::drop_na()
+  select(age_years, hrs_indoors) |>
+  mutate(hrs_indoors = factor(hrs_indoors)) |>
+  group_by(age_years, hrs_indoors) |>
+  count() |>
+  ungroup() |>
+  drop_na()
 ```
 
 ### The first plot
@@ -180,7 +182,6 @@ We pass our data into the `ggplot()` function as always, and then set up the aes
 #| label: fig-cats-base-plot
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category."
 #| fig-alt: ""
-library(ggplot2)
 basic_plot <- ggplot(
   data = plot_data,
   mapping = aes(
@@ -236,10 +237,10 @@ Here, we’ll use a *fun* font for the title, but keep it clean and minimal for 
 
 ```{r}
 #| label: cats-fonts
-sysfonts::font_add_google(name = "Chewy")
-sysfonts::font_add_google(name = "Ubuntu")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Chewy")
+font_add_google(name = "Ubuntu")
+showtext_auto()
+showtext_opts(dpi = 300)
 title_font <- "Chewy"
 body_font <- "Ubuntu"
 ```
@@ -255,7 +256,7 @@ Let's say we want to add an annotation to the plot that highlights the oldest ca
 ```{r}
 #| label: cats-oldest
 annot_oldest <- cats_reference |>
-  dplyr::slice_max(age_years)
+  slice_max(age_years)
 ```
 
 When it comes to adding the annotation to the plot, there are several choices we can make within {ggplot2}: 
@@ -272,12 +273,12 @@ From {ggtext}, we can use the `geom_textbox()` function to add an annotation. Li
 #| fig-cap: "Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots'."
 #| fig-alt: ""
 annotated_plot <- basic_plot +
-  ggtext::geom_textbox(
+  geom_textbox(
     data = annot_oldest,
     mapping = aes(
       x = age_years - 2.5,
       y = factor(hrs_indoors),
-      label = glue::glue(
+      label = glue(
         "The oldest cat is <span style='color:{highlight_col}'>{animal_id}</span> who is {age_years} years old."
       )
     ),
@@ -353,7 +354,7 @@ Let's start to add some other, more standard text, to the chart and define some 
 title <- "Do older cats spend more time indoors?"
 # subtitle text
 perc_indoor <- round(100 * sum(cats_reference$hrs_indoors == "22.5") / nrow(cats_reference))
-st <- glue::glue("Around {perc_indoor}% of cats in the study spend on average 22.5 hours per day indoors! There is a slight trend for cats to spend more time indoors as they age.")
+st <- glue("Around {perc_indoor}% of cats in the study spend on average 22.5 hours per day indoors! There is a slight trend for cats to spend more time indoors as they age.")
 ```
 
 ### Custom caption functions
@@ -478,8 +479,8 @@ text_plot +
       face = "bold",
       size = rel(1.5)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(),
-    plot.caption = ggtext::element_textbox_simple(),
+    plot.subtitle = element_textbox_simple(),
+    plot.caption = element_textbox_simple(),
     plot.title.position = "plot",
     plot.caption.position = "plot",
     # background and grid

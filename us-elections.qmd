@@ -33,12 +33,18 @@ In this chapter, we'll learn how to arrange faceted plots in a grid that resembl
 
 ```{r}
 #| label: elections-pkgs-req
-#| eval: false
-c(
-  "dplyr", "geofacet", "ggplot2", "ggtext",
-  "glue", "patchwork", "showtext", "sysfonts",
-  "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(geofacet)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(patchwork)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
@@ -49,7 +55,7 @@ The MIT Election Data and Science Lab collects, analyzes, and shares data and re
 #| label: elections-load-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2023-11-07")
+tuesdata <- tt_load("2023-11-07")
 house <- tuesdata$house
 ```
 
@@ -84,11 +90,10 @@ The `house` data is very granular, and it's unlikely we'll be able to visualize 
 
 Let's start by having a quick look at whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses [@UScensuspop] so might we also expect a similar increase in votes? Let's start by having a look at the number of candidate votes over time with a quick scatter plot made with `plot()`:
 
-```{r}
+```{r, echo=-1}
 #| label: fig-elections-scatterplot
 #| fig-cap: "Scatter plot showing the number of candidate votes over time, where it's clear that elections take place every two years and there has been little change over time."
 #| fig-alt: ""
-#| echo: -1
 #| fig-asp: 0.8
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.6, cex.names = 0.6)
 plot(
@@ -103,12 +108,11 @@ There doesn't seem to be an especially interesting pattern in votes over time in
 
 We might also be interested in how the number of candidate votes varies by party, and we can use the `boxplot()` function to explore whether or not there are big differences: \index{graphics!boxplot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-elections-boxplot
 #| fig-cap: "Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes)."
 #| fig-alt: ""
 #| fig-asp: 1.2
-#| echo: -1
 par(mar = c(4.1, 7.1, 1.1, 1.1), cex.axis = 0.4, cex.names = 0.4)
 boxplot(
   candidatevotes ~ party,
@@ -147,15 +151,15 @@ The `stage` column contains information on whether the election was a general el
 ```{r}
 #| label: elections-wrangling
 house_data <- house |>
-  dplyr::mutate(party = dplyr::case_when(
+  mutate(party = case_when(
     party == "REPUBLICAN" ~ "Republican Party",
     party == "DEMOCRAT" ~ "Democratic Party",
     TRUE ~ "Other"
   )) |>
-  dplyr::filter(stage == "GEN") |>
-  dplyr::group_by(year, state_po, party) |>
-  dplyr::summarise(votes = sum(candidatevotes)) |>
-  dplyr::ungroup()
+  filter(stage == "GEN") |>
+  group_by(year, state_po, party) |>
+  summarise(votes = sum(candidatevotes)) |>
+  ungroup()
 ```
 
 There are some years for which there were no `"Other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from {ggplot2}. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from {tidyr}, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
@@ -163,7 +167,7 @@ There are some years for which there were no `"Other"` candidates in some states
 ```{r}
 #| label: elections-wrangling2
 plot_data <- house_data |>
-  tidyr::complete(
+  complete(
     year, state_po, party,
     fill = list(votes = 0)
   )
@@ -187,9 +191,8 @@ We've already seen examples of making area charts in @sec-museums and @sec-r-pkg
 #| fig-cap: "Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied."
 #| fig-alt: ""
 #| warning: false
-library(ggplot2)
 basic_plot <- ggplot(
-  data = dplyr::filter(plot_data, state_po == "CA")
+  data = filter(plot_data, state_po == "CA")
 ) +
   geom_area(
     mapping = aes(
@@ -213,7 +216,7 @@ Since the first argument of `ggplot` is `data`, this means that we *could* pipe 
 #| eval: false
 #| echo: true
 plot_data |>
-  dplyr::filter(state_po == "CA") |>
+  filter(state_po == "CA") |>
   ggplot() +
   geom_area(
     mapping = aes(
@@ -270,9 +273,8 @@ If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a U
 #| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
 #| fig-alt: ""
 #| warning: false
-library(geofacet)
 map_plot <- basic_plot +
-  geofacet::facet_geo(
+  facet_geo(
     ~state_po,
     grid = "us_state_grid2"
   )
@@ -322,12 +324,12 @@ As in previous chapters, fonts can be defined using the {sysfonts} and {showtext
 
 ```{r}
 #| label: elections-fonts
-sysfonts::font_add_google(name = "Roboto")
-sysfonts::font_add_google(
+font_add_google(name = "Roboto")
+font_add_google(
   name = "Carter One", family = "Carter"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Roboto"
 title_font <- "Carter"
 ```
@@ -336,7 +338,7 @@ We write text for the subtitle, using `glue()` to add HTML styling for colored t
 
 ```{r}
 #| label: elections-text
-st <- glue::glue("<span style='font-size:10pt; font-family:{title_font}; color:{text_col};'>Votes in US House Elections</span><br>Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
+st <- glue("<span style='font-size:10pt; font-family:{title_font}; color:{text_col};'>Votes in US House Elections</span><br>Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
 We also use our `social_caption()` function defined in @sec-cats, which we'll later add as a plot caption: \index{social\_caption}
@@ -416,14 +418,14 @@ styled_plot_2 <- styled_plot_1 +
       color = bg_col
     ),
     plot.margin = margin(5, 5, 5, 125),
-    plot.tag = ggtext::element_textbox_simple(
+    plot.tag = element_textbox_simple(
       hjust = 0,
       color = text_col,
       maxwidth = 0.65,
       lineheight = 0.6,
       size = rel(1.0)
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 1,
       halign = 1,
       color = text_col,
@@ -450,7 +452,7 @@ Let's start by filtering the data, to select only a single state. It doesn't rea
 
 ```{r}
 #| label: elections-legend-data
-ca_data <- dplyr::filter(plot_data, state_po == "CA")
+ca_data <- filter(plot_data, state_po == "CA")
 ```
 
 We then reuse the code written for the main plot, passing in the `ca_data` to the `ggplot()` function, then adding the aesthetic mapping and the area chart with `geom_area()`. The colors and custom state (facet) labels are added with `scale_fill_manual()` and `geom_text()` as discussed earlier in this chapter. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_area} \index{ggplot2!geom\_text} \index{ggplot2!scale\_fill\_manual}
@@ -560,7 +562,6 @@ Now, the last step is to join together our custom legend with the main plot. We'
 #| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side."
 #| fig-alt: ""
 #| warning: false
-library(patchwork)
 final_plot <- styled_plot_2 + inset_element(
   p = p_inset,
   left = 0.035,

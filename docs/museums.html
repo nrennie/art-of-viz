@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>3&nbsp; UK museums: highlighting line charts with {gghighlight} – The TidyTuesday Cookbook</title>
+<title>3&nbsp; UK museums: highlighting line charts with {gghighlight} – The Art of Data Visualization with {ggplot2}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -143,7 +143,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -371,7 +371,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <p>The <a href="https://museweb.dcs.bbk.ac.uk/data">Mapping Museums</a> project <span class="citation" data-cites="museums_data">(<a href="references.html#ref-museums_data" role="doc-biblioref">Mapping Museums 2021</a>)</span> has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/home">museweb.dcs.bbk.ac.uk</a>. It was also used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in November 2022 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), and we’ll use that version for this chapter.</p>
 <p>Let’s start by reading in the data using the <code>tidytuesdayR</code> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tidytuesdayR/man/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-11-22"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu">tidytuesdayR</span><span class="fu">::</span><span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-11-22"</span><span class="op">)</span></span>
 <span><span class="va">museums</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">museums</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The data contains information for 35 different variables on 4191 museums. After the first <code>museum_id</code> columns, the next 8 columns provide information on the location of the museum - including address and co-ordinates. The next set of columns provides information about the museums such as whether it’s an accredited museum, how it’s governed, what types of items it has, and when it was open. Since this is a collated data set, information is also provided on the original source of the data for some of these variables. The remaining columns provide information on the area in which the museum is located, including information about different deprivation indices and geo-demographic group (type of area e.g.&nbsp;<code>"University Towns and Cities"</code>). A full glossary of the terms used can be found on the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/glossary">museweb.dcs.bbk.ac.uk/glossary</a>.</p>
@@ -431,7 +431,7 @@ Tip&nbsp;3.1: Alternative graphics packages
 <li>Or do we use faceting to split it into multiple smaller plots by deprivation index?</li>
 </ul>
 <p>If we go with line charts, and faceting by deprivation index, that might look something like this:</p>
-<div id="fig-museums-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text." data-fig-align="center">
+<div id="fig-museums-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-museums.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text.">
 </div>
@@ -1303,8 +1303,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1415,7 +1413,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

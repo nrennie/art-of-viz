@@ -2,9 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.55">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>11&nbsp; Doctors across the world: making maps with {ggplot2} – The TidyTuesday Cookbook</title>
+<title>11&nbsp; Doctors across the world: making maps with {ggplot2} – The Art of Data Visualization with {ggplot2}</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -87,10 +87,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -143,7 +143,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">The TidyTuesday Cookbook</a> 
+      <a href="./">The Art of Data Visualization with {ggplot2}</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -359,22 +359,25 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </header><p>In this chapter we’ll learn how to identify open data sources, make maps with {ggplot2} using data from the {maps} package, and create title panels with an unorthodox use of facets.</p>
 <p><strong>Packages required in this chapter</strong>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggtext"</span>, <span class="st">"MetBrewer"</span>,</span>
-<span>  <span class="st">"readr"</span>, <span class="st">"showtext"</span>, <span class="st">"sysfonts"</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org">readr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="data" class="level2" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">11.1</span> Data</h2>
 <p>We’ll visualize data on <em>Medical doctors per 1,000 people</em> using the dataset from the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>) <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you’re ever looking for inspiration.</p>
-<p>You can either download the CSV file from <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">ourworldindata.org/grapher/physicians-per-1000-people</a> manually or you can do as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and download it directly into R using the URL. Simply pass the URL into the <code>read_csv()</code> function from {readr} (or <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> from base R if you prefer). As in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. </p>
+<p>You can either download the CSV file from <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">ourworldindata.org/grapher/physicians-per-1000-people</a> manually or you can do as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and download it directly into R using the URL. Simply pass the URL into the <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code> function from {readr} (or <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> from base R if you prefer). As in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, we split the URL into the base URL and the specific page of interest to make it easier to later load in other datasets if we choose to. </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_url</span> <span class="op">&lt;-</span> <span class="st">"https://ourworldindata.org/grapher/"</span></span>
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="va">base_url</span>,</span>
 <span>  <span class="st">"physicians-per-1000-people.csv"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tip-doctors-owid" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -386,7 +389,7 @@ Tip&nbsp;11.1: Connecting to Our World in Data via R
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The {owidR} R package <span class="citation" data-cites="owidR">(<a href="references.html#ref-owidR" role="doc-biblioref">York 2023</a>)</span> provides an R interface to the Our World in Data website, allowing you to search and download data in R without having to navigate through the website. However, it’s not much less complicated than passing in the URL to <code>read_csv()</code>. At the time of writing, the {owidR} package also hasn’t been updated to use the newest API and the following code results in errors: </p>
+<p>The {owidR} R package <span class="citation" data-cites="owidR">(<a href="references.html#ref-owidR" role="doc-biblioref">York 2023</a>)</span> provides an R interface to the Our World in Data website, allowing you to search and download data in R without having to navigate through the website. However, it’s not much less complicated than passing in the URL to <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>. At the time of writing, the {owidR} package also hasn’t been updated to use the newest API and the following code results in errors: </p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">owidR</span><span class="op">)</span></span>
 <span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/owidR/man/owid.html">owid</a></span><span class="op">(</span><span class="st">"physicians-per-1000-people"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -403,7 +406,7 @@ Tip&nbsp;11.2: Saving data for later use
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>You may choose to save a copy of <code>doctors</code> as a CSV file for later use by using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> or <code>write_csv()</code> from {readr}. This means you don’t have to download the data each time you open R and don’t have to worry about the data updating when you’re halfway through your analysis. You can then later read in the data with <code>read.csv</code> or <code>read_csv()</code> from {readr}. </p>
+<p>You may choose to save a copy of <code>doctors</code> as a CSV file for later use by using <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> or <code><a href="https://readr.tidyverse.org/reference/write_delim.html">write_csv()</a></code> from {readr}. This means you don’t have to download the data each time you open R and don’t have to worry about the data updating when you’re halfway through your analysis. You can then later read in the data with <code>read.csv</code> or <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code> from {readr}. </p>
 </div>
 </div>
 <div id="tip-doctors-open-data" class="callout callout-style-default callout-tip callout-titled">
@@ -463,7 +466,7 @@ Figure&nbsp;11.1: Simple non-styled scatterplot of number of physicians per 1,00
 </section><section id="exploratory-sketches" class="level3" data-number="11.2.2"><h3 data-number="11.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">11.2.2</span> Exploratory sketches</h3>
 <p>The most common approach to visualizing spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it’s very common to color the country based on the value of the variable. These are often termed <em>choropleth maps</em>.</p>
-<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
@@ -477,23 +480,22 @@ Figure&nbsp;11.2: Initial sketch of a map of the world, showing title enclosed i
 <p>To create the map sketched out in <a href="#fig-doctors-sketch" class="quarto-xref">Figure&nbsp;<span>11.2</span></a>, we need to do two things (i) decide which data to plot: which regions, and which years; and (ii) source some spatial data beyond just region names and country codes.</p>
 <section id="data-wrangling" class="level3" data-number="11.3.1"><h3 data-number="11.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">11.3.1</span> Data wrangling</h3>
-<p>Since this data is already fairly tidy, there isn’t too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don’t need, and renaming a couple of columns to make them easier to work with. We can use the <code>rename()</code> function from {dplyr} to rename the <code>Entity</code> column to <code>region</code> (for reasons that will become clear in the next paragraph!). We also rename the <code>Physicians (per 1,000 people)</code> column to <code>doctors</code> to make it easier to work with, and rename <code>Year</code> to <code>year</code> for consistency. The data has multiple entries for each country, spanning different years. We <em>could</em> make an animated map to show how the number of doctors is changing over time, but for now we’ll keep it simple with a static map showing a snapshot at one point in time. However, there’s a bit of a problem. If you inspect the data, you’ll see that not every country has an entry for each year - let’s use the most recent data available for each country. For each <code>region</code>, we keep the row with only the most recent year using a combination of <code>group_by()</code> and <code>slice_max()</code> from {dplyr}.</p>
+<p>Since this data is already fairly tidy, there isn’t too much data wrangling to be done. The only processing we really need to do is getting rid of the data we don’t need, and renaming a couple of columns to make them easier to work with. We can use the <code><a href="https://dplyr.tidyverse.org/reference/rename.html">rename()</a></code> function from {dplyr} to rename the <code>Entity</code> column to <code>region</code> (for reasons that will become clear in the next paragraph!). We also rename the <code>Physicians (per 1,000 people)</code> column to <code>doctors</code> to make it easier to work with, and rename <code>Year</code> to <code>year</code> for consistency. The data has multiple entries for each country, spanning different years. We <em>could</em> make an animated map to show how the number of doctors is changing over time, but for now we’ll keep it simple with a static map showing a snapshot at one point in time. However, there’s a bit of a problem. If you inspect the data, you’ll see that not every country has an entry for each year - let’s use the most recent data available for each country. For each <code>region</code>, we keep the row with only the most recent year using a combination of <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max()</a></code> from {dplyr}.</p>
 <div class="cell">
 <div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">doctors</span> <span class="op">&lt;-</span> <span class="va">doctors</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span></span>
 <span>    year <span class="op">=</span> <span class="va">Year</span>,</span>
 <span>    region <span class="op">=</span> <span class="va">Entity</span>,</span>
 <span>    doctors <span class="op">=</span> <span class="va">`Physicians (per 1,000 people)`</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">region</span>, <span class="va">year</span>, <span class="va">doctors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">region</span>, <span class="va">year</span>, <span class="va">doctors</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To plot this data on a world map, we also need data for the country borders. Luckily, the <code><a href="https://ggplot2.tidyverse.org/reference/map_data.html">map_data()</a></code> function built into {ggplot2} can help us with that! This function takes data from the {maps} package and turns it into an object you can plot directly with {ggplot2}.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/map_data.html">map_data</a></span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/map_data.html">map_data</a></span><span class="op">(</span><span class="st">"world"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Of course, it’s never quite that straightforward. We need to join the <code>world</code> map data to our <code>doctors</code> data, and to do that we need a column in each data sets to join by - we’ll use the <code>region</code> column. If you try to join these two data sets using the <code>region</code> column, you’ll notice that you end up with some unexpected <code>NA</code> values. So what’s going on?</p>
 <div id="tip-doctors-join" class="callout callout-style-default callout-tip callout-titled">
@@ -521,12 +523,12 @@ Tip&nbsp;11.4: Renaming columns
 </div>
 </div>
 <p>This is partly due to the fact that the <code>doctors</code> data has implicitly missing values - if no data is available for a region, no rows exists in the data for that region. It isn’t listed with <code>NA</code> values. Note that there are also some <em>regions</em> in <code>doctors</code> which do not exist in <code>world</code> - for example, the entity <code>"Upper-middle-income countries"</code> is listed within <code>doctors</code>.</p>
-<p>Secondly, if you inspect the region names, you’ll see that for some countries, their names are encoded differently. For example, in the <code>world</code> data, the United States is listed as <code>"USA"</code> whilst in the <code>doctors</code> data, it’s listed as <code>"United States"</code>. Here, the easiest thing to do is manually rename the values that differ in one of the datasets. We can use the <code>recode()</code> function from {dplyr} to do that. Note that <code>recode()</code> has the rather unusual (for the {tidyverse}) syntax of <code>old_name = new_name</code>:</p>
+<p>Secondly, if you inspect the region names, you’ll see that for some countries, their names are encoded differently. For example, in the <code>world</code> data, the United States is listed as <code>"USA"</code> whilst in the <code>doctors</code> data, it’s listed as <code>"United States"</code>. Here, the easiest thing to do is manually rename the values that differ in one of the datasets. We can use the <code><a href="https://dplyr.tidyverse.org/reference/recode.html">recode()</a></code> function from {dplyr} to do that. Note that <code><a href="https://dplyr.tidyverse.org/reference/recode.html">recode()</a></code> has the rather unusual (for the {tidyverse}) syntax of <code>old_name = new_name</code>:</p>
 <div class="cell">
 <div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">doctors</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    region <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/recode.html">recode</a></span><span class="op">(</span><span class="va">region</span>,</span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/recode.html">recode</a></span><span class="op">(</span><span class="va">region</span>,</span>
 <span>        <span class="st">"United Kingdom"</span> <span class="op">=</span> <span class="st">"UK"</span>,</span>
 <span>        <span class="st">"United States"</span> <span class="op">=</span> <span class="st">"USA"</span>,</span>
 <span>        <span class="st">"Democratic Republic of Congo"</span> <span class="op">=</span> <span class="st">"Democratic Republic of the Congo"</span>,</span>
@@ -536,14 +538,14 @@ Tip&nbsp;11.4: Renaming columns
 <span>      <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The entries in the <code>region</code> column of <code>doctors</code> that don’t correspond to countries e.g.&nbsp;<code>"Upper-middle-income countries"</code> are not values that are required for the map. Therefore a <code>left_join()</code> can be performed, with <code>world</code> on the left - keeping all the countries listed in <code>world</code> and joining only those with a corresponding value in <code>doctors</code>. The remaining countries in <code>world</code> with no match in <code>doctors</code> are listed with <code>NA</code> values. The rows for <code>"Antarctica"</code> are filtered out - Antarctica is often given a disproportionate amount of space on world maps (at least those not centered on Antarctica) in the process of projecting a sphere onto a rectangle. </p>
+<p>The entries in the <code>region</code> column of <code>doctors</code> that don’t correspond to countries e.g.&nbsp;<code>"Upper-middle-income countries"</code> are not values that are required for the map. Therefore a <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join()</a></code> can be performed, with <code>world</code> on the left - keeping all the countries listed in <code>world</code> and joining only those with a corresponding value in <code>doctors</code>. The remaining countries in <code>world</code> with no match in <code>doctors</code> are listed with <code>NA</code> values. The rows for <code>"Antarctica"</code> are filtered out - Antarctica is often given a disproportionate amount of space on world maps (at least those not centered on Antarctica) in the process of projecting a sphere onto a rectangle. </p>
 <div class="cell">
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span></span>
 <span>  <span class="va">world</span>,</span>
 <span>  <span class="va">plot_data</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"region"</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">region</span> <span class="op">!=</span> <span class="st">"Antarctica"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">region</span> <span class="op">!=</span> <span class="st">"Antarctica"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, we have everything we need to create a simple map.</p>
 </section><section id="the-first-plot" class="level3" data-number="11.3.2"><h3 data-number="11.3.2" class="anchored" data-anchor-id="the-first-plot">
@@ -599,7 +601,7 @@ Figure&nbsp;11.3: Map of the world with countries colored based on number of doc
 <p>We’ll start by considering alternative color palettes, then think about what text that should be added, before finalizing the layout.</p>
 <section id="colors" class="level3" data-number="11.4.1"><h3 data-number="11.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">11.4.1</span> Colors</h3>
-<p>There are many, many color palette R packages in existence, and even more outside of the R ecosystem. In fact, the {paletteer} package <span class="citation" data-cites="paletteer">(<a href="references.html#ref-paletteer" role="doc-biblioref">Hvitfeldt 2021</a>)</span> is designed to give a common interface to a comprehensive collection of color palettes in R. A popular color palette R package is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualizations. You can view all available palettes using <code>MetBrewer::display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only. </p>
+<p>There are many, many color palette R packages in existence, and even more outside of the R ecosystem. In fact, the {paletteer} package <span class="citation" data-cites="paletteer">(<a href="references.html#ref-paletteer" role="doc-biblioref">Hvitfeldt 2021</a>)</span> is designed to give a common interface to a comprehensive collection of color palettes in R. A popular color palette R package is {MetBrewer} <span class="citation" data-cites="MetBrewer">(<a href="references.html#ref-MetBrewer" role="doc-biblioref">Mills 2022</a>)</span> - a collection of color palettes inspired by works of art at the Metropolitan Museum of Art in New York. It has many beautiful palettes, and many that work in traditional data visualizations. You can view all available palettes using <code>display_all(colorblind_only = TRUE)</code>. Since <code>doctors</code> is a continuous variable, we’ll look at the sequential palettes only. </p>
 <p>{MetBrewer} does have functions that interface directly with {ggplot2} (such as <code><a href="https://rdrr.io/pkg/MetBrewer/man/scale_fill_met_c.html">scale_fill_met_c()</a></code>) but we’re going to use some of the colors in the palette to also define variables for the highlight and text colors. To get a good range of colors, we extract 20 colors from the <code>"Hokusai2"</code> palette. The <code>text_col</code> is the 18th color and <code>highlight_col</code> is the 15th color. A variable containing the background color, <code>bg_col</code>, is also defined.</p>
 <div class="cell">
 <div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetBrewer</span><span class="op">)</span></span>
@@ -633,10 +635,10 @@ Figure&nbsp;11.4: Map of the world with countries colored based on number of doc
 <span class="header-section-number">11.4.2</span> Text and fonts</h3>
 <p>As in previous chapters, fonts can be defined using the {sysfonts} and {showtext} packages. Here, the <em>Roboto</em> font is loaded through Google Fonts for the main font used, and <em>Roboto Slab</em> is loaded for use in the title. </p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span><span class="op">)</span></span>
-<span><span class="fu">sysfonts</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto Slab"</span><span class="op">)</span></span>
-<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">showtext</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto Slab"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Roboto"</span></span>
 <span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"Roboto Slab"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -683,14 +685,14 @@ Figure&nbsp;11.4: Map of the world with countries colored based on number of doc
 <span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      family <span class="op">=</span> <span class="va">title_font</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span></span>
 <span>    <span class="op">)</span></span>
@@ -760,16 +762,16 @@ Tip&nbsp;11.6: Choosing a column name
 <span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.title <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.subtitle <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.subtitle <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
@@ -797,7 +799,7 @@ Figure&nbsp;11.6: Map of the world with duplicated title in the facet strip text
 <li>The map still appears stretched.</li>
 <li>The legend is taking up quite a lot of space, and the white ticks in the colorbar are distracting.</li>
 </ul>
-<p>To solve the first two problems, the <code>title</code> and <code>subtitle</code> arguments of <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be set to <code>NULL</code> to remove them from the plot. Instead, the <code>tag</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be used to set the subtitle. The nice thing about using <code>tag</code> is the <code>plot.tag.position</code> argument within <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> which allows you to position the text anywhere on the plot. The <code>strip.text</code> and <code>plot.tag</code> arguments of theme should also be set using <code>element_textbox_simple()</code> from {ggtext} to allow the text to be styled as we wish. The top, left, and right margins of the plot should be set to <code>0</code> using <code>plot.margin</code> to make sure that the strip text banner goes to the edge of the plot. </p>
+<p>To solve the first two problems, the <code>title</code> and <code>subtitle</code> arguments of <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be set to <code>NULL</code> to remove them from the plot. Instead, the <code>tag</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be used to set the subtitle. The nice thing about using <code>tag</code> is the <code>plot.tag.position</code> argument within <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> which allows you to position the text anywhere on the plot. The <code>strip.text</code> and <code>plot.tag</code> arguments of theme should also be set using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from {ggtext} to allow the text to be styled as we wish. The top, left, and right margins of the plot should be set to <code>0</code> using <code>plot.margin</code> to make sure that the strip text banner goes to the edge of the plot. </p>
 <p>To solve the third problem of the map looking stretched, we can apply <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> which applies the World Geodetic System 1984 (WGS84) CRS (coordinate reference system). Chapter <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> discusses coordinate reference systems in more detail. The upper limit of the <code>y</code> axis can also be extended beyond the range of the data to make room for the subtitle added using <code>tag</code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">&lt;-</span> <span class="va">styled_plot</span> <span class="op">+</span></span>
@@ -810,21 +812,21 @@ Figure&nbsp;11.6: Map of the world with duplicated title in the facet strip text
 <span>    <span class="co"># move and format the tag (subtitle) text</span></span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
-<span>    plot.tag <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.tag <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.6</span>,</span>
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      maxwidth <span class="op">=</span> <span class="fl">0.98</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="co"># add margin for caption</span></span>
-<span>    plot.caption <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>l <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.6</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="co"># change title text color</span></span>
-<span>    strip.text <span class="op">=</span> <span class="fu">ggtext</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
 <span>      color <span class="op">=</span> <span class="va">bg_col</span>,</span>
 <span>      family <span class="op">=</span> <span class="va">title_font</span>,</span>
 <span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">5</span>, <span class="fl">7</span>, <span class="fl">5</span><span class="op">)</span>,</span>
@@ -1324,8 +1326,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1436,7 +1436,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

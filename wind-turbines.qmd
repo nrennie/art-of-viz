@@ -20,12 +20,20 @@ In this chapter, we'll learn how to read in data from an Excel file via a URL, c
 
 ```{r}
 #| label: turbines-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "glue", "marquee",
-  "openxlsx", "rcartocolor", "readr", "showtext",
-  "stringr", "sysfonts", "waffle"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(GGally)
+library(ggplot2)
+library(glue)
+library(marquee)
+library(openxlsx)
+library(rcartocolor)
+library(readr)
+library(showtext)
+library(stringr)
+library(sysfonts)
+library(waffle)
 ```
 
 ## Data
@@ -59,7 +67,7 @@ url <- paste0(
   base_url,
   "pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
 )
-wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
+wind_turbines <- read.xlsx(xlsxFile = url)
 ```
 
 :::
@@ -76,7 +84,7 @@ url <- paste0(
   "pub/nrcan_rncan/Wind-energy_Energie-eolienne/
   wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
 )
-wind_turbines <- openxlsx::read.xlsx(xlsxFile = url)
+wind_turbines <- read.xlsx(xlsxFile = url)
 ```
 
 :::
@@ -132,7 +140,7 @@ We can then use either `read.csv()` or `read_csv()` from {readr} to read the CSV
 ```{r}
 #| label: turbines-data
 #| output: false
-wind_turbines <- readr::read_csv("data/wind_turbines.csv")
+wind_turbines <- read_csv("data/wind_turbines.csv")
 ```
 
 The `wind_turbines` data has `r nrow(wind_turbines)` rows and `r ncol(wind_turbines)` columns. The first few rows of the data are as follows:
@@ -156,11 +164,10 @@ There are quite a few variables that we might be interested in looking at here -
 
 Let's start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step. The `Turbine.rated.capacity.(kW)` column is currently a character column even though it contains numeric values, so we wrap the column in `as.numeric()` before plotting it:
 
-```{r}
+```{r, echo=-1}
 #| label: fig-turbines-scatter
 #| fig-cap: "Scatter plot showing the relationship between rotor diameter and turbine capacity."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
   x = wind_turbines$`Rotor.diameter.(m)`,
@@ -190,15 +197,14 @@ Remember that you can use `View(wind_turbines)` to inspect the data in a more hu
 
 For example, the {GGally} package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
 
-```{r}
+```{r, echo=-1}
 #| label: fig-turbines-ggally
 #| fig-cap: "A 3x3 grid of comparisons between three columns in the `wind_turbines` data relationships using correlation, density plots, bar charts, scatter plots, and box plots."
 #| fig-alt: ""
 #| fig-asp: 1
 #| message: false
-#| echo: -1
-ggplot2::theme_set(ggplot2::theme_gray(base_size = 2))
-GGally::ggpairs(
+theme_set(theme_gray(base_size = 2))
+ggpairs(
   data = wind_turbines,
   columns = c(
     "Province/Territory",
@@ -212,11 +218,10 @@ GGally::ggpairs(
 
 Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
 
-```{r}
+```{r, echo=-1}
 #| label: fig-turbines-barplot
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(3.1, 6.6, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
@@ -227,11 +232,10 @@ barplot(
 
 Most of the turbines are located in Ontario, but has this always been the case? We also have information on the commissioning date of each turbine. We could recreate this bar chart for different time periods to see how the geographic spread of turbines has changed over time. We can add `wind_turbines$Commissioning.date` into the `table()` function to create a stacked bar chart for each year:
 
-```{r}
+```{r, echo=-1}
 #| label: fig-turbines-barplot-2
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(
@@ -289,9 +293,9 @@ Let's make a function that does exactly that, called `extract_after_last_slash()
 ```{r}
 #| label: turbines-extract
 extract_after_last_slash <- function(texts) {
-  has_slash <- stringr::str_detect(texts, "/")
-  extracted <- stringr::str_match(texts, ".*/(.*)$")[, 2]
-  output <- dplyr::if_else(has_slash, extracted, texts)
+  has_slash <- str_detect(texts, "/")
+  extracted <- str_match(texts, ".*/(.*)$")[, 2]
+  output <- if_else(has_slash, extracted, texts)
   return(output)
 }
 ```
@@ -306,7 +310,7 @@ If you've used the `ifelse()` function in base R before, you might be wondering 
 #| label: r-pkgs-ifelse
 #| error: true
 x <- c(1, 0, 2, 3)
-dplyr::if_else(x == 0, c(4, 5, 3), x)
+if_else(x == 0, c(4, 5, 3), x)
 ifelse(x == 0, c(4, 5, 3), x)
 ```
 
@@ -319,10 +323,10 @@ Now, let's use our new `extract_after_last_slash()` function! Let's start by usi
 ```{r}
 #| label: turbines-year-data
 turbines_year <- wind_turbines |>
-  dplyr::select(
+  select(
     `Province/Territory`, Commissioning.date
   ) |>
-  dplyr::mutate(
+  mutate(
     Year = extract_after_last_slash(Commissioning.date),
     Year = as.numeric(Year)
   )
@@ -333,16 +337,16 @@ Now let's group the new `Year` column into categories. Our categories span 2000 
 ```{r}
 #| label: turbines-data-wrangling-1
 turbines_year_group <- turbines_year |>
-  dplyr::filter(Year >= 2000 & Year <= 2019) |>
-  dplyr::mutate(
-    Year_Group = dplyr::case_when(
+  filter(Year >= 2000 & Year <= 2019) |>
+  mutate(
+    Year_Group = case_when(
       Year %in% seq(2000, 2004) ~ "2000 - 2004",
       Year %in% seq(2005, 2009) ~ "2005 - 2009",
       Year %in% seq(2010, 2014) ~ "2010 - 2014",
       Year %in% seq(2015, 2019) ~ "2015 - 2019"
     )
   ) |>
-  dplyr::mutate(
+  mutate(
     Year_Group = factor(Year_Group, levels = c(
       "2000 - 2004", "2005 - 2009",
       "2010 - 2014", "2015 - 2019"
@@ -355,8 +359,8 @@ Let's look at the `Province/Territory` categories. Using `count()` and `arrange(
 ```{r}
 #| label: turbines-data-counts
 turbines_year_group |>
-  dplyr::count(`Province/Territory`) |>
-  dplyr::arrange(-n)
+  count(`Province/Territory`) |>
+  arrange(-n)
 ```
 
 First, let's rename the `Province/Territory` column to `Region` - a shorter name that will make it a little bit easier to work with. As well as the issue posed by small numbers in categories, twelve categories is also a fairly large number to visualize. We might choose to group together the six smallest categories. The choice of six is fairly arbitrary - but we want a balance between lots of categories with small numbers and few categories with very high numbers. We use `mutate()` and `case_when()` again, to change the value in `Region` to `"other"` when the region is one of the six specified values. \index{dplyr!rename} \index{dplyr!mutate} \index{dplyr!case\_when}
@@ -368,9 +372,9 @@ We filter out any rows where the rounded count is `0` since these won't be plott
 ```{r}
 #| label: turbines-data-wrangling-2
 turbines_region <- turbines_year_group |>
-  dplyr::rename(Region = `Province/Territory`) |>
-  dplyr::mutate(
-    Region = dplyr::case_when(
+  rename(Region = `Province/Territory`) |>
+  mutate(
+    Region = case_when(
       Region %in% c(
         "Northwest Territories",
         "Newfoundland and Labrador",
@@ -382,9 +386,9 @@ turbines_region <- turbines_year_group |>
       TRUE ~ Region
     )
   ) |>
-  dplyr::count(Region, Year_Group) |>
-  dplyr::mutate(n = round(n / 20)) |>
-  dplyr::filter(n != 0)
+  count(Region, Year_Group) |>
+  mutate(n = round(n / 20)) |>
+  filter(n != 0)
 ```
 
 The `Region` variable will be plotted alphabetically be default, but this is rarely the most useful ordering. Instead, let's order by magnitude - with the exception of putting the `"other"` category last. 
@@ -394,10 +398,10 @@ We start by using the `summarise()` function to add up the number of turbines ac
 ```{r}
 #| label: turbines-fct-levels-1
 region_levels <- c(turbines_region |>
-  dplyr::summarise(n = sum(n), .by = Region) |>
-  dplyr::arrange(-n) |>
-  dplyr::filter(Region != "other") |>
-  dplyr::pull(Region), "other")
+  summarise(n = sum(n), .by = Region) |>
+  arrange(-n) |>
+  filter(Region != "other") |>
+  pull(Region), "other")
 ```
 
 Now, let's apply these new factor levels to the `Region` column using `mutate()`. Due to a *quirk* of the {waffle} package [@waffle] that we'll be using to make our plot (it plots data in the order it appears in the dataset, rather than according to the factor levels), we also sort the data using `arrange()` from {dplyr}. \index{dplyr!arrange} \index{dplyr!mutate} \index{base!factor}
@@ -405,10 +409,10 @@ Now, let's apply these new factor levels to the `Region` column using `mutate()`
 ```{r}
 #| label: turbines-fct-levels-2
 plot_data <- turbines_region |>
-  dplyr::mutate(
+  mutate(
     Region = factor(Region, levels = region_levels)
   ) |>
-  dplyr::arrange(Region)
+  arrange(Region)
 ```
 
 Our data is now ready for us to plot!
@@ -423,12 +427,12 @@ Then, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R
 
 ```{r}
 #| label: turbines-font-awesome
-sysfonts::font_add(
+font_add(
   family = "Font Awesome 6",
   regular = "fonts/Font-Awesome-6-Free-Solid-900.otf"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 ```
 
 ::: {#tip-turbines-open .callout-tip}
@@ -457,10 +461,9 @@ Finally, we add `facet_wrap()` to create a pictogram for each date range, placin
 #| fig-alt: ""
 #| message: false
 #| echo: -1
-ggplot2::theme_set(ggplot2::theme_gray(base_size = 2))
-library(ggplot2)
+theme_set(ggplot2::theme_gray(base_size = 2))
 basic_plot <- ggplot(data = plot_data) +
-  waffle::geom_pictogram(
+  geom_pictogram(
     mapping = aes(
       label = Region,
       color = Region,
@@ -495,7 +498,7 @@ We can add `scale_label_pictogram()` from {waffle} to our plot to specify the ic
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded."
 #| fig-alt: ""
 icons_plot <- basic_plot +
-  waffle::scale_label_pictogram(
+  scale_label_pictogram(
     values = "fan",
     guide = "none"
   )
@@ -529,7 +532,7 @@ In the {rcartocolor} package, categorical palettes are referred to as *qualitati
 #| fig-asp: 0.8
 #| echo: -1
 par(mar = c(2.1, 4.1, 1.1, 2.1))
-rcartocolor::display_carto_all(
+display_carto_all(
   n = 6, type = "qualitative"
 )
 ```
@@ -540,7 +543,7 @@ We also make the `col_palette` vector a named vector by using the `names()` func
 
 ```{r}
 #| label: turbines-col-palette
-col_palette <- rcartocolor::carto_pal(
+col_palette <- carto_pal(
   n = length(unique(plot_data$Region)) + 1,
   name = "Vivid"
 )[1:length(unique(plot_data$Region))]
@@ -605,7 +608,7 @@ Normally, when we want to write character strings and insert variables into the 
 
 ```{r}
 #| label: turbines-text-3
-st <- marquee::marquee_glue(
+st <- marquee_glue(
   "The Canadian Wind Turbine Database contains the geographic location and key technology details for wind turbines installed in Canada. It includes information about turbines installed in {.{col_palette[[1]]} {names(col_palette)[[1]]}}, {.{col_palette[[2]]} {names(col_palette)[[2]]}}, {.{col_palette[[3]]} {names(col_palette)[[3]]}}, {.{col_palette[[4]]} {names(col_palette)[[4]]}}, {.{col_palette[[5]]} {names(col_palette)[[5]]}}, and {.{col_palette[[6]]} {names(col_palette)[[6]]}} regions."
 )
 ```
@@ -706,18 +709,18 @@ scale_plot +
       linewidth = 0.4
     ),
     # format text with {marquee}
-    plot.title = marquee::element_marquee(
+    plot.title = element_marquee(
       color = text_col,
       width = 1,
       size = 12,
       margin = margin(b = -10)
     ),
-    plot.subtitle = marquee::element_marquee(
+    plot.subtitle = element_marquee(
       color = text_col,
       width = 1,
       size = 9
     ),
-    plot.caption = marquee::element_marquee(
+    plot.caption = element_marquee(
       hjust = 0,
       lineheight = 0.5,
       size = 8,

@@ -75,11 +75,10 @@ There are many different types of plot, and you'll see several different example
 
 We can't explore every column in this chapter, but you're encouraged to do so at home. So we'll start with `language_rank` - the most obvious outcome that we might want to consider. Note that, in this data, the rank starts at 0 (insert your own joke about indexing from 1 being better here...). We might want to look at the `last_activity` column in relation to the rank: are programming languages with more recent activity also more popular? Let's start by making a scatter plot of last activity (on the x-axis) and language rank (on the y-axis). Adding better axis titles with `xlab` and `ylab` in @fig-languages-scatter isn't necessary if it's just you looking at these plots, but if you're sharing them with anyone else it can be a useful thing to do. Especially if the column names are less descriptive than we see here! \index{scatter plot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-languages-scatter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing some unusual date values."
 #| fig-alt: "The scatterplot shows last activity on the x-axis and rank on the y-axis. However, there seem to be some negative values on the x-axis, which might indicate an issue with the data."
-#| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 plot(
   x = languages$last_activity,
@@ -106,11 +105,10 @@ Though the name of the Programming Languages Database may suggest that it focuse
 
 Let's look at the balance between these different types of languages in the data using a bar chart created using the `barplot()` function from the {graphics} package in base R. The `barplot()` function takes a (named) vector or matrix of counts for each category. We can create this vector of counts using the `table()` function from base R. Wrapping the vector inside `sort()` means that the bars will be plotted in ascending order. \index{graphics!barplot} \index{base!table} \index{base!sort} \index{bar chart}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-languages-pl-barplot
 #| fig-cap: "A bar chart showing the number of different languages of each type, sorted in ascending in order from left to right."
 #| fig-alt: "The bar plot shows various categories on the x-axis, with one category having an extremely high count compared to others. The y-axis represents the frequency, with values reaching up to 3000. This suggests a highly skewed distribution with one dominant category."
-#| echo: -1
 par(mar = c(7.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   height = sort(table(languages$type)),
@@ -120,11 +118,10 @@ barplot(
 
 Almost all of them are programming languages so let's focus on them only, and recreate our `last_activity` against `language_rank` scatter plot. We can use the `subset()` function to extract only rows of the data where the `type` is `"pl"` and save this to a new object called `pl_df`. \index{base!subset}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-languages-scatter-filter
 #| fig-cap: "A basic scatter plot of how language rank varies based on last activity, showing clustering of languages with last activity before and after 2000."
 #| fig-alt: "The scatterplot displays 'Last activity' on the x-axis, ranging from 1950 to 2010, and 'Rank' on the y-axis. The data points are densely clustered in certain time periods, with many ranks overlapping. This suggests temporal trends or concentrated activity during specific years."
-#| echo: -1
 par(mar = c(5.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 pl_df <- subset(languages, type == "pl")
 plot(
@@ -156,11 +153,10 @@ Both approaches are equally valid. For this book, if we're plotting in {ggplot2}
 
 Which other columns might we explore? In R, we write comments using the `#` symbol. For personal curiosity, we might be interested in how common that is. Of these programming languages, which symbols are used to denote comments? We can create a bar chart of the different types of `line_comment_token` using the `barplot()` function again: \index{graphics!barplot} \index{bar chart}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-languages-comment-barplot
 #| fig-cap: "A bar chart showing the number of different programming languages that each each comment symbol, sorted in ascending in order from left to right."
 #| fig-alt: "Bar chart of the number of different langauges that use different comment symbols, showing quite a skewed distribution and with double forward slashes ranked top."
-#| echo: -1
 #| dev: "ragg_png"
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
