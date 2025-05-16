@@ -11,9 +11,9 @@ execute:
 #| file: R/options.R
 ```
 
-# Programming languages: dumbbell charts with {ggplot2} {#sec-programming}
+# Programming languages: dumbbell charts with **`ggplot2`** {#sec-programming}
 
-In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the {glue} package, and understand how to style charts using themes, fonts, and colors in {ggplot2}.
+In this chapter we'll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the **`glue`** package, and understand how to style charts using themes, fonts, and colors in **`ggplot2`**.
 
 **Packages required in this chapter**:
 
@@ -35,9 +35,9 @@ library(tidytuesdayR)
 
 In this chapter, we're going to explore the Programming Languages Database (PLDB) [@pldb_data]. This database is an encyclopedia of programming languages, containing information on ranking, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn. 
 
-The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by [Jesus M. Castagnetto](https://github.com/jmcastagnetto)), meaning we can also easily load the data into R using the *`tidytuesdayR`* R package [@tidytuesdayR]. 
+The PLDB is *published to the public domain* and can be found online at [pldb.io](https://pldb.io/), where you can make queries and view the data. You can also download the data in CSV or JSON format. The PLDB data was used as a TidyTuesday dataset in March 2023 (after being suggested by [Jesus M. Castagnetto](https://github.com/jmcastagnetto)), meaning we can also easily load the data into R using the **`tidytuesdayR`** R package [@tidytuesdayR]. 
 
-The *`tidytuesdayR`* R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the date) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
+The **`tidytuesdayR`** R package has several functions for helping to get data and information about TidyTuesday data into R. One of the most commonly used functions is the `tt_load()` function, which loads the data from a specific week (specified by the date) into your R session. For a given week, there may be multiple datasets, and a specific one can be accessed using the `$` notation: \index{tidytuesdayR!tt\_load} \index{TidyTuesday}
 
 ```{r}
 #| label: languages-load-data-show
@@ -55,7 +55,7 @@ languages <- tuesdata$languages
 languages <- readr::read_csv("data/languages.csv")
 ```
 
-You can alternatively read the data in via *`tidytuesdayR`* using the year and week. For example `languages <- tt_load(2023, week = 12)`. You can also read the data in directly from the CSV file on GitHub using `read.csv()` or `read_csv()` from *`readr`*. 
+You can alternatively read the data in via **`tidytuesdayR`** using the year and week. For example `languages <- tt_load(2023, week = 12)`. You can also read the data in directly from the CSV file on GitHub using `read.csv()` from base R or `read_csv()` from **`readr`**. 
 
 What does the data look like? We can inspect the first six rows of the data using `head()`:
 
@@ -143,7 +143,7 @@ Now, our scatter plot looks much more reasonable - with the first entries in the
 
 ## Subsetting data in R
 
-You can also subset the data using the `filter()` function from {dplyr}, either with or without the use of the pipe operator: \index{dplyr!filter}
+You can also subset the data using the `filter()` function from **`dplyr`**, either with or without the use of the pipe operator: \index{dplyr!filter}
 
 ```{r}
 #| label: languages-filter
@@ -152,7 +152,7 @@ You can also subset the data using the `filter()` function from {dplyr}, either 
 pl_df <- filter(languages, type == "pl")
 ```
 
-Both approaches are equally valid. For this book, if we're plotting in {ggplot2}, we'll prepare data using other {tidyverse} packages. But if we're plotting in base R, we'll prepare data using base R as well.
+Both approaches are equally valid. For this book, if we're plotting in **`ggplot2`**, we'll prepare data using other **`tidyverse`** packages. But if we're plotting in base R, we'll prepare data using base R as well.
 
 :::
 
@@ -193,26 +193,26 @@ A dumbbell chart for the timelines of languages that use a `#` for comments migh
 
 ![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages.png){#fig-languages-sketch fig-align="center" fig-alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change."}
 
-To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In {ggplot2}, these are called *facets*, and might look something like this:
+To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In **`ggplot2`**, these are called *facets*, and might look something like this:
 
 ![Initial sketch of a dumbbell chart showing the time frame that different languages are active for a specific comment character.](images/sketch-languages-2.png){#fig-languages-sketch-2 fig-align="center" fig-alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language."}
 
 ## Preparing a plot
 
-Dumbbell charts are essentially a combination of two things: lines and points. Although there isn't a built-in function for creating dumbbell charts in {ggplot2}, there are built-in functions for creating lines and points so we have everything we need to make a dumbbell chart. 
+Dumbbell charts are essentially a combination of two things: lines and points. Although there isn't a built-in function for creating dumbbell charts in **`ggplot2`**, there are built-in functions for creating lines and points so we have everything we need to make a dumbbell chart. 
 
-There are a few extensions packages that can help you to make dumbbell charts without having to assemble the lines and points yourself. The {ggalt} package [@ggalt] which provides additional coordinate systems, geoms, statistical transformations, and scales for {ggplot2}, includes the `geom_dumbbell()` function which, as the name suggests, provides a quick and easy way to create dumbbell charts. The {dumbbell} package [@dumbbell] also provides functionality for creating dumbbell charts.
+There are a few extensions packages that can help you to make dumbbell charts without having to assemble the lines and points yourself. The **`ggalt`** package [@ggalt] which provides additional coordinate systems, geoms, statistical transformations, and scales for **`ggplot2`**, includes the `geom_dumbbell()` function which, as the name suggests, provides a quick and easy way to create dumbbell charts. The **`dumbbell`** package [@dumbbell] also provides functionality for creating dumbbell charts.
 
 In this chapter, we're not going to use either of those for a couple of reasons:
 
-* Extension packages are perfect for making charts quickly and easily, and I would encourage you to try them. But it's also really useful to understand that, as long as you can break down the chart you want into lines, points, and polygons, then you can make it with {ggplot2}. That's, at least in part, what this book is about.
-* We're going to apply reasonably advanced customization to our dumbbell chart, and it's useful to see how these work in {ggplot2} first so that you can later apply them to other plot types more easily. 
+* Extension packages are perfect for making charts quickly and easily, and I would encourage you to try them. But it's also really useful to understand that, as long as you can break down the chart you want into lines, points, and polygons, then you can make it with **`ggplot2`**. That's, at least in part, what this book is about.
+* We're going to apply reasonably advanced customization to our dumbbell chart, and it's useful to see how these work in **`ggplot2`** first so that you can later apply them to other plot types more easily. 
 
 ### Data wrangling
 
-We'll start by sub-setting the data to keep only the rows relating to languages that use one of the comment symbols that we're interested in. If we want to look at only languages that use a `//`, `#`, or `;` for comments, we can use the `filter()` function from {dplyr} in conjunction with the `%in%` operator. This keeps only rows where the value in the  `line_comment_token` column is in the vector `c("//", "#", ";")`. We'll be faceting by `line_comment_token`, and we want to make sure that the title of the facet is informative - not just a `#` symbol on its own. Although we could create a labeling function to do this, it's even easier to just edit the text in the `line_comment_token` token. We use the `paste()` function to add the phrase `"Comment token:"` before each symbol and add this as a new column called `label` using `mutate()` from {dplyr}. \index{dplyr!filter} \index{dplyr!mutate} \index{base!paste}
+We'll start by sub-setting the data to keep only the rows relating to languages that use one of the comment symbols that we're interested in. If we want to look at only languages that use a `//`, `#`, or `;` for comments, we can use the `filter()` function from **`dplyr`** in conjunction with the `%in%` operator. This keeps only rows where the value in the  `line_comment_token` column is in the vector `c("//", "#", ";")`. We'll be faceting by `line_comment_token`, and we want to make sure that the title of the facet is informative - not just a `#` symbol on its own. Although we could create a labeling function to do this, it's even easier to just edit the text in the `line_comment_token` token. We use the `paste()` function to add the phrase `"Comment token:"` before each symbol and add this as a new column called `label` using `mutate()` from **`dplyr`**. \index{dplyr!filter} \index{dplyr!mutate} \index{base!paste}
 
-To keep our data tidy and manageable, we can drop the columns we no longer need using the `select()` function from {dplyr} to keep only the five columns we'll be using in the visualization. We'll also discard any rows that contain an `NA` value in any of these columns using `drop_na()` from {tidyr}. \index{dplyr!select} \index{tidyr!drop\_na}
+To keep our data tidy and manageable, we can drop the columns we no longer need using the `select()` function from **`dplyr`** to keep only the five columns we'll be using in the visualization. We'll also discard any rows that contain an `NA` value in any of these columns using `drop_na()` from **`tidyr`**. \index{dplyr!select} \index{tidyr!drop\_na}
 
 ```{r}
 #| label: languages-data-wrangling-1
@@ -231,9 +231,9 @@ comment_df <- pl_df |>
 
 In each facet, we could list all programming languages that use the comment symbol related to that facet. This would also display information about how many languages use each symbol. Alternatively, we may choose to use only the top 10 ranked languages for each symbol. 
 
-We can extract the top 10 using `slice_min()` from {dplyr} and select the 10 with the smallest values in `language_rank`. Alternatively, since the data is already sorted in rank order, we can use `slice_head()` from {dplyr} to extract the first 10 rows. Since we want the top 10 rows from each comment symbol category (not just the top 10 overall), we need to `group()` the data based on the `label` column. Before we `ungroup()` the data, we also want to create a new column that defines the within-group ranking as this will help with plotting. The `row_number()` function from {dplyr} identifies the row number within each group so is used to define this within-group ranking. We add it as a new column called `n` using `mutate()`. \index{dplyr!slice\_min} \index{dplyr!slice\_head} \index{dplyr!group} \index{dplyr!mutate} \index{dplyr!row\_number}
+We can extract the top 10 using `slice_min()` from **`dplyr`** and select the 10 with the smallest values in `language_rank`. Alternatively, since the data is already sorted in rank order, we can use `slice_head()` from **`dplyr`** to extract the first 10 rows. Since we want the top 10 rows from each comment symbol category (not just the top 10 overall), we need to `group()` the data based on the `label` column. Before we `ungroup()` the data, we also want to create a new column that defines the within-group ranking as this will help with plotting. The `row_number()` function from **`dplyr`** identifies the row number within each group so is used to define this within-group ranking. We add it as a new column called `n` using `mutate()`. \index{dplyr!slice\_min} \index{dplyr!slice\_head} \index{dplyr!group} \index{dplyr!mutate} \index{dplyr!row\_number}
 
-To aid in plotting, we also want to reformat the data to put both year columns (`appeared` and `last_activity`) into one column. We can do this using `pivot_longer()` from {tidyr}. \index{tidyr!pivot\_longer}
+To aid in plotting, we also want to reformat the data to put both year columns (`appeared` and `last_activity`) into one column. We can do this using `pivot_longer()` from **`tidyr`**. \index{tidyr!pivot\_longer}
 
 ```{r}
 #| label: languages-data-wrangling-2
@@ -262,11 +262,11 @@ Now we're ready to start plotting!
 
 ### The first plot
 
-One of the especially nice features of {ggplot2} is the ability to save plots as variables, and iteratively add (using `+`) layers to it. To make the code a little bit clearer, we'll be creating each aspect of our plot in stages, and gradually adding more complex styling to it. We'll save the first plot we create as `basic_plot`. 
+One of the especially nice features of **`ggplot2`** is the ability to save plots as variables, and iteratively add (using `+`) layers to it. To make the code a little bit clearer, we'll be creating each aspect of our plot in stages, and gradually adding more complex styling to it. We'll save the first plot we create as `basic_plot`. 
 
-As with most plots created with {ggplot2}, we'll start by calling the `ggplot()` function. In {ggplot2} we can define which data and aesthetic mapping we want to use either globally (in the `ggplot()` function) or in each individual layer. We'll be using the same data (`plot_data`) for all layers, so we pass it into the `data` argument of `ggplot()`. \index{ggplot2!ggplot}
+As with most plots created with **`ggplot2`**, we'll start by calling the `ggplot()` function. We can define which data and aesthetic mapping we want to use either globally (in the `ggplot()` function) or in each individual layer. We'll be using the same data (`plot_data`) for all layers, so we pass it into the `data` argument of `ggplot()`. \index{ggplot2!ggplot}
 
-Next, we start adding geometries: lines and points. The order we add the geometries is important here. We want the points to be plotted on top of the lines so that we don't see the lines overlapping with the points. This means we need to plot the lines first, then the points. We add geometries using the different `geom_*` functions. To add lines, we use `geom_line()`. Although {ggplot2} is smart, it's not smart enough to guess which variables will be plotted on each axis. We need to specify an *aesthetic mapping* using the `aes()` function - to define which columns from the data are going on the `x` and `y` axes. We want to draw horizontal lines for our dumbbell chart, meaning that `year` goes on the `x`-axis, and the rank category, `n`, goes on the `y`-axis. By default, `geom_line()` draws lines between the co-ordinates in the order of the variable on the x-axis. That's not really what we want here. We want a separate line drawn for each language, i.e. each rank, `n`. So we pass this into the `group` argument as well. This will still draw lines between co-ordinates in order of the variable of the x-axis, but separately for each rank category. To add points at each end of the dumbbell, we add `geom_point()` - specifying the aesthetic mapping to put the year on the x-axis and the rank on the y-axis again. We don't need to specify a `group` here, although it won't make any difference if we do. \index{ggplot2!geom\_point} \index{ggplot2!geom\_line} \index{ggplot2!aes}
+Next, we start adding geometries: lines and points. The order we add the geometries is important here. We want the points to be plotted on top of the lines so that we don't see the lines overlapping with the points. This means we need to plot the lines first, then the points. We add geometries using the different `geom_*` functions. To add lines, we use `geom_line()`. Although **`ggplot2`** is smart, it's not smart enough to guess which variables will be plotted on each axis. We need to specify an *aesthetic mapping* using the `aes()` function - to define which columns from the data are going on the `x` and `y` axes. We want to draw horizontal lines for our dumbbell chart, meaning that `year` goes on the `x`-axis, and the rank category, `n`, goes on the `y`-axis. By default, `geom_line()` draws lines between the co-ordinates in the order of the variable on the x-axis. That's not really what we want here. We want a separate line drawn for each language, i.e. each rank, `n`. So we pass this into the `group` argument as well. This will still draw lines between co-ordinates in order of the variable of the x-axis, but separately for each rank category. To add points at each end of the dumbbell, we add `geom_point()` - specifying the aesthetic mapping to put the year on the x-axis and the rank on the y-axis again. We don't need to specify a `group` here, although it won't make any difference if we do. \index{ggplot2!geom\_point} \index{ggplot2!geom\_line} \index{ggplot2!aes}
 
 Finally, we also add `facet_wrap()` to create a small multiple plot (facet) for each category in the `label` column. Note the `~` required before the name of the column we wish to facet by.  \index{ggplot2!facet\_wrap}
 
@@ -282,9 +282,9 @@ basic_plot <- ggplot(data = plot_data) +
 basic_plot
 ```
 
-In {ggplot2} (and most other plotting software) the y-axis starts with 0 at the bottom with increasing values going upwards. However, when we visualize rankings, we usually want to put the smallest number (highest rank) at the top. So we want to reverse the y-axis here. In {ggplot2}, for a discrete axes, we do this by passing the `rev()` (short for reverse) function to the `limits` argument of `scale_y_discrete()`. \index{base!rev} \index{ggplot2!scale\_y\_discrete}
+In **`ggplot2`** (and most other plotting software) the y-axis starts with 0 at the bottom with increasing values going upwards. However, when we visualize rankings, we usually want to put the smallest number (highest rank) at the top. So we want to reverse the y-axis here. In **`ggplot2`**, for a discrete axes, we do this by passing the `rev()` (short for reverse) function to the `limits` argument of `scale_y_discrete()`. \index{base!rev} \index{ggplot2!scale\_y\_discrete}
 
-The current y-axis labels are not especially informative - it would be more useful to add in the names of the languages or the overall ranking rather than simply the numbers 1 to 10. Later, we're going to add some labels in each facet to provide this information, so we'll expand the left hand side of the x-axis to leave some space for those labels. By setting `expand = expansion(0, 0)` we remove the extra space that's automatically added by {ggplot2} at either side of the axis. 
+The current y-axis labels are not especially informative - it would be more useful to add in the names of the languages or the overall ranking rather than simply the numbers 1 to 10. Later, we're going to add some labels in each facet to provide this information, so we'll expand the left hand side of the x-axis to leave some space for those labels. By setting `expand = expansion(0, 0)` we remove the extra space that's automatically added at either side of the axis. 
 
 ```{r}
 #| label: fig-languages-scales-plot
@@ -381,7 +381,7 @@ subtitle <- "Of the 4,303 programming languages listed in the Programming Langua
 
 The problem with writing out the values into a text string like this is that it's hard to update. The snapshot of data we're working with here is from March 2023. If we updated the data to a more recent version, we'd have to recalculate these values manually then copy and paste them into the text string. A better approach is to use data-driven text - combine calculation with text.
 
-The {glue} package [@glue] makes it easy to combine text with variable values. The `glue()` function evaluates R code inside curly brackets `{}` and inserts it into the string. Alternatively, you can use `paste()` as we did earlier for the facet labels, or `sprintf()` in base R. 
+The **`glue`** package [@glue] makes it easy to combine text with variable values. The `glue()` function evaluates R code inside curly brackets `{}` and inserts it into the string. Alternatively, you can use `paste()` as we did earlier for the facet labels, or `sprintf()` in base R. 
 
 ::: {#tip-languages-glue .callout-tip}
 
@@ -398,7 +398,7 @@ Since the values are going into a sentence we can make use of the `format()` fun
 subtitle <- glue("Of the {format(nrow(languages), big.mark = ',')} programming languages listed in the Programming Language DataBase, {sum(languages$line_comment_token == '//', na.rm = TRUE)} use //, {sum(languages$line_comment_token == '#', na.rm = TRUE)} use #, and sum(languages$line_comment_token == ';', na.rm = TRUE) use ; to define which lines are comments. {format(sum(is.na(languages$line_comment_token)), big.mark = ',')} languages do not have a comment token listed.")
 ```
 
-Let's add the title, subtitle, and caption to the plot using the `labs()` function from {ggplot2}: \index{ggplot2!labs}
+Let's add the title, subtitle, and caption to the plot using the `labs()` function: \index{ggplot2!labs}
 
 ```{r}
 #| label: fig-languages-text_plot
@@ -415,9 +415,9 @@ text_plot
 
 You'll notice that the subtitle text runs off the edge of the plot here - we'll deal with that a little bit later. Let's first decide on a font to use in the plot. As with choosing colors, when choosing fonts it's useful to think about choosing a font that fits with the theme. Think about the fonts used in horror films posters. Isn't it quite different to the font used in marketing children's toys? Since we're going with a monochrome monitor theme for the colors, we can extend that to the font choice by choosing a monospace font reminiscent of early computers. 
 
-Working with fonts in R isn't always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the `font_add_google()` function from {sysfonts} [@sysfonts]. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at [fonts.google.com](https://fonts.google.com/). The `VT323` and `Share Tech Mono` fonts both look like they'll fit in with our theme. The `font_add_google()` function looks through the Google Fonts database for the specified font `name` (e.g. `"VT323"`) and loads the font files you'll need. The second argument, `family` is how we'll refer to the font when using it to plot in R. By default it's the same as the `name` but it's often useful to change it to something else (e.g. `"vt"`), especially for long font names. \index{sysfonts} \index{sysfonts!font\_add\_google}
+Working with fonts in R isn't always easy. When it comes to using a different font for text in R, you can use fonts that come installed with your operating system or download font files from elsewhere and load them into R. An easy way to use external fonts is through the `font_add_google()` function from **`sysfonts`** [@sysfonts]. This function allows you to load Google Fonts in R without worrying about downloading or installing font files. You can browse Google Fonts at [fonts.google.com](https://fonts.google.com/). The `VT323` and `Share Tech Mono` fonts both look like they'll fit in with our theme. The `font_add_google()` function looks through the Google Fonts database for the specified font `name` (e.g. `"VT323"`) and loads the font files you'll need. The second argument, `family` is how we'll refer to the font when using it to plot in R. By default it's the same as the `name` but it's often useful to change it to something else (e.g. `"vt"`), especially for long font names. \index{sysfonts} \index{sysfonts!font\_add\_google}
 
-We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the {showtext} package [@showtext] comes in. By running `showtext_auto()`, this means that the {showtext} package is automatically used to render text. We can also set `showtext_opts(dpi = 300)` to use fonts in the resolution we plan to save our image in later - see @sec-save-image for more details on image resolution. \index{showtext} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
+We also need to make sure that whichever graphics device we are using, is able to make use of these fonts. This is where the **`showtext`** package [@showtext] comes in. By running `showtext_auto()`, this means that the **`showtext`** package is automatically used to render text. We can also set `showtext_opts(dpi = 300)` to use fonts in the resolution we plan to save our image in later - see @sec-save-image for more details on image resolution. \index{showtext} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
 #| label: languages-showtext
@@ -433,13 +433,13 @@ showtext_opts(dpi = 300)
 
 ::: {#tip-languages-showtext .callout-tip}
 
-## Alternatives to {showtext}
+## Alternatives to **`showtext`**
 
-There are several alternatives to {showtext} for working with fonts in R. Depending on what you're creating, you might find one of these works better for you:
+There are several alternatives to **`showtext`** for working with fonts in R. Depending on what you're creating, you might find one of these works better for you:
 
-* The {ragg} package [@ragg] uses a different graphics device, and allows to use any fonts installed on your system. You can usually install additional fonts by downloading the relevant font files, then right clicking and choosing the install option.
-* The {systemfonts} package [@systemfonts] allows you to locate or load local font files based on font family and style. We'll look at an example of using {systemfonts} in @sec-lemurs.
-* The {extrafont} package [@extrafont] which focuses on using TrueType fonts in PDF formats.
+* The **`ragg``** package [@ragg] uses a different graphics device, and allows to use any fonts installed on your system. You can usually install additional fonts by downloading the relevant font files, then right clicking and choosing the install option.
+* The **`systemfonts`** package [@systemfonts] allows you to locate or load local font files based on font family and style. We'll look at an example of using {systemfonts} in @sec-lemurs.
+* The **`extrafont`** package [@extrafont] which focuses on using TrueType fonts in PDF formats.
 
 :::
 
@@ -451,9 +451,9 @@ body_font <- "share"
 title_font <- "vt"
 ```
 
-When it comes to styling to all of the non-geom elements of your plot (such as the background color, the font family used for the title, or how the caption is aligned) this is handled by the `theme()` function in {ggplot2}. There are several built-in themes which pre-set some of the arguments such as `theme_classic()`, `theme_minimal()`, or `theme_gray()`. The default theme is `theme_gray()` - this is where the default gray background comes from. \index{ggplot2!theme\_minimal} \index{ggplot2!theme\_classic} \index{ggplot2!theme\_gray} \index{ggplot2!theme}
+When it comes to styling to all of the non-geom elements of your plot (such as the background color, the font family used for the title, or how the caption is aligned) this is handled by the `theme()` function in **`ggplot2`**. There are several built-in themes which pre-set some of the arguments such as `theme_classic()`, `theme_minimal()`, or `theme_gray()`. The default theme is `theme_gray()` - this is where the default gray background comes from. \index{ggplot2!theme\_minimal} \index{ggplot2!theme\_classic} \index{ggplot2!theme\_gray} \index{ggplot2!theme}
 
-Normally, we want the title text to appear larger than other text. Similarly, we might want the axis text to be smaller than other text. In {ggplot2}, all text is defined relative to some baseline text size. If we want to increase (or decrease) the size of all text used in the plot, changing the `base_size` argument in the built-in themes sets the baseline text size used for all elements. This means you don't have to individually increase the size of every single text element. Similarly, the `base_family` changes the default font family used for all (non-geom) text elements.
+Normally, we want the title text to appear larger than other text. Similarly, we might want the axis text to be smaller than other text. In **`ggplot2`**, all text is defined relative to some baseline text size. If we want to increase (or decrease) the size of all text used in the plot, changing the `base_size` argument in the built-in themes sets the baseline text size used for all elements. This means you don't have to individually increase the size of every single text element. Similarly, the `base_family` changes the default font family used for all (non-geom) text elements.
 
 Here, we might start with `theme_minimal()` and set the `base_size` to `8`. This is quite a small font size (smaller than the default size of 11) to make sure the plot fits within the width of the printed version of this book.
 
@@ -473,7 +473,7 @@ theme_plot1
 
 ### Adjusting themes
 
-We can make some further adjustments to the styling by editing individual arguments in the `theme()` function. When editing `theme()` arguments in {ggplot2}, many arguments are specified as a type of element: `element_text()`, `element_line()`, `element_rect()`, `element_grob()`, `element_render()`, or `element_blank()`. 
+We can make some further adjustments to the styling by editing individual arguments in the `theme()` function. When editing `theme()` arguments, many arguments are specified as a type of element: `element_text()`, `element_line()`, `element_rect()`, `element_grob()`, `element_render()`, or `element_blank()`. 
 
 #### Background color
 
@@ -481,7 +481,7 @@ We can edit the background color using the `panel.background` and `plot.backgrou
 
 #### Grid lines
 
-Grid lines in {ggplot2} fall into two categories: major and minor. Major grid lines are usually slightly bolder and correspond to the axis text labels. Minor grid lines are usually lighter and unlabeled. They can be controlled using the `panel.grid.major` and `panel.grid.minor` arguments, with finer control possible for x- and y-axis gridlines. They are all defined using `element_line()`. We can change the color of the major x-axis gridlines using the color element. To ensure the bright green color doesn't become distracting as a background element, we can make it semi-transparent using the `alpha()` function from {ggplot2} - `0` means fully transparent and `1` means fully opaque. The `linewidth` controls the width of the lines. We remove all the y-axis grid lines and all minor grid lines by setting both `panel.grid.major.y` and `panel.grid.minor` to `element_blank()` which removes the elements completely. We can also remove all axis ticks using `axis.ticks = element_blank()`.
+Grid lines in **`ggplot2`** fall into two categories: major and minor. Major grid lines are usually slightly bolder and correspond to the axis text labels. Minor grid lines are usually lighter and unlabeled. They can be controlled using the `panel.grid.major` and `panel.grid.minor` arguments, with finer control possible for x- and y-axis gridlines. They are all defined using `element_line()`. We can change the color of the major x-axis gridlines using the color element. To ensure the bright green color doesn't become distracting as a background element, we can make it semi-transparent using the `alpha()` function from **`ggplot2`** - `0` means fully transparent and `1` means fully opaque. The `linewidth` controls the width of the lines. We remove all the y-axis grid lines and all minor grid lines by setting both `panel.grid.major.y` and `panel.grid.minor` to `element_blank()` which removes the elements completely. We can also remove all axis ticks using `axis.ticks = element_blank()`.
 
 #### Text elements
 
@@ -546,8 +546,8 @@ theme_plot1 +
 We also need to deal with the fact that the subtitle text is too long and is running off the side of the page. There are a few options for this:
 
 * We can manually add line breaks by adding in `"\n"` to the subtitle string where we want the line to break. This is very much a manual approach that requires a lot of trial and error. 
-* We can use `str_wrap()` from {stringr} to split the text with a specified number of characters per line. This still involves a bit of trial and error to find the best line length. It also means you need to re-optimize the line length if you change the text size.
-* One of the best solutions I've found is to use `element_textbox_simple()` from the {ggtext} package [@ggtext]. The {ggtext} package provides improved text rendering support for {ggplot2}, including support for using Markdown and HTML text which you'll see several examples of in later chapters. The `element_textbox_simple()` function enables you to places text in a box, with word wrapping. 
+* We can use `str_wrap()` from **`stringr`** to split the text with a specified number of characters per line. This still involves a bit of trial and error to find the best line length. It also means you need to re-optimize the line length if you change the text size.
+* One of the best solutions I've found is to use `element_textbox_simple()` from the **`ggtext`** package [@ggtext]. The **`ggtext`** package provides improved text rendering support for **`ggplot2`**, including support for using Markdown and HTML text which you'll see several examples of in later chapters. The `element_textbox_simple()` function enables you to places text in a box, with word wrapping. 
 
 \index{stringr!str\_wrap} \index{ggtext!element\_textbox\_simple}
 
@@ -612,7 +612,7 @@ We also need to edit the appearance of the text, since its styling is separate f
 
 ## Default font sizes in `geom_text()`
 
-The default font size of `geom_text()` is 3.88. This is slightly confusing because the size in `geom_text()` is defined in `mm` whereas the size in `theme()` elements is defined in `pt`. To match the font size in `geom_text()` to the theme’s font size, specify `size.unit = "pt"` in `geom_text()`. This argument is available from version 3.5.0 of {ggplot2}.
+The default font size of `geom_text()` is 3.88. This is slightly confusing because the size in `geom_text()` is defined in `mm` whereas the size in `theme()` elements is defined in `pt`. To match the font size in `geom_text()` to the theme’s font size, specify `size.unit = "pt"` in `geom_text()`. This argument is available from version 3.5.0 of **`ggplot2`**.
 
 :::
 
@@ -630,7 +630,7 @@ theme_plot2 +
   )
 ```
 
-Although these labels are an improvement on not having any language label, they're still not as informative as they could be. There's no information about the overall rank included in the plot. There's no way to tell if the top ranked language that uses `#` as a comment symbol is also the top ranked language overall or ranked as low as 1000! Let's create a more informative label using the {glue} package again. We can create a new `rank_label` column using `mutate()` which combines the language name from the `title` column, the text `"Rank: `, and the rank from the `language_rank` column. The `\n` adds a line break between the language name and rank text. \index{dplyr!mutate} \index{glue!glue}
+Although these labels are an improvement on not having any language label, they're still not as informative as they could be. There's no information about the overall rank included in the plot. There's no way to tell if the top ranked language that uses `#` as a comment symbol is also the top ranked language overall or ranked as low as 1000! Let's create a more informative label using the **`glue`** package again. We can create a new `rank_label` column using `mutate()` which combines the language name from the `title` column, the text `"Rank: `, and the rank from the `language_rank` column. The `\n` adds a line break between the language name and rank text. \index{dplyr!mutate} \index{glue!glue}
 
 ```{r}
 #| label: languages-better-labels
@@ -668,8 +668,8 @@ And we're finished!
 There are many different options available for saving plots created with R to a file you can later use in presentations, on social media, in publications, or anywhere else you might need to: \index{grDevices!png} \index{ragg!agg\_png}
 
 * You can use the interactive interface in RStudio by going to the **Plots** tab, then clicking **Export** and **Save as Image**. This creates a pop-up window where you can choose your desired file type, set the size, and choose a location to save the file in. However, this approach doesn't allow you to set the resolution (image quality) of the file you save. 
-* The base R {grDevices} package provides several functions for saving to different file types. For example, the `png()` function enables you to save PNG files with a specific height, width, and resolution. You can also set other arguments such as the background color in the `png()` function. The {ragg} package [@ragg] provides a similar set of functions. For example, the `agg_png()` function. 
-* If you are using {ggplot2} to create your plots, the `ggsave()` function is the easiest way to save your visualizations to a file. As detailed in the help file it *defaults to saving the last plot that you displayed, using the size of the current graphics device. It also guesses the type of graphics device from the extension.*
+* The base R **`grDevices`** package provides several functions for saving to different file types. For example, the `png()` function enables you to save PNG files with a specific height, width, and resolution. You can also set other arguments such as the background color in the `png()` function. The **`ragg``** package [@ragg] provides a similar set of functions. For example, the `agg_png()` function. 
+* If you are using **`ggplot2`** to create your plots, the `ggsave()` function is the easiest way to save your visualizations to a file. As detailed in the help file it *defaults to saving the last plot that you displayed, using the size of the current graphics device. It also guesses the type of graphics device from the extension.*
 
 It's recommended to save your images in a specific size, rather than using the size of the current graphics device in RStudio - it makes it much easier to reproduce the same image again! You can set the width and height in `ggsave()`, using a calculation instead of a specific value if you want a specific aspect ratio: \index{ggplot2!ggsave}
 
@@ -700,7 +700,7 @@ ggsave(
 
 If you're creating plots with other R packages, some of those packages will also come with their own built-in *save* functions. 
 
-If you're saving images at a different size or resolution (e.g. 300 dpi) to the resolution that you preview images in (e.g. 96 dpi), then your saved image might not look quite how you expect. The lines and text might appear much thinner or thicker than you expect. The `scale` argument in `ggsave()` or the `scaling` argument in the {ragg} family of functions is one option for dealing with this. These arguments apply a scaling factor to line and text sizes allowing you to scale up (or down) your plot if it appears too small (or large) at your desired size and resolution. An even easier way to deal with this problem is to make sure you are previewing your plot at the same size and resolution as you'd like your final image to be. The {camcorder} [@camcorder] package provides a solution to this issue, and you can read more about how to use it in @sec-other.
+If you're saving images at a different size or resolution (e.g. 300 dpi) to the resolution that you preview images in (e.g. 96 dpi), then your saved image might not look quite how you expect. The lines and text might appear much thinner or thicker than you expect. The `scale` argument in `ggsave()` or the `scaling` argument in the **`ragg``** family of functions is one option for dealing with this. These arguments apply a scaling factor to line and text sizes allowing you to scale up (or down) your plot if it appears too small (or large) at your desired size and resolution. An even easier way to deal with this problem is to make sure you are previewing your plot at the same size and resolution as you'd like your final image to be. The **`camcorder`** [@camcorder] package provides a solution to this issue, and you can read more about how to use it in @sec-other.
 
 ## Reflection
 
@@ -708,13 +708,13 @@ Even though we're essentially *finished* with this visualization, it's useful to
 
 When using dumbbell charts to show time frames like this, the dots at each end are often taken as start and end time points. In this chart, that doesn't quite make sense. Imagine a programming language that was last active twenty years ago and is officially no longer maintained. Then imagine a different language that was last updated last week. The end time point (showing `last_activity`) is represented the same way in these two cases. Using an open-ended dumbbell for languages that are still actively being maintained might be more representative of what's actually happening in the data.
 
-The labels showing the name and rank of the programming languages are a little bit hard to read. Each label isn't distinct enough from the labels above or below it. One option would be to change the size of the image - making the image taller would allow more space between each label. A second option would be to make the language name a slightly larger bold font, with the rank in a slightly smaller font below. This would make it clearer that there are ten labels rather than 20! We'll discuss how to add more complex formatting to text labels in @sec-cats, using the {ggtext} package. 
+The labels showing the name and rank of the programming languages are a little bit hard to read. Each label isn't distinct enough from the labels above or below it. One option would be to change the size of the image - making the image taller would allow more space between each label. A second option would be to make the language name a slightly larger bold font, with the rank in a slightly smaller font below. This would make it clearer that there are ten labels rather than 20! We'll discuss how to add more complex formatting to text labels in @sec-cats, using the **`ggtext`** package. 
 
 \index{ggtext}
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/languages.gif){fig-align="center" fig-alt=""}
 
