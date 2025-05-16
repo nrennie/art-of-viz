@@ -102,6 +102,7 @@ ggplot() +
   )
 tmp_a <- tempfile()
 ggsave(tmp_a,
+       device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
        units = "px"
@@ -133,6 +134,7 @@ ggplot() +
   )
 tmp_b <- tempfile()
 ggsave(tmp_b,
+       device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
        units = "px"
@@ -168,6 +170,7 @@ ggplot() +
   )
 tmp_c <- tempfile()
 ggsave(tmp_c,
+       device = "png",
        height = 400, width = 400,
        dpi = 300, bg = bg_col,
        units = "px"
