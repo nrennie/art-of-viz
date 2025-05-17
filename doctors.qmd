@@ -490,7 +490,7 @@ It's obvious that there are some issues with this plot now that the strip text c
 
 To solve the first two problems, the `title` and `subtitle` arguments of `labs()` can be set to `NULL` to remove them from the plot. Instead, the `tag` argument in `labs()` can be used to set the subtitle. The nice thing about using `tag` is the `plot.tag.position` argument within `theme()` which allows you to position the text anywhere on the plot. The `strip.text` and `plot.tag` arguments of theme should also be set using `element_textbox_simple()` from {ggtext} to allow the text to be styled as we wish. The top, left, and right margins of the plot should be set to `0` using `plot.margin` to make sure that the strip text banner goes to the edge of the plot. \index{ggplot2!theme} \index{ggplot2!labs}
 
-To solve the third problem of the map looking stretched, we can apply `coord_sf()` which applies the World Geodetic System 1984 (WGS84) CRS (coordinate reference system). Chapter @sec-time-zones discusses coordinate reference systems in more detail. The upper limit of the `y` axis can also be extended beyond the range of the data to make room for the subtitle added using `tag`. \index{ggplot2!theme} \index{ggplot2!coord\_sf}
+To solve the third problem of the map looking stretched, we can apply `coord_sf()` which applies the World Geodetic System 1984 (WGS84) CRS (coordinate reference system). @sec-time-zones discusses coordinate reference systems in more detail. The upper limit of the `y` axis can also be extended beyond the range of the data to make room for the subtitle added using `tag`. \index{ggplot2!theme} \index{ggplot2!coord\_sf}
 
 ```{r}
 #| label: doctors-style-plot-4
@@ -588,7 +588,7 @@ ggsave(
 
 The color scale in @fig-doctors-style-plot-5 is quite hard to interpret and the choice was made to use *Fewer doctors* and *More doctors* labels instead of values. When the underlying data is simple and easy to interpret, having the values on the legend would add more useful information. The title could probably also be changed to something more informative. \index{color}
 
-When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the difference is between time periods. Showing uncertainty on maps is tricky, and there's no straightforward solution here. Perhaps setting the colors to a binary scale showing whether the value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.
+When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it's much older. In fact, running `range(doctors$year)` shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there's no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the difference is between time periods. Showing uncertainty on maps is tricky, and there's no straightforward solution here. Perhaps setting the colors to a binary scale showing whether the value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. The **`Vizumap`** package [@Vizumap], which provides functions for visualizing uncertainty on maps, could be used to create a bivariate map showing both the value and how recent it is. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle. 
 
 ::: {.content-visible when-format="html"}
 
@@ -600,6 +600,6 @@ Each plot created during the process of developing the original version of this 
 
 ## Exercises
 
-* Subset the data to create a map for only the following regions: `c("France", "Spain", "Italy", "Portugal", "Switzerland)`. Do you need to change the limits of the x- and y-axes?
+* Subset the data to create a map for only the following regions: `c("France", "Spain", "Italy", "Portugal", "Switzerland")`. Do you need to change the limits of the x- and y-axes?
 
 * Can you keep the countries that border these regions on the map, but fill them with a neutral gray color?
