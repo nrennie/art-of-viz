@@ -351,12 +351,12 @@ At first glance, this first plot might look like a complete mess but with a litt
 
 ### Fonts
 
-Let's start by choosing some fonts for our visualization. We're going to pick two fonts:
+Let's start by choosing some typefaces for our visualization. We're going to pick two typefaces:
 
-* `title_font`: a bold font that will, as the name suggests, be used for the title. We'll use *Passion One* - a display font with thick, bold strokes which make it ideal for titles. 
-* a `body_font`: a simple font that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple font. We'll use *Ubuntu* - a sans serif font.
+* `title_font`: a bold typeface that will, as the name suggests, be used for the title. We'll use *Passion One* - a display typeface with thick, bold strokes which make it ideal for titles. 
+* a `body_font`: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple typeface. We'll use *Ubuntu* - a sans serif typeface that we've used in previous chapters.
 
-Both fonts are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
+Both typefaces are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
 
 ```{r}
 #| label: nobel-fonts
@@ -368,7 +368,7 @@ body_font <- "Ubuntu"
 title_font <- "Passion One"
 ```
 
-Now, let's remake our `basic_plot` - this time also setting the font `famly` to `body_font`. We'll also right align the text using `hjust = 1` to make the text appear around the outer edge of the circle. The text also needs to be a bit smaller to avoid overlapping between names positioned next to each other. \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
+Now, let's remake our `basic_plot` - this time also setting the font `family` to `body_font`. We'll also right align the text using `hjust = 1` to make the text appear around the outer edge of the circle. The text also needs to be a bit smaller to avoid overlapping between names positioned next to each other. \index{ggplot2!ggplot} \index{ggplot2!geom\_text} \index{ggplot2!aes}
 
 ```{r}
 #| label: fig-nobel-base-plot-2
@@ -526,7 +526,7 @@ Although we could copy and paste the code we already have, and change out `physi
 
 This can be really useful if, for example, you want to create a plot of sales performance for a given month. Let's say last month you wanted to create a histogram of the sales for only last month. This month, you want to create the same histogram but with the data for only this month, Nothing other than the underlying data (and perhaps the title of the plot) should change. You could create a function that takes the month as an argument, filters the data, and then plots it with the updated title. You don't have to rewrite the plotting code every month, you just need to call your custom plot function. 
 
-Throughout this book, we've been using variables to store our choice of colors, and fonts. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments! \index{color}
+Throughout this book, we've been using variables to store our choice of colors, and typefaces. This makes it easier to quickly try out a new color scheme. But it also makes it easier to convert your code into a function: those variables just become function arguments! \index{color}
 
 When we're converting our code into a function, we need to think about what a user has to tell us, in order for the code to work. In the sales histogram example above, a user would need to specify which month they want the plot for. In our example of the Nobel Prize visualizations, a user need to specify: 
 
@@ -556,11 +556,11 @@ For these arguments, we can specify a default. This means that the function will
 
 ## Using fonts in functions
 
-Here, we've specified that the default title font is `"Passion One"`. A similar approach is used for the body font. Usually, I'd strongly recommend against such an approach since there's no guarantee that a user will have the `"Passion One"` font installed or loaded when running the function. This makes it a bad choice of default font. 
+Here, we've specified that the default title typeface is `"Passion One"`. A similar approach is used for the body typeface. Usually, such an approach is not recommended since there's no guarantee that a user will have the `"Passion One"` typeface installed or loaded when running the function. This makes it a bad choice of default typeface. 
 
-We *could* add the `font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the font every time we run the function. A better option is to specify one of the integrated fonts as a default e.g. `title_font = "sans"`.
+We *could* add the `font_add_google()` code inside the function, but this also isn't a good solution. We don't want to re-install the fonts every time we run the function. A better option is to specify one of the integrated typefaces as a default e.g. `title_font = "sans"`.
 
-(Or at the very least, add instructions for how to load the fonts you've used as a default!)
+(Or at the very least, add instructions for how to load the typefaces you've used as a default!)
 
 :::
 
@@ -734,6 +734,14 @@ peace_plot
 ```
 
 What you might notice about this version of the chart is that a third color has appeared! In `scale_color_manual()`, we only specified which colors relate to `"male"` and `"female"` laureates. However, the Nobel Peace Prize can also be awarded to an organization, not just an individual. The (newly appeared) gray text relates to organisations listed in the `nobel_peace` data.
+
+::: {#tip-nobel-extension .callout-tip}
+
+## Building your own **`ggplot2`** extension
+
+Once you've built a custom chart type with core **`ggplot2`** functions, you might be considering turning it into a **`ggplot2`** extension package to make it easier for you and other people to use. The *Everyday ggplot2 extension* website [@Reynolds2025] provides advice and tutorials for building your first (or next) extension.
+
+:::
 
 We can save a copy of the visualization using `ggsave()`: \index{ggplot2!ggsave}
 
