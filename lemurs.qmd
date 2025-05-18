@@ -41,7 +41,7 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 # Lemurs: manipulating images in R {#sec-lemurs}
 
-In this chapter, we'll cover how to load and manipulate images in R using the {magick} and {imager} packages. We'll also look at how to combine images with plots using the {cowplot} package.
+In this chapter, we'll cover how to load and manipulate images in R using the **`magick`** and **`imager`** packages. We'll also look at how to combine images with plots using the **`cowplot`** package.
 
 **Packages required in this chapter**:
 
@@ -62,7 +62,7 @@ library(tidytuesdayR)
 
 ## Data
 
-We're going to be exploring data about lemurs from [Duke Lemur Center](https://lemur.duke.edu/) in this chapter [@lemurs_data]. Duke Lemur Center houses hundreds of lemurs across many different species, and collect data on their lemur residents to better understand the factors that effect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by [Jesse Mostipak](https://github.com/kierisi)), and so can be loaded into R using the `tt_load()` function from {tidytuesdayR} as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
+We're going to be exploring data about lemurs from [Duke Lemur Center](https://lemur.duke.edu/) in this chapter [@lemurs_data]. Duke Lemur Center houses hundreds of lemurs across many different species, and collect data on their lemur residents to better understand the factors that effect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by [Jesse Mostipak](https://github.com/kierisi)), and so can be loaded into R using the `tt_load()` function from **`tidytuesdayR`** as we've done in previous chapters: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-lemurs-data-show
@@ -160,7 +160,7 @@ if (knitr::is_html_output()) {
 
 :::
 
-There are `r nrow(taxonomy)` species of lemurs included in the data, and for the rest of the chapter we'll focus in on *red ruffed lemurs*. Red ruffed lemurs have the taxonomy code `VRUB`. We use the `filter()` function from {dplyr} to retain only the rows of data with `"VRUB"` in the `taxon` column: \index{dplyr!filter}
+There are `r nrow(taxonomy)` species of lemurs included in the data, and for the rest of the chapter we'll focus in on *red ruffed lemurs*. Red ruffed lemurs have the taxonomy code `VRUB`. We use the `filter()` function from **`dplyr`** to retain only the rows of data with `"VRUB"` in the `taxon` column: \index{dplyr!filter}
 
 ```{r}
 #| label: lemurs-wrangling-1
@@ -241,11 +241,11 @@ col_plot <- basic_plot +
 
 We'll use colored text and icons in the subtitle to distinguish the two categories as we did in @sec-turbines, and so we'll remove the legend by setting `legend.position = "none"` inside the `theme()` function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend e.g. color, we could set `guide = "none"` inside `scale_color_manual()`. This would result in a legend for shape only with the shapes shown in black by default. \index{ggplot2!scale\_color\_manual} \index{ggplot2!theme}
 
-### Working with {systemfonts}
+### Working with **`systemfonts`**
 
-Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the {showtext} package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't always play nicely with Unicode icons. We'll look at an alternative font package: {systemfonts} [@systemfonts]. As mentioned in @sec-programming, the {systemfonts} package allows you to locate or load font files available on your local system. 
+Rather than using a traditional legend for color and shape, we're going to include colored text in the subtitle. Here, we're also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the **`showtext`** package, that we've been using to load the Font Awesome icon font and other Google fonts, doesn't always play nicely with Unicode icons. We'll look at an alternative font package: **`systemfonts`** [@systemfonts]. As mentioned in @sec-programming, the **`systemfonts`** package allows you to locate or load font files available on your local system. 
 
-To register a font using {systemfonts}, we use the `register_font()` function. It looks quite similar to the `font_add()` function from {showtext} for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons using {systemfonts} as an alternative approach to the one taken in @sec-cats. \index{systemfonts!register\_font}
+To register a font using **`systemfonts`**, we use the `register_font()` function. It looks quite similar to the `font_add()` function from **`showtext`** for loading local fonts - see @sec-turbines and @sec-cats to compare them. Let's load the Font Awesome Brand icons using **`systemfonts`** as an alternative approach to the one taken in @sec-cats. \index{systemfonts!register\_font}
 
 The first argument `name` will be the name that the font is known by in R. You can choose any name you want, but here we'll make sure to use the same name as we did for the `family` argument in @sec-cats, in order for our `social_caption()` function to still work. The `plain` argument is the the path to the font file. 
 
@@ -262,13 +262,13 @@ register_font(
 
 ## Setting a graphics device
 
-In R, a graphics device is the system that is used to render visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create e.g. png or pdf. The {ragg} package [@ragg] provides graphic devices for R based on the AGG library. \index{graphics device} \index{ragg}
+In R, a graphics device is the system that is used to render visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create e.g. png or pdf. The **`ragg`** package [@ragg] provides graphic devices for R based on the AGG library. \index{graphics device} \index{ragg}
 
-It's recommended to use {ragg} for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with {systemfonts} may not appear correctly. To use {ragg} for the graphics devices in RStudio, go to `Tools -> Global Options -> General -> Graphics -> Backend` and select `AGG`.  In R Markdown or Quarto documents, you can add a set up chunk at the top to use ragg which includes `knitr::opts_chunk$set(dev = "ragg_png")`, or your device of choice. \index{RStudio}
+It's recommended to use **`ragg`** for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with **`systemfonts`** may not appear correctly. To use **`ragg`** for the graphics devices in RStudio, go to `Tools -> Global Options -> General -> Graphics -> Backend` and select `AGG`.  In R Markdown or Quarto documents, you can add a set up chunk at the top to use ragg which includes `knitr::opts_chunk$set(dev = "ragg_png")`, or your device of choice. \index{RStudio}
 
 :::
 
-We can also use `register_font()` from {systemfonts} to load the fonts we'll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. \index{systemfonts!register\_font}
+We can also use `register_font()` from **`systemfonts`** to load the fonts we'll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. \index{systemfonts!register\_font}
 
 For the body text, we'll use *Lato*, a sans serif typeface designed by [Łukasz Dziedzic](http://www.latofonts.com/team/). The font files can be downloaded from [fonts.google.com/specimen/Lato](https://fonts.google.com/specimen/Lato) or [www.latofonts.com/lato-free-fonts](https://www.latofonts.com/lato-free-fonts/). For the title, we'll use *Passion One* - a typeface specifically designed for large titles! It can be downloaded from [fonts.google.com/specimen/Passion+One](https://fonts.google.com/specimen/Passion+One). When you download these typefaces, you'll see that you don't just download a single file, you actually download multiple files - one for each variation of the font that is available e.g. bold and italic. 
 
@@ -298,11 +298,11 @@ body_font <- "Lato"
 title_font <- "Passion One"
 ```
 
-An alternative to using `register_font()` is to install the font on your system, by right clicking on the downloaded font file and selecting *Install*. Then {ragg} should be able to find the font automatically. However, there may be reasons why you can't or don't want to prefer install a font system wide. Using `register_font()` in a script also leaves a record of how the fonts were installed, rather than relying on other processes happening outside of R.
+An alternative to using `register_font()` is to install the font on your system, by right clicking on the downloaded font file and selecting *Install*. Then **`ragg`** should be able to find the font automatically. However, there may be reasons why you can't or don't want to prefer install a font system wide. Using `register_font()` in a script also leaves a record of how the fonts were installed, rather than relying on other processes happening outside of R.
 
 ### Adding text
 
-The title for the plot can be defined as a simple character string, which asks the reader a question and encourages them to engage with the plot. To write the subtitle text we'll use the `glue()` function from {glue} to do two things: \index{glue!glue}
+The title for the plot can be defined as a simple character string, which asks the reader a question and encourages them to engage with the plot. To write the subtitle text we'll use the `glue()` function from **`glue`** to do two things: \index{glue!glue}
 
 * Add colored text in the subtitle, as we did in @sec-cats. 
 * Create data-driven text, as we did in @sec-programming.
@@ -353,7 +353,7 @@ Now we need to add some final styling to implement the background and text color
 
 We start with `theme_minimal()` as a base, which keeps the grid lines and axes but removes the grey background and dark axis ticks. We also set the base font size as size `6` and use our previously defined `body_font` variable as the base font family. We can then make a few further adjustments using `theme()`, where we remove the legend by setting `legend.position = "none"`, add a margin around the edge of the plot, and apply the selected background color using `element_rect()`. \index{ggplot2!theme\_minimal} \index{ggplot2!theme}  \index{ggplot2!element\_rect}
 
-Setting `plot.title.position` and `plot.caption.position` to `"plot"` aligns the title, subtitle, and caption with outside of the entire plot rather than the panel with the scatter plot - giving a cleaner, more balanced look. The title text is further adjusted with `element_text()` to use the `title_font` family, increase it in size, change the color, and add a little bit more space at the bottom of it. As described in @sec-programming and @sec-cats, we use `element_textbox_simple()` from {ggtext} for the plot subtitle and caption to force the long text to wrap onto multiple lines, and to correctly process the HTML code in the caption. \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_text} 
+Setting `plot.title.position` and `plot.caption.position` to `"plot"` aligns the title, subtitle, and caption with outside of the entire plot rather than the panel with the scatter plot - giving a cleaner, more balanced look. The title text is further adjusted with `element_text()` to use the `title_font` family, increase it in size, change the color, and add a little bit more space at the bottom of it. As described in @sec-programming and @sec-cats, we use `element_textbox_simple()` from **`ggtext`** for the plot subtitle and caption to force the long text to wrap onto multiple lines, and to correctly process the HTML code in the caption. \index{ggtext!element\_textbox\_simple} \index{ggplot2!element\_text} 
 
 ```{r}
 #| label: fig-lemurs-style-1
@@ -433,11 +433,11 @@ We now have an appropriate space to place an image.
 
 Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you're just looking for a way to make your plot more eye catching! \index{image} 
 
-### Manipulating images with {magick} and {imager}
+### Manipulating images with **`magick`** and **`imager`**
 
-The {magick} package [@magick] provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including png, jpeg, and pdf. \index{ImageMagick} \index{magick}
+The **`magick`** package [@magick] provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including PNG, JPG, and PDF. \index{ImageMagick} \index{magick}
 
-The {magick} package is not the only R package that enables you to process and manipulate images. A popular alternative is the {imager} package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in {imager}. There are some operations that are easier in {imager}, and some that are easier in {magick}. In this chapter, we’re going to use both packages together to demonstrate how easy it is. \index{imager} \index{imager!cimg2magick} \index{imager!magick2cimg}
+The **`magick`** package is not the only R package that enables you to process and manipulate images. A popular alternative is the **`imager`** package [@imager] which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the `cimg2magick()` and `magick2cimg()` conversion functions in **`imager`**. There are some operations that are easier in **`imager`**, and some that are easier in **`magick`**. In this chapter, we’re going to use both packages together to demonstrate how easy it is. \index{imager} \index{imager!cimg2magick} \index{imager!magick2cimg}
 
 ::: {#tip-lemurs-unsplash .callout-tip}
 
@@ -451,7 +451,7 @@ If you add images to plots that you don't own, make sure you have permission to 
 
 For this visualization, we're going to use a photograph of a red ruffed lemur from [Unsplash](https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k) taken by [Jax](https://unsplash.com/@lysrix) [@img_jax].
 
-We're going to start with the {imager} package and use it to read the image into R with the `load.image()` function. If you were using {magick} to start with, you would use the `image_read()` function instead. \index{imager!load.image} \index{magick!image\_read}
+We're going to start with the **`imager`** package and use it to read the image into R with the `load.image()` function. If you were using **`magick`** to start with, you would use the `image_read()` function instead. \index{imager!load.image} \index{magick!image\_read}
 
 ```{r}
 #| label: fig-lemurs-imager-read
@@ -467,7 +467,7 @@ You can view the image to check it's been loaded correctly by running `plot(lemu
 
 Though this is a fun image of a lemur, overlaying it on top of the plot in its raw format isn't going to be the most aesthetically pleasing. The background of the image would be quite clear against the plot. It would be better if the image was simply of the lemur itself with a transparent background. There are many online tools and desktop software available that could remove the background for you, but we can also do this in R!
 
-Let's start by cropping out as much of the background as possible. In {imager}, the `Xc()` and `Yc()` functions return pixel coordinates for an image, for x- and y- coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. \index{imager!Xc} \index{imager!Yc}
+Let's start by cropping out as much of the background as possible. In **`imager`**, the `Xc()` and `Yc()` functions return pixel coordinates for an image, for x- and y- coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. \index{imager!Xc} \index{imager!Yc}
 
 Running `Xc(lemur_img) <= 200` creates a pixel matrix where all values with an x-coordinate less than or equal to 200 are `TRUE`, and is otherwise `FALSE`. Setting these values to `0` turns those pixels to the color black. We can do something similar to remove sections where the x-coordinate is less than 275 and the y-coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis - it goes the opposite direction of most plots! \index{imager!Xc}
 
@@ -480,9 +480,9 @@ px <- Xc(lemur_img) <= 275 &
 lemur_img[px] <- 0
 ```
 
-Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don't (the background). The `px.flood()` function from {imager} allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the `px.flood()` function to select all pixels that are similar to it. The `x` and `y` arguments are used to specify the coordinates of the initial pixel to start with. The `sigma` argument specifies how different we want to allow the pixels to be with lower indicating very similar, and higher values of `sigma` allowing more different values to be selected. \index{imager!px.flood}
+Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don't (the background). The `px.flood()` function from **`imager`** allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the `px.flood()` function to select all pixels that are similar to it. The `x` and `y` arguments are used to specify the coordinates of the initial pixel to start with. The `sigma` argument specifies how different we want to allow the pixels to be with lower indicating very similar, and higher values of `sigma` allowing more different values to be selected. \index{imager!px.flood}
 
-It takes a little bit of trial and error to choose the best values for these arguments, and we can visually inspect performance by plotting the boundary lines of the pixels that are considered similar. Passing in the output from `px.flood()` into `highlight()` from {imager} draws a red outline around the *similar* pixels. \index{imager!highlight}
+It takes a little bit of trial and error to choose the best values for these arguments, and we can visually inspect performance by plotting the boundary lines of the pixels that are considered similar. Passing in the output from `px.flood()` into `highlight()` from **`imager`** draws a red outline around the *similar* pixels. \index{imager!highlight}
 
 ```{r}
 #| label: fig-lemurs-img-outline
@@ -520,9 +520,9 @@ To make it easier to create a transparent background, we turn the non-similar pa
 lemur_img[detect_outline & !detect_outline_2] <- 0
 ```
 
-We now want to turn the sections of the image that are pure black into transparent sections. The easiest way to do this is through the `image_transparent()` function from {magick}. However, our `lemur_img` image is currently of a format designed to work with {imager}, and won't work out of the box with {magick}. Luckily, the `cimg2magick()` function in the {imager} package converts it to a format that is compatible with {magick}. For some reason, the `cimg2magick()` also causes the image to be flipped horizontally. We can turn it back to the correct orientation using the `image_flop()` function in {magick}. \index{imager!cimg2magick} \index{magick!image\_flop} 
+We now want to turn the sections of the image that are pure black into transparent sections. The easiest way to do this is through the `image_transparent()` function from **`magick`**. However, our `lemur_img` image is currently of a format designed to work with **`imager`**, and won't work out of the box with **`magick`**. Luckily, the `cimg2magick()` function in the **`imager`** package converts it to a format that is compatible with **`magick`**. For some reason, the `cimg2magick()` also causes the image to be flipped horizontally. We can turn it back to the correct orientation using the `image_flop()` function in **`magick`**. \index{imager!cimg2magick} \index{magick!image\_flop} 
 
-Note that since the image is always the first argument of the `image_*()` functions in {magick} (and the output remains of the same class) we can use a piped workflow here, just as we do with {tidyverse} functions when working with data. Finally, we use the `image_transparent()` function in {magick} to turn all pixels that are currently `"black"` transparent. \index{magick!image\_transparent}
+Note that since the image is always the first argument of the `image_*()` functions in **`magick`** (and the output remains of the same class) we can use a piped workflow here, just as we do with **`tidyverse`** functions when working with data. Finally, we use the `image_transparent()` function in **`magick`** to turn all pixels that are currently `"black"` transparent. \index{magick!image\_transparent}
 
 ```{r}
 #| label: fig-lemurs-img-rmbg
@@ -534,9 +534,9 @@ lemur_nobg <- cimg2magick(lemur_img) |>
 lemur_nobg
 ```
 
-When you print the image with {magick}, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white *collar* of the lemur has still been partially removed. It's also a process that requires a lot of trial and error to find the right combination of argument values. 
+When you print the image with **`magick`**, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white *collar* of the lemur has still been partially removed. It's also a process that requires a lot of trial and error to find the right combination of argument values. 
 
-### Adding images to plots with {cowplot}
+### Adding images to plots with **`cowplot`**
 
 Before we go ahead with adding the image to the scatter plot, let's first update the caption to add an attribution for the image, in addition to the attributions for the data and graphic. We can use `paste0()` to join together the output from the `source_caption()` function we were already using for the caption, with some additional styled text. You'll see that this new text is similar to the text described in @sec-turbines, with `<br>` adding a new and `**` used to style the word `Image` in bold text. We can then override the existing caption in the `labs()` function. \index{base!paste0} \index{source\_caption}  \index{ggplot2!labs}
 
@@ -554,17 +554,17 @@ styled_plot <- styled_plot +
   labs(caption = cap)
 ```
 
-The {cowplot} package [@cowplot] extends {ggplot2} and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the {cowplot} functionality for adding annotations and customization - including images. \index{cowplot}
+The **`cowplot`** package [@cowplot] extends **`ggplot2`** and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we're more interested in the **`cowplot`** functionality for adding annotations and customization - including images. \index{cowplot}
 
 ::: {#tip-lemurs-arrange .callout-tip}
 
 ## R packages for combining plots and images
 
-There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the {patchwork} package [@patchwork] which we'll use in @sec-time-zones and @sec-house. The {egg} package [@egg] is another popular alternative, with the `geom_custom()` function being especially useful for adding images. The {ggimage} package [@ggimage] can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g. file paths or image coordinates. \index{egg} \index{patchwork} \index{ggimage}
+There are several other R packages available for arranging different elements together e.g. combining multiple plots or adding images to plots. The most common for arranging charts is the **`patchwork`** package [@patchwork] which we'll use in @sec-time-zones and @sec-house. The **`egg`** package [@egg] is another popular alternative, with the `geom_custom()` function being especially useful for adding images. The **`ggimage`** package [@ggimage] can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g. file paths or image coordinates. \index{egg} \index{patchwork} \index{ggimage}
 
 :::
 
-With {cowplot}, we start by using the `ggdraw()` function which sets up a layer on top of our {ggplot2} `styled_plot` object to allow us to draw on top of it. The `draw_image()` function is then used to add the `lemur_nobg` image on top. By default, the layer on top of the plot has coordinates running from 0 to 1, with `(0, 0)` being the lower left corner of the plot and `(1, 1)` the top right. Since we want to position the image in the bottom right hand corner, we set `hjust` and `halign` to `1`, to align the right hand side of the image with an `x` value of `1`. Setting `vjust` and `valign` to `0` aligns the bottom of the image with the to the `y`- value of `0`. The `width` defines how big the image is - some trial and error results in a choice of `0.4` for the image width. \index{cowplot!ggdraw} \index{cowplot!draw\_image} 
+With **`cowplot`**, we start by using the `ggdraw()` function which sets up a layer on top of our **`ggplot2`** `styled_plot` object to allow us to draw on top of it. The `draw_image()` function is then used to add the `lemur_nobg` image on top. By default, the layer on top of the plot has coordinates running from 0 to 1, with `(0, 0)` being the lower left corner of the plot and `(1, 1)` the top right. Since we want to position the image in the bottom right hand corner, we set `hjust` and `halign` to `1`, to align the right hand side of the image with an `x` value of `1`. Setting `vjust` and `valign` to `0` aligns the bottom of the image with the to the `y`- value of `0`. The `width` defines how big the image is - some trial and error results in a choice of `0.4` for the image width. \index{cowplot!ggdraw} \index{cowplot!draw\_image} 
 
 ```{r}
 #| label: fig-lemurs-img-plot
@@ -596,12 +596,11 @@ ggsave(
 )
 ```
 
-When you add the image using {cowplot}, you may see some warnings returned in the console about some of the custom fonts not being found. However, as long as the fonts are appearing correctly on the chart, you can ignore these warnings.
+When you add the image using **`cowplot`**, you may see some warnings returned in the console about some of the custom fonts not being found. However, as long as the fonts are appearing correctly on the chart, you can ignore these warnings.
 
 ## Reflection
 
 Despite the complexity of the code behind it, this is a relatively simple plot. And that's where the strengths of this visualization lie - it often takes a lot of work to create a clean and minimal chart. The lemur image adds a fun element to the chart and makes it more eye-catching and interesting without adding any additional complexity to the way the data is presented. The use of shapes in addition to color for distinguishing data for male and female lemurs is another strength as it increases the accessibility of the chart, making it available to a wider audience. 
-
 However, there are still a few areas where improvements could be made. The obvious one is the background removal of the lemur image. As we noted earlier, some of the lemur's white fur has been incorrectly removed as it's a similar color to the background. 
 
 The plot could be further improved by giving more consideration to the choice of axes - both x and y. Depending on what aspect of lemur ages or weights a reader is interested in, a different choice of axis may be more appropriate. For example, if the interest is in adult lemurs, subsetting the data to consider only lemurs above a certain age would work better. If the interest is in looking at when lemurs reaching their adult weight, looking at lemurs below a specific age or performing a transformation of the axis (e.g. logarithmic) would make it easier to see the point at which lemurs stop growing. Similarly, the y-axis uses grams as its units since this is how the weight data is recorded. For young lemurs, measuring on a scale of grams is appropriate. However, the majority of lemurs in the data are adults and so perhaps presenting the data in terms of kilograms might make more sense.

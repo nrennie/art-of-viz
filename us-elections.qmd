@@ -36,9 +36,9 @@ library(sysfonts)
 #| file: R/social_caption.R
 ```
 
-# US House elections: geography on a grid with {geofacet} {#sec-house}
+# US House elections: geography on a grid with **`geofacet`** {#sec-house}
 
-In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with {geofacet}, and look at another approach for creating customized legends. \index{geofacet} \index{patchwork}
+In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with **`geofacet`**, and look at another approach for creating customized legends. \index{geofacet} \index{patchwork}
 
 **Packages required in this chapter**:
 
@@ -60,7 +60,7 @@ library(tidytuesdayR)
 
 ## Data
 
-The MIT Election Data and Science Lab collects, analyzes, and shares data and results about elections in the United States of America, with the aim to improve democracy in the USA. This includes data on elections to the U.S. House of Representatives, at the constituency level [@elections_data]. The data is regularly updated, and a version of this dataset containing information about elections from 1976 to 2022 was used as a [TidyTuesday dataset in November 2023](https://github.com/rfordatascience/tidytuesday/tree/main/data/2023/2023-11-07). We can again load the data in using the `tt_load()` function from {tidytuesdayR}: \index{TidyTuesday} \index{tidytuesdayR!tt\_load}
+The MIT Election Data and Science Lab collects, analyzes, and shares data and results about elections in the United States of America, with the aim to improve democracy in the USA. This includes data on elections to the U.S. House of Representatives, at the constituency level [@elections_data]. The data is regularly updated, and a version of this dataset containing information about elections from 1976 to 2022 was used as a [TidyTuesday dataset in November 2023](https://github.com/rfordatascience/tidytuesday/tree/main/data/2023/2023-11-07). We can again load the data in using the `tt_load()` function from **`tidytuesdayR`**: \index{TidyTuesday} \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: elections-load-data-show
@@ -155,9 +155,9 @@ In order to bring @fig-elections-sketch-2 to life, we need to start by aggregati
 
 ### Data wrangling
 
-To aggregate the *other* parties, we use `mutate()` from {dplyr} to update the existing `party` column. We create the new party categories using `case_when()` and also take the opportunity to provide slightly better, alternative labels for the two dominant parties. \index{dplyr!mutate} \index{dplyr!case\_when}
+To aggregate the *other* parties, we use `mutate()` from **`dplyr`** to update the existing `party` column. We create the new party categories using `case_when()` and also take the opportunity to provide slightly better, alternative labels for the two dominant parties. \index{dplyr!mutate} \index{dplyr!case\_when}
 
-The `stage` column contains information on whether the election was a general election (`"GEN"`) or primary election (`"PRI"`). To keep things simpler, we use `filter()` from {dplyr} to restrict the data to general elections only. We then use `group_by()` and `summarise()` to add up the number of votes in each year, state, and party category - remembering to `ungroup()` the data at the end! \index{dplyr!filter} \index{dplyr!group\_by} \index{dplyr!summarise} \index{dplyr!ungroup}
+The `stage` column contains information on whether the election was a general election (`"GEN"`) or primary election (`"PRI"`). To keep things simpler, we use `filter()` from **`dplyr`** to restrict the data to general elections only. We then use `group_by()` and `summarise()` to add up the number of votes in each year, state, and party category - remembering to `ungroup()` the data at the end! \index{dplyr!filter} \index{dplyr!group\_by} \index{dplyr!summarise} \index{dplyr!ungroup}
 
 ```{r}
 #| label: elections-wrangling
@@ -173,7 +173,7 @@ house_data <- house |>
   ungroup()
 ```
 
-There are some years for which there were no `"Other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from {ggplot2}. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from {tidyr}, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
+There are some years for which there were no `"Other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from **`ggplot2`**. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from **`tidyr`**, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
 
 ```{r}
 #| label: elections-wrangling2
@@ -193,7 +193,7 @@ We're once again going to create a faceted plot, as we did in @sec-programming, 
 
 It's this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.
 
-We start by passing in our `plot_data` to the `data` argument of `ggplot()`, wrapped inside the `filter()` function from {dplyr} which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. \index{dplyr!filter} \index{ggplot2!ggplot} \index{ggplot2!aes}
+We start by passing in our `plot_data` to the `data` argument of `ggplot()`, wrapped inside the `filter()` function from **`dplyr`** which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. \index{dplyr!filter} \index{ggplot2!ggplot} \index{ggplot2!aes}
 
 We've already seen examples of making area charts in @sec-museums and @sec-r-pkgs, but we're going to make a slight change in this chapter. Since we're going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of number of votes, we'll look at the proportion for each party. Luckily, we don't have to calculate these percentages ourselves, since setting `position = "fill"` inside `geom_area()` does this for us. \index{ggplot2!geom\_area}
 
@@ -267,17 +267,17 @@ basic_plot +
 
 In @fig-elections-basic-plot, we can't actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We'll deal with this problem a little bit later when adjusting the plot theme. 
 
-### Faceting with {geofacet}
+### Faceting with **`geofacet`**
 
-To arrange the faceted plots into a grid that resembles the underlying geography, we'll use the {geofacet} package [@geofacet]. The {geofacet} package makes it easier to arrange facets in the shape of a map. This makes it easier to compare data across regions, like states or countries, in a grid format. There are many built-in grids for different geographical regions, including the several for the United States of America. However, you can also create your own custom facet grid if you prefer a different layout, or if no grid exists for the region you are plotting.
+To arrange the faceted plots into a grid that resembles the underlying geography, we'll use the **`geofacet`** package [@geofacet]. The **`geofacet`** package makes it easier to arrange facets in the shape of a map. This makes it easier to compare data across regions, like states or countries, in a grid format. There are many built-in grids for different geographical regions, including the several for the United States of America. However, you can also create your own custom facet grid if you prefer a different layout, or if no grid exists for the region you are plotting.
 
-To do faceting with {geofacet}, we use `facet_geo()` instead of `facet_wrap()`. It works in essentially the same way, and we start by using a `~` to indicate which column is the faceting column. However, there are two things that are a little bit different: \index{geofacet!facet\_geo} \index{geofacet!facet\_geo}
+To do faceting with **`geofacet`**, we use `facet_geo()` instead of `facet_wrap()`. It works in essentially the same way, and we start by using a `~` to indicate which column is the faceting column. However, there are two things that are a little bit different: \index{geofacet!facet\_geo} \index{geofacet!facet\_geo}
 
-* We need to specify which grid layout we want to use. You can use the `get_grid_names()` function in {geofacet} to get a list of all of the valid grid names. They are named sensibly based on what region the grid is for e.g. `"us_state_grid1"` and `"eu_grid1"`. Here, we'll use `"us_state_grid2"`. 
+* We need to specify which grid layout we want to use. You can use the `get_grid_names()` function in **`geofacet`** to get a list of all of the valid grid names. They are named sensibly based on what region the grid is for e.g. `"us_state_grid1"` and `"eu_grid1"`. Here, we'll use `"us_state_grid2"`. 
 
 * In order to map the data to the correct facet position on the grid, one of the columns in the data must align with the value in the `code` column of your chosen grid. In the `"us_state_grid2"` grid, the `code` column contains the two letter state abbreviations which matches the `state_po` column in our data. If you didn't have the two letter abbreviations, you may need to do some data joining to attach them.
 
-If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a US state column even though it isn't) or are missing some states, you can still use `geo_facet()`. However, it will only plot states listed in the facet grid, and you may get a warning message.
+If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a US state column even though it isn't) or are missing some states, you can still use `facet_geo()`. However, it will only plot states listed in the facet grid, and you may get a warning message.
 
 ```{r}
 #| label: fig-elections-geofacet-plot
@@ -331,7 +331,7 @@ col_plot <- map_plot +
 
 ### Text and fonts
 
-As in previous chapters, typefaces can be defined using the {sysfonts} and {showtext} packages. For the main font, we'll use the *Roboto* typeface as we did in @sec-doctors. For the title text, we'll use *Carter One*, a [display font designed by Vernon Adams](https://fonts.google.com/specimen/Carter+One) inspired by typefaces used in mid 20th century advertising. It's a bold typeface which works well for titles of visualizations. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+As in previous chapters, typefaces can be defined using the **`sysfonts`** and **`showtext`** packages. For the main font, we'll use the *Roboto* typeface as we did in @sec-doctors. For the title text, we'll use *Carter One*, a [display font designed by Vernon Adams](https://fonts.google.com/specimen/Carter+One) inspired by typefaces used in mid 20th century advertising. It's a bold typeface which works well for titles of visualizations. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: elections-fonts
@@ -388,7 +388,7 @@ Here, we're going to go for the third option. Later, we'll use the `theme()` fun
 
 We add text labels with `geom_text()`. The x-coordinate position of the text is set as the mean of the years in the full `plot_data` data to automatically position it in the middle of the chart. The y-coordinate position is set to `0.5` i.e. also in the middle of the chart since the `position = "fill"` argument scales the y-axis to be between `0` and `1`. The `alpha()` function is used to control the transparency of the text color. \index{ggplot2!geom\_text}  \index{ggplot2!aes} \index{ggplot2!alpha}
 
-Note that we use a much smaller value of in `alpha()` than we normally would here. This is because there are actually multiple labels drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other results in a pretty opaque label. Though we could filter the data to consider only one year and party, the {geofacet} package sometimes has issues rendering the labels correctly with this approach.
+Note that we use a much smaller value of in `alpha()` than we normally would here. This is because there are actually multiple labels drawn on top of each other - one for each year, and party combination. Though this isn't necessarily a problem, if we're trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other results in a pretty opaque label. Though we could filter the data to consider only one year and party, the **`geofacet`** package sometimes has issues rendering the labels correctly with this approach.
 
 ```{r}
 #| label: elections-geofacet-style-1
@@ -564,9 +564,9 @@ p_inset
 
 Our custom legend is now ready to add to @fig-elections-plot-style-2.
 
-### Joining with {patchwork}
+### Joining with **`patchwork`**
 
-Now, the last step is to join together our custom legend with the main plot. We've already left some blank space on the main plot for the legend to go in, so we'll use the `inset_element()` function from {patchwork} [@patchwork] as we did in @sec-time-zones. We use the `left`, `right`, `top`, and `bottom` arguments to choose where the corners of the legend appear in relation to the main plot -  getting these values correct takes some trial and error! Setting `align_to = "full"` allows us to choose the coordinates relative to the full chart area, rather than just the panel area as per the default settings. \index{patchwork} \index{patchwork!inset\_element}
+Now, the last step is to join together our custom legend with the main plot. We've already left some blank space on the main plot for the legend to go in, so we'll use the `inset_element()` function from **`patchwork`** [@patchwork] as we did in @sec-time-zones. We use the `left`, `right`, `top`, and `bottom` arguments to choose where the corners of the legend appear in relation to the main plot -  getting these values correct takes some trial and error! Setting `align_to = "full"` allows us to choose the coordinates relative to the full chart area, rather than just the panel area as per the default settings. \index{patchwork} \index{patchwork!inset\_element}
 
 ```{r}
 #| label: fig-combine-plots
@@ -608,21 +608,21 @@ Though use of state two-letter abbreviations saves space and avoids excessive te
 
 ## Interactive charts from {ggplot2}
 
-Though this books focuses on creating static visualizations, you may also be interested in developing interactive charts for use in web-based outputs. There are many packages in R that enable you to make interactive visualizations, and a few that are particularly useful for {ggplot2} users: \index{plotly} \index{plotly!ggplotly} \index{ggiraph}
+Though this books focuses on creating static visualizations, you may also be interested in developing interactive charts for use in web-based outputs. There are many packages in R that enable you to make interactive visualizations, and a few that are particularly useful for **`ggplot2`** users: \index{plotly} \index{plotly!ggplotly} \index{ggiraph}
 
-* **{plotly}** [@plotly]: allows you to build interactive graphics using the `plotly.js` JavaScript library. The `ggplotly()` function can transform a `{ggplot2} plot to a {plotly} plot as a quick way to make interactive graphics.
+* **`plotly`** [@plotly]: allows you to build interactive graphics using the `plotly.js` JavaScript library. The `ggplotly()` function can transform a **`ggplot2`** plot to a **`plotly`** plot as a quick way to make interactive graphics.
 
-* **{ggiraph}** [@ggiraph]: allows you to add tooltips, zooming, and clickable elements to {ggplot2} graphics.
+* **`ggiraph`** [@ggiraph]: allows you to add tooltips, zooming, and clickable elements to **`ggplot2`** graphics.
 
 :::
 
-Though the colors are intuitive, they are not the most accessible since they are of similar intensity. If we were to use the `cvd_grid()` function from {colorblindr} as we did in @sec-technology, these colors might look much less distinguishable. Choosing a combination of a lighter blue and bright red, or lighter red and bright blue would retain the intuitiveness of the colors, but improve accessibility. \index{color} \index{accessibility} \index{colorblindr!cvd\_grid}
+Though the colors are intuitive, they are not the most accessible since they are of similar intensity. If we were to use the `cvd_grid()` function from **`colorblindr`** as we did in @sec-technology, these colors might look much less distinguishable. Choosing a combination of a lighter blue and bright red, or lighter red and bright blue would retain the intuitiveness of the colors, but improve accessibility. \index{color} \index{accessibility} \index{colorblindr!cvd\_grid}
 
 The use of area charts to show percentages is intuitive and sensible for this, since vote share is essentially what decides an election. However, it would also be interesting to see the counts of the number of votes - especially since states can have vastly different populations. A small change in percentage for a state with a large population may result in large changes in number of votes, but this wouldn't be seen in our version of this visualization. 
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/elections.gif){fig-align="center" fig-alt=""}
 
