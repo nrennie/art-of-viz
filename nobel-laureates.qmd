@@ -67,7 +67,7 @@ In this chapter, we're going to explore Nobel Prize Laureates. Since 1901, the N
 
 In May 2019, the TidyTuesday challenge used [several datasets about Nobel Prize Laureates](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14) and their publications. Those datasets contain data up to the year 2016. Since that data is now a little bit outdated, we're going to look at an alternative way of obtaining the data and getting it into R - using an API! \index{TidyTuesday}
 
-An API (Application Programming Interface) is essentially a tool that lets different software programs communicate with each other [@harmon2024]. The Nobel Prize API endpoint [@nobel_data] can be accessed at [https://api.nobelprize.org/2.1/laureates](https://api.nobelprize.org/2.1/laureates), with some instructions and guidance about how to use it available on the [nobelprize.org](https://www.nobelprize.org/) website at [www.nobelprize.org/organization/developer-zone-2](https://www.nobelprize.org/organization/developer-zone-2/), which also links to the [Terms of Use](https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/).
+An API (Application Programming Interface) is essentially a tool that lets different software programs communicate with each other [@harmon2024]. The Nobel Prize API endpoint [@nobel_data] can be accessed at [api.nobelprize.org/2.1/laureates](https://api.nobelprize.org/2.1/laureates), with some instructions and guidance about how to use it available on the [nobelprize.org](https://www.nobelprize.org/) website at [www.nobelprize.org/organization/developer-zone-2](https://www.nobelprize.org/organization/developer-zone-2/), which also links to the [Terms of Use](https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/).
 
 This API doesn't require an API key, so we don't need to worry about registering, or authenticating an account. Instead, we simply pass the options into a URL and then read the CSV from that URL.
 
@@ -89,7 +89,7 @@ If you have a limit of 250 requests and the data returned contains 250 results, 
 
 We construct a URL in the following format: the base API URL, followed by the endpoint, followed by a `?`, then a list of query parameters separated by `&`. Here, the base URL is `http://api.nobelprize.org/2.1/` and the endpoint is `laureates`. You can either (1) build the URL as one long character string, or (2) construct the strings separately and stick them together with `glue()` as we've done here. If you are making multiple, slightly different, API calls then the second approach is more appropriate since you can re-use the base URL. 
 
-Once we've constructed the URL, we simply pass it into `read.csv()` (or `read_csv()` from {readr} if you prefer) and save the output to a variable - `nobel_physics` in this case. \index{utils!read.csv} \index{readr!read\_csv} 
+Once we've constructed the URL, we simply pass it into `read_csv()` from **`readr`** (or `read.csv()` from base R if you prefer) and save the output to a variable - `nobel_physics` in this case. \index{utils!read.csv} \index{readr!read\_csv} 
 
 ::: {.content-visible when-format="html"}
 
@@ -98,7 +98,7 @@ Once we've constructed the URL, we simply pass it into `read.csv()` (or `read_cs
 #| eval: false
 #| echo: true
 api_url <- "http://api.nobelprize.org/2.1/laureates"
-nobel_physics <- read.csv(
+nobel_physics <- read_csv(
   glue(
     "{api_url}?limit=250&nobelPrizeCategory=phy&format=csv"
   )
@@ -114,7 +114,7 @@ nobel_physics <- read.csv(
 #| eval: false
 #| echo: true
 api_url <- "http://api.nobelprize.org/2.1/laureates"
-nobel_physics <- read.csv(
+nobel_physics <- read_csv(
   glue(
     "{api_url}?limit=250&nobelPrizeCategory
     =phy&format=csv"
@@ -124,7 +124,7 @@ nobel_physics <- read.csv(
 
 :::
 
-The data can also be accessed using the {nobel} R package [@nobel] which wraps the code above into the `laureates()` function.
+The data can also be accessed using the **`nobel`** R package [@nobel] which wraps the code above into the `laureates()` function.
 
 We want to avoid querying the API multiple times if we don't need to. Once we've downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the `write.csv()` option to save the data to a file called `nobel_physics.csv` in an existing folder called `data` - you might choose to save it somewhere slightly different! \index{utils!write.csv}
 
@@ -139,7 +139,7 @@ write.csv(
 )
 ```
 
-We can keep using the existing `nobel_physics` object, or we can read it back in from the CSV file using `read_csv()`: \index{readr!read\_csv}
+We can keep using the existing `nobel_physics` object, or we can read it back in from the CSV file using `read_csv()`. \index{readr!read\_csv}
 
 ```{r}
 #| label: nobel-load-data-csv
@@ -147,7 +147,7 @@ We can keep using the existing `nobel_physics` object, or we can read it back in
 nobel_physics <- read_csv("data/nobel_physics.csv")
 ```
 
-Let's have a quick look at the data:
+Let's have a quick look at the data.
 
 ```{r}
 #| label: nobel-head
@@ -179,7 +179,7 @@ plot(
 )
 ```
 
-We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the `year()` function from {lubridate} to convert the `birthdate` into a year and subtract this from the award `year` to get an approximate age. Then plot this against the award year: \index{lubridate!year}
+We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the `year()` function from **`lubridate`** to convert the `birthdate` into a year and subtract this from the award `year` to get an approximate age. Then plot this against the award year: \index{lubridate!year}
 
 ```{r, echo=-1}
 #| label: fig-nobel-hist
@@ -250,7 +250,7 @@ Even though we've asked for only physics data from the API, the data also includ
 
 ### Data wrangling
 
-We'll start by using `filter()` from {dplyr} to filter out any non-Physics entries, and then selecting only the columns we need for our plot: `name`, `gender`, and `year`. The data is currently arranged alphabetically based on `name`, so we'll use the `arrange()` function to sort by year. \index{dplyr!filter} \index{dplyr!select} \index{dplyr!arrange}
+We'll start by using `filter()` from **`dplyr`** to filter out any non-Physics entries, and then selecting only the columns we need for our plot: `name`, `gender`, and `year`. The data is currently arranged alphabetically based on `name`, so we'll use the `arrange()` function to sort by year. \index{dplyr!filter} \index{dplyr!select} \index{dplyr!arrange}
 
 ```{r}
 #| label: nobel-physics-data
@@ -260,9 +260,9 @@ physics_data <- nobel_physics |>
   arrange(year)
 ```
 
-Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in {ggplot2} to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot.  \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial}
+Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in **`ggplot2`** to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot.  \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial}
 
-We could make use of the {ggplot2} extension package, {geomtextpath} [@geomtextpath], which allows you to write text in {ggplot2} that follows a curved path. But (just for the fun of it) let's try to make the plot from scratch using only {ggplot2}. 
+We could make use of the **`ggplot2`** extension package, **`geomtextpath`** [@geomtextpath], which allows you to write text in **`ggplot2`** that follows a curved path. But (just for the fun of it) let's try to make the plot from scratch using only **`ggplot2`**. 
 
 We need to define the following to be able to position the text:
 
@@ -292,11 +292,11 @@ y & = r sin(\theta)
 \end{split}
 \end{equation*}
 
-We don't want to put the text all the way around the circle, since we want to leave some space to add the title as shown in @fig-nobel-sketch. We'll leave a gap starting from $\pi/4$ (between 1 and 2 on a clock face) to $7\pi/4$ (between 4 and 5 on a clock face). We start by generating a sequence of equally spaced $\theta$ values, starting from $\pi/4$ and going to $7\pi/4$, with one value for each observation in the data. This is added as a new column in the data using `mutate()` from {dplyr}. We then calculate the `x` and `y` coordinates using the equations above and, again, add these as new columns to the data. \index{dplyr!mutate} 
+We don't want to put the text all the way around the circle, since we want to leave some space to add the title as shown in @fig-nobel-sketch. We'll leave a gap starting from $\pi/4$ (between 1 and 2 on a clock face) to $7\pi/4$ (between 4 and 5 on a clock face). We start by generating a sequence of equally spaced $\theta$ values, starting from $\pi/4$ and going to $7\pi/4$, with one value for each observation in the data. This is added as a new column in the data using `mutate()` from **`dplyr`**. We then calculate the `x` and `y` coordinates using the equations above and, again, add these as new columns to the data. \index{dplyr!mutate} 
 
 The angle of the text is a little bit more tricky. We want the text to be positioned perpendicular to the circle i.e. the angle of the text is different for each name. We can use the value of `theta` to calculate the angle of the text. 
 
-When we later pass the angle value into {ggplot2} functions for plotting, it's expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in `angle = 90` rather than `angle = pi/2`. So we need to transform `theta` to degrees by dividing by $2\pi$ and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. \index{base!seq} \index{base!cos} \index{base!sin}
+When we later pass the angle value into **`ggplot2`** functions for plotting, it's expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in `angle = 90` rather than `angle = pi/2`. So we need to transform `theta` to degrees by dividing by $2\pi$ and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. \index{base!seq} \index{base!cos} \index{base!sin}
 
 ```{r}
 #| label: nobel-theta-data
@@ -320,11 +320,11 @@ Let's have a quick look at the data:
 head(plot_data)
 ```
 
-Now we're ready to start plotting with {ggplot2}!
+Now we're ready to start plotting with **`ggplot2`**!
 
 ### The first plot
 
-Constructing the base plot is reasonably straightforward - we've done the hard work in defining the x values, y values, the angles already. Since our plot is a visualization of text data, we'll use `geom_text()` to add the text. All we have to do is tell {ggplot2} what to put where! \index{ggplot2!geom\_text}
+Constructing the base plot is reasonably straightforward - we've done the hard work in defining the x values, y values, the angles already. Since our plot is a visualization of text data, we'll use `geom_text()` to add the text. All we have to do is tell **`ggplot2`** what to put where! \index{ggplot2!geom\_text}
 
 We pass `plot_data` into the `data` argument, and then set the aesthetic mapping using `aes()`. The mappings are as you would expect: `x` goes on the x-axis, `y` goes on the y-axis, the `label` comes from the `name` column, the text `angle` is defined by the `angle` column we created, and the `color` is based on the values in the `gender` column. This mapping could be passed into either `ggplot()` or directly into `geom_text()` as we've done here. Since we'll only be using one geometry for this plot, it won't make a difference! \index{ggplot2!ggplot} \index{ggplot2!aes}
 
@@ -356,7 +356,7 @@ Let's start by choosing some typefaces for our visualization. We're going to pic
 * `title_font`: a bold typeface that will, as the name suggests, be used for the title. We'll use *Passion One* - a display typeface with thick, bold strokes which make it ideal for titles. 
 * a `body_font`: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple typeface. We'll use *Ubuntu* - a sans serif typeface that we've used in previous chapters.
 
-Both typefaces are provided through Google Fonts so we'll use `font_add_google()` from {sysfonts} to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use {showtext} for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
+Both typefaces are provided through Google Fonts so we'll use `font_add_google()` from **`sysfonts`** to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use **`showtext`** for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
 
 ```{r}
 #| label: nobel-fonts
@@ -418,7 +418,7 @@ col_plot <- basic_plot +
 
 ### Adding text
 
-Rather than adding a title and subtitle at the top of the plot, we'll add them in the gap in the right hand side of the circle. We'll use the `annotate()` function from {ggplot2} to add the text. Remember that for `annotate()`, we need to start by specifying the type of geometry we're annotating - in this case, `"text"`. \index{ggplot2!annotate}
+Rather than adding a title and subtitle at the top of the plot, we'll add them in the gap in the right hand side of the circle. We'll use the `annotate()` function from **`ggplot2`** to add the text. Remember that for `annotate()`, we need to start by specifying the type of geometry we're annotating - in this case, `"text"`. \index{ggplot2!annotate}
 
 We'll add two separate annotations: one for the title (*Nobel Prize Laureates*) and for a subtitle indicating the award category (*Physics*). The title and subtitle should be right-aligned, so we set the x-coordinate for each annotation to be equal to 10 and set `hjust = 1`. The title is vertically aligned with the center of the circle (at `y = 0`), and the subtitle slightly below it at `y = -1`. The font family is adjusted to either the `body_font` or `title_font` using the `family` argument, and the text `size` and `color` is also adjusted.
 
@@ -446,9 +446,7 @@ annotated_plot <- col_plot +
 annotated_plot
 ```
 
-We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the `social_caption()` function we defined in @sec-cats. We make both the icons and text the same color - `primary_col`. We can pass this into the `source_caption()` function defined in @sec-turbines.
-
-We'll later use {ggtext} again to apply Markdown formatting to the caption, and so we add `**` to make the words **Data** and **Graphic** in bold font. The HTML line break `<br>` separates the data source text and the social media caption onto two separate lines. We can join the data source text with the social media caption into one character string using the `paste0()` function. \index{social\_caption} \index{source\_caption}
+We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the `social_caption()` function we defined in @sec-cats. We make both the icons and text the same color - `primary_col`. We can pass this into the `source_caption()` function defined in @sec-turbines. \index{social\_caption} \index{source\_caption}
 
 ```{r}
 #| label: nobel-text
@@ -495,7 +493,7 @@ We can some further, final customization by changing the following `theme()` ele
 
 * removing the legend
 * changing the background color by passing in the `bg_col` variable to `element_rect()`
-* using `element_textbox_simple()` from {ggtext} to format the HTML tags that add the social media icons in the caption
+* using `element_textbox_simple()` from **`ggtext`** to format the HTML tags that add the social media icons in the caption
 
 ```{r}
 #| label: fig-nobel-style-plot-2
@@ -665,7 +663,7 @@ category_plot <- function(
 }
 ```
 
-Now let's test if our function works with a completely different set of data! Let's use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use `nobelPrizeCategory=pea` (`pea` for *peace*) and then save the output to a CSV file, just as we did before for the physics data. \index{utils!write.csv} \index{utils!read.csv}
+Now let's test if our function works with a completely different set of data! Let's use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use `nobelPrizeCategory=pea` (`pea` for *peace*) and then save the output to a CSV file, just as we did before for the physics data, this time using base R functions. \index{utils!write.csv} \index{utils!read.csv}
 
 ::: {.content-visible when-format="html"}
 
@@ -759,9 +757,9 @@ ggsave(
 
 ::: {#tip-nobel-ggtextcircle .callout-tip}
 
-## Circular text with {ggtextcircle}
+## Circular text with **`ggtextcircle`**
 
-The {ggtextcircle} package [@ggtextcircle] implements this type of visualization in a generic way - if you want to create something similar with a different data set!
+The **`ggtextcircle`** package [@ggtextcircle] implements this type of visualization in a generic way - if you want to create something similar with a different data set!
 
 :::
 
