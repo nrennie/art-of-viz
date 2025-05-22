@@ -14,7 +14,7 @@ fig-asp: 0.75
 
 # Canadian wind turbines: waffle plots and pictograms {#sec-turbines}
 
-In this chapter, we'll learn how to read in data from an Excel file via a URL, create waffle plots using the {waffle} package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
+In this chapter, we'll learn how to read in data from an Excel file via a URL, create waffle plots using the **`waffle`** package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
 
 **Packages required in this chapter**:
 
@@ -38,7 +38,7 @@ library(waffle)
 
 ## Data
 
-Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a [TidyTuesday dataset](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27) [@tidytuesday]. The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location [@turbines_data]. Rather than reading in the data using the {tidytuesdayR} package as we've done in previous chapters, let's read in the data directly from the [open.canada.ca](https://open.canada.ca/en) website.
+Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a [TidyTuesday dataset](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27) [@tidytuesday]. The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location [@turbines_data]. Rather than reading in the data using the **`tidytuesdayR`** package as we've done in previous chapters, let's read in the data directly from the [open.canada.ca](https://open.canada.ca/en) website.
 
 ::: {#tip-turbines-open .callout-tip}
 
@@ -48,13 +48,13 @@ The Canadian Wind Turbine data contains information licensed under the [Open Gov
 
 :::
 
-### Reading data with {openxlsx}
+### Reading data with **`openxlsx`**
 
-Though the {readxl} package [@readxl] package can be used to read Excel files stored locally, it doesn't work for reading in Excel files directly from a URL. We could visit the relevant [open.canada.ca/data/dataset](https://open.canada.ca/data/dataset/) website, manually download the file, and then read it in using {readxl}. Alternatively, we can use the {openxlsx} package [@openxlsx] which allows us to pass in a URL.
+Though the **`readxl`** package [@readxl] package can be used to read Excel files stored locally, it doesn't work for reading in Excel files directly from a URL. We could visit the relevant [open.canada.ca/data/dataset](https://open.canada.ca/data/dataset/) website, manually download the file, and then read it in using  **`readxl`**. Alternatively, we can use the **`openxlsx`** package [@openxlsx] which allows us to pass in a URL.
 
 Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ([open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070](https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070)), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called `url`. If you plan to download other datasets from the same site, it can be useful to save the main website as the `base_url` variable so that you can reuse this string later.
 
-We then use the `read.xlsx()` function from {openxlsx}, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
+We then use the `read.xlsx()` function from **`openxlsx`**, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
 
 ::: {.content-visible when-format="html"}
 
@@ -135,7 +135,7 @@ write.csv(
 )
 ```
 
-We can then use either `read.csv()` or `read_csv()` from {readr} to read the CSV file back in: \index{readr!read\_csv}
+We can then use either `read.csv()` or `read_csv()` from **`readr``** to read the CSV file back in: \index{readr!read\_csv}
 
 ```{r}
 #| label: turbines-data
@@ -195,7 +195,7 @@ This scatter plot highlights a few issues:
 
 Remember that you can use `View(wind_turbines)` to inspect the data in a more human-readable format. In addition to looking at the data, obtaining summaries of the columns, and creating exploratory graphics with base R, there are many packages available to help with exploratory data analysis. 
 
-For example, the {GGally} package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
+For example, the **`GGally`** package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
 
 ```{r, echo=-1}
 #| label: fig-turbines-ggally
@@ -269,7 +269,7 @@ We can make two slight variations to this basic version of the chart:
 
 ## Preparing a plot
 
-In order to make a draft of @fig-sketch-turbines using {ggplot2}, there are a few things we need to prepare:
+In order to make a draft of @fig-sketch-turbines using **`ggplot2`**, there are a few things we need to prepare:
 
 * The `Commissioning.date` column needs processed to deal with the multiyear labels, and grouped into 5-year categories.
 * We need to decide how many wind turbines each icon will represent.
@@ -288,7 +288,7 @@ Essentially, this means that:
 * If there is no `"/"` in the `Commissioning.date`, we do nothing.
 * If there is one or more `"/"` in the `Commissioning.date`, we extract whatever comes after the last one.
 
-Let's make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the {stringr} package [@stringr]. We then use `str_match()` from {stringr} in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from {dplyr}, to if there was a `"/"` then use the output from `str_match()`, otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} \index{extract\_after\_last\_slash}
+Let's make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the **`stringr`** package [@stringr]. We then use `str_match()` from **`stringr`** in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from **`dplyr`**, to if there was a `"/"` then use the output from `str_match()`, otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} \index{extract\_after\_last\_slash}
 
 ```{r}
 #| label: turbines-extract
@@ -304,7 +304,7 @@ extract_after_last_slash <- function(texts) {
 
 ## Comparing `if_else()` and `ifelse()`
 
-If you've used the `ifelse()` function in base R before, you might be wondering why there's a very similarly named function in {dplyr} and what's different about it. The main difference is that `if_else()` is a bit more strict about checking whether you're doing what you think you're doing. For example, let's say we have a vector `x` of length 4 and we want to replace the values in `x` that are equal to 0 with something else. If that replacement is of length 3, that doesn't really make sense. Which value in the vector of length 3 should it use? The `if_else()` function highlights this issue with an error, the `ifelse()` function quietly uses the value in the same position. 
+If you've used the `ifelse()` function in base R before, you might be wondering why there's a very similarly named function in **`dplyr`** and what's different about it. The main difference is that `if_else()` is a bit more strict about checking whether you're doing what you think you're doing. For example, let's say we have a vector `x` of length 4 and we want to replace the values in `x` that are equal to 0 with something else. If that replacement is of length 3, that doesn't really make sense. Which value in the vector of length 3 should it use? The `if_else()` function highlights this issue with an error, the `ifelse()` function quietly uses the value in the same position. 
 
 ```{r}
 #| label: r-pkgs-ifelse
@@ -314,7 +314,7 @@ if_else(x == 0, c(4, 5, 3), x)
 ifelse(x == 0, c(4, 5, 3), x)
 ```
 
-The `if_else()` function from {dplyr} also preserves types. If you put a `Date` into `if_else()`, then a `Date` is what comes out. That's not always true with `ifelse()`. \index{base!ifelse} \index{dplyr!if\_else}
+The `if_else()` function from **`dplyr`** also preserves types. If you put a `Date` into `if_else()`, then a `Date` is what comes out. That's not always true with `ifelse()`. \index{base!ifelse} \index{dplyr!if\_else}
 
 :::
 
@@ -332,7 +332,7 @@ turbines_year <- wind_turbines |>
   )
 ```
 
-Now let's group the new `Year` column into categories. Our categories span 2000 to 2019, so we start by filtering out any rows that don't fit into this time frame using `filter()` from {dplyr}. We then use `case_when()` from {dplyr} to actually construct the categories. Here, we make use of the `seq()` function. The `seq(2000, 2004)` code creates a vector `2000 2001 2002 2003 2004`. If any the `Year` is equal to any of those values, then it goes into the `"2000 - 2004"` category. And so on. Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it's good practice to be explicit about what order the categories should have, so we can also set `Year_Group` to be a factor and specify the correct order. \index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor} \index{base!seq}
+Now let's group the new `Year` column into categories. Our categories span 2000 to 2019, so we start by filtering out any rows that don't fit into this time frame using `filter()` from **`dplyr`**. We then use `case_when()` from **`dplyr`** to actually construct the categories. Here, we make use of the `seq()` function. The `seq(2000, 2004)` code creates a vector `2000 2001 2002 2003 2004`. If any the `Year` is equal to any of those values, then it goes into the `"2000 - 2004"` category. And so on. Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it's good practice to be explicit about what order the categories should have, so we can also set `Year_Group` to be a factor and specify the correct order. \index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor} \index{base!seq}
 
 ```{r}
 #| label: turbines-data-wrangling-1
@@ -354,7 +354,7 @@ turbines_year_group <- turbines_year |>
   )
 ```
 
-Let's look at the `Province/Territory` categories. Using `count()` and `arrange()` from {dplyr}, shows us that there is a big imbalance between the categories: \index{dplyr!count} \index{dplyr!arrange}
+Let's look at the `Province/Territory` categories. Using `count()` and `arrange()` from **`dplyr`**, shows us that there is a big imbalance between the categories: \index{dplyr!count} \index{dplyr!arrange}
 
 ```{r}
 #| label: turbines-data-counts
@@ -404,7 +404,7 @@ region_levels <- c(turbines_region |>
   pull(Region), "other")
 ```
 
-Now, let's apply these new factor levels to the `Region` column using `mutate()`. Due to a *quirk* of the {waffle} package [@waffle] that we'll be using to make our plot (it plots data in the order it appears in the dataset, rather than according to the factor levels), we also sort the data using `arrange()` from {dplyr}. \index{dplyr!arrange} \index{dplyr!mutate} \index{base!factor}
+Now, let's apply these new factor levels to the `Region` column using `mutate()`. Due to a *quirk* of the **`waffle`** package [@waffle] that we'll be using to make our plot (it plots data in the order it appears in the dataset, rather than according to the factor levels), we also sort the data using `arrange()` from **`dplyr`**. \index{dplyr!arrange} \index{dplyr!mutate} \index{base!factor}
 
 ```{r}
 #| label: turbines-fct-levels-2
@@ -421,9 +421,9 @@ Our data is now ready for us to plot!
 
 Before we jump into plotting, we need to do one more thing. In @fig-sketch-turbines, we decided we would use icons in the waffle chart instead of just colored grid squares. So we need to find a way of using icons in R. 
 
-In @sec-programming, we saw how to load fonts into R using the {sysfonts} and {showtext} packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. \index{Font Awesome} \index{fonts}
+In @sec-programming, we saw how to load fonts into R using the **`sysfonts`** and **`showtext`** packages. Luckily, we can use a similar process here to load in an icon font. [Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos (more on this in @sec-cats) [@fontawesome]. You can download font files containing the freely available icons at [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option. This will download a zip file containing several font files. For this chart, we only need one of those files `Font-Awesome-6-Free-Solid-900.otf`. Save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. \index{Font Awesome} \index{fonts}
 
-Then, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use {showtext} to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+Then, we'll use `font_add()` from **`sysfonts`** [@sysfonts] to load the font into R. The `family` argument is what we want to refer to the font as in R. The `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` in exactly the same way as we did for @sec-programming, to use **`showtext`** to render the text.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: turbines-font-awesome
@@ -437,17 +437,17 @@ showtext_opts(dpi = 300)
 
 ::: {#tip-turbines-open .callout-tip}
 
-## Installing Font Awesome icons with {waffle}
+## Installing Font Awesome icons with **`waffle`**
 
-The {waffle} package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to approach described here. Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and means you don't have to install the font system wide - you only need to load it into R. \index{waffle!install\_fa\_fonts}
+The **`waffle`** package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to approach described here. Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and means you don't have to install the font system wide - you only need to load it into R. \index{waffle!install\_fa\_fonts}
 
 :::
 
 Now we're ready to plot!
 
-### The first plot with {waffle}
+### The first plot with **`waffle`**
 
-We're going to use the {waffle} package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with {ggplot2}. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons i.e. pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
+We're going to use the **`waffle`** package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with **`ggplot2`**. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons i.e. pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
 
 We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want the icon to vary with region. Instead, we want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region and we'll later use `scale_label_pictogram()` to make them all the same icon. The `values` argument is also a required aesthetic. We use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the `geom_pictogram()` function so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
 
@@ -491,7 +491,7 @@ By default, `geom_pictogram()` and `geom_waffle()` both assume that the column m
 
 What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at [fontawesome.com/search](https://fontawesome.com/search) and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan` to name a few. We'll use `fan` [@fontawesome]. \index{Font Awesome}
 
-We can add `scale_label_pictogram()` from {waffle} to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set `guide = "none"` to remove the legend for icons as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
+We can add `scale_label_pictogram()` from **`waffle`** to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set `guide = "none"` to remove the legend for icons as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
 
 ```{r}
 #| label: fig-turbines-icons-plot
@@ -511,7 +511,7 @@ You might also have noticed that the values on the y-axis are incorrect - there 
 
 Now we still need to edit the colors used in the plot, add a title and subtitle (including colored text to replace the legend), and edit the axis labels.
 
-### Colors with {rcartocolor}
+### Colors with **`rcartocolor`**
 
 We start by defining variables for the background and text colors: \index{color}
 
@@ -521,13 +521,13 @@ bg_col <- "#FAFAFA"
 text_col <- "black"
 ```
 
-Let's also define a color palette that we'll use for the color of the icons. We're looking for 6 different colors - one for area. The {rcartocolor} [@rcartocolor] package provides access to the [CARTOColors](https://carto.com/carto-colors/) color palettes for maps designed by [CARTO](https://carto.com/) [@cartocolors]. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics. 
+Let's also define a color palette that we'll use for the color of the icons. We're looking for 6 different colors - one for area. The **`rcartocolor`** [@rcartocolor] package provides access to the [CARTOColors](https://carto.com/carto-colors/) color palettes for maps designed by [CARTO](https://carto.com/) [@cartocolors]. Although these palettes were primarily designed for coloring maps, the color palettes are also very effective for other types of graphics. 
 
-In the {rcartocolor} package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using `display_carto_all()`: \index{rcartocolor!display\_carto\_all}
+In the **`rcartocolor`** package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using `display_carto_all()`: \index{rcartocolor!display\_carto\_all}
 
 ```{r}
 #| label: fig-turbines-rcarto
-#| fig-cap: "All qualitative color palettes with at least 6 colors in the {rcartocolor} package."
+#| fig-cap: "All qualitative color palettes with at least 6 colors in the `rcartocolor` package."
 #| fig-alt: ""
 #| fig-asp: 0.8
 #| echo: -1
@@ -537,7 +537,7 @@ display_carto_all(
 )
 ```
 
-Although the {rcartocolor} package has the `scale_fill_carto_d()` which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the {rcartocolor} package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal} \index{color}
+Although the **`rcartocolor`** package has the `scale_fill_carto_d()` function which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the **`rcartocolor`** package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal} \index{color}
 
 We also make the `col_palette` vector a named vector by using the `names()` function, and using `region_levels` as the names. Although this isn't necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.
 
@@ -561,9 +561,9 @@ col_plot <- icons_plot +
   )
 ```
 
-### Adding styled text with {marquee}
+### Adding styled text with **`marquee`**
 
-We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument inside `theme()` elements. But what if we want to make only *part* of the text bold? We can use the {marquee} package [@marquee] to add styling to text within in a string. The {marquee} package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with {ggplot2} or other graphics built on {grid}. \index{marquee}
+We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument inside `theme()` elements. But what if we want to make only *part* of the text bold? We can use the **`marquee`** package [@marquee] to add styling to text within in a string. The **`marquee`** package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with **`ggplot2`** or other graphics built with **`grid`**. \index{marquee}
 
 In Markdown, to make text bold, you enclose it inside two pairs of asterisks e.g. `**bold text**`. For example, if we wanted to put the entire title in bold font, we could write the title inside `**`. In the caption, we might want to embolden the words `Data` and `Graphic` to highlight that there are two different fields of information:
 
@@ -579,7 +579,7 @@ This type of formatting for the plot caption is something that we might like to 
 * `graphic`: a character string for the attribution of the visualization
 * `sep`: a character string for what should separate the two pieces of text, which has `" | "` as a default.
 
-We then use `glue()` from {glue} to stick these three arguments together, and include the bold formatting using `**`. 
+We then use `glue()` from **`glue`** to stick these three arguments together, and include the bold formatting using `**`. 
 
 ```{r}
 #| echo: true
@@ -600,11 +600,11 @@ cap
 
 You can see that it's identical to the one we manually created earlier. We'll also re-use the `source_caption()` function in later chapters.
 
-Let's move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we'll use colored text to denote the different categories. In {marquee}, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text i.e. `{.color text to color}`. For example, `{.red This is red text.}`. 
+Let's move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we'll use colored text to denote the different categories. In **`marquee`**, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text i.e. `{.color text to color}`. For example, `{.red This is red text.}`. 
 
 We want to add the colors and the text to be colored in a programmatic way. We'll use square brackets to subset the values and names stored in the `col_palette` vector. Here, `col_palette[[1]]` extracts the hex code for the color of the first category, and `names(col_palette)[[1]]` extracts the name of the first category.
 
-Normally, when we want to write character strings and insert variables into the string, we'd use `glue()` to combine them. However, the `{}` that we normally use for variables in `glue()` will get mixed up with the `{}` we'll use for text formatting with {marquee}. There are a couple of different ways we can get around this problem. One way is changing the delimiters used in `glue()`. For example, by setting `.open = "["` and `.close = "]"` inside the `glue()` function. Alternatively, we can use `marquee_glue()` from the {marquee} package - an equivalent version of `glue()` that was built to deal with this problem.
+Normally, when we want to write character strings and insert variables into the string, we'd use `glue()` to combine them. However, the `{}` that we normally use for variables in `glue()` will get mixed up with the `{}` we'll use for text formatting with **`marquee`**. There are a couple of different ways we can get around this problem. One way is changing the delimiters used in `glue()`. For example, by setting `.open = "["` and `.close = "]"` inside the `glue()` function. Alternatively, we can use `marquee_glue()` from the **`marquee`** package - an equivalent version of `glue()` that was built to deal with this problem.
 
 ```{r}
 #| label: turbines-text-3
@@ -643,11 +643,11 @@ text_plot <- col_plot +
 text_plot
 ```
 
-You'll notice that the formatting hasn't been applied, and that the `**` have been rendered literally. We'll deal with this when we edit the arguments in `theme()` - we haven't actually used {marquee} yet to format the title text!
+You'll notice that the formatting hasn't been applied, and that the `**` have been rendered literally. We'll deal with this when we edit the arguments in `theme()` - we haven't actually used **`marquee`** yet to format the title text!
 
 ### Adjusting scales and themes
 
-We can make a final few tweaks to our plot, to apply the formatting with {marquee} and make it look a little bit cleaner. Let's start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn't correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:
+We can make a final few tweaks to our plot, to apply the formatting with **`marquee`** and make it look a little bit cleaner. Let's start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn't correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:
 
 * Each icon represents 20 turbines, so the y-axis labels are currently showing as 20 times smaller than they should be.
 * Within each facet, we row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be. 
@@ -675,16 +675,16 @@ Let's make a few final edits to tidy up our plot by editing the theme. We'll use
 
 Within `theme()`, we start by setting `plot.title.position` and `plot.caption.position` to `"plot"` to align the title, subtitle, and caption text with the edge of the whole plot, rather than the start of the first panel. Some additional spacing around the edge of the plot is added using `plot.margin` and the background color is edited by using the `fill` and `color` arguments in `element_rect()` for the `plot.background` argument. The gridlines are also made slightly thinner by adjusting `panel.grid.major`. \index{ggplot2!element\_rect} \index{ggplot2!element\_line} \index{ggplot2!margin}
 
-Finally, we edit the plot, subtitle, and caption elements and specify them all using `element_marquee()`. By using `element_marquee()`, the Markdown syntax we've applied, such as the bold and colored text, will be rendered correctly. You can adjust the `color`, `size`, `margin` and `hjust` of {marquee} text in the same way you would with `element_text()`. If you have some elements of the text rendered with `element_text()` and some rendered with `element_marquee()`, you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the `size` argument. \index{marquee!element\_marquee}
+Finally, we edit the plot, subtitle, and caption elements and specify them all using `element_marquee()`. By using `element_marquee()`, the Markdown syntax we've applied, such as the bold and colored text, will be rendered correctly. You can adjust the `color`, `size`, `margin` and `hjust` of **`marquee`** text in the same way you would with `element_text()`. If you have some elements of the text rendered with `element_text()` and some rendered with `element_marquee()`, you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the `size` argument. \index{marquee!element\_marquee}
 
-The `width` argument applies text wrapping, where `width = 1` means the text wraps to the full width of the plot. This is similar to the way that `element_textbox_simple()` from {ggtext} works. However, the `width` is not set by default, so if you want the text to wrap it's important to specify the width.
+The `width` argument applies text wrapping, where `width = 1` means the text wraps to the full width of the plot. This is similar to the way that `element_textbox_simple()` from **`ggtext`** works. However, the `width` is not set by default, so if you want the text to wrap it's important to specify the width.
 
 
 ::: {#tip-turbines-marquee-req .callout-tip}
 
-## Requirements for using {marquee}
+## Requirements for using **`marquee`**
 
-The {marquee} package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for {marquee} text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the {ragg} package [@ragg] are a good choice. \index{ragg}
+The **`marquee`** package relies on some of the more recent features in the R graphics engine. This means that you need at least version 4.3 of R for **`marquee`** text to render correctly. Not all graphics devices support these new features (especially in Windows) so you might need to adjust the graphics device that R uses. The devices made available through the **`ragg``** package [@ragg] are a good choice. \index{ragg}
 
 :::
 
@@ -708,7 +708,7 @@ scale_plot +
     panel.grid.major = element_line(
       linewidth = 0.4
     ),
-    # format text with {marquee}
+    # format text with marquee
     plot.title = element_marquee(
       color = text_col,
       width = 1,
@@ -752,7 +752,7 @@ Finally, we've used a `fan` icon because the Font Awesome wind turbine icon is o
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/turbines.gif){fig-align="center" fig-alt=""}
 
@@ -762,4 +762,4 @@ Each plot created during the process of developing the original version of this 
 
 * Instead of using the icons to represent the number of turbines, recreate this visualization where the icons represent the total capacity (kW). Should you choose a different icon?
 
-* Can you arrange both versions (number and capacity) as a single visualization? Hint: you might want to use the {patchwork} package discussed in @sec-time-zones.
+* Can you arrange both versions (number and capacity) as a single visualization? Hint: you might want to use the **`patchwork`** package discussed in @sec-time-zones.

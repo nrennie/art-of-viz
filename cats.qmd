@@ -18,7 +18,7 @@ fig-asp: 0.75
 #| file: R/source_caption.R
 ```
 
-# Cats: data-driven annotations with {ggtext} {#sec-cats}
+# Cats: data-driven annotations with **`ggtext`** {#sec-cats}
 
 In this chapter, we'll learn how to create custom captions with social media icons, and add data-driven annotations to our plots. 
 
@@ -44,7 +44,7 @@ library(tidytuesdayR)
 
 Between 2013 and 2017, @kays2020 recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data [@cats_data] was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they're not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we'll focus on the data from cats (and their owners!) based in the United Kingdom.
 
-The data was used as a TidyTuesday dataset in January 2023 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), and so can be loaded with the `tt_load()` function from {tidytuesdayR} [@tidytuesdayR]. There are two datasets included, which we'll read in as `cats` and `cats_reference`. \index{tidytuesdayR!tt\_load}
+The data was used as a TidyTuesday dataset in January 2023 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), and so can be loaded with the `tt_load()` function from **`tidytuesdayR`** [@tidytuesdayR]. There are two datasets included, which we'll read in as `cats` and `cats_reference`. \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: cats-data-show
@@ -155,13 +155,13 @@ Let's take the idea from @fig-cats-scatter but develop into a much more effectiv
 
 ## Preparing a plot
 
-In order to create @fig-cats-sketch in {ggplot2}, we only need to work with two columns in the `cats_reference` data: the cat age, `age_years`, and the average number of hours per day spent indoors, `hrs_indoors`.
+In order to create @fig-cats-sketch in **`ggplot2`**, we only need to work with two columns in the `cats_reference` data: the cat age, `age_years`, and the average number of hours per day spent indoors, `hrs_indoors`.
 
 ### Data wrangling
 
-The `hrs_indoors` column contains five categories for time spend indoors: `2.5`, `7.5`, `12.5`, `17.5`, and `22.5`. Since these category names are numbers, they are encoded in R as numeric columns instead of categories, so we start by convert the `hrs_indoors` column to a `factor()`. To know how big the *bubbles* of our plot will be, we need to know how many cats there are for each combination of age and indoor time. We `group_by()` the two relevant columns and then use `count()` from {dplyr} to count the number of each category combination, before un-grouping with `ungroup()`. \index{dplyr!select} \index{dplyr!mutate} \index{base!factor} \index{dplyr!group\_by} \index{dplyr!count} \index{dplyr!ungroup} 
+The `hrs_indoors` column contains five categories for time spend indoors: `2.5`, `7.5`, `12.5`, `17.5`, and `22.5`. Since these category names are numbers, they are encoded in R as numeric columns instead of categories, so we start by convert the `hrs_indoors` column to a `factor()`. To know how big the *bubbles* of our plot will be, we need to know how many cats there are for each combination of age and indoor time. We `group_by()` the two relevant columns and then use `count()` from **`dplyr`** to count the number of each category combination, before un-grouping with `ungroup()`. \index{dplyr!select} \index{dplyr!mutate} \index{base!factor} \index{dplyr!group\_by} \index{dplyr!count} \index{dplyr!ungroup} 
 
-There's one cat (`r cats_reference$animal_id[is.na(cats_reference$age_years)]`) whose age is unknown, so we use `drop_na()` from {tidyr} to remove this value. See @sec-bees and @sec-r-pkgs for some other discussions on visualizing and dealing with missing values in your data. \index{tidyr!drop\_na} 
+There's one cat (`r cats_reference$animal_id[is.na(cats_reference$age_years)]`) whose age is unknown, so we use `drop_na()` from **`tidyr`** to remove this value. See @sec-bees and @sec-r-pkgs for some other discussions on visualizing and dealing with missing values in your data. \index{tidyr!drop\_na} 
 
 ```{r}
 #| label: cats-wrangling
@@ -176,7 +176,7 @@ plot_data <- cats_reference |>
 
 ### The first plot
 
-We pass our data into the `ggplot()` function as always, and then set up the aesthetic mapping with `aes()`. As we did in @fig-cats-scatter, we put age on the x-axis and hours indoors on the y-axis. Here, we also map the number of cats in each category combination, `n`, to the `size` aesthetic to make the bubbles. Although we are making a bubble plot rather than a scatter plot, we still use `geom_point()` since both types of plots are made from points. Scatter plots are essentially a special case of bubble plots where all of the points represent one observation and so are all the same size. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
+We pass our data into the `ggplot()` function as usual, and then set up the aesthetic mapping with `aes()`. As we did in @fig-cats-scatter, we put age on the x-axis and hours indoors on the y-axis. Here, we also map the number of cats in each category combination, `n`, to the `size` aesthetic to make the bubbles. Although we are making a bubble plot rather than a scatter plot, we still use `geom_point()` since both types of plots are made from points. Scatter plots are essentially a special case of bubble plots where all of the points represent one observation and so are all the same size. \index{ggplot2!ggplot} \index{ggplot2!aes} \index{ggplot2!geom\_point}
 
 ```{r}
 #| label: fig-cats-base-plot
@@ -233,7 +233,7 @@ basic_plot
 
 ### Text and fonts
 
-Here, we’ll use a *fun* typeface for the title, but keep use a clean and minimal typeface for the rest of the text. For the `body_font`, we'll use *Ubuntu* as we did in @sec-technology. For the `title_font`, we'll use *Chewy*, an almost cartoonish typeface that vaguely resembles handwriting. Both are Google Fonts and so we load them using `font_add_google()` as we've done in previous chapters, and set up the relevant {showtext} options. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
+Here, we’ll use a *fun* typeface for the title, but keep use a clean and minimal typeface for the rest of the text. For the `body_font`, we'll use *Ubuntu* as we did in @sec-technology. For the `title_font`, we'll use *Chewy*, an almost cartoonish typeface that vaguely resembles handwriting. Both are Google Fonts and so we load them using `font_add_google()` as we've done in previous chapters, and set up the relevant **`showtext`** options. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
 
 ```{r}
 #| label: cats-fonts
@@ -251,7 +251,7 @@ Charts are considered *visual* elements. And the quote *a picture is worth a tho
 
 In @sec-programming, when we constructed the subtitle, we used `glue()` to create data-driven text. This meant that, if the underlying data was updated, the subtitle would also be updated correctly. It's a more efficient approach that's less prone to accidental errors than *hard coding* all of the text. We can take a similar approach when adding annotations to plots.
 
-Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from {dplyr} to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
+Let's say we want to add an annotation to the plot that highlights the oldest cat in the data. We'll start by obtaining the data that relates to the oldest cat. We can use `slice_max()` from **`dplyr`** to obtain the row of the data where the `age_years` is highest: \index{ggplot2!slice\_max}
 
 ```{r}
 #| label: cats-oldest
@@ -259,14 +259,14 @@ annot_oldest <- cats_reference |>
   slice_max(age_years)
 ```
 
-When it comes to adding the annotation to the plot, there are several choices we can make within {ggplot2}: 
+When it comes to adding the annotation to the plot, there are several choices we can make within **`ggplot2`**: 
 
 * `text` or `label`: using `text` simply adds the text while `label` adds text within a rectangular box.
 * `annotate()` or `geom_*()`: `annotate()` places objects (in this case text) at fixed, specified locations whereas `geom_*()` functions add objects based on some input data. 
 
-Any combination of these choices could likely work for the annotations we plan to add. However, we're going to use {ggtext} [@ggtext] instead of just {ggplot2}. The {ggtext} package will allow us to perform further customization of the labels more easily. We've already seen examples of using {ggtext} for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've previously described coloring sections of text in @sec-turbines using the {marquee} package, but we'll look at {ggtext} as a comparison.
+Any combination of these choices could likely work for the annotations we plan to add. However, we're going to use **`ggtext`** [@ggtext] instead of just **`ggplot2`**. The **`ggtext`** package will allow us to perform further customization of the labels more easily. We've already seen examples of using **`ggtext`** for automatically wrapping long strings, but we're going to showcase some of its other features here - such as coloring and highlighting specific elements of text. We've previously described coloring sections of text in @sec-turbines using the **`marquee`** package, but we'll look at **`ggtext`** as a comparison.
 
-From {ggtext}, we can use the `geom_textbox()` function to add an annotation. Like the `element_textbox_simple()` we've been using from {ggtext} for the subtitle in previous chapters, `geom_textbox()` will automatically wrap the text to some pre-specified textbox size. The `label` aesthetic uses `glue()` to the cat's name and age into the text. We can wrap sections of text inside some `<span>` tags. This lets us specify how we want to style the font within the tags using CSS. We also use `glue()` to insert the `highlight_col` into the `style` for the font used for the cat's name. You may notice some similarity with the colored text code in @sec-turbines that uses {marquee} instead of {ggtext}. Additional arguments of `geom_textbox()` allow you to control the color of the text, box outline, and background color as well as the size and alignment of the text. \index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
+From **`ggtext`**, we can use the `geom_textbox()` function to add an annotation. Like the `element_textbox_simple()` we've been using from **`ggtext`** for the subtitle in previous chapters, `geom_textbox()` will automatically wrap the text to some pre-specified textbox size. The `label` aesthetic uses `glue()` to the cat's name and age into the text. We can wrap sections of text inside some `<span>` tags. This lets us specify how we want to style the font within the tags using CSS. We also use `glue()` to insert the `highlight_col` into the `style` for the font used for the cat's name. You may notice some similarity with the colored text code in @sec-turbines that uses **`marquee`** instead of **`ggtext`**. Additional arguments of `geom_textbox()` allow you to control the color of the text, box outline, and background color as well as the size and alignment of the text. \index{ggplot2!aes} \index{ggtext!geom\_textbox} \index{glue!glue}
 
 ```{r}
 #| label: fig-cats-annot-1
@@ -297,13 +297,13 @@ annotated_plot <- basic_plot +
 annotated_plot
 ```
 
-Although we've used HTML code within the `geom_textbox()` function, you can also use HTML code in the title, subtitle, or caption text - although much like with {marquee} in @sec-turbines, you also need to edit the relevant `theme()` arguments to specify you are using {ggtext}.
+Although we've used HTML code within the `geom_textbox()` function, you can also use HTML code in the title, subtitle, or caption text - although much like with **`marquee`** in @sec-turbines, you also need to edit the relevant `theme()` arguments to specify you are using **`ggtext`**.
 
 ::: {#tip-cats-repel .callout-tip}
 
 ## Non-overlapping labels
 
-Here, we're only positioning one annotation and so it's reasonably easy to manually adjust the position to make sure it doesn't exceed the plot area or cover up any data points. If you have many textual annotations, it will quickly become difficult to manually adjust them to avoid overlapping. The {ggrepel} package [@ggrepel] may help. It's specifically designed to creating non-overlapping text and label annotations in {ggplot2}, and repositions the text for you.
+Here, we're only positioning one annotation and so it's reasonably easy to manually adjust the position to make sure it doesn't exceed the plot area or cover up any data points. If you have many textual annotations, it will quickly become difficult to manually adjust them to avoid overlapping. The **`ggrepel`** package [@ggrepel] may help. It's specifically designed to creating non-overlapping text and label annotations in **`ggplot2`**, and repositions the text for you.
 
 :::
 
@@ -311,7 +311,7 @@ To add clarity about which aspect of the plot the annotation refers to, we can a
 
 We use need to tell `annotate()` where to put the arrow. Don't be fooled by thinking that these co-ordinate choices were perfect first time! It takes at least a little bit of trial and error to get the arrow positioned where we want it. We can use the x-axis in @fig-cats-annot-1 as a guide for choosing what the `x` and `xend` values should be. The choice of `y` and `yend` values might look a little odd - why are we placing an arrow at around 5, when the y-axis suggests we want to place the arrow around 22? Remember that `hrs_indoors` is actually a factor column, not a numeric column. \index{ggplot2!annotate} 
 
-Though you might expect {ggplot2} to complain when we try to place in arrow using numeric values on a discrete scale, surprisingly, it doesn't. Since factors are essentially just ordered categories, R assigns the first level in the factor to `1`, the second level to `2`, and so on. This means you *can* convert factors to numeric variables - though be warned that the results might not always be what you expect! For our chart, we want to position the end of the arrow just below the `22.5` value which is the fifth category, so the `y` and `yend` values are slightly below `5`.
+Though you might expect **`ggplot2`** to complain when we try to place in arrow using numeric values on a discrete scale, surprisingly, it doesn't. Since factors are essentially just ordered categories, R assigns the first level in the factor to `1`, the second level to `2`, and so on. This means you *can* convert factors to numeric variables - though be warned that the results might not always be what you expect! For our chart, we want to position the end of the arrow just below the `22.5` value which is the fifth category, so the `y` and `yend` values are slightly below `5`.
 
 We add some further styling to the line by specifying the width, the color, and how curved the line is. To add the arrow on the end of the line, we use the `arrow()` function. This function allows us to define the length of the arrow - note this is the length of the arrowhead, rather than the entire arrow. We also specify that the type is `"closed"`, meaning that the arrowhead is a filled triangle. The default is `"open"` which, at smaller arrow sizes, sometimes looks less clear. \index{grid!arrow}
 
@@ -340,7 +340,7 @@ arrow_plot
 
 ## Highlighting observations in data
 
-In @sec-museums, we used {gghighlight} [@gghighlight] to highlight individual lines in facet plots. You can also use {gghighlight} to highlight and label individual data points in a more automated way. This may be an easier approach if you want to highlight multiple points based on some conditions, at the expense of more custom, aesthetically pleasing annotations.
+In @sec-museums, we used **`gghighlight`** [@gghighlight] to highlight individual lines in facet plots. You can also use **`gghighlight`** to highlight and label individual data points in a more automated way. This may be an easier approach if you want to highlight multiple points based on some conditions, at the expense of more custom, aesthetically pleasing annotations.
 
 :::
 
@@ -365,7 +365,7 @@ Instead of simply passing in a character string with a name, we'll create a capt
 
 But first, before we jump into writing functions, we need to get some social media icons! As we did in @sec-turbines, we'll again use [Font Awesome](https://fontawesome.com/) icons [@fontawesome], but this time we'll use the *Brand* pack of icons instead of the *Solid* icons. The process of loading the icons here is essentially the same as loading the Font Awesome icons in @sec-turbines. After you've downloaded zip file of freely available icons from [fontawesome.com/download](https://fontawesome.com/download), selecting the **Free for Desktop** option, you should see a file called `Font-Awesome-6-Brands-Regular-400.otf`. Again, save this `.otf` file somewhere you can find it again - such as in a project folder called `fonts`. \index{Font Awesome} \index{fonts}
 
-As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font into R. The `family` argument is how we'll refer to the font in R, and the `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` to use {showtext} to render the text and set the desired resolution.  \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+As before, we'll use `font_add()` from **`sysfonts`** [@sysfonts] to load the font into R. The `family` argument is how we'll refer to the font in R, and the `regular` argument is the file path to the `.otf` file. We then use `showtext_auto()` and `showtext_opts()` to use **`showtext`** to render the text and set the desired resolution. \index{sysfonts!font\_add} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| echo: true
@@ -377,7 +377,7 @@ As before, we'll use `font_add()` from {sysfonts} [@sysfonts] to load the font i
 
 ## Font Awesome icons in R
 
-The {fontawesome} package [@fontawesomeR] makes it easier to use Font Awesome icons in R Markdown, Quarto, and Shiny outputs created with R. The package allows you to insert icons as SVG or PNG images, and provides functions for writing HTML code that inserts icons using `<i></i>` tags in Shiny applications.
+The **`fontawesome`** package [@fontawesomeR] makes it easier to use Font Awesome icons in R Markdown, Quarto, and Shiny outputs created with R. The package allows you to insert icons as SVG or PNG images, and provides functions for writing HTML code that inserts icons using `<i></i>` tags in Shiny applications.
 
 :::
 
@@ -388,9 +388,9 @@ Let's go back to adding social media icons and create a function, `social_captio
 * The colors of the icons and the fonts. We might choose to force these to be the same, or allow them to be different.
 * The typeface of the non-icon text i.e. the social media handles. We want a user to be able to pass in their choice of typeface to match with the text in the rest of their chart.
 
-To construct this example `social_caption()` function, we'll include icons for LinkedIn, GitHub, and BlueSky. You might choose to include others. We'll have one argument in the function for each of these social media sites, with the default value specified as the handle that will be used most often. We also add two arguments to control the icon and font colors: `icon_color` and `font_color`. Both are set to `"black"` by default, which is consistent with other {ggplot2} text.
+To construct this example `social_caption()` function, we'll include icons for LinkedIn, GitHub, and BlueSky. You might choose to include others. We'll have one argument in the function for each of these social media sites, with the default value specified as the handle that will be used most often. We also add two arguments to control the icon and font colors: `icon_color` and `font_color`. Both are set to `"black"` by default, which is consistent with other **`ggplot2`** text.
 
-Within the function, we start by putting together a `data.frame` that maps the values a user has input for the social media handles to the correct icon. We're going to be using {ggtext} [@ggtext] to process the caption, meaning we can write HTML code to join together icons, text, and text formatting. We also need to know which Unicode characters map to each social media icons so that we can pass them into some HTML code.
+Within the function, we start by putting together a `data.frame` that maps the values a user has input for the social media handles to the correct icon. We're going to be using **`ggtext`** [@ggtext] to process the caption, meaning we can write HTML code to join together icons, text, and text formatting. We also need to know which Unicode characters map to each social media icons so that we can pass them into some HTML code.
 
 Take the GitHub icon as an example. You can search for the icon you want at [fontawesome.com/icons](https://fontawesome.com/icons), and you’ll see the Unicode icon in the top right of the screen (although a Google search or ChatGPT would likely work equally well!) The Unicode for the GitHub icon is `f09b`, and to use this in HTML code we can write it as `&#xf09b` [@social_icons]. We repeat this for the other icons we want to use. 
 
@@ -398,7 +398,7 @@ We then use `na.omit()` to remove any rows of our `data.frame` that contain `NA`
 
 Rather than trying to immediately write a function that joins together many icons and handles, we'll start by writing a function that joins one icon and one social media handle. The inner function, `glue_icon()`, creates a styled HTML snippet using the `glue()` to join together the icon Unicode and the text within the snippet. The HTML snippet contains two spans: one for the icon (styled with the `"Font Awesome 6 Brands"` font and our chosen `icon_color`) and another for the social media text (styled with our chosen `font_family` and `font_color`). We also add a space between the icon and the handle with `&nbsp;`, and a larger space at the end to separate multiple icons using `&emsp;`. These are special strings for adding spaces to HTML. Note that because we have quotation marks inside quotation marks inside quotation marks, we need to escape the inner ones using `\"`. \index{glue!glue}
 
-Finally, we use `map2()` from {purrr} [@purrr] to apply `glue_icon()` to each row of our `icon_df` data. We then collapse the resulting list into a vector using `as_vector()` from {purrr}. We then further collapse the vector into a single character string with `str_flatten()` from {stringr}. This flattened string is our social media caption. \index{purrr!map2} \index{purrr!as\_vector} \index{stringr!str\_flatten} \index{social\_caption}  
+Finally, we use `map2()` from **`purrr`** [@purrr] to apply `glue_icon()` to each row of our `icon_df` data. We then collapse the resulting list into a vector using `as_vector()` from **`purrr`**. We then further collapse the vector into a single character string with `str_flatten()` from **`stringr`**. This flattened string is our social media caption. \index{purrr!map2} \index{purrr!as\_vector} \index{stringr!str\_flatten} \index{social\_caption}  
 
 ```{r}
 #| echo: true
@@ -451,7 +451,7 @@ text_plot
 
 ### Adjusting themes
 
-You'll notice that in @fig-cats-text-plot, the social media caption that we worked so hard to create isn't properly formatted and it simply appears as the raw HTML code we wrote. The reason it doesn’t look quite as we’d hoped is because {ggplot2} doesn’t natively understand how to parse the HTML code. That's where {ggtext} comes in. {ggtext} is designed to improve text rendering in {ggplot2}, including providing support for using Markdown and HTML inside text elements. We haven't actually used {ggtext} for our caption yet! Much like with {marquee} in @sec-turbines, we need to edit the `plot.caption` argument of `theme()` to tell it to use {ggtext} to process the HTML code. We can use `element_textbox_simple()` to do this (as we've been doing to wrap the subtitle text anyway). It had similar arguments to `element_text()` in {ggplot2} but we don't actually need to specify any additional arguments here. You could also use `element_textbox()` which works very similarly but has slightly different default values or `element_markdown()`, if you’d prefer [@social_icons]. \index{ggplot2!theme} \index{ggplot2!element\_text} \index{ggtext!element\_textbox\_simple}
+You'll notice that in @fig-cats-text-plot, the social media caption that we worked so hard to create isn't properly formatted and it simply appears as the raw HTML code we wrote. The reason it doesn’t look quite as we’d hoped is because **`ggplot2`** doesn’t natively understand how to parse the HTML code. That's where **`ggtext`** comes in. **`ggtext`** is designed to improve text rendering in **`ggplot2`**, including providing support for using Markdown and HTML inside text elements. We haven't actually used **`ggtext`** for our caption yet! Much like with **`marquee`** in @sec-turbines, we need to edit the `plot.caption` argument of `theme()` to tell it to use **`ggtext`** to process the HTML code. We can use `element_textbox_simple()` to do this (as we've been doing to wrap the subtitle text anyway). It had similar arguments to `element_text()` in **`ggplot2`** but we don't actually need to specify any additional arguments here. You could also use `element_textbox()` which works very similarly but has slightly different default values or `element_markdown()`, if you’d prefer [@social_icons]. \index{ggplot2!theme} \index{ggplot2!element\_text} \index{ggtext!element\_textbox\_simple}
 
 We make some further edits using the `theme()` function after applying `theme_minimal()` as a base theme, as we've done in previous chapters to align the plot and caption text to the plot rather than the panel, change the color of the text, and edit the background color. We also make some adjustments to the legend. It's currently taking up quite a lot of space on the right hand side, but there is plenty of available space within the plot area itself. We use `legend.position = "inside"` to move the legend inside the panel area and specify the coordinates of where we want to position it using `legend.position.inside`. For positioning the legend, `c(0, 0)` is the bottom left corner and `c(1, 1)` is the top right corner. To make sure that it's easy to distinguish between the legend and the data points, we draw a dark outline around it. \index{ggplot2!theme\_minimal} \index{ggplot2!element\_blank} \index{ggplot2!element\_rect}
 
@@ -520,9 +520,9 @@ In this chart, we've considered only two variables, but there are many others av
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
-The original version look at the relationship between age and ground speed (despite) the issues with the reliability of the data.
+The original version look at the relationship between age and ground speed (despite the issues with the reliability of the data).
 
 ![](images/cats.gif){fig-align="center" fig-alt=""}
 
