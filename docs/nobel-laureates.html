@@ -249,7 +249,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./cats.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with <strong><code>ggtext</code></strong></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -307,7 +307,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./us-elections.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with {geofacet}</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -399,7 +399,7 @@ window.Quarto = {
 <span class="header-section-number">8.1</span> Data</h2>
 <p>In this chapter, we’re going to explore Nobel Prize Laureates. Since 1901, the Nobel Prizes have been awarded to those who, during the preceding year, have conferred the greatest benefit to humankind. Awards are granted in the fields of Physics, Chemistry, Physiology or Medicine, Literature, Peace, and (since 1969) Economic Sciences.</p>
 <p>In May 2019, the TidyTuesday challenge used <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14">several datasets about Nobel Prize Laureates</a> and their publications. Those datasets contain data up to the year 2016. Since that data is now a little bit outdated, we’re going to look at an alternative way of obtaining the data and getting it into R - using an API! </p>
-<p>An API (Application Programming Interface) is essentially a tool that lets different software programs communicate with each other <span class="citation" data-cites="harmon2024">(<a href="references.html#ref-harmon2024" role="doc-biblioref">Harmon 2024</a>)</span>. The Nobel Prize API endpoint <span class="citation" data-cites="nobel_data">(<a href="references.html#ref-nobel_data" role="doc-biblioref">www.nobelprize.org 2024</a>)</span> can be accessed at <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>, with some instructions and guidance about how to use it available on the <a href="https://www.nobelprize.org/">nobelprize.org</a> website at <a href="https://www.nobelprize.org/organization/developer-zone-2/">www.nobelprize.org/organization/developer-zone-2</a>, which also links to the <a href="https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/">Terms of Use</a>.</p>
+<p>An API (Application Programming Interface) is essentially a tool that lets different software programs communicate with each other <span class="citation" data-cites="harmon2024">(<a href="references.html#ref-harmon2024" role="doc-biblioref">Harmon 2024</a>)</span>. The Nobel Prize API endpoint <span class="citation" data-cites="nobel_data">(<a href="references.html#ref-nobel_data" role="doc-biblioref">www.nobelprize.org 2024</a>)</span> can be accessed at <a href="https://api.nobelprize.org/2.1/laureates">api.nobelprize.org/2.1/laureates</a>, with some instructions and guidance about how to use it available on the <a href="https://www.nobelprize.org/">nobelprize.org</a> website at <a href="https://www.nobelprize.org/organization/developer-zone-2/">www.nobelprize.org/organization/developer-zone-2</a>, which also links to the <a href="https://www.nobelprize.org/organization/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/">Terms of Use</a>.</p>
 <p>This API doesn’t require an API key, so we don’t need to worry about registering, or authenticating an account. Instead, we simply pass the options into a URL and then read the CSV from that URL.</p>
 <p>Let’s look at the data for just one of the fields to start with: Physics. There are lots of different options available for accessing the API, but we only need to specify a few of them:</p>
 <ul>
@@ -425,16 +425,16 @@ Tip&nbsp;8.1: Choosing an API Limit
 </div>
 </div>
 <p>We construct a URL in the following format: the base API URL, followed by the endpoint, followed by a <code>?</code>, then a list of query parameters separated by <code>&amp;</code>. Here, the base URL is <code>http://api.nobelprize.org/2.1/</code> and the endpoint is <code>laureates</code>. You can either (1) build the URL as one long character string, or (2) construct the strings separately and stick them together with <code><a href="https://glue.tidyverse.org/reference/glue.html">glue()</a></code> as we’ve done here. If you are making multiple, slightly different, API calls then the second approach is more appropriate since you can re-use the base URL.</p>
-<p>Once we’ve constructed the URL, we simply pass it into <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> (or <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code> from {readr} if you prefer) and save the output to a variable - <code>nobel_physics</code> in this case. </p>
+<p>Once we’ve constructed the URL, we simply pass it into <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code> from <strong><code>readr</code></strong> (or <code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code> from base R if you prefer) and save the output to a variable - <code>nobel_physics</code> in this case. </p>
 <div class="cell">
 <div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">api_url</span> <span class="op">&lt;-</span> <span class="st">"http://api.nobelprize.org/2.1/laureates"</span></span>
-<span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span></span>
+<span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
 <span>    <span class="st">"{api_url}?limit=250&amp;nobelPrizeCategory=phy&amp;format=csv"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The data can also be accessed using the {nobel} R package <span class="citation" data-cites="nobel">(<a href="references.html#ref-nobel" role="doc-biblioref">Rennie 2024b</a>)</span> which wraps the code above into the <code>laureates()</code> function.</p>
+<p>The data can also be accessed using the <strong><code>nobel</code></strong> R package <span class="citation" data-cites="nobel">(<a href="references.html#ref-nobel" role="doc-biblioref">Rennie 2024b</a>)</span> which wraps the code above into the <code>laureates()</code> function.</p>
 <p>We want to avoid querying the API multiple times if we don’t need to. Once we’ve downloaded the data, we can save it as a CSV file to allow us to use the data at a later point in time without re-querying the same query. We can use the <code><a href="https://rdrr.io/r/utils/write.table.html">write.csv()</a></code> option to save the data to a file called <code>nobel_physics.csv</code> in an existing folder called <code>data</code> - you might choose to save it somewhere slightly different! </p>
 <div class="cell">
 <div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span><span class="op">(</span></span>
@@ -443,11 +443,11 @@ Tip&nbsp;8.1: Choosing an API Limit
 <span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We can keep using the existing <code>nobel_physics</code> object, or we can read it back in from the CSV file using <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>: </p>
+<p>We can keep using the existing <code>nobel_physics</code> object, or we can read it back in from the CSV file using <code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_physics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/nobel_physics.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Let’s have a quick look at the data:</p>
+<p>Let’s have a quick look at the data.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -491,7 +491,7 @@ Figure&nbsp;8.1: A scatter plot of awardee birth date against year of award, sho
 </div>
 </div>
 </div>
-<p>We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the <code><a href="https://lubridate.tidyverse.org/reference/year.html">year()</a></code> function from {lubridate} to convert the <code>birthdate</code> into a year and subtract this from the award <code>year</code> to get an approximate age. Then plot this against the award year: </p>
+<p>We might be interested in seeing whether this relationship is changing over time. Essentially, is the age of awardees changing over time? We can use the <code><a href="https://lubridate.tidyverse.org/reference/year.html">year()</a></code> function from <strong><code>lubridate</code></strong> to convert the <code>birthdate</code> into a year and subtract this from the award <code>year</code> to get an approximate age. Then plot this against the award year: </p>
 <div class="cell">
 <div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">award_age</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span><span class="op">$</span><span class="va">year</span> <span class="op">-</span></span>
 <span>  <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">birthdate</span><span class="op">)</span></span>
@@ -571,15 +571,15 @@ Figure&nbsp;8.5: A bar chart of the number of <em>Physics</em> laureates (with a
 <p>Even though we’ve asked for only physics data from the API, the data also includes an entry relating to the Chemistry prize. If we read the <a href="https://www.nobelprize.org/organization/developer-zone-2/">documentation for the API</a>, this gives us the explanation as to why. The API we’ve used relates to Nobel Laureates, not Nobel Prizes - meaning the list includes all laureates who have won a prize in Physics. Marie Curie won two Nobel Prizes - in 1903 for Physics, and in 1911 for Chemistry.</p>
 <section id="data-wrangling" class="level3" data-number="8.3.1"><h3 data-number="8.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">8.3.1</span> Data wrangling</h3>
-<p>We’ll start by using <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> from {dplyr} to filter out any non-Physics entries, and then selecting only the columns we need for our plot: <code>name</code>, <code>gender</code>, and <code>year</code>. The data is currently arranged alphabetically based on <code>name</code>, so we’ll use the <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> function to sort by year. </p>
+<p>We’ll start by using <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> from <strong><code>dplyr</code></strong> to filter out any non-Physics entries, and then selecting only the columns we need for our plot: <code>name</code>, <code>gender</code>, and <code>year</code>. The data is currently arranged alphabetically based on <code>name</code>, so we’ll use the <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> function to sort by year. </p>
 <div class="cell">
 <div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">physics_data</span> <span class="op">&lt;-</span> <span class="va">nobel_physics</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">category</span> <span class="op">==</span> <span class="va">nobel_category</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">gender</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> (or <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_radial()</a></code>) function in {ggplot2} to transform the coordinate space. However, <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> makes it really hard to position other elements such as annotations on the plot. </p>
-<p>We could make use of the {ggplot2} extension package, {geomtextpath} <span class="citation" data-cites="geomtextpath">(<a href="references.html#ref-geomtextpath" role="doc-biblioref">Cameron and van den Brand 2024</a>)</span>, which allows you to write text in {ggplot2} that follows a curved path. But (just for the fun of it) let’s try to make the plot from scratch using only {ggplot2}.</p>
+<p>Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> (or <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_radial()</a></code>) function in <strong><code>ggplot2</code></strong> to transform the coordinate space. However, <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> makes it really hard to position other elements such as annotations on the plot. </p>
+<p>We could make use of the <strong><code>ggplot2</code></strong> extension package, <strong><code>geomtextpath</code></strong> <span class="citation" data-cites="geomtextpath">(<a href="references.html#ref-geomtextpath" role="doc-biblioref">Cameron and van den Brand 2024</a>)</span>, which allows you to write text in <strong><code>ggplot2</code></strong> that follows a curved path. But (just for the fun of it) let’s try to make the plot from scratch using only <strong><code>ggplot2</code></strong>.</p>
 <p>We need to define the following to be able to position the text:</p>
 <ul>
 <li>the x- and y- coordinates of where the text should end</li>
@@ -609,9 +609,9 @@ x &amp; = r cos(\theta) \\
 y &amp; = r sin(\theta)
 \end{split}
 \end{equation*}\]</span></p>
-<p>We don’t want to put the text all the way around the circle, since we want to leave some space to add the title as shown in <a href="#fig-nobel-sketch" class="quarto-xref">Figure&nbsp;<span>8.4</span></a>. We’ll leave a gap starting from <span class="math inline">\(\pi/4\)</span> (between 1 and 2 on a clock face) to <span class="math inline">\(7\pi/4\)</span> (between 4 and 5 on a clock face). We start by generating a sequence of equally spaced <span class="math inline">\(\theta\)</span> values, starting from <span class="math inline">\(\pi/4\)</span> and going to <span class="math inline">\(7\pi/4\)</span>, with one value for each observation in the data. This is added as a new column in the data using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> from {dplyr}. We then calculate the <code>x</code> and <code>y</code> coordinates using the equations above and, again, add these as new columns to the data. </p>
+<p>We don’t want to put the text all the way around the circle, since we want to leave some space to add the title as shown in <a href="#fig-nobel-sketch" class="quarto-xref">Figure&nbsp;<span>8.4</span></a>. We’ll leave a gap starting from <span class="math inline">\(\pi/4\)</span> (between 1 and 2 on a clock face) to <span class="math inline">\(7\pi/4\)</span> (between 4 and 5 on a clock face). We start by generating a sequence of equally spaced <span class="math inline">\(\theta\)</span> values, starting from <span class="math inline">\(\pi/4\)</span> and going to <span class="math inline">\(7\pi/4\)</span>, with one value for each observation in the data. This is added as a new column in the data using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> from <strong><code>dplyr</code></strong>. We then calculate the <code>x</code> and <code>y</code> coordinates using the equations above and, again, add these as new columns to the data. </p>
 <p>The angle of the text is a little bit more tricky. We want the text to be positioned perpendicular to the circle i.e.&nbsp;the angle of the text is different for each name. We can use the value of <code>theta</code> to calculate the angle of the text.</p>
-<p>When we later pass the angle value into {ggplot2} functions for plotting, it’s expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in <code>angle = 90</code> rather than <code>angle = pi/2</code>. So we need to transform <code>theta</code> to degrees by dividing by <span class="math inline">\(2\pi\)</span> and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. </p>
+<p>When we later pass the angle value into <strong><code>ggplot2</code></strong> functions for plotting, it’s expected that the angle be expressed in degrees (rather than radians). For example, for vertical text, we would pass in <code>angle = 90</code> rather than <code>angle = pi/2</code>. So we need to transform <code>theta</code> to degrees by dividing by <span class="math inline">\(2\pi\)</span> and multiplying by 360. To make the text the right way up (at least on the left side of the circle) we add 180 degrees. </p>
 <div class="cell">
 <div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">physics_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
@@ -640,10 +640,10 @@ y &amp; = r sin(\theta)
 6 Pierre Curie          male    1903 0.891  3.14  3.89  231.</code></pre>
 </div>
 </div>
-<p>Now we’re ready to start plotting with {ggplot2}!</p>
+<p>Now we’re ready to start plotting with <strong><code>ggplot2</code></strong>!</p>
 </section><section id="the-first-plot" class="level3" data-number="8.3.2"><h3 data-number="8.3.2" class="anchored" data-anchor-id="the-first-plot">
 <span class="header-section-number">8.3.2</span> The first plot</h3>
-<p>Constructing the base plot is reasonably straightforward - we’ve done the hard work in defining the x values, y values, the angles already. Since our plot is a visualization of text data, we’ll use <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to add the text. All we have to do is tell {ggplot2} what to put where! </p>
+<p>Constructing the base plot is reasonably straightforward - we’ve done the hard work in defining the x values, y values, the angles already. Since our plot is a visualization of text data, we’ll use <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to add the text. All we have to do is tell <strong><code>ggplot2</code></strong> what to put where! </p>
 <p>We pass <code>plot_data</code> into the <code>data</code> argument, and then set the aesthetic mapping using <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. The mappings are as you would expect: <code>x</code> goes on the x-axis, <code>y</code> goes on the y-axis, the <code>label</code> comes from the <code>name</code> column, the text <code>angle</code> is defined by the <code>angle</code> column we created, and the <code>color</code> is based on the values in the <code>gender</code> column. This mapping could be passed into either <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> or directly into <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> as we’ve done here. Since we’ll only be using one geometry for this plot, it won’t make a difference! </p>
 <div class="cell">
 <div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -678,7 +678,7 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 <code>title_font</code>: a bold typeface that will, as the name suggests, be used for the title. We’ll use <em>Passion One</em> - a display typeface with thick, bold strokes which make it ideal for titles.</li>
 <li>a <code>body_font</code>: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it’s important that it’s a clean and simple typeface. We’ll use <em>Ubuntu</em> - a sans serif typeface that we’ve used in previous chapters.</li>
 </ul>
-<p>Both typefaces are provided through Google Fonts so we’ll use <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> from {sysfonts} to load them into R. We also run <code><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto()</a></code> and <code>showtext_opts(dpi = 300)</code> to use {showtext} for rendering text on plots at our desired resolution. </p>
+<p>Both typefaces are provided through Google Fonts so we’ll use <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> from <strong><code>sysfonts</code></strong> to load them into R. We also run <code><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto()</a></code> and <code>showtext_opts(dpi = 300)</code> to use <strong><code>showtext</code></strong> for rendering text on plots at our desired resolution. </p>
 <div class="cell">
 <div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Passion One"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Ubuntu"</span><span class="op">)</span></span>
@@ -735,7 +735,7 @@ Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semi
 </div>
 </section><section id="adding-text" class="level3" data-number="8.4.3"><h3 data-number="8.4.3" class="anchored" data-anchor-id="adding-text">
 <span class="header-section-number">8.4.3</span> Adding text</h3>
-<p>Rather than adding a title and subtitle at the top of the plot, we’ll add them in the gap in the right hand side of the circle. We’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function from {ggplot2} to add the text. Remember that for <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code>, we need to start by specifying the type of geometry we’re annotating - in this case, <code>"text"</code>. </p>
+<p>Rather than adding a title and subtitle at the top of the plot, we’ll add them in the gap in the right hand side of the circle. We’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function from <strong><code>ggplot2</code></strong> to add the text. Remember that for <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code>, we need to start by specifying the type of geometry we’re annotating - in this case, <code>"text"</code>. </p>
 <p>We’ll add two separate annotations: one for the title (<em>Nobel Prize Laureates</em>) and for a subtitle indicating the award category (<em>Physics</em>). The title and subtitle should be right-aligned, so we set the x-coordinate for each annotation to be equal to 10 and set <code>hjust = 1</code>. The title is vertically aligned with the center of the circle (at <code>y = 0</code>), and the subtitle slightly below it at <code>y = -1</code>. The font family is adjusted to either the <code>body_font</code> or <code>title_font</code> using the <code>family</code> argument, and the text <code>size</code> and <code>color</code> is also adjusted.</p>
 <div class="cell">
 <div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">annotated_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
@@ -767,8 +767,7 @@ Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-sh
 </div>
 </div>
 </div>
-<p>We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the <code>social_caption()</code> function we defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. We make both the icons and text the same color - <code>primary_col</code>. We can pass this into the <code>source_caption()</code> function defined in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>.</p>
-<p>We’ll later use {ggtext} again to apply Markdown formatting to the caption, and so we add <code>**</code> to make the words <strong>Data</strong> and <strong>Graphic</strong> in bold font. The HTML line break <code>&lt;br&gt;</code> separates the data source text and the social media caption onto two separate lines. We can join the data source text with the social media caption into one character string using the <code><a href="https://rdrr.io/r/base/paste.html">paste0()</a></code> function. </p>
+<p>We can add a caption to the plot which contains: (i) a description of the data source, and (ii) the social media links from the <code>social_caption()</code> function we defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. We make both the icons and text the same color - <code>primary_col</code>. We can pass this into the <code>source_caption()</code> function defined in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">primary_col</span>,</span>
@@ -813,7 +812,7 @@ Figure&nbsp;8.10: The names of Nobel Prize in Physics awardees arranged around a
 <li>removing the legend</li>
 <li>changing the background color by passing in the <code>bg_col</code> variable to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect()</a></code>
 </li>
-<li>using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from {ggtext} to format the HTML tags that add the social media icons in the caption</li>
+<li>using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> to format the HTML tags that add the social media icons in the caption</li>
 </ul>
 <div class="cell">
 <div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
@@ -989,7 +988,7 @@ Tip&nbsp;8.3: Using fonts in functions
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now let’s test if our function works with a completely different set of data! Let’s use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use <code>nobelPrizeCategory=pea</code> (<code>pea</code> for <em>peace</em>) and then save the output to a CSV file, just as we did before for the physics data. </p>
+<p>Now let’s test if our function works with a completely different set of data! Let’s use the Nobel Prize API again to download data on Nobel Peace Prize laureates. We edit the end of the API URL to use <code>nobelPrizeCategory=pea</code> (<code>pea</code> for <em>peace</em>) and then save the output to a CSV file, just as we did before for the physics data, this time using base R functions. </p>
 <div class="cell">
 <div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nobel_peace</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span></span>
@@ -1057,11 +1056,11 @@ Tip&nbsp;8.4: Building your own <strong><code>ggplot2</code></strong> extension
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;8.5: Circular text with {ggtextcircle}
+Tip&nbsp;8.5: Circular text with <strong><code>ggtextcircle</code></strong>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The {ggtextcircle} package <span class="citation" data-cites="ggtextcircle">(<a href="references.html#ref-ggtextcircle" role="doc-biblioref">Rennie 2024a</a>)</span> implements this type of visualization in a generic way - if you want to create something similar with a different data set!</p>
+<p>The <strong><code>ggtextcircle</code></strong> package <span class="citation" data-cites="ggtextcircle">(<a href="references.html#ref-ggtextcircle" role="doc-biblioref">Rennie 2024a</a>)</span> implements this type of visualization in a generic way - if you want to create something similar with a different data set!</p>
 </div>
 </div>
 </section></section><section id="reflection" class="level2" data-number="8.5"><h2 data-number="8.5" class="anchored" data-anchor-id="reflection">
@@ -1849,8 +1848,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><nav class="page-navigation"><div class="nav-page nav-page-previous">
-      <a href="./cats.html" class="pagination-link" aria-label="Cats: data-driven annotations with {ggtext}">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with {ggtext}</span></span>
+      <a href="./cats.html" class="pagination-link" aria-label="Cats: data-driven annotations with **`ggtext`**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with <strong><code>ggtext</code></strong></span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
