@@ -47,14 +47,20 @@ All data sets used in this book, and links to the relevant licenses:
 #| label: data-sources
 #| echo: false
 #| output: asis
-data_data <- readr::read_csv("data/data.csv") |> 
+data_data <- readr::read_csv("data/data.csv") |>
   tidyr::drop_na()
 for (i in seq_len(nrow(data_data))) {
   pander::pandoc.list(
     list(
       glue::glue("**Chapter {data_data$Chapter[i]}**: {data_data$Data[i]} {data_data$BibTex[i]}"),
       list(
-        glue::glue("Source: [{stringr::str_remove(data_data$URL[i], 'https://')}]({data_data$URL[i]})"),
+        paste0(
+          "Source: {{< '",
+          data_data$URL[i],
+          "' '",
+          stringr::str_remove(data_data$URL[i], "https://"),
+          "' >}} "
+        ),
         glue::glue("License: {data_data$License[i]}")
       )
     )
@@ -70,14 +76,21 @@ All images used in this book (which were not created by the author) and links to
 #| label: img-sources
 #| echo: false
 #| output: asis
-img_data <- readr::read_csv("images/data.csv") |> 
+img_data <- readr::read_csv("images/data.csv") |>
   tidyr::drop_na()
 for (i in seq_len(nrow(img_data))) {
   pander::pandoc.list(
     list(
       glue::glue("Image: {img_data$Photographer[i]}"),
       list(
-        glue::glue("Source: [{stringr::str_remove(img_data$Source[i], 'https://')}]({img_data$Source[i]}) {img_data$BibTex[i]}"),
+        paste0(
+          "Source: {{< '",
+          img_data$Source[i],
+          "' '",
+          stringr::str_remove(img_data$Source[i], "https://"),
+          "' >}} ",
+          img_data$BibTex[i]
+        ),
         glue::glue("License: {img_data$License[i]}")
       )
     )
@@ -153,4 +166,3 @@ The (work-in-progress) cover of this book was also created with **`ggplot2`**. T
 ```
 
 :::
-

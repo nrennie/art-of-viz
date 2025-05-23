@@ -12,19 +12,19 @@ social_caption <- function(linkedin = "nicola-rennie",
   
   # Inner function to join icon and text
   glue_icon <- function(icon, social) {
-    glue(
+    glue::glue(
       "<span style='font-family:\"Font Awesome 6 Brands\"; color:{icon_color};'>{icon} </span>&nbsp; <span style='font-family:{font_family}; color:{font_color};'>{social} </span>&emsp;"
     )
   }
   
   # Map over all icons
-  caption <- map2(
+  caption <- purrr::map2(
     .x = icon_df$icons,
     .y = icon_df$socials,
     .f = ~glue_icon(.x, .y)
   ) |> 
-    as_vector() |> 
-    str_flatten()
+    purrr::as_vector() |> 
+    stringr::str_flatten()
 
   return(caption)
 }
