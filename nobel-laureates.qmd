@@ -257,9 +257,17 @@ physics_data <- nobel_physics |>
   arrange(year)
 ```
 
-Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in **`ggplot2`** to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot.  \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial}
+Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the `coord_polar()` (or `coord_radial()`) function in **`ggplot2`** to transform the coordinate space. However, `coord_polar()` makes it really hard to position other elements such as annotations on the plot. Alternatively, we could make use of the **`ggplot2`** extension package, **`geomtextpath`** [@geomtextpath], which allows you to write text in **`ggplot2`** that follows a curved path. \index{ggplot2!coord\_polar} \index{ggplot2!coord\_radial} \index{geomtextpath}
 
-We could make use of the **`ggplot2`** extension package, **`geomtextpath`** [@geomtextpath], which allows you to write text in **`ggplot2`** that follows a curved path. But (just for the fun of it) let's try to make the plot from scratch using only **`ggplot2`**. 
+::: {#tip-nobel-external .callout-tip}
+
+## Why add annotations in R?
+
+You may be wondering why we want to put so much work into building a custom layout from scratch, when you could easily just create a basic chart, apply `coord_polar()`, and then export it to other software (e.g. Inkscape or PowerPoint) to add the text annotations. This is certaintly a valid point. If you were only making a single chart on one occassion, then adding the finishing touches outside of R would be both quicker and easier. However, if you're making the same chart multiple times, or creating slightly different versions of a similar chart, the manual work can quickly accumulate. The benefit of creating annotations in R is that it's easier to scale up your work, and automate the annotation creation.
+
+:::
+
+But (just for the fun of it) let's try to make the plot from scratch using only **`ggplot2`**. 
 
 We need to define the following to be able to position the text:
 
@@ -351,7 +359,7 @@ At first glance, this first plot might look like a complete mess but with a litt
 Let's start by choosing some typefaces for our visualization. We're going to pick two typefaces:
 
 * `title_font`: a bold typeface that will, as the name suggests, be used for the title. We'll use *Passion One* - a display typeface with thick, bold strokes which make it ideal for titles. 
-* a `body_font`: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it's important that it's a clean and simple typeface. We'll use *Ubuntu* - a sans serif typeface that we've used in previous chapters.
+* a `body_font`: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be quite a small font size, and so it's important to use a clean and simple typeface. We'll use *Ubuntu* - a sans serif typeface that we've used in previous chapters.
 
 Both typefaces are provided through Google Fonts so we'll use `font_add_google()` from **`sysfonts`** to load them into R. We also run `showtext_auto()` and `showtext_opts(dpi = 300)` to use **`showtext`** for rendering text on plots at our desired resolution.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} \index{fonts}
 
