@@ -578,8 +578,21 @@ Figure&nbsp;8.5: A bar chart of the number of <em>Physics</em> laureates (with a
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">gender</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> (or <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_radial()</a></code>) function in <strong><code>ggplot2</code></strong> to transform the coordinate space. However, <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> makes it really hard to position other elements such as annotations on the plot. </p>
-<p>We could make use of the <strong><code>ggplot2</code></strong> extension package, <strong><code>geomtextpath</code></strong> <span class="citation" data-cites="geomtextpath">(<a href="references.html#ref-geomtextpath" role="doc-biblioref">Cameron and van den Brand 2024</a>)</span>, which allows you to write text in <strong><code>ggplot2</code></strong> that follows a curved path. But (just for the fun of it) let’s try to make the plot from scratch using only <strong><code>ggplot2</code></strong>.</p>
+<p>Now comes the tricky part of figuring out how to position the text in a circle. The first idea might be to simply plot the text in a line and then use the <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> (or <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_radial()</a></code>) function in <strong><code>ggplot2</code></strong> to transform the coordinate space. However, <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> makes it really hard to position other elements such as annotations on the plot. Alternatively, we could make use of the <strong><code>ggplot2</code></strong> extension package, <strong><code>geomtextpath</code></strong> <span class="citation" data-cites="geomtextpath">(<a href="references.html#ref-geomtextpath" role="doc-biblioref">Cameron and van den Brand 2024</a>)</span>, which allows you to write text in <strong><code>ggplot2</code></strong> that follows a curved path. </p>
+<div id="tip-nobel-external" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;8.2: Why add annotations in R?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You may be wondering why we want to put so much work into building a custom layout from scratch, when you could easily just create a basic chart, apply <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code>, and then export it to other software (e.g.&nbsp;Inkscape or PowerPoint) to add the text annotations. This is certaintly a valid point. If you were only making a single chart on one occassion, then adding the finishing touches outside of R would be both quicker and easier. However, if you’re making the same chart multiple times, or creating slightly different versions of a similar chart, the manual work can quickly accumulate. The benefit of creating annotations in R is that it’s easier to scale up your work, and automate the annotation creation.</p>
+</div>
+</div>
+<p>But (just for the fun of it) let’s try to make the plot from scratch using only <strong><code>ggplot2</code></strong>.</p>
 <p>We need to define the following to be able to position the text:</p>
 <ul>
 <li>the x- and y- coordinates of where the text should end</li>
@@ -676,7 +689,7 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 <ul>
 <li>
 <code>title_font</code>: a bold typeface that will, as the name suggests, be used for the title. We’ll use <em>Passion One</em> - a display typeface with thick, bold strokes which make it ideal for titles.</li>
-<li>a <code>body_font</code>: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be used a quite a small font size, and so it’s important that it’s a clean and simple typeface. We’ll use <em>Ubuntu</em> - a sans serif typeface that we’ve used in previous chapters.</li>
+<li>a <code>body_font</code>: a simple typeface that will be used for all other text elements, including the text displaying the laureate names. This means the text will be quite a small font size, and so it’s important to use a clean and simple typeface. We’ll use <em>Ubuntu</em> - a sans serif typeface that we’ve used in previous chapters.</li>
 </ul>
 <p>Both typefaces are provided through Google Fonts so we’ll use <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> from <strong><code>sysfonts</code></strong> to load them into R. We also run <code><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto()</a></code> and <code>showtext_opts(dpi = 300)</code> to use <strong><code>showtext</code></strong> for rendering text on plots at our desired resolution. </p>
 <div class="cell">
@@ -859,7 +872,7 @@ Figure&nbsp;8.11: The names of Nobel Prize in Physics awardees arranged in an an
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;8.2: Checking columns exist
+Tip&nbsp;8.3: Checking columns exist
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -881,7 +894,7 @@ Tip&nbsp;8.2: Checking columns exist
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;8.3: Using fonts in functions
+Tip&nbsp;8.4: Using fonts in functions
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1034,7 +1047,7 @@ Figure&nbsp;8.12: The names of Nobel Peace Prize awardees arranged in an anti-cl
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;8.4: Building your own <strong><code>ggplot2</code></strong> extension
+Tip&nbsp;8.5: Building your own <strong><code>ggplot2</code></strong> extension
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1056,7 +1069,7 @@ Tip&nbsp;8.4: Building your own <strong><code>ggplot2</code></strong> extension
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;8.5: Circular text with <strong><code>ggtextcircle</code></strong>
+Tip&nbsp;8.6: Circular text with <strong><code>ggtextcircle</code></strong>
 </div>
 </div>
 <div class="callout-body-container callout-body">

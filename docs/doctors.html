@@ -467,7 +467,7 @@ Figure&nbsp;11.1: Simple non-styled scatterplot of number of physicians per 1,00
 </section><section id="exploratory-sketches" class="level3" data-number="11.2.2"><h3 data-number="11.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">11.2.2</span> Exploratory sketches</h3>
 <p>The most common approach to visualizing spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it’s very common to color the country based on the value of the variable. These are often termed <em>choropleth maps</em>.</p>
-<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
 </div>
@@ -724,11 +724,33 @@ Tip&nbsp;11.6: Choosing a column name
 </div>
 <div class="callout-body-container callout-body">
 <p>This column does not need to be called <code>label</code>, you can use any name you choose as long as it’s not an existing column.</p>
+<p>You could also pass the title directly into <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> instead of creating a new column:</p>
+<div class="cell">
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="st">"Doctors across the world"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>&lt;ggproto object: Class FacetWrap, Facet, gg&gt;
+    compute_layout: function
+    draw_back: function
+    draw_front: function
+    draw_labels: function
+    draw_panels: function
+    finish_data: function
+    init_scales: function
+    map_data: function
+    params: list
+    setup_data: function
+    setup_params: function
+    shrink: TRUE
+    train_scales: function
+    vars: function
+    super:  &lt;ggproto object: Class FacetWrap, Facet, gg&gt;</code></pre>
+</div>
+</div>
 </div>
 </div>
 <p>Then we can use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> and facet across the <code>label</code> column. Since there’s only one value of <code>label</code> in the data, this just adds the title as strip text at the top of the plot. While we’re here, let’s make the country outlines in the map the same color as the background, and make the lines a little bit thicker. </p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">map_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>    <span class="va">long</span>,</span>
@@ -803,7 +825,7 @@ Figure&nbsp;11.6: Map of the world with duplicated title in the facet strip text
 <p>To solve the first two problems, the <code>title</code> and <code>subtitle</code> arguments of <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be set to <code>NULL</code> to remove them from the plot. Instead, the <code>tag</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> can be used to set the subtitle. The nice thing about using <code>tag</code> is the <code>plot.tag.position</code> argument within <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> which allows you to position the text anywhere on the plot. The <code>strip.text</code> and <code>plot.tag</code> arguments of theme should also be set using <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> to allow the text to be styled as we wish. The top, left, and right margins of the plot should be set to <code>0</code> using <code>plot.margin</code> to make sure that the strip text banner goes to the edge of the plot. </p>
 <p>To solve the third problem of the map looking stretched, we can apply <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code> which applies the World Geodetic System 1984 (WGS84) CRS (coordinate reference system). <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> discusses coordinate reference systems in more detail. The upper limit of the <code>y</code> axis can also be extended beyond the range of the data to make room for the subtitle added using <code>tag</code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">&lt;-</span> <span class="va">styled_plot</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">&lt;-</span> <span class="va">styled_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="cn">NULL</span>, subtitle <span class="op">=</span> <span class="cn">NULL</span>, tag <span class="op">=</span> <span class="va">subtitle</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -855,7 +877,7 @@ Tip&nbsp;11.7: Styling guides in <strong><code>ggplot2</code></strong>
 </div>
 <p>The size of the legend is controlled through the <code>legend.key.width</code> and <code>legend.key.height</code> arguments.</p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot2</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    <span class="co"># legend text</span></span>
 <span>    legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -887,7 +909,7 @@ Figure&nbsp;11.7: Final styled plot showing a map of the world, with title insid
 </div>
 <p>We can then finally save a copy with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"doctors.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.67</span> <span class="op">*</span> <span class="fl">5</span></span>

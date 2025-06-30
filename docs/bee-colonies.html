@@ -384,7 +384,7 @@ window.Quarto = {
 
 
 </header><p>In this chapter, we’ll learn how to explore patterns in missing data, install R packages that aren’t available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -396,6 +396,13 @@ window.Quarto = {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/visdat/">visdat</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>We’ll be using <strong><code>ggplot2</code></strong> for plotting, and <strong><code>ggtext</code></strong> for text styling as we’ve done in previous chapters, with <strong><code>dplyr</code></strong> and <strong><code>tidyr</code></strong> used for preparing the data downloaded with <strong><code>tidytuesdayR</code></strong>. Again, <strong><code>sysfonts</code></strong> and <strong><code>showtext</code></strong> are used for loading and rendering different fonts. In this chapter, we’ll be using two packages that haven’t been mentioned yet:</p>
+<ul>
+<li>
+<strong><code>visdat</code></strong>: for creating heatmaps showing information about entire datasets, including missing data.</li>
+<li>
+<strong><code>poissoned</code></strong>: for performing Poisson disk sampling.</li>
+</ul>
 <section id="data" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">4.1</span> Data</h2>
 <p>As a major pollinator, bees are a vitally important part of our planet’s ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases <span class="citation" data-cites="Brown2009">(<a href="references.html#ref-Brown2009" role="doc-biblioref">Brown, Mark J.F. and Paxton, Robert J. 2009</a>)</span>. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors <span class="citation" data-cites="bees_data">(<a href="references.html#ref-bees_data" role="doc-biblioref">United States Department of Agriculture: Economics, Statistics and Market Information System 2022</a>)</span>.</p>
@@ -422,9 +429,9 @@ window.Quarto = {
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Simple horizontal boxplot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-boxplot-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-boxplot-1.png" class="img-fluid figure-img" alt="Simple horizontal boxplot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.1: Simple boxplot of number of bee colonies per year, showing a highly skewed distribution.
@@ -445,9 +452,9 @@ Figure&nbsp;4.1: Simple boxplot of number of bee colonies per year, showing a hi
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-boxplot2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-boxplot2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'. California and North Dakota show higher ranges, but the highest value is for the United States i.e. is a sum of all other values.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-boxplot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-boxplot2-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-boxplot2-1.png" class="img-fluid figure-img" alt="Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'. California and North Dakota show higher ranges, but the highest value is for the United States i.e. is a sum of all other values.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-boxplot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.2: Boxplot of the number of bee colonies per state, showing an issue with the definition of ‘state’.
@@ -475,9 +482,9 @@ Tip&nbsp;4.1: Choose appropriate column names
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">colony_AL</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">colony</span>, <span class="va">state</span> <span class="op">==</span> <span class="st">"Alabama"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="va">colony_AL</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-vismiss" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-vismiss" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The label for this one is truncated.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-vismiss-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-vismiss-1.png" class="img-fluid figure-img" alt="A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The label for this one is truncated.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-vismiss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.3: A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares.
@@ -496,9 +503,9 @@ Figure&nbsp;4.3: A plot showing the missing values in the rows and columns in th
 <span>  <span class="fu"><a href="https://docs.ropensci.org/visdat/reference/vis_miss.html">vis_miss</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-vismiss-tip" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-vismiss-tip" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The column names are abbreviated.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-vismiss-tip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-vismiss-tip-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-vismiss-tip-1.png" class="img-fluid figure-img" alt="A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The column names are abbreviated.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-vismiss-tip-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.4: A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. The label for the last column of data is now legible and not hidden by the edge of the plot.
@@ -527,9 +534,9 @@ Tip&nbsp;4.2: Avoid missing patterns about missingness
 </section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
 <p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <a href="#fig-bees-sketch-blank" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
-<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square representing a combination of year and US state.
@@ -537,9 +544,9 @@ Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square repr
 </div>
 <p>Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>.</p>
 <p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
-<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.6: Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.
@@ -642,9 +649,9 @@ Tip&nbsp;4.3: Installing R packages from GitHub
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sampling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-layout-row">
 <div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-bees-sampling" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-bees-sampling-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-sampling-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two plots side by side showing the difference between Poisson disk sampling and uniform sampling. In uniform sampling some points are close together and overlap, where as with Poisson disk they are more evenly spaced.">
 <figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-bees-sampling-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-sampling-1.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling">
+<img src="bee-colonies_files/figure-html/fig-bees-sampling-1.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling" alt="Two plots side by side showing the difference between Poisson disk sampling and uniform sampling. In uniform sampling some points are close together and overlap, where as with Poisson disk they are more evenly spaced.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-bees-sampling-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) Poisson disk sampling
@@ -652,9 +659,9 @@ Tip&nbsp;4.3: Installing R packages from GitHub
 </div>
 </div>
 <div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-bees-sampling" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div id="fig-bees-sampling-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-sampling-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two plots side by side showing the difference between Poisson disk sampling and uniform sampling. In uniform sampling some points are close together and overlap, where as with Poisson disk they are more evenly spaced.">
 <figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-bees-sampling-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-sampling-2.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling">
+<img src="bee-colonies_files/figure-html/fig-bees-sampling-2.png" class="img-fluid figure-img" data-ref-parent="fig-bees-sampling" alt="Two plots side by side showing the difference between Poisson disk sampling and uniform sampling. In uniform sampling some points are close together and overlap, where as with Poisson disk they are more evenly spaced.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-bees-sampling-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (b) Uniform sampling
@@ -709,9 +716,9 @@ Figure&nbsp;4.7: Plots comparing data generated using Poisson disk sampling and 
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-base-plot-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-base-plot-1.png" class="img-fluid figure-img" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.8: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other.
@@ -744,9 +751,9 @@ Figure&nbsp;4.8: A 6x6 grid with each grid square denoting a year between 2015-2
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">state</span> <span class="op">~</span> <span class="va">year</span>, switch <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-base-plot2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-base-plot2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-base-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-base-plot2-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-base-plot2-1.png" class="img-fluid figure-img" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-base-plot2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.9: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares.
@@ -785,9 +792,9 @@ Figure&nbsp;4.9: A 6x6 grid with each grid square denoting a year between 2015-2
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-bees-text-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-bees-text-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bee-colonies_files/figure-html/fig-bees-text-plot-1.png" class="img-fluid figure-img">
+<img src="bee-colonies_files/figure-html/fig-bees-text-plot-1.png" class="img-fluid figure-img" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bees-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page.
@@ -852,7 +859,7 @@ Figure&nbsp;4.10: A 6x6 grid with each grid square denoting a year between 2015-
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="bee-colonies_files/figure-html/bees-theme-plot-2-1.png" class="img-fluid figure-img"></p>
+<figure class="figure"><p><img src="bee-colonies_files/figure-html/bees-theme-plot-2-1.png" class="img-fluid figure-img" alt="A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The design is much more minimal, with the black background of the grid squares allowing the yellow points to be more easily seen due to the higher contrast."></p>
 <figcaption>A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The design is much more minimal, with the black background of the grid squares allowing the yellow points to be more easily seen due to the higher contrast.</figcaption></figure>
 </div>
 </div>

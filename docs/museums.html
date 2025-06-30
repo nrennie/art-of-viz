@@ -357,8 +357,14 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
   
 
 
-</header><p>In this chapter we’ll consider different ways of visualising data that varies over time, aiming to avoid <em>spaghetti charts</em>, with the help of the <strong><code>gghighlight</code></strong> extension package. </p>
-<p><strong>Packages required in this chapter</strong>:</p>
+</header><p>In this chapter we’ll consider different ways of visualising data that varies over time, aiming to avoid <em>spaghetti charts</em>, and instead highlight subsets of the data to better demonstrate trends and relationships.</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Compare line charts and area charts for showing data over time, alongside whether to create small multiples or show all data on one chart.</li>
+<li>Decide whether color is necessary for a chart, choose accessible palettes, and load palettes from other R packages;</li>
+<li>Highlight subsets of data on a chart to make trends clearer while still allowing easy comparisons.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yutannihilation.github.io/gghighlight/">gghighlight</a></span><span class="op">)</span></span>
@@ -372,6 +378,18 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/">viridis</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>The new packages we’ll be exploring for the first time in this chapter are:</p>
+<ul>
+<li>
+<strong><code>gghighlight</code></strong>: which makes it easy to highlight specific data in <strong><code>ggplot2</code></strong> plots while fading the rest.</li>
+<li>
+<strong><code>purrr</code></strong>: for easily repeating actions on lists or vectors.</li>
+<li>
+<strong><code>tibble</code></strong>: another one of the core <strong><code>tidyverse</code></strong> packages that provides a modern, tidy version of data frames that’s easier to use and prints nicely.</li>
+<li>
+<strong><code>viridis</code></strong>: which provides colorblind-friendly and perceptually uniform color palettes.</li>
+</ul>
+<p> </p>
 <section id="data" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">3.1</span> Data</h2>
 <p>The <a href="https://museweb.dcs.bbk.ac.uk/data">Mapping Museums</a> project <span class="citation" data-cites="museums_data">(<a href="references.html#ref-museums_data" role="doc-biblioref">Mapping Museums 2021</a>)</span> has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/home">museweb.dcs.bbk.ac.uk</a>. It was also used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in November 2022 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), and we’ll use that version for this chapter.</p>
@@ -665,6 +683,20 @@ Figure&nbsp;3.4: An area chart of total number of museums open per year for each
 <li>The number of open museums in 1960 is different in each faceted plot: since they all start at different levels, it makes it more difficult to compare the relative increases or decreases.</li>
 <li>It’s hard to directly compare one facet to another since each facet only contains one trend line: we have to imagine overlaying the lines in our head to compare one trend line to another.</li>
 </ul>
+<div id="tip-museums-vars" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;3.3: Specifying variables for facets
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There are different ways to specify which variables are used for facets in <strong><code>ggplot2</code></strong>. Here, we’ve written <code>facet_wrap(~deprivation)</code> which makes use of the formula shorthand, <code>~</code>, to tell <strong><code>ggplot2</code></strong> to facet by the <code>deprivation</code> variable.</p>
+<p>However, you may also see facet variables specified using the <code><a href="https://dplyr.tidyverse.org/reference/vars.html">vars()</a></code> function, like <code>facet_wrap(vars(deprivation))</code>. Using the <code><a href="https://dplyr.tidyverse.org/reference/vars.html">vars()</a></code> function makes it easier to facet by multiple variables, but it’s a more modern approach so you may see it less often if you’re looking for other examples.</p>
+</div>
+</div>
 <p>We could solve these problems by making two changes:</p>
 <ul>
 <li>Rescale the data based on the number of museums open in 1960; and</li>
@@ -785,7 +817,7 @@ Figure&nbsp;3.7: An updated version of the previous chart with colors chosen fro
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;3.3: Typeface vs.&nbsp;font vs.&nbsp;font family
+Tip&nbsp;3.4: Typeface vs.&nbsp;font vs.&nbsp;font family
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -811,7 +843,7 @@ Tip&nbsp;3.3: Typeface vs.&nbsp;font vs.&nbsp;font family
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;3.4: Adding line breaks using <code>&lt;br&gt;</code>
+Tip&nbsp;3.5: Adding line breaks using <code>&lt;br&gt;</code>
 </div>
 </div>
 <div class="callout-body-container callout-body">

@@ -13,9 +13,15 @@ execute:
 
 # UK museums: highlighting line charts with **`gghighlight`** {#sec-museums}
 
-In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, with the help of the **`gghighlight`** extension package. \index{gghighlight}
+In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, and instead highlight subsets of the data to better demonstrate trends and relationships.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Compare line charts and area charts for showing data over time, alongside whether to create small multiples or show all data on one chart.
+* Decide whether color is necessary for a chart, choose accessible palettes, and load palettes from other R packages; 
+* Highlight subsets of data on a chart to make trends clearer while still allowing easy comparisons.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: museums-pkgs-req
@@ -33,6 +39,15 @@ library(tidyr)
 library(tidytuesdayR)
 library(viridis)
 ```
+
+The new packages we'll be exploring for the first time in this chapter are:
+
+* **`gghighlight`**: which makes it easy to highlight specific data in **`ggplot2`** plots while fading the rest.
+* **`purrr`**: for easily repeating actions on lists or vectors.
+* **`tibble`**: another one of the core **`tidyverse`** packages that provides a modern, tidy version of data frames that’s easier to use and prints nicely.
+* **`viridis`**: which provides colorblind-friendly and perceptually uniform color palettes.
+
+\index{gghighlight} \index{viridis} \index{tibble} \index{purrr}
 
 ## Data
 
@@ -325,6 +340,16 @@ This tells a similar story to the initial bar chart in @fig-museums-barplot - th
 
 * The number of open museums in 1960 is different in each faceted plot: since they all start at different levels, it makes it more difficult to compare the relative increases or decreases.
 * It's hard to directly compare one facet to another since each facet only contains one trend line: we have to imagine overlaying the lines in our head to compare one trend line to another.
+
+::: {#tip-museums-vars .callout-tip}
+
+## Specifying variables for facets
+
+There are different ways to specify which variables are used for facets in **`ggplot2`**. Here, we've written `facet_wrap(~deprivation)` which makes use of the formula shorthand, `~`, to tell **`ggplot2`** to facet by the `deprivation` variable.
+
+However, you may also see facet variables specified using the `vars()` function, like `facet_wrap(vars(deprivation))`. Using the `vars()` function makes it easier to facet by multiple variables, but it's a more modern approach so you may see it less often if you're looking for other examples.
+
+:::
 
 We could solve these problems by making two changes:
 

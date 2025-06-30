@@ -357,8 +357,14 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
   
 
 
-</header><p>In this chapter we’ll learn how to combine points and lines to create dumbbell charts, create data-driven captions using the <strong><code>glue</code></strong> package, and understand how to style charts using themes, fonts, and colors in <strong><code>ggplot2</code></strong>.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+</header><p>In this chapter we’ll learn how to combine points and lines to create dumbbell charts, create data-driven captions, and understand how to style charts using themes, fonts, and colors.</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Create a dumbbell chart using basic geometries available in <strong><code>ggplot2</code></strong>;</li>
+<li>Select an appropriate font for your chart design, and load it into R for use in plots; and</li>
+<li>Understand how to save high quality images of plots in different formats.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -369,6 +375,18 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>It’s assumed that you’re already a little bit familiar with the <strong><code>dplyr</code></strong> and <strong><code>tidyr</code></strong> packages that we’ll be using for data wrangling, alongside <strong><code>ggplot2</code></strong> itself of course! We’ll introduce each of the other packages as we use them, but the following provides a brief summary of each package’s purpose:</p>
+<ul>
+<li>
+<strong><code>ggtext</code></strong>: allows you to use Markdown, HTML, and CSS formatting in <strong><code>ggplot2</code></strong> text.</li>
+<li>
+<strong><code>glue</code></strong>: for <em>gluing</em> together R code with strings to create text.</li>
+<li>
+<strong><code>showtext</code></strong> and <strong><code>sysfonts</code></strong>: for loading fonts and making them available within an R session.</li>
+<li>
+<strong><code>tidytuesdayR</code></strong>: for accessing data published on GitHub as part of the TidyTuesday project.</li>
+</ul>
+<p> </p>
 <section id="data" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">2.1</span> Data</h2>
 <p>In this chapter, we’re going to explore the Programming Languages Database (PLDB) <span class="citation" data-cites="pldb_data">(<a href="references.html#ref-pldb_data" role="doc-biblioref">PLDB contributors 2022</a>)</span>. This database is an encyclopedia of programming languages, containing information on ranking, when it was created, what type of language it is, and how many GitHub repositories use the language - to name just a few variables. Programming language creators can use the database to help design and improve programming languages, whilst programming language users can use the database to help make decisions about which languages to use or learn.</p>
@@ -553,7 +571,7 @@ Tip&nbsp;2.2: The importance of sketching
 </div>
 </div>
 <p>A dumbbell chart for the timelines of languages that use a <code>#</code> for comments might look something like this:</p>
-<div id="fig-languages-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change." data-fig-align="center">
+<div id="fig-languages-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-languages.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="The hand-drawn chart titled 'Comment: #' shows the evolution of a language over time, with dots and lines representing different stages and developments. It starts around 1950 and extends to 2020, suggesting a significant period of linguistic change.">
 </div>
@@ -562,7 +580,7 @@ Figure&nbsp;2.5: Initial sketch of a dumbbell chart showing the time frame that 
 </figcaption></figure>
 </div>
 <p>To show how this differs between different comment symbols, we might create small multiples of this chart - essentially creating the same plot multiple times for different subsets of the data. In <strong><code>ggplot2</code></strong>, these are called <em>facets</em>, and might look something like this:</p>
-<div id="fig-languages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language." data-fig-align="center">
+<div id="fig-languages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-languages-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-languages-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="The hand-drawn chart titled 'Title' shows the evolution of three different languages over time. Each language is represented by a vertical line with dots and horizontal lines indicating changes and developments. The lines extend from 1950 to 2020, suggesting a significant period of linguistic evolution. The comments '#', '//', and ';' likely denote different types of changes or features within each language.">
 </div>
