@@ -16,29 +16,39 @@ fig-asp: 1
 
 In this chapter, we'll learn how to explore patterns in missing data, install R packages that aren't available on CRAN, find out how to perform Poisson disk sampling, and create plots that are faceted by two variables.
 
-**Packages required in this chapter**:
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: bees-pkgs-req
-#| eval: false
-c(
-  "dplyr", "ggplot2", "ggtext", "poissoned",
-  "showtext", "sysfonts", "tidyr", "tidytuesdayR",
-  "visdat"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(ggplot2)
+library(ggtext)
+library(poissoned)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
+library(visdat)
 ```
+
+We'll be using **`ggplot2`** for plotting, and **`ggtext`** for text styling as we've done in previous chapters, with **`dplyr`** and **`tidyr`** used for preparing the data downloaded with **`tidytuesdayR`**. Again, **`sysfonts`** and **`showtext`** are used for loading and rendering different fonts. In this chapter, we'll be using two packages that haven't been mentioned yet:
+
+* **`visdat`**: for creating heatmaps showing information about entire datasets, including missing data.
+* **`poissoned`**: for performing Poisson disk sampling.
 
 ## Data
 
 As a major pollinator, bees are a vitally important part of our planet's ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [@Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors [@bees_data].
 
-The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] data set in January 2022 (after being suggested by [Georgios Karamanis](https://github.com/gkaramanis)), and so can be loaded in using the {tidytuesdayR} package: \index{tidytuesdayR!tt\_load}
+The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] data set in January 2022 (after being suggested by [Georgios Karamanis](https://github.com/gkaramanis)), and so can be loaded in using the **`tidytuesdayR`** package: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: bees-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2022-01-11")
+tuesdata <- tt_load("2022-01-11")
 colony <- tuesdata$colony
 stressor <- tuesdata$stressor
 ```
@@ -51,7 +61,7 @@ stressor <- tuesdata$stressor
 colony <- readr::read_csv("data/colony.csv")
 ```
 
-Since this version of the data is based on the 2021 release, it includes data up to June 2021. If you want to work with a more recent publication of the data, it can be obtained from [usda.library.cornell.edu/concern/publications/rn301137d](https://usda.library.cornell.edu/concern/publications/rn301137d).
+Since this version of the data is based on the 2021 release, it includes data up to June 2021. If you want to work with a more recent publication of the data, it can be obtained from {{< monolink "https://usda.library.cornell.edu/concern/publications/rn301137d" "usda.library.cornell.edu/concern/publications/rn301137d" >}}.
 
 Two different data sets are included. The first, `colony`, contains information about the number and size of bee colonies in each US state per year since 2015. The second, `stressor`, contains information about different sources of health stressors for bee colonies and what percentage of colonies are affected by these stressors, again for different states and time periods.
 
@@ -63,12 +73,11 @@ In this chapter, we'll focus on the `colony` data, where we'll try to build a pi
 
 Let's start by looking at a quick box plot of how the number of colonies (`colony_n`) is changing over time, using the base R `boxplot()` function: \index{graphics!boxplot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-bees-boxplot
 #| fig-cap: "Simple boxplot of number of bee colonies per year, showing a highly skewed distribution."
-#| fig-alt: ""
+#| fig-alt: "Simple horizontal boxplot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below."
 #| fig-asp: 0.66
-#| echo: -1
 par(mar = c(2.1, 2.1, 1.1, 2.1))
 boxplot(
   colony_n ~ year,
@@ -83,12 +92,11 @@ boxplot(
 
 Let's start by trying to understand what's causing these outliers. Are they real values? Are they mistakes in the data? Or have we made an incorrect assumption about the data? To understand this a bit better, let's zoom in on one year, 2020, and look at the number of colonies in each state to understand which states the largest outliers relate to. \index{base!subset} \index{graphics!boxplot}
 
-```{r}
+```{r, echo=-1}
 #| fig-asp: 1.2
 #| label: fig-bees-boxplot2
 #| fig-cap: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'."
-#| fig-alt: ""
-#| echo: -1
+#| fig-alt: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'. California and North Dakota show higher ranges, but the highest value is for the United States i.e. is a sum of all other values."
 par(mar = c(4.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 colony_2020 <- subset(colony, year == 2020)
 boxplot(
@@ -111,34 +119,33 @@ It's unfortunately not uncommon for a column name to suggest one thing (e.g. eac
 
 :::
 
-The other aspect of our data that box plots don't tell us about is the missingness. Box plots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that {ggplot2} [@ggplot2] does. So how do we plot data that doesn't exist? \index{box plot} \index{missing data}
+The other aspect of our data that box plots don't tell us about is the missingness. Box plots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that **`ggplot2`** [@ggplot2] does. So how do we plot data that doesn't exist? \index{box plot} \index{missing data}
 
-The {visdat} package [@visdat] is an excellent way to take a quick look at your data. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we'll start by visualising just the data for one state. We can use the `subset()` function from base R to obtain just the data fro Alabama. \index{visdat!vis\_miss} \index{base!subset}
+The **`visdat`** package [@visdat] is an excellent way to take a quick look at your data. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we'll start by visualising just the data for one state. We can use the `subset()` function from base R to obtain just the data for Alabama. \index{visdat!vis\_miss} \index{base!subset}
 
 ```{r}
 #| label: fig-bees-vismiss
 #| fig-cap: "A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares."
-#| fig-alt: ""
+#| fig-alt: "A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The label for this one is truncated."
 #| fig-asp: 0.6
 colony_AL <- subset(colony, state == "Alabama")
-visdat::vis_miss(colony_AL)
+vis_miss(colony_AL)
 ```
 
 You may notice that the column names in the plot generated by `vis_miss()` in @fig-bees-vismiss are rotated and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: \index{visdat!vis\_miss} \index{visdat!abbreviate\_vars} \index{ggplot2!theme}
 
-* Use the `abbreviate_vars()` function from {visdat} which abbreviates column names, and makes them less likely to exceed the available space.
-* Exploit the fact that the plot output from `vis_miss()` is made with {ggplot2}. This means we can use the `theme()` function to extend the space available in the plot's right margin.
+* Use the `abbreviate_vars()` function from **`visdat`** which abbreviates column names, and makes them less likely to exceed the available space.
+* Exploit the fact that the plot output from `vis_miss()` is made with **`ggplot2`**. This means we can use the `theme()` function to extend the space available in the plot's right margin.
 
 ```{r}
 #| label: fig-bees-vismiss-tip
 #| fig-cap: "A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. The label for the last column of data is now legible and not hidden by the edge of the plot."
-#| fig-alt: ""
+#| fig-alt: "A plot showing the missing values in the rows and columns in the subset of the data related to Alabama, with missing values represented by black squares. Besides dates and states, there are some time periods with no data available at all, and others where only the last column of data is missing. The column names are abbreviated."
 #| fig-asp: 0.6
 #| message: false
-library(ggplot2)
 colony_AL |>
-  visdat::abbreviate_vars(min_length = 8) |>
-  visdat::vis_miss() +
+  abbreviate_vars(min_length = 8) |>
+  vis_miss() +
   theme(plot.margin = margin(r = 25))
 ```
 
@@ -154,7 +161,7 @@ Instead, we'll limit our visualization to a quarter for which we have complete d
 
 ## Avoid missing patterns about missingness
 
-By default, the {visdat} packages assumes that missing data is encoded as `NA`. This is not always true - especially when you're working with data that's been processed by other software before you receive it. It's not uncommon for missing values to be encoded using values such as `""`, `" "`, `99`, `999`, `-`, or `0`. The {naniar} package [@naniar] is very useful for summarizing and wrangling missing values. The `replace_with_na()` function from {naniar} can help you to replace unusual encoding of missing values with `NA` for easier data processing in R. \index{naniar!replace\_with\_na}
+By default, the **`visdat`** packages assumes that missing data is encoded as `NA`. This is not always true - especially when you're working with data that's been processed by other software before you receive it. It's not uncommon for missing values to be encoded using values such as `""`, `" "`, `99`, `999`, `-`, or `0`. The **`naniar`** package [@naniar] is very useful for summarizing and wrangling missing values. The `replace_with_na()` function from **`naniar`** can help you to replace unusual encoding of missing values with `NA` for easier data processing in R. \index{naniar!replace\_with\_na}
 
 It's also important to think about the ordering of the columns and rows when visualizing missing values. For example, if there is a column which holds a date, ordering the rows by date before visualising the missing data, will allow you to identify temporal patterns in the missingness. If the rows are ordered in some other way, you might miss this pattern.
 
@@ -164,13 +171,13 @@ It's also important to think about the ordering of the columns and rows when vis
 
 For each state, let's visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let's try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of *things* (bee colonies) in each *combination of two variables* (state and year). We have data available for every combination of state and year, so let's create a grid of states and years, as in @fig-bees-sketch-blank.
 
-![Initial sketch showing a grid of squares, with each square representing a combination of year and US state.](images/sketch-bees-blank.png){#fig-bees-sketch-blank fig-align="center" fig-alt=""}
+![Initial sketch showing a grid of squares, with each square representing a combination of year and US state.](images/sketch-bees-blank.png){#fig-bees-sketch-blank fig-align="center" fig-alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states"}
 
 Now in each grid square, we're simply trying to show the number of *things*. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in @fig-bees-sketch.
 
 We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we're most interested in). 
 
-![Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.](images/sketch-bees.png){#fig-bees-sketch fig-align="center" fig-alt=""}
+![Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.](images/sketch-bees.png){#fig-bees-sketch fig-align="center" fig-alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text."}
 
 ## Preparing a plot
 
@@ -194,69 +201,71 @@ states_to_plot <- c(
 )
 ```
 
-We then use the `filter()` function from {dplyr} to subset the data to only include rows for these states, and in our chosen time period of `"October-December"`. We also use the `select()` function to keep only the columns we actually need for our plot - the year, the state, and the number of colonies: \index{dplyr!filter} \index{dplyr!select}
+We then use the `filter()` function from **`dplyr`** to subset the data to only include rows for these states, and in our chosen time period of `"October-December"`. We also use the `select()` function to keep only the columns we actually need for our plot - the year, the state, and the number of colonies: \index{dplyr!filter} \index{dplyr!select}
 
 ```{r}
 #| label: bees-prep-data
 plot_data <- colony |>
-  dplyr::filter(
+  filter(
     state %in% states_to_plot,
     months == "October-December"
   ) |>
-  dplyr::select(
+  select(
     year, state, colony_n
   )
 ```
 
-By default, the states will be ordered in alphabetical order. To make it easier to communicate patterns, we'll order the states based on the number of colonies in the final year of the data (2020). We start by determining what that order is by filtering the data to the year `2020`, arranging the data based on the `colony_n` column in a descending order (using `desc()` from {dplyr}), and then extracting the state column using `pull()`. \index{dplyr!filter} \index{dplyr!arrange} \index{dplyr!desc} \index{dplyr!pull}
+By default, the states will be ordered in alphabetical order. To make it easier to communicate patterns, we'll order the states based on the number of colonies in the final year of the data (2020). We start by determining what that order is by filtering the data to the year `2020`, arranging the data based on the `colony_n` column in a descending order (using `desc()` from **`dplyr`**), and then extracting the state column using `pull()`. \index{dplyr!filter} \index{dplyr!arrange} \index{dplyr!desc} \index{dplyr!pull}
 
 ```{r}
 #| label: bees-state_order
 state_levels <- plot_data |>
-  dplyr::filter(year == 2020) |>
-  dplyr::arrange(dplyr::desc(colony_n)) |>
-  dplyr::pull(state)
+  filter(year == 2020) |>
+  arrange(desc(colony_n)) |>
+  pull(state)
 ```
 
 We'll convert the state column to a factor a little bit later, and this `state_levels` vector will provide us with the factor levels
 
 Now we need to generate the points that will represent the number of honey bee colonies in each grid square, as we sketched in @fig-bees-sketch. We could do something simple, such as using the `runif()` function to generate `x` and `y` coordinates from a uniform distribution. However, this approach is likely to lead a plot that looks a bit messy. Randomness doesn't usually look very nice, and we would likely end up with lots of overlapping points. Instead, we want to generate points that don't overlap and are at least some minimum distance apart. To do this, we'll use *Poisson disk sampling*. \index{Poisson disk sampling}
 
-### Poisson disk sampling with {poissoned}
+### Poisson disk sampling with **`poissoned`**
 
 Poisson disk sampling is one way of generating *blue noise*, a type pattern where the points are mostly random but are fairly evenly distributed. In Poisson disk sampling, all of the points must be at least some distance, $r$ apart i.e. you can draw a *disk* of radius $r$ around each point and no other point will be included in the disk.
 
-There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the {poissoned} package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimensions - though we'll stick to two dimensions here!
+There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the **`poissoned`** package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimensions - though we'll stick to two dimensions here!
 
 ::: {#tip-bees-sampling .callout-tip}
 
 ## Installing R packages from GitHub
 
-**Using {remotes}**
+**Using `remotes`**
 
-When this chapter was first written, the {poissoned} package wasn't available on CRAN, so it had to be installed from GitHub instead. The {remotes} package [@remotes] can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the `install_github()` function, passing in a character string of the form `"user/repository"`: \index{remotes!install\_github}
+When this chapter was first written, the **`poissoned`** package wasn't available on CRAN, so it had to be installed from GitHub instead. The **`remotes`** package [@remotes] can be used to install packages from remote repositories, such as GitHub or GitLab. We can use the `install_github()` function, passing in a character string of the form `"user/repository"`: \index{remotes!install\_github}
 
 ```{r}
 #| label: bees-install
 #| eval: false
-remotes::install_github("coolbutuseless/poissoned")
+library(remotes)
+install_github("coolbutuseless/poissoned")
 ```
 
-**Using {pak}**
+**Using `pak`**
 
-An alternative to {remotes} is the {pak} package [@pak]. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using {pak}, use the `pkg_install()` function and again pass in the `"user/repository"` string: \index{pak!pkg\_install}
+An alternative to **`remotes``** is the **`pak`** package [@pak]. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using **`pak`**, use the `pkg_install()` function and again pass in the `"user/repository"` string: \index{pak!pkg\_install}
 
 ```{r}
 #| label: bees-pak-install
 #| eval: false
-pak::pkg_install("coolbutuseless/poissoned")
+library(pak)
+pkg_install("coolbutuseless/poissoned")
 ```
 
-The same function can be used for installing packages from CRAN e.g. `pak::pkg_install("ggplot2")`.
+The same function can be used for installing packages from CRAN e.g. `pkg_install("ggplot2")`.
 
 :::
 
-We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we'll use the `poisson2d()` function from {poissoned}. Since we're storing two coordinates (`x` and `y`) and the number of coordinate pairs will vary for each grid square, we'll store the output in a list column. We can add list columns in the same way we would add any other new column using the `mutate()` function from {dplyr}. Since we want to generate samples according to the values of `state`, `year`, and `colony_n` in each *row* of our data, we use the `rowwise()` function from {dplyr}. Since we're generating random data, we also need to make sure we set the random seed using `set.seed()` to ensure we get the same plot every time we run the code. \index{dplyr!mutate} \index{dplyr!rowwise} \index{base!set.seed}
+We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we'll use the `poisson2d()` function from **`poissoned`**. Since we're storing two coordinates (`x` and `y`) and the number of coordinate pairs will vary for each grid square, we'll store the output in a list column. We can add list columns in the same way we would add any other new column using the `mutate()` function from **`dplyr`**. Since we want to generate samples according to the values of `state`, `year`, and `colony_n` in each *row* of our data, we use the `rowwise()` function from **`dplyr`**. Since we're generating random data, we also need to make sure we set the random seed using `set.seed()` to ensure we get the same plot every time we run the code. \index{dplyr!mutate} \index{dplyr!rowwise} \index{base!set.seed}
 
 We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e. there is an inverse relationship between `r` and `colony_n`. The default grid in `poisson2d()` goes from 0 to 10 on both axes. The values in `colony_n` range from `r format(min(plot_data$colony_n), scientific = FALSE)` to `r format(max(plot_data$colony_n), scientific = FALSE)`, meaning that if we simply set the minimum radius to `1/colony_n`, we end up with points that are only `r format(1/max(plot_data$colony_n), scientific = FALSE)` apart. That's a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set `r` to `200000/colony_n`. \index{poissoned!poisson2d}
 
@@ -264,10 +273,10 @@ We want the area to be more populated and contain more points where the number o
 #| label: bees-disk-sampling
 set.seed(123)
 bees_grid <- plot_data |>
-  dplyr::rowwise() |>
-  dplyr::mutate(
+  rowwise() |>
+  mutate(
     pts = list(
-      poissoned::poisson2d(r = 200000 / colony_n)
+      poisson2d(r = 200000 / colony_n)
     )
   )
 ```
@@ -277,14 +286,14 @@ To see the difference between Poisson disk sampling and Uniform sampling, we can
 ```{r}
 #| label: fig-bees-sampling
 #| fig-cap: "Plots comparing data generated using Poisson disk sampling and uniform sampling."
-#| fig-alt: ""
+#| fig-alt: "Two plots side by side showing the difference between Poisson disk sampling and uniform sampling. In uniform sampling some points are close together and overlap, where as with Poisson disk they are more evenly spaced."
 #| fig-subcap:
 #|   - "Poisson disk sampling"
 #|   - "Uniform sampling"
 #| layout-ncol: 2
 set.seed(123)
 # Poisson disk sampling
-pts <- poissoned::poisson2d()
+pts <- poisson2d()
 plot(
   x = pts$x, y = pts$y,
   main = "Poisson disk sampling"
@@ -298,13 +307,13 @@ plot(
 
 You can see in @fig-bees-sampling that the location of the points for Poisson disk sampling is not actually completely random, and is much *nicer* in appearance.
 
-Returning to our `bees_grid` data, we use `unnest()` from {tidyr} to expand the `pts` list column into separate rows and columns, and make sure that the `state` column is a factor, ordered by the `state_levels` variable we defined earlier. \index{tidyr!unnest}  \index{base!factor} \index{dplyr!mutate}
+Returning to our `bees_grid` data, we use `unnest()` from **`tidyr`** to expand the `pts` list column into separate rows and columns, and make sure that the `state` column is a factor, ordered by the `state_levels` variable we defined earlier. \index{tidyr!unnest}  \index{base!factor} \index{dplyr!mutate}
 
 ```{r}
 #| label: bees-disk-sampling2
 bees_plot_data <- bees_grid |>
-  tidyr::unnest(pts) |>
-  dplyr::mutate(
+  unnest(pts) |>
+  mutate(
     state = factor(state, levels = state_levels)
   )
 ```
@@ -325,7 +334,7 @@ In @sec-programming and @sec-museums, we used `facet_wrap()` to create small mul
 ```{r}
 #| label: fig-bees-base-plot
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other."
-#| fig-alt: ""
+#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The high density for California means that the points are so closely packed that they are not distinguishable from each other."
 basic_plot <- ggplot(
   data = bees_plot_data,
   mapping = aes(x = x, y = y)
@@ -351,14 +360,14 @@ bg_col <- "#FECC27"
 highlight_col <- "black"
 ```
 
-Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color...
+Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color!
 
 Let's remake the `basic_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
 
 ```{r}
 #| label: fig-bees-base-plot2
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares."
-#| fig-alt: ""
+#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The reduced (now yellow) point sizes allows points to be distinguishable from each other, even in the most densely packed grid squares."
 #| source-line-numbers: "6,7"
 basic_plot <- ggplot(
   data = bees_plot_data,
@@ -376,15 +385,15 @@ We'll edit the background color of the facet grid squares later in @sec-bees-the
 
 ### Fonts
 
-Since this is already quite a visually complex chart, we'll avoid further distractions and use the same font for all text elements in the chart. This means we define only a single font variable, `body_font`. We'll also use a simple, easy-to-read font. The *Red Hat* fonts are sans serif fonts, with the *Red Hat Text* version designed for increased legibility, especially at smaller font sizes. Again, it's available through Google Fonts and so can be loaded using `font_add_google()` from {sysfonts}, with `showtext_auto()` allowing plots to draw text using {showtext} automatically.  \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
+Since this is already quite a visually complex chart, we'll avoid further distractions and use the same typeface for all text elements in the chart. This means we define only a single font variable, `body_font`. We'll also use a simple, easy-to-read typeface. *Red Hat* is a sans serif typeface, with the *Red Hat Text* version designed for increased legibility, especially at smaller font sizes. Again, it's available through Google Fonts and so can be loaded using `font_add_google()` from **`sysfonts`**, with `showtext_auto()` allowing plots to draw text using **`showtext`** automatically. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts} 
 
 ```{r}
 #| label: bees-fonts
-sysfonts::font_add_google(
+font_add_google(
   name = "Red Hat Text", family = "red_hat"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "red_hat"
 ```
 
@@ -404,7 +413,7 @@ We can then add this text using the `labs()` function, and setting the `title`, 
 ```{r}
 #| label: fig-bees-text-plot
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page."
-#| fig-alt: ""
+#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page."
 text_plot <- basic_plot +
   labs(
     title = title,
@@ -417,7 +426,7 @@ text_plot
 
 ### Adjusting themes {#sec-bees-theme}
 
-We can then remove the axis text and ticks using `theme_void()`, which also removes the grid lines. Within `theme_void()`, we can also set the default font as our pre-defined `body_font` variable and reduce the size to ensure the facet labels fit within their allocated space. \index{ggplot2!theme\_void}
+We can then remove the axis text and ticks using `theme_void()`, which also removes the grid lines. Within `theme_void()`, we can also set the default typeface as our pre-defined `body_font` variable and reduce the size to ensure the facet labels fit within their allocated space. \index{ggplot2!theme\_void}
 
 Since the grid square goes from 0-10 for both the x and y axes, it would make sense for the grid square to actually be square rather than rectangular to avoid the points looking closer together in one direction. We we use `coord_fixed()` to force a 1:1 aspect ratio. Setting `expand = FALSE` to remove the extra padding around the edges of the plots also makes the differences in point density easier to see. \index{ggplot2!coord\_fixed} 
 
@@ -437,14 +446,14 @@ The last step is adjusting the remaining theme elements: \index{ggplot2!element\
 
 * The text text color and margin for facet labels can be modified using the `strip.text` argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets). 
 
-* We change the title, subtitle, and caption text color to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from {ggtext} to enable automatic line wrapping of the long text as described in @sec-programming.
+* We change the title, subtitle, and caption text color to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from **`ggtext`** to enable automatic line wrapping of the long text as described in @sec-programming.
 
 * We adjust the `plot.margin` to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.
 
 ```{r}
 #| label: bees-theme-plot-2
 #| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The design is much more minimal, with the black background of the grid squares allowing the yellow points to be more easily seen due to the higher contrast."
-#| fig-alt: ""
+#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. The design is much more minimal, with the black background of the grid squares allowing the yellow points to be more easily seen due to the higher contrast."
 theme_plot +
   theme(
     # background colors
@@ -469,7 +478,7 @@ theme_plot +
       color = highlight_col,
       face = "bold"
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = highlight_col,
       margin = margin(t = 5, b = 5)
     ),

@@ -12,33 +12,39 @@ fig-asp: 0.7
 #| file: R/options.R
 ```
 
-# Technology adoption: making gauge charts with {ggforce} {#sec-technology}
+# Technology adoption: making gauge charts with **`ggforce`** {#sec-technology}
 
-In this chapter we'll discover how to create gauge charts, a type of chart not native to {ggplot2}, with the help of the {ggforce} extension package.
+In this chapter we'll discover how to create gauge charts, a type of chart not native to **`ggplot2`**, with the help of the **`ggforce`** extension package.
 
 **Packages required in this chapter**:
 
 ```{r}
 #| label: technology-pkgs-req
-#| eval: false
-c(
-  "colorblindr", "dplyr", "ggforce", "ggplot2",
-  "ggtext", "scales", "showtext", "sysfonts",
-  "tidyr", "tidytuesdayR"
-)
+#| warning: false
+#| message: false
+library(colorblindr)
+library(dplyr)
+library(ggforce)
+library(ggplot2)
+library(ggtext)
+library(scales)
+library(showtext)
+library(sysfonts)
+library(tidyr)
+library(tidytuesdayR)
 ```
 
 ## Data
 
 The Cross‐country Historical Adoption of Technology (CHAT) dataset [@technology_data] contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing *as broad a definition of technology as possible* [@technology_data].
 
-The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), so let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
+The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), so let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: technology-load-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2022-07-19")
+tuesdata <- tt_load("2022-07-19")
 technology <- tuesdata$technology
 ```
 
@@ -65,13 +71,12 @@ Given the large scale of this data (in terms of time frame, spatially, and range
 
 ### Data exploration
 
-As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot()` function\index{graphics!barplot}:
+As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot()` function. \index{graphics!barplot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-technology-barplot
 #| fig-cap: "Bar chart of number of observations (all years, countries, and variables) in each category."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(2.1, 8.1, 1.1, 1.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(technology$category),
@@ -82,11 +87,10 @@ barplot(
 
 We have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changed over time, using the `heatmap()` function in base R: \index{stats!heatmap}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-technology-heatmap
 #| fig-cap: "Heatmap of number of observations (all countries and variables) in each category, each year. An increasing number of observations are seen in recent years."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
   table(technology$category, technology$year),
@@ -102,11 +106,10 @@ heatmap(
 
 Let's look into a specific variable in more detail. We need to narrow down the data we want to consider - there are `r length(unique(technology$label))` different questions (variables) contained in the data. You can check by running `length(unique(technology$label))`. One variable we could consider further is the percentage of children who received a measles immunization - indicated by the `"pctimmunizmeas"` level in the `variable` column. Let's create a quick scatter plot of how this percentage has been changing over time: \index{scatter plot}
 
-```{r}
+```{r, echo=-1}
 #| label: fig-technology-scatterplot
 #| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
 #| fig-alt: ""
-#| echo: -1
 par(mar = c(3.1, 2.1, 2.1, 2.1), cex = 0.5)
 pctimmunizmeas_df <- subset(
   technology, variable == "pctimmunizmeas"
@@ -123,9 +126,9 @@ For obvious reasons (the timing of when the first measles vaccine was created an
 
 A list of all ISO3 country codes can be obtained by running `unique(technology$iso3c)`, and from there we can choose a subset of countries we want to look at in more detail. Let's look at Great Britain, USA, Sweden, Brazil, New Zealand, and Venezuela, and store these choices in a vector called `countries`. 
 
-Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter`\index{dplyr!filter} function from {dplyr}\index{dplyr} to filter our `technology` data set to consider only the rows showing data about the percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
+Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter()`\index{dplyr!filter} function from **`dplyr`**\index{dplyr} to filter our `technology` data set to consider only the rows showing data about the percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
 
-We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from {dplyr}.
+We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from **`dplyr`**.
 
 ```{r}
 #| label: filter-technology
@@ -134,12 +137,12 @@ countries <- c("GBR", "USA", "SWE", "BRA", "NZL", "VEN")
 
 # subset data for specific topic, years, and countries
 measles_data <- technology |>
-  dplyr::filter(
+  filter(
     label == "% children who received a measles immunization",
     year %in% c(1980, 2010),
     iso3c %in% countries
   ) |>
-  dplyr::select(-c(group, category, variable, label))
+  select(-c(group, category, variable, label))
 head(measles_data)
 ```
 
@@ -147,7 +150,7 @@ Our tidier data now shows just the percentage (`value`) of children who received
 
 There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 1980 to 2010? Do we want to compare countries to each other? Do we just want to show the range of values in the data? In this data, the most interesting example is a comparison between 1980 and 2010. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
 
-At the time of writing, there isn't a built-in function in {ggplot2} to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, this initial sketch might give you an idea of what we're aiming for.
+At the time of writing, there isn't a built-in function in **`ggplot2`** to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, the initial sketch in @fig-technology-sketch might give you an idea of what we're aiming for.
 
 ### Exploratory sketches
 
@@ -159,28 +162,28 @@ Gauge charts often also include a dial (or needle) to highlight the value furthe
 
 ## Preparing a plot
 
-Gauge charts are not a built-in feature of {ggplot2}, so we're going to have to do a little bit of manual preparation before we start plotting.
+Gauge charts are not a built-in feature of **`ggplot2`**, so we're going to have to do a little bit of manual preparation before we start plotting.
 
 ### Data wrangling
 
-We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart natively in {ggplot2}. However, the use of polar coordinates in {ggplot2} often makes it difficult to add elements such as annotations in the position you'd like them to be in. So let's create a gauge chart a slightly different way! \index{ggplot2!geom\_col} \index{ggplot2!coord\_polar}
+We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart natively in **`ggplot2`**. However, the use of polar coordinates in **`ggplot2`** often makes it difficult to add elements such as annotations in the position you'd like them to be in. So let's create a gauge chart a slightly different way! \index{ggplot2!geom\_col} \index{ggplot2!coord\_polar}
 
 The `value` in the data currently tells us the percentage of children who did have an immunization, we also need to calculate the percentage of children who did not - by subtracting `value` from 100. We can then pivot the data such that each country has two rows in the data: (i) one row for the *did have immunization* value in 1980 and 2010, and (ii) one row for the *did not have immunization* value in 1980 and 2010. We end up with something halfway in between wide and long format data. Let's also make the `YN` column (indicating a did/did not have immunization row) into a factor.
 
 ```{r}
 #| label: wrangle-technology-1
 measles_YN <- measles_data |>
-  dplyr::mutate(no_value = 100 - value) |>
-  tidyr::pivot_longer(
+  mutate(no_value = 100 - value) |>
+  pivot_longer(
     cols = c(value, no_value),
     names_to = "YN",
     values_to = "perc"
   ) |>
-  tidyr::pivot_wider(
+  pivot_wider(
     names_from = "year",
     values_from = "perc"
   ) |>
-  dplyr::mutate(YN = factor(YN))
+  mutate(YN = factor(YN))
 ```
 
 To enable us to work with the percentages more easily, we can convert them into values between 0 and 1 by dividing by 100, and drop the original columns. If you think about creating a stacked bar chart, we need to know the end point of each bar (the maximum y-axis value for each bar). This isn't the percentage of each group, it's the cumulative percentage of each group and the ones stacked below it. We use the `cumsum()` function to calculate the cumulative sum of the percentages across each year and country: \index{cumsum}
@@ -188,13 +191,13 @@ To enable us to work with the percentages more easily, we can convert them into 
 ```{r}
 #| label: wrangle-technology-2
 plot_data <- measles_YN |>
-  dplyr::mutate(
+  mutate(
     perc_1980 = `1980` / 100,
     perc_2010 = `2010` / 100
   ) |>
-  dplyr::select(-c(`1980`, `2010`)) |>
-  dplyr::group_by(iso3c) |>
-  dplyr::mutate(
+  select(-c(`1980`, `2010`)) |>
+  group_by(iso3c) |>
+  mutate(
     ymax_1980 = cumsum(perc_1980),
     ymax_2010 = cumsum(perc_2010)
   )
@@ -203,13 +206,13 @@ head(plot_data)
 
 You'll notice that the `ymax_*` values are always `1` for the `no_value` rows - this is because the `no_value` is the last bar so we will always have plotted 100% of the data by the time we've finished that bar. Note that the data is currently still grouped by `iso3c` - this will be important later!
 
-### The {ggforce} extension package
+### The **`ggforce`** extension package
 
-The {ggforce}\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of {ggplot2}, many of them aimed at exploratory data visualization. We won't cover many of it's functions in this chapter, and instead we'll focus on how to use it to create gauge charts. {ggforce} is available on CRAN and can be installed with the usual `install.packages("ggforce")` command.
+The **`ggforce`**\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of **`ggplot2`**, many of them aimed at exploratory data visualization. We won't cover many of it's functions in this chapter, and instead we'll focus on how to use it to create gauge charts. **`ggforce`** is available on CRAN and can be installed with the usual `install.packages("ggforce")` command.
 
-### Gauge charts with {ggforce}
+### Gauge charts with **`ggforce`**
 
-The function that we're interested in for the purposes of creating a gauge chart is `geom_arc_bar()` \index{ggforce!geom\_arc\_bar}. The `geom_arc_bar()` function makes it possible to draw arcs in {ggplot2}. You can also use this function to create visualizations such as donut charts or sunburst plots. We'll use two calls to `geom_arc_bar()` to create the double gauge chart - one for the 1980 arc, and one for the 2010 arc. There are several required aesthetics when using `geom_arc_bar()`:
+The function that we're interested in for the purposes of creating a gauge chart is `geom_arc_bar()` \index{ggforce!geom\_arc\_bar}. The `geom_arc_bar()` function makes it possible to draw arcs in **`ggplot2`**. You can also use this function to create visualizations such as donut charts or sunburst plots. We'll use two calls to `geom_arc_bar()` to create the double gauge chart - one for the 1980 arc, and one for the 2010 arc. There are several required aesthetics when using `geom_arc_bar()`:
 
 * `x0`: The x-coordinate of the center of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice.
 * `y0`: The y-coordinate of the center of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice again.
@@ -224,13 +227,13 @@ The last part of data wrangling we need to do is compute the `start` and `end` v
 
 The end values are easy - these are the `ymax_1980` and `ymax_2010` columns that we already have. We need to compute the equivalent `ymin_1980` and `ymin_2010` values: what are the minimum values in each stacked bar chart?
 
-Think again about stacked bar charts instead of gauge charts for a second (since it's a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero - it's right at the bottom. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we've actually already computed all the values we need and stored them in `plot_data`. We just need to rearrange them a bit...
+Think again about stacked bar charts instead of gauge charts for a second (since it's a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero - it's right at the bottom. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we've actually already computed all the values we need and stored them in `plot_data`. We just need to rearrange them a bit.
 
 ::: {#tip-technology-ymin .callout-tip}
 
 ## Just because you can doesn't mean you should
 
-There is almost certainly a nicer way of doing this in base R that contains fewer lines of code and is easier to read. Consider the following code block as an experiment in seeing whether we *could* do this in a piped workflow, without considering whether we *should*...
+There is almost certainly a nicer way of doing this in base R that contains fewer lines of code and is easier to read. Consider the following code block as an experiment in seeing whether we *could* do this in a piped workflow, without considering whether we *should*!
 
 :::
 
@@ -239,44 +242,44 @@ Let's start with the 1980 data. We start off by creating the `0` values for the 
 ```{r}
 #| label: technology-gauge-data-1
 ymin_data <- plot_data |>
-  dplyr::ungroup() |>
+  ungroup() |>
   # start values for 1980 arc
-  dplyr::mutate(
+  mutate(
     ymin_1980 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |>
-        dplyr::pull(ymax_1980))
+      (slice_head(plot_data, n = -1) |>
+        pull(ymax_1980))
     ))
   ) |>
   # repeat for 2010
-  dplyr::mutate(
+  mutate(
     ymin_2010 = c(rbind(
       rep(0, length(countries)),
-      (dplyr::slice_head(plot_data, n = -1) |>
-        dplyr::pull(ymax_2010))
+      (slice_head(plot_data, n = -1) |>
+        pull(ymax_2010))
     ))
   )
 ```
 
-All of our variables are currently scaled between 0 and 1 (since they relate to percentages). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at $-\pi/2$ (instead of 0) and end at $\pi/2$ (instead of 1). We can use the `rescale()` function from the {scales} package [@scales] to define the range we want to scale `from` and `to`. \index{scales!rescale} 
+All of our variables are currently scaled between 0 and 1 (since they relate to percentages). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at $-\pi/2$ (instead of 0) and end at $\pi/2$ (instead of 1). We can use the `rescale()` function from the **`scales`** package [@scales] to define the range we want to scale `from` and `to`. \index{scales!rescale} 
 
-We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from {dplyr} in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent {dplyr} from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
+We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from **`dplyr`** in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent **`dplyr`** from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
 
 ::: {#tip-technology-mutate .callout-tip}
 
 ## Older versions of `mutate()`
 
-In older versions of {dplyr} (including when this plot was originally made), the `mutate_at()` function would have been used instead of `mutate()` and `across()`. The `mutate_at()` function has now been superseded. 
+In older versions of **`dplyr`**, the `mutate_at()` function would have been used instead of `mutate()` and `across()`. The `mutate_at()` function has now been superseded. 
 
 :::
 
 ```{r}
 #| label: technology-gauge-data-2
 gauge_data <- ymin_data |>
-  dplyr::mutate(
-    dplyr::across(
-      dplyr::starts_with("y", ignore.case = FALSE),
-      ~ scales::rescale(.,
+  mutate(
+    across(
+      starts_with("y", ignore.case = FALSE),
+      ~ rescale(.,
         to = pi * c(-0.5, 0.5),
         from = 0:1
       )
@@ -295,13 +298,12 @@ We also use `facet_wrap()` to draw a pair of arcs for each country in a separate
 
 ```{r}
 #| label: fig-technology-basic-plot-1
-#| fig-cap: "Initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries."
+#| fig-cap: "Initial plot created using `geom_arc_bar()` from `ggforce`, facetted by different countries."
 #| fig-alt: ""
 #| warning: false
-library(ggplot2)
 basic_plot <- ggplot(data = gauge_data) +
   # Outer 2010 arc
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
@@ -310,7 +312,7 @@ basic_plot <- ggplot(data = gauge_data) +
     )
   ) +
   # Inner 1980 arc
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
@@ -342,11 +344,11 @@ Before we add the new colors to our gauge chart, let's remove the black outline 
 
 ```{r}
 #| label: fig-technology-basic-plot-2
-#| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from {ggforce}, facetted by different countries, with the outline color removed."
+#| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from `ggforce`, facetted by different countries, with the outline color removed."
 #| fig-alt: ""
 #| source-line-numbers: "9,18"
 basic_plot <- ggplot(data = gauge_data) +
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
@@ -355,7 +357,7 @@ basic_plot <- ggplot(data = gauge_data) +
     ),
     color = NA
   ) +
-  ggforce::geom_arc_bar(
+  geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
@@ -367,7 +369,7 @@ basic_plot <- ggplot(data = gauge_data) +
   facet_wrap(~iso3c, nrow = 2)
 ```
 
-Now we can apply the colors using `scale_fill_manual()` from {ggplot2}, setting both the color values but also more informative labels for the legend at the same time. \index{ggplot2!scale\_fill\_manual}
+Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**, setting both the color values but also more informative labels for the legend at the same time. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-technology-color-plot
@@ -384,30 +386,29 @@ color_plot
 
 When choosing colors for a visualization, it's important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color blindness comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color blindness, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can't, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable [@GAcharts]. \index{accessibility} \index{legend} \index{color}
 
-There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is {colorblindr} [@colorblindr]. The {colorblindr} package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated {ggplot2} functions. At the time of writing, {colorblindr} is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
+There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is **`colorblindr`** [@colorblindr]. The **`colorblindr`** package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated **`ggplot2`** functions. At the time of writing, **`colorblindr`** is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
 
-```{r}
+```{r, echo=2}
 #| label: fig-technology-cvd
 #| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types of color vision deficiency."
 #| fig-alt: ""
 #| fig-dpi: 250
-#| echo: 3
 theme_set(theme_gray(base_size = 3))
-colorblindr::cvd_grid(color_plot)
+cvd_grid(color_plot)
 theme_set(theme_gray(base_size = 11))
 ```
 
-Note that the default color palette in {ggplot2} does not show any differentiation when viewed in grayscale, so it's important to think about which colors you're using for any chart.
+Note that the default color palette in **`ggplot2`** does not show any differentiation when viewed in grayscale, so it's important to think about which colors you're using for any chart.
 
 ### Text and fonts
 
-As we've seen in previous chapters, we can load in Google fonts using the {sysfonts}\index{sysfonts} and {showtext}\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` font for both the title and the body font. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+As we've seen in previous chapters, we can load in Google fonts using the **`sysfonts`**\index{sysfonts} and **`showtext`**\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` typeface for both the title and the body. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: technology-fonts
-sysfonts::font_add_google(name = "Ubuntu")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Ubuntu")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
 ```
 
@@ -431,7 +432,7 @@ text_df <- data.frame(
 )
 ```
 
-We can then add this text to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the font family and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from {ggplot2}.
+We can then add this text to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the typeface and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from **`ggplot2`**.
 
 ```{r}
 #| label: fig-technology-text
@@ -454,7 +455,7 @@ text_plot
 
 ### Adjusting themes
 
-We'll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the font family that will be used by default for any non-geom text elements that remain. 
+We'll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the typeface that will be used by default for any non-geom text elements that remain. 
 
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()` \index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
@@ -471,7 +472,7 @@ theme_plot
 This looks better but it's still not great. What do we still need to improve with styling?
 
 * The title text doesn't stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
-* The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from {ggtext}.
+* The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from **`ggtext`**.
 * Since we're using `coord_fixed()` to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.
 * The legend takes up a lot of space and isn't very informative.
 
@@ -506,7 +507,7 @@ styled_plot <- theme_plot +
       face = "bold",
       size = rel(1.2)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       margin = margin(b = 10),
       hjust = 0,
       halign = 0
@@ -552,7 +553,8 @@ We have a few different options for dealing with the legend. Some options might 
 
 * We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-time-zones and @sec-house. 
 
-* We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats. 
+* We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats.
+
 Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the pink color represents the positive response data (percentage who have been immunized). 
 
 So let's remove the legend, by setting `legend.position = "none"` inside `theme()`: \index{ggplot2!theme}

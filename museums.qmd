@@ -11,33 +11,55 @@ execute:
 #| file: R/options.R
 ```
 
-# UK museums: highlighting line charts with {gghighlight} {#sec-museums}
+# UK museums: highlighting line charts with **`gghighlight`** {#sec-museums}
 
-In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, with the help of the {gghighlight} extension package. \index{gghighlight}
+In this chapter we'll consider different ways of visualising data that varies over time, aiming to avoid *spaghetti charts*, and instead highlight subsets of the data to better demonstrate trends and relationships.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Compare line charts and area charts for showing data over time, alongside whether to create small multiples or show all data on one chart.
+* Decide whether color is necessary for a chart, choose accessible palettes, and load palettes from other R packages; 
+* Highlight subsets of data on a chart to make trends clearer while still allowing easy comparisons.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: museums-pkgs-req
-#| eval: false
-c(
-  "dplyr", "gghighlight", "ggplot2", "ggtext",
-  "purrr", "showtext", "sysfonts", "tibble",
-  "tidyr", "tidytuesdayR", "viridis"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(gghighlight)
+library(ggplot2)
+library(ggtext)
+library(purrr)
+library(showtext)
+library(sysfonts)
+library(tibble)
+library(tidyr)
+library(tidytuesdayR)
+library(viridis)
 ```
+
+The new packages we'll be exploring for the first time in this chapter are:
+
+* **`gghighlight`**: which makes it easy to highlight specific data in **`ggplot2`** plots while fading the rest.
+* **`purrr`**: for easily repeating actions on lists or vectors.
+* **`tibble`**: another one of the core **`tidyverse`** packages that provides a modern, tidy version of data frames that’s easier to use and prints nicely.
+* **`viridis`**: which provides colorblind-friendly and perceptually uniform color palettes.
+
+\index{gghighlight} \index{viridis} \index{tibble} \index{purrr}
 
 ## Data
 
-The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at [museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home). It was also used as a TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), and we'll use that version for this chapter.
+The [Mapping Museums](https://museweb.dcs.bbk.ac.uk/data) project [@museums_data] has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at {{< monolink "https://museweb.dcs.bbk.ac.uk/home" "museweb.dcs.bbk.ac.uk" >}}. It was also used as a TidyTuesday\index{TidyTuesday} [@tidytuesday] data set in November 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), and we'll use that version for this chapter.
 
-Let's start by reading in the data using the `tidytuesdayR` R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
+Let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: load-museums-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tidytuesdayR::tt_load("2022-11-22")
+tuesdata <- tt_load("2022-11-22")
 museums <- tuesdata$museums
 ```
 
@@ -49,7 +71,7 @@ museums <- tuesdata$museums
 museums <- readr::read_csv("data/museums.csv")
 ```
 
-The data contains information for `r ncol(museums)` different variables on `r nrow(museums)` museums. After the first `museum_id` columns, the next 8 columns provide information on the location of the museum - including address and co-ordinates. The next set of columns provides information about the museums such as whether it's an accredited museum, how it's governed, what types of items it has, and when it was open. Since this is a collated data set, information is also provided on the original source of the data for some of these variables. The remaining columns provide information on the area in which the museum is located, including information about different deprivation indices and geo-demographic group (type of area e.g. `"University Towns and Cities"`). A full glossary of the terms used can be found on the Mapping Museums website at [museweb.dcs.bbk.ac.uk/glossary](https://museweb.dcs.bbk.ac.uk/glossary).
+The data contains information for `r ncol(museums)` different variables on `r nrow(museums)` museums. After the first `museum_id` columns, the next 8 columns provide information on the location of the museum - including address and co-ordinates. The next set of columns provides information about the museums such as whether it's an accredited museum, how it's governed, what types of items it has, and when it was open. Since this is a collated data set, information is also provided on the original source of the data for some of these variables. The remaining columns provide information on the area in which the museum is located, including information about different deprivation indices and geo-demographic group (type of area e.g. `"University Towns and Cities"`). A full glossary of the terms used can be found on the Mapping Museums website at {{< monolink "https://museweb.dcs.bbk.ac.uk/glossary" "museweb.dcs.bbk.ac.uk/glossary" >}}.
 
 ## Exploratory work
 
@@ -67,11 +89,10 @@ Some of the variables, such as `DOMUS_Subject_Matter` have quite a lot of missin
 
 Given the wealth of information around deprivation indices (8 different variables), that's the first aspect of the data that jumps out. How does the number of museums vary by index of deprivation?
 
-```{r}
+```{r, echo=-1}
 #| label: fig-museums-barplot
 #| fig-cap: "Bar chart of number of museums per level of deprivation, with higher numbers of museums shown in levels 5 and 6."
 #| fig-alt: "Bar chart of 10 bars, one for each level of deprivation from 1 to 10, which exhibits a bell-shaped curve with the maximum value around 600."
-#| echo: -1
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(table(museums$Area_Deprivation_index))
 ```
@@ -82,13 +103,13 @@ Here, `1` is the most deprived, and `10` is the least deprived. This is quite an
 
 ## Alternative graphics packages
 
-This book focuses on building graphics with {ggplot2} (and its various extension packages), in combination with using base R graphics for basic data exploration. However, these are not the only two graphics systems available for creating plots in R. \index{lattice} \index{tidyplots} 
+This book focuses on building graphics with **`ggplot2`** (and its various extension packages), in combination with using base R graphics for basic data exploration. However, these are not the only two graphics systems available for creating plots in R. \index{lattice} \index{tidyplots} 
 
 Just a few of the many alternatives:
 
-* **{lattice}** [@lattice]: provides a framework for creating *trellis graphics* (also called small multiples or facet plots).
+* **`lattice`** [@lattice]: provides a framework for creating *trellis graphics* (also called small multiples or facet plots).
 
-* **{tidyplots}** [@tidyplots]: a newer graphics package aiming to make it easier to create publication-ready plots for scientific papers. It allows you to pipe together different functions, and add statistical summaries more easily.
+* **`tidyplots`** [@tidyplots]: a newer graphics package aiming to make it easier to create publication-ready plots for scientific papers. It allows you to pipe together different functions, and add statistical summaries more easily. It also integrates with existing **`ggplot2`** functions.
 
 Packages for interactive visualizations are also discussed in @sec-house.
 
@@ -108,9 +129,9 @@ If we go with line charts, and faceting by deprivation index, that might look so
 
 ![Initial sketch of a faceted line chart showing change over time for each level of deprivation.](images/sketch-museums.png){#fig-museums-sketch fig-align="center" fig-alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text."}
 
-We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from {ggplot2} \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in @sec-programming but we haven't really thought much about the layouts of those facets. In @sec-programming, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. Here, we have a little bit more flexibility and we might want to think about controlling that layout.
+We could achieve something this type of plot using `geom_line()` and `facet_wrap()` from **`ggplot2`** \index{ggplot2!facet\_wrap} \index{ggplot2!geom\_line}. We've talked about faceting before in @sec-programming but we haven't really thought much about the layouts of those facets. In @sec-programming, we used faceting with only 3 categories, where the layout choice is fairly obvious: either one column or one row. Here, we have a little bit more flexibility and we might want to think about controlling that layout.
 
-If we leave it to the default options, {ggplot2} usually tries to coerce it into something *square-ish*. Here, it would likely give us a 3x4 grid filled with 10 plots (for the 10 levels of deprivation) and 2 blank spaces. It's not always possible, but plots without those blank spaces often look a lot cleaner and tidier. We could do either a 5x2 (or 2x5) grid, or a 10x1 (or 1x10) grid to fit our small multiple plots into a perfect rectangle. A 5x2 grid works better here since we don't want to make a very wide but very short plot.
+If we leave it to the default options, **`ggplot2`** usually tries to coerce it into something *square-ish*. Here, it would likely give us a 3x4 grid filled with 10 plots (for the 10 levels of deprivation) and 2 blank spaces. It's not always possible, but plots without those blank spaces often look a lot cleaner and tidier. We could do either a 5x2 (or 2x5) grid, or a 10x1 (or 1x10) grid to fit our small multiple plots into a perfect rectangle. A 5x2 grid works better here since we don't want to make a very wide but very short plot.
 
 ## Preparing a plot
 
@@ -120,7 +141,7 @@ So let's get started on preparing the data to create this plot!
 
 This is one of those very *real* datasets - the data wrangling is not straightforward for the data. In fact, the two columns relating to opening and closing dates are the two that will require the most attention.
 
-First, let's drop any columns that we don't actually need using the `select()` function from {dplyr} - we only need the `Year_opened`, `Year_closed`, and `Area_Deprivation_index` columns to calculate the number of museums open each year\index{dplyr!select}. There are a few `NA` values in the `Area_Deprivation_index` column so we'll drop those rows using `drop_na()` from {tidyr}\index{tidyr!drop\_na}.
+First, let's drop any columns that we don't actually need using the `select()` function from **`dplyr`** - we only need the `Year_opened`, `Year_closed`, and `Area_Deprivation_index` columns to calculate the number of museums open each year\index{dplyr!select}. There are a few `NA` values in the `Area_Deprivation_index` column so we'll drop those rows using `drop_na()` from **`tidyr`**\index{tidyr!drop\_na}.
 
 Now let's start dealing with the year columns. If you look at the values, you'll notice that they're not exactly what you'd expect in a *year* column:
 
@@ -132,27 +153,27 @@ head(museums$Year_closed, 4)
 
 Each entry is in fact two years, separated by a `:`. According to the [Mapping Museums glossary]([museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home)), this is because these are actually date ranges. For some museums, it wasn't possible to establish an exact opening or closing date, and instead a date range is given based on partial information. For example, a value of `"2007:2017"` means the museum opened (or closed) sometime between 2007 and 2017.
 
-Let's separate out these year values into four columns instead of two using the `separate_wider_delim()` function from {tidyr} \index{tidyr!separate\_wider\_delim}. We separate based on the `:`, and create two new columns, `opened1` and `opened2` from the `Year_opened` column. We do the same thing for the `Year_closed` closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use `mutate()` and `across()` from {dplyr} to convert them using `as.numeric()`\index{dplyr!mutate} \index{dplyr!across}. We can also convert the `Area_Deprivation_index` to a factor rather than a numeric and make sure the order is correct. 
+Let's separate out these year values into four columns instead of two using the `separate_wider_delim()` function from **`tidyr`** \index{tidyr!separate\_wider\_delim}. We separate based on the `:`, and create two new columns, `opened1` and `opened2` from the `Year_opened` column. We do the same thing for the `Year_closed` closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use `mutate()` and `across()` from **`dplyr`** to convert them using `as.numeric()`\index{dplyr!mutate} \index{dplyr!across}. We can also convert the `Area_Deprivation_index` to a factor rather than a numeric and make sure the order is correct. 
 
 ```{r}
 #| label: museums-wrangle1
 museum_subset <- museums |>
-  dplyr::select(
+  select(
     Year_opened, Year_closed, Area_Deprivation_index
   ) |>
-  tidyr::drop_na() |>
-  tidyr::separate_wider_delim(
+  drop_na() |>
+  separate_wider_delim(
     Year_opened,
     delim = ":",
     names = c("opened1", "opened2")
   ) |>
-  tidyr::separate_wider_delim(
+  separate_wider_delim(
     Year_closed,
     delim = ":",
     names = c("closed1", "closed2")
   ) |>
-  dplyr::mutate(
-    dplyr::across(
+  mutate(
+    across(
       c(opened1, opened2, closed1, closed2), as.numeric
     ),
     Area_Deprivation_index = factor(
@@ -164,9 +185,9 @@ museum_subset <- museums |>
 
 ::: {#tip-museums-separate .callout-tip}
 
-## Using `separate()` from {tidyr}
+## Using `separate()` from **`tidyr`**
 
-In older versions of {tidyr} (including when this plot was originally made), the `separate()` function would have been used instead of `separate_wider_delim()`. The `separate()` function has now been superseded. \index{tidyr!separate}
+In older versions of **`tidyr`**, the `separate()` function would have been used instead of `separate_wider_delim()`. The `separate()` function has now been superseded. \index{tidyr!separate}
 
 :::
 
@@ -176,9 +197,9 @@ Now we need to think about how to deal with all of these *year* columns:
 * If the dates do not match, we need to decide a way of choosing which year to use. The simplest approach is to take the midpoint of the date range. 
 * If the value in the `Year_closed` column is `"9999:9999"`, this means that the museum is still open. 
 
-Let's start with the last of these issues first. For the `closed1` and `closed2` columns, if the value is `"9999"`, we'll convert it to an `NA_real_` value. We can do this using a combination of `mutate()`, `across()`, and `if_else()` from {dplyr} \index{dplyr!mutate} \index{dplyr!across} \index{dplyr!if\_else}.
+Let's start with the last of these issues first. For the `closed1` and `closed2` columns, if the value is `"9999"`, we'll convert it to an `NA_real_` value. We can do this using a combination of `mutate()`, `across()`, and `if_else()` from **`dplyr`** \index{dplyr!mutate} \index{dplyr!across} \index{dplyr!if\_else}.
 
-The remaining two issues can be dealt with at the same time using `case_when()` from {dplyr} \index{dplyr!case\_when}. We can create a new column called `closed` which:
+The remaining two issues can be dealt with at the same time using `case_when()` from **`dplyr`** \index{dplyr!case\_when}. We can create a new column called `closed` which:
 
 * if `closed1` and `closed2` are equal, takes this equal value;
 * if `closed1` and `closed2` are not equal, takes the value in the middle (rounded so that we work only with whole year values).
@@ -188,21 +209,21 @@ The same approach is then applied to create another new column called `opened`. 
 ```{r}
 #| label: museums-wrangle2
 museum_data <- museum_subset |>
-  dplyr::mutate(dplyr::across(
+  mutate(across(
     c(closed1, closed2),
-    ~ dplyr::if_else(.x == 9999, NA_real_, .x)
+    ~ if_else(.x == 9999, NA_real_, .x)
   )) |>
-  dplyr::mutate(closed = dplyr::case_when(
+  mutate(closed = case_when(
     closed1 == closed2 ~ closed1,
     closed1 != closed2 ~ round((closed2 + closed1) / 2)
   )) |>
-  dplyr::mutate(opened = dplyr::case_when(
+  mutate(opened = case_when(
     opened1 == opened2 ~ opened1,
     opened1 != opened2 ~ round((opened2 + opened1) / 2)
   )) |>
-  dplyr::select(Area_Deprivation_index, opened, closed) |>
-  dplyr::rename(deprivation = Area_Deprivation_index) |>
-  dplyr::arrange(deprivation)
+  select(Area_Deprivation_index, opened, closed) |>
+  rename(deprivation = Area_Deprivation_index) |>
+  arrange(deprivation)
 ```
 
 This gives us data that looks like this:
@@ -219,7 +240,7 @@ What we want to know is how many museums were open in a given year for each leve
 ```{r}
 #| label: museums-count-function
 num_year <- function(year, dep, data = museum_data) {
-  df <- dplyr::filter(data, deprivation == dep)
+  df <- filter(data, deprivation == dep)
   num_open <- sum(df$opened <= year)
   num_closed <- sum(df$closed <= year, na.rm = TRUE)
   diff <- num_open - num_closed
@@ -234,13 +255,13 @@ Let's test it works:
 num_year(1980, 3)
 ```
 
-There were `r num_year(1980, 3)` museums open in 1980, in an area in the third deprivation decile. Now, we need to run this function for every combination of year (from `1960` to `2021`) and deprivation level (from `1` to `10`). There are many different ways of doing this in R, and we're going to use the {purrr} package [@purrr]. We start by creating two variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use `expand.grid` to create a `data.frame` with all of the combinations and pass this in as the first argument to `pmap_vec` from {purrr}. The second argument to `pmap_vec` is the function we want to apply (`num_year()`) that we defined above), where the first argument of `num_year()` comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. \index{purrr!pmap\_vec} 
+There were `r num_year(1980, 3)` museums open in 1980, in an area in the third deprivation decile. Now, we need to run this function for every combination of year (from `1960` to `2021`) and deprivation level (from `1` to `10`). There are many different ways of doing this in R, and we're going to use the **`purrr`** package [@purrr]. We start by creating two variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use `expand.grid` to create a `data.frame` with all of the combinations and pass this in as the first argument to `pmap_vec` from **`purrr`**. The second argument to `pmap_vec` is the function we want to apply (`num_year()`) that we defined above), where the first argument of `num_year()` comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. \index{purrr!pmap\_vec} 
 
 ```{r}
 #| label: museums-count-1
 all_years <- 1960:2021
 deps <- 1:10
-output <- purrr::pmap_vec(
+output <- pmap_vec(
   expand.grid(all_years, deps),
   ~ num_year(year = .x, dep = .y)
 )
@@ -258,19 +279,19 @@ Now, our data looks like this:
 head(results)
 ```
 
-We're almost ready to start plotting our data! We just need to convert this into a `tibble()` (or `data.frame`), add the `year` column using `mutate()`, and put the data into a long format using `pivot_longer` from {tidyr} \index{tibble!as\_tibble} \index{dplyr!mutate} \index{tidyr!pivot\_longer}. We want to end up with a 3 column data set, where the 3 columns are: `year`, `deprivation`, and `museums` (number of open museums).
+We're almost ready to start plotting our data! We just need to convert this into a `tibble()` (or `data.frame`), add the `year` column using `mutate()`, and put the data into a long format using `pivot_longer` from **`tidyr`** \index{tibble!as\_tibble} \index{dplyr!mutate} \index{tidyr!pivot\_longer}. We want to end up with a 3 column data set, where the 3 columns are: `year`, `deprivation`, and `museums` (number of open museums).
 
 ```{r}
 #| label: museums-count-3
 plot_data <- results |>
-  tibble::as_tibble() |>
-  dplyr::mutate(year = all_years) |>
-  tidyr::pivot_longer(
+  as_tibble() |>
+  mutate(year = all_years) |>
+  pivot_longer(
     -year,
     names_to = "deprivation",
     values_to = "museums"
   ) |>
-  dplyr::mutate(
+  mutate(
     deprivation = factor(deprivation, levels = 1:10)
   )
 ```
@@ -284,7 +305,6 @@ One of most common approaches to visualising multiple time series, is to plot mu
 #| fig-cap: "A line chart of total number of museums open per year for each level of deprivation, with the overlapping lines resembling spaghetti!"
 #| fig-alt: "A line chart with 10 lines showing the number of open museums for each level of deprivation. Many of the lines overlap and are similar colors, making it difficult to read the values. Line go from 1980 to 2020 and show a general increase from around 100 to 500."
 #| message: false
-library(ggplot2)
 ggplot(
   data = plot_data,
   mapping = aes(
@@ -321,14 +341,24 @@ This tells a similar story to the initial bar chart in @fig-museums-barplot - th
 * The number of open museums in 1960 is different in each faceted plot: since they all start at different levels, it makes it more difficult to compare the relative increases or decreases.
 * It's hard to directly compare one facet to another since each facet only contains one trend line: we have to imagine overlaying the lines in our head to compare one trend line to another.
 
+::: {#tip-museums-vars .callout-tip}
+
+## Specifying variables for facets
+
+There are different ways to specify which variables are used for facets in **`ggplot2`**. Here, we've written `facet_wrap(~deprivation)` which makes use of the formula shorthand, `~`, to tell **`ggplot2`** to facet by the `deprivation` variable.
+
+However, you may also see facet variables specified using the `vars()` function, like `facet_wrap(vars(deprivation))`. Using the `vars()` function makes it easier to facet by multiple variables, but it's a more modern approach so you may see it less often if you're looking for other examples.
+
+:::
+
 We could solve these problems by making two changes:
 
 * Rescale the data based on the number of museums open in 1960; and
 * Show all 10 lines on each faceted plot but highlight only one relating to each level of deprivation. 
 
-### Highlighting with {gghighlight}
+### Highlighting with **`gghighlight`**
 
-The second change can be implemented easily using the {gghighlight} package [@gghighlight]. {gghighlight} is a {ggplot2} extension package, specifically designed for highlighting points and lines based on some conditions. Let's switch back to `geom_line()` and add `gghighlight::gghighlight()`. We set `use_direct_label = FALSE` because {gghighlight} will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it's facet label already. \index{gghighlight!gghighlight} \index{ggplot2!geom\_line} \index{line chart}
+The second change can be implemented easily using the **`gghighlight`** package [@gghighlight]. **`gghighlight`** is a **`ggplot2`** extension package, specifically designed for highlighting points and lines based on some conditions. Let's switch back to `geom_line()` and add `gghighlight()`. We set `use_direct_label = FALSE` because **`gghighlight`** will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it's facet label already. \index{gghighlight!gghighlight} \index{ggplot2!geom\_line} \index{line chart}
 
 ```{r}
 #| label: fig-museums-basic-plot-3
@@ -346,7 +376,7 @@ ggplot(
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
-  gghighlight::gghighlight(use_direct_label = FALSE)
+  gghighlight(use_direct_label = FALSE)
 ```
 
 We can also perform an additional bit of data wrangling to rescale the values by their 1960 levels. We start by filtering the data to only include data from the year 1960 and keeping only the `deprivation` and `museums` columns \index{dplyr!filter} \index{dplyr!select}. Then, we join this baseline data back to our original data based on the `deprivation` level, and for each year calculate the percentage change since 1960 and save it in a new column called `change`. \index{dplyr!mutate} \index{dplyr!rename} \index{dplyr!left\_join} \index{dplyr!select}
@@ -354,20 +384,20 @@ We can also perform an additional bit of data wrangling to rescale the values by
 ```{r}
 #| label: museums-wrangle-perc
 lookup <- plot_data |>
-  dplyr::filter(year == 1960) |>
-  dplyr::select(deprivation, museums)
+  filter(year == 1960) |>
+  select(deprivation, museums)
 
 new_plot_data <- plot_data |>
-  dplyr::left_join(lookup, by = "deprivation") |>
-  dplyr::rename(
+  left_join(lookup, by = "deprivation") |>
+  rename(
     museums = museums.x,
     museums_1960 = museums.y
   ) |>
-  dplyr::mutate(
+  mutate(
     change = (
       100 * (museums - museums_1960) / museums_1960)
   ) |>
-  dplyr::select(year, deprivation, change)
+  select(year, deprivation, change)
 ```
 
 We can then re-do our line chart using the rescaled `change` data on the y-axis instead:
@@ -383,7 +413,7 @@ basic_plot <- ggplot(
 ) +
   geom_line() +
   facet_wrap(~deprivation, nrow = 2) +
-  gghighlight::gghighlight(use_direct_label = FALSE)
+  gghighlight(use_direct_label = FALSE)
 basic_plot
 ```
 
@@ -407,14 +437,14 @@ bg_col <- "#FAFAFA"
 text_col <- "black"
 ```
 
-For the colors of the lines, we can use the {viridis} package [@viridis]. The {viridis} package provides multiple different color palettes which are designed to be visually pleasing, perceptually-uniform ,and colorblind friendly. The default viridis palette includes purples, blues, greens, then yellows. Viridis color palettes are most commonly used with continuous data, rather than categorical data. However, since the categories that we wish to color (levels of deprivation) are ordered, they will work well here too. The {viridis} package includes functions to add the colors to plots made with {ggplot2}. Here, we use the `scale_color_viridis()` function, specify that we want a discrete palette and that the lowest values should have the yellow colors with `direction = -1` \index{viridis!scale\_color\_viridis}.
+For the colors of the lines, we can use the **`viridis`** package [@viridis]. The **`viridis`** package provides multiple different color palettes which are designed to be visually pleasing, perceptually-uniform ,and colorblind friendly. The default viridis palette includes purples, blues, greens, then yellows. Viridis color palettes are most commonly used with continuous data, rather than categorical data. However, since the categories that we wish to color (levels of deprivation) are ordered, they will work well here too. The **`viridis`** package includes functions to add the colors to plots made with **`ggplot2`**. Here, we use the `scale_color_viridis()` function, specify that we want a discrete palette and that the lowest values should have the yellow colors with `direction = -1` \index{viridis!scale\_color\_viridis}.
 
 ```{r}
 #| label: fig-museums-style-plot-1
 #| fig-cap: "An updated version of the previous chart with colors chosen from the {viridis} R package."
 #| fig-alt: "10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side. Lines are colored yellows, blues, and purples."
 col_plot <- basic_plot +
-  viridis::scale_color_viridis(
+  scale_color_viridis(
     discrete = TRUE,
     direction = -1
   )
@@ -423,15 +453,31 @@ col_plot
 
 ### Text and fonts
 
-Let's start by loading in a different font using `font_add_google()` from {sysfonts} and setting font options with {showtext}\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}. The *Raleway* font is a minimalist, sans serif font, and we'll use it for both body text and title text. We can save it as a single variable, `body_font`.
+Let's start by loading in a different typeface using `font_add_google()` from **`sysfonts`** and setting font options with **`showtext`**\index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}. *Raleway* is a minimalist, sans serif typeface, and we'll use it for both body text and title text. We can save it as a single variable, `body_font`.
 
 ```{r}
 #| label: museums-fonts
-sysfonts::font_add_google(name = "Raleway")
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+font_add_google(name = "Raleway")
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "Raleway"
 ```
+
+::: {#tip-museums-typeface .callout-tip}
+
+## Typeface vs. font vs. font family
+
+Thomas Lin Pederson's blog post about fonts in R [@Pedersen2025] highlights the different meanings of the words *typeface* and *font* (family), which are often (incorrectly) used interchangeably:
+
+* **Typeface**:the design of a set of characters e.g. *Arial*
+
+* **Font**: a specific style and size of that typeface e.g. *Arial Bold 12pt*
+
+* **Font family**: a group of related fonts that share the same typeface but vary in styles e.g. *Arial Bold* and *Arial Italic*
+
+Although these terms do have different meanings, in **`ggplot2`**, the `family` argument is often used to specify the typeface so you may see the terms used interchangeably in this book.
+
+:::
 
 We also need to define a title, subtitle, and caption. Adding a question as a title can help guide readers towards what you want them to see, but also force them to look for themselves. Here, we ask *Are there fewer museums opening in more deprived areas?* in the title - telling readers to look at changes across the levels of deprivation, but not giving them the answer straight away. 
 
@@ -448,7 +494,7 @@ cap <- "*The Index of Multiple Deprivation (IMD) measures the relative deprivati
 
 ## Adding line breaks using `<br>`
 
-The caption includes HTML line breaks, `<br>`, since we'll be using `element_textbox_simple()` from {ggtext} for processing the text elements as we've done in previous chapters. \index{ggtext!element\_textbox\_simple}
+The caption includes HTML line breaks, `<br>`, since we'll be using `element_textbox_simple()` from **`ggtext`** for processing the text elements as we've done in previous chapters. \index{ggtext!element\_textbox\_simple}
 
 :::
 
@@ -468,13 +514,13 @@ text_plot <- col_plot +
 
 Now we need to edit the `theme()` elements to apply the text fonts and styles, edit the background colors, and remove the legend. \index{ggplot2!theme}
 
-In {ggplot2}, the axis limits are chosen automatically based on the range of the data. It's often useful to chose limits (and breaks) that are *nice* - it makes it easier to calculate where other values are. We can set `scale_y_continuous(limits = c(0, 300))` to make the range of the y-axis between 0 and 300. We can also set `coord_cartesian(expand = FALSE)` to remove the extra space around the plot area that is added by default - giving a slightly cleaner look. Using `theme_minimal()` as a base, we can set the default font size and family using `base_size = 7` and `base_family = body_font`. \index{ggplot2!theme\_minimal} \index{ggplot2!coord\_cartesian} \index{ggplot2!scale\_y\_continuous}
+In **`ggplot2`**, the axis limits are chosen automatically based on the range of the data. It's often useful to chose limits (and breaks) that are *nice* - it makes it easier to calculate where other values are. We can set `scale_y_continuous(limits = c(0, 300))` to make the range of the y-axis between 0 and 300. We can also set `coord_cartesian(expand = FALSE)` to remove the extra space around the plot area that is added by default - giving a slightly cleaner look. Using `theme_minimal()` as a base, we can set the default font size and family using `base_size = 7` and `base_family = body_font`. \index{ggplot2!theme\_minimal} \index{ggplot2!coord\_cartesian} \index{ggplot2!scale\_y\_continuous}
 
 Setting `legend.position = "none"` removes the legend on the right hand side. The `plot.title.position = "plot"` and `plot.caption.position = "plot"` arguments make sure that the title, subtitle, and caption text are all aligned with the left side of the plot area. The default is to align with the edge of the panel area (the area shaded gray by default), which doesn't look good when you have long axis labels, or a multiline axis title on the y-axis.
 
 The `panel.spacing` argument controls how close the facets are to each other -  this can help to stop the year labels on side-by-side plots from overlapping. Setting `plot.margin = margin(10, 15, 10, 10)` adds some extra space around the outside of the plot, with the higher value on the right hand side compensating and balancing out the space from the axis title on the left hand side. The `plot.background` and `panel.background` arguments set the background color of the plot and panel areas to be the `bg_col` variable previously defined.
 
-For the `plot.title`, `plot.subtitle`, and `plot.caption`, arguments, we use `element_textbox_simple()` from {ggtext} to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a `lineheight` of `0.5`, and set to use the `text_col` variable for the color. The title font is made slightly larger and in bold. The `axis.text` is also set to be `text_col` colored with a `lineheight` of `0.5` using `element_text()`. \index{ggplot2!element\_text} \index{ggplot2!theme}
+For the `plot.title`, `plot.subtitle`, and `plot.caption`, arguments, we use `element_textbox_simple()` from **`ggtext`** to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a `lineheight` of `0.5`, and set to use the `text_col` variable for the color. The title font is made slightly larger and in bold. The `axis.text` is also set to be `text_col` colored with a `lineheight` of `0.5` using `element_text()`. \index{ggplot2!element\_text} \index{ggplot2!theme}
 
 Now, we have our final plot:
 
@@ -498,18 +544,18 @@ text_plot +
     panel.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       lineheight = 0.5,
       size = rel(1.2),
       face = "bold",
       margin = margin(b = 5)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col,
       lineheight = 0.5
     ),
-    plot.caption = ggtext::element_textbox_simple(
+    plot.caption = element_textbox_simple(
       hjust = 0,
       color = text_col,
       lineheight = 0.5
@@ -546,7 +592,7 @@ We removed the legend from the plot with the reason that *the colors are based o
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/uk-museums.gif){fig-align="center" fig-alt="Gif showing the process of creating the final line chart, going through iterations of area charts first."}
 

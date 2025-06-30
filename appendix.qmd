@@ -5,6 +5,18 @@ execute:
 
 # Appendix {.unnumbered .appendix}
 
+## Frequently asked questions (FAQs)
+
+* When I run the code in the examples, I get an error message or a different result. How do I fix it?
+  * Make sure you haveve run all of the code in the chapter in order, including loading all packages.
+  * Check to see if you're using a different version of R, or a specific package by looking at the software requirements in the appendix.
+  
+* How do I stop my plots looking squashed, stretched, or just different when I view them using RStudio vs saving them?
+  * Take a look at @sec-camcorder for a solution to this problem!
+  
+* I've completed the exercises at the end of each chapter. Can I check my answers?
+  * The exercises are purposefully left open-ended, rather than prescriptive questions with defined answers. Since there's often no single right answer in data visualization, solutions are not provided. You're encouraged to think about how *you* would design and implement different solutions, and you're encouraged to get feedback from others as a way of checking your answers instead.
+
 ## Software requirements {.unnumbered}
 
 ```{r}
@@ -47,14 +59,20 @@ All data sets used in this book, and links to the relevant licenses:
 #| label: data-sources
 #| echo: false
 #| output: asis
-data_data <- readr::read_csv("data/data.csv") |> 
+data_data <- readr::read_csv("data/data.csv") |>
   tidyr::drop_na()
 for (i in seq_len(nrow(data_data))) {
   pander::pandoc.list(
     list(
       glue::glue("**Chapter {data_data$Chapter[i]}**: {data_data$Data[i]} {data_data$BibTex[i]}"),
       list(
-        glue::glue("Source: [{stringr::str_remove(data_data$URL[i], 'https://')}]({data_data$URL[i]})"),
+        paste0(
+          "Source: {{< monolink '",
+          data_data$URL[i],
+          "' '",
+          stringr::str_remove(data_data$URL[i], "https://"),
+          "' >}} "
+        ),
         glue::glue("License: {data_data$License[i]}")
       )
     )
@@ -70,14 +88,21 @@ All images used in this book (which were not created by the author) and links to
 #| label: img-sources
 #| echo: false
 #| output: asis
-img_data <- readr::read_csv("images/data.csv") |> 
+img_data <- readr::read_csv("images/data.csv") |>
   tidyr::drop_na()
 for (i in seq_len(nrow(img_data))) {
   pander::pandoc.list(
     list(
       glue::glue("Image: {img_data$Photographer[i]}"),
       list(
-        glue::glue("Source: [{stringr::str_remove(img_data$Source[i], 'https://')}]({img_data$Source[i]}) {img_data$BibTex[i]}"),
+        paste0(
+          "Source: {{< monolink '",
+          img_data$Source[i],
+          "' '",
+          stringr::str_remove(img_data$Source[i], "https://"),
+          "' >}} ",
+          img_data$BibTex[i]
+        ),
         glue::glue("License: {img_data$License[i]}")
       )
     )
@@ -139,5 +164,17 @@ Chapter @sec-house:
 
 ![](images/final/us-elections.png){fig-align="center" fig-alt=""}
 
-:::
+## Book cover {.unnumbered}
 
+The (work-in-progress) cover of this book was also created with **`ggplot2`**. The code can be viewed below.
+
+```{r}
+#| file: R/cover.R
+#| echo: true
+#| eval: true
+#| code-fold: true
+#| fig-asp: 1.5
+#| fig.show: hold
+```
+
+:::

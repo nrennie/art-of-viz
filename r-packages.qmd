@@ -16,6 +16,14 @@ fig-asp: 0.5
 ```{r}
 #| echo: false
 #| eval: true
+#| message: false
+#| warning: false
+library(sysfonts)
+```
+
+```{r}
+#| echo: false
+#| eval: true
 #| file: R/load_font_awesome.R
 ```
 
@@ -39,64 +47,72 @@ In this chapter, we'll learn about how to collect data on which packages and fun
 
 ```{r}
 #| label: r-pkgs-pkgs-req
-#| eval: false
-c(
-  "dplyr", "funspotr", "ggplot2", "ggtext",
-  "glue", "lubridate", "rcartocolor", "readr",
-  "showtext", "stringr", "sysfonts", "tidyr"
-)
+#| warning: false
+#| message: false
+library(dplyr)
+library(forcats)
+library(funspotr)
+library(ggplot2)
+library(ggtext)
+library(glue)
+library(lubridate)
+library(rcartocolor)
+library(readr)
+library(showtext)
+library(sysfonts)
+library(tidyr)
 ```
 
 ## Data
 
-In July 2024, TidyTuesday [@tidytuesday] featured some examples of using the {funspotr} package [@funspotr] as datasets, suggested by [Bryan Shalloway](https://github.com/brshallo). The {funspotr} package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualizations: [github.com/nrennie/tidytuesday](https://github.com/nrennie/tidytuesday). 
+In July 2024, TidyTuesday [@tidytuesday] featured some examples of using the **`funspotr`** package [@funspotr] as datasets, suggested by [Bryan Shalloway](https://github.com/brshallo). The **`funspotr`** package was designed to help identify which R functions and packages are used in files and projects. Let's try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualizations: {{< monolink "https://github.com/nrennie/tidytuesday" "github.com/nrennie/tidytuesday" >}}. 
 
-Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from {funspotr} to get this list of files - specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to the root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
+Let's start by getting a list of all the files that exist in the GitHub repository. We can use the `list_files_github_repo()` function from **`funspotr`** to get this list of files - specifying which GitHub repository we want the list for (in the form of `"username/repository"`), and which branch of the repository we want to look at. The `list_files_github_repo()` function returns a data frame with two columns: `relative_paths` (file path relative to the root of the git repository) and `absolute_paths` (URL of each file). \index{funspotr!list\_files\_github\_repo}
 
-All of the files in this repository are named and organised based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R` [@streamline]. Since the code to extract used functions takes a while to run, let's filter this list of files to only include files dated `2023`. We can use `str_detect()` from {stringr} to find any values in the `relative_paths` column that contain `"2023"` and then `filter()` from {dplyr} to keep only those rows.  \index{stringr!str\_detect} \index{dplyr!filter}
+All of the files in this repository are named and organised based on dates in the following structure: `yyyy/yyyy-mm-dd/yyyymmdd.R` [@streamline]. Since the code to extract used functions takes a while to run, let's filter this list of files to only include files dated `2023`. We can use `str_detect()` from **`stringr`** to find any values in the `relative_paths` column that contain `"2023"` and then `filter()` from **`dplyr`** to keep only those rows.  \index{stringr!str\_detect} \index{dplyr!filter}
 
 ```{r}
 #| label: r-pkgs-load-data-1
 #| eval: false
 #| echo: true
-files_to_check <- funspotr::list_files_github_repo(
+files_to_check <- list_files_github_repo(
   repo = "nrennie/tidytuesday",
   branch = "main"
 ) |>
-  dplyr::filter(
-    stringr::str_detect(relative_paths, "2023")
+  filter(
+    str_detect(relative_paths, "2023")
   )
 ```
 
-We then pass the `files_to_check` data frame into `spot_funs_files()` from {funspotr} to get the list of functions and packages uses in each file. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
+We then pass the `files_to_check` data frame into `spot_funs_files()` from **`funspotr`** to get the list of functions and packages uses in each file. Since we want to look at total package use, we set `show_each_use = TRUE` to make sure that individual rows are returned each time a function is used (rather than just once for an entire file). \index{funspotr!spot\_funs\_files}
 
 ```{r}
 #| label: r-pkgs-load-data-2
 #| eval: false
 #| echo: true
 r_funs <- files_to_check |>
-  funspotr::spot_funs_files(
+  spot_funs_files(
     show_each_use = TRUE
   )
 ```
 
-We then use the `unnest_results()` function from {funspotr} to get a row in the data for each use of a function. Since the code above takes a while to run, it's also important that we save the data in a format that means we can use it later (rather than having to re-download it). We'll save it as a CSV file using `write.csv()`, choosing an appropriate file name and removing the row names. \index{funspotr!unnest\_results} \index{utils!write.csv}
+We then use the `unnest_results()` function from **`funspotr`** to get a row in the data for each use of a function. Since the code above takes a while to run, it's also important that we save the data in a format that means we can use it later (rather than having to re-download it). We'll save it as a CSV file using `write.csv()`, choosing an appropriate file name and removing the row names. \index{funspotr!unnest\_results} \index{utils!write.csv}
 
 ```{r}
 #| label: r-pkgs-load-data-3
 #| eval: false
 #| echo: true
 r_pkgs <- rfuns |>
-  funspotr::unnest_results()
+  unnest_results()
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
 ```
 
-We can then read the CSV back in using `read_csv()` from {readr} (or `read.csv()` if you prefer!) \index{readr!read\_csv}
+We can then read the CSV back in using `read_csv()` from **`readr``** (or `read.csv()` if you prefer!) \index{readr!read\_csv}
 
 ```{r}
 #| label: r-pkgs-load-data-csv
 #| output: false
-r_pkgs <- readr::read_csv("data/r_pkgs.csv")
+r_pkgs <- read_csv("data/r_pkgs.csv")
 ```
 
 ::: {.content-visible when-format="html"}
@@ -130,18 +146,17 @@ We can then pass this into the `barplot()` function to obtain an ordered bar cha
 
 ::: {#tip-r-pkgs-showtext .callout-tip}
 
-## Base R or {tidyverse}?
+## Base R or **`tidyverse`**?
 
-As an aside, this highlights that combining base R and {tidyverse} packages can be incredibly effective since they each have different strengths. There's no need to choose a side on the base R versus {tidyverse} argument - use both!
+As an aside, this highlights that combining base R and **`tidyverse`** packages can be incredibly effective since they each have different strengths. There's no need to choose a side on the base R versus **`tidyverse`** argument - use both!
 
 :::
 
-```{r}
+```{r, echo=-1}
 #| label: fig-r-pkgs-barplot
-#| fig-cap: "Ordered bar chart showing the number of times each package was used in 2023. The 'ggplot2' package is used most."
+#| fig-cap: "Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most."
 #| fig-alt: ""
 #| fig-asp: 1
-#| echo: -1
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   sort(table(r_pkgs$pkgs)),
@@ -150,13 +165,13 @@ barplot(
 )
 ```
 
-One thing that you may have noticed is that, for some reason, in the data the package is listed as `"ggplot"` rather than `"ggplot2"`. So let's fix that using `mutate()` and the `if_else()` function from {dplyr}. We can overwrite the existing `pkgs` column, where (i) if the value is currently `"ggplot"`, we replace it with `"ggplot2"`; (ii) otherwise, we leave the existing value in the `pkgs` column. \index{dplyr!mutate} \index{dplyr!if\_else}
+One thing that you may have noticed is that, for some reason, in the data the package is listed as `"ggplot"` rather than `"ggplot2"`. So let's fix that using `mutate()` and the `if_else()` function from **`dplyr`**. We can overwrite the existing `pkgs` column, where (i) if the value is currently `"ggplot"`, we replace it with `"ggplot2"`; (ii) otherwise, we leave the existing value in the `pkgs` column. \index{dplyr!mutate} \index{dplyr!if\_else}
 
 ```{r}
 #| label: r-pkgs-pkgs
 r_pkgs <- r_pkgs |>
-  dplyr::mutate(
-    pkgs = dplyr::if_else(
+  mutate(
+    pkgs = if_else(
       pkgs == "ggplot",
       "ggplot2",
       pkgs
@@ -166,27 +181,27 @@ r_pkgs <- r_pkgs |>
 
 ### Exploratory sketches
 
-There are currently `r length(unique(r_pkgs$pkgs))` packages listed in the data, many of them with one or two uses. That's quite a lot of categories to visualize at once, so let's narrow it down to only the [core {tidyverse}](https://www.tidyverse.org/packages/#core-tidyverse) packages [@tidyverse]. We could visualise a simple bar chart (or variation of a bar chart) showing how often each core {tidyverse} package was used. But due to the structure of the file names, we also have information about *when* each package was used. So we could visualize usage over time, for each package. 
+There are currently `r length(unique(r_pkgs$pkgs))` packages listed in the data, many of them with one or two uses. That's quite a lot of categories to visualize at once, so let's narrow it down to only the [core **`tidyverse`**](https://www.tidyverse.org/packages/#core-tidyverse) packages [@tidyverse]. We could visualise a simple bar chart (or variation of a bar chart) showing how often each core **`tidyverse`** package was used. But due to the structure of the file names, we also have information about *when* each package was used. So we could visualize usage over time, for each package. 
 
-For each package, we could create an area (or line) chart showing usage over time using facets as we did in @sec-museums. This time, the categories don't really have a natural order, so instead we'll order the facets from most to least used. It might look something like this:
+For each package, we could create an area (or line) chart showing usage over time using facets as we did in @sec-museums. This time, the categories don't really have a natural order, so instead we'll order the facets from most to least used. It might look something like @fig-packages-sketch-1.
 
-![Initial sketch of a faceted area charts showing packages use over time](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area charts showing packages use over time.](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center" fig-alt=""}
 
-One of the most incredible things about the R community, is our adoration of hex stickers - package logos in the shape of a hexagon. All of the core {tidyverse} packages have their own hex sticker. Rather than simply using the package name as the facet label in our plot, we could replace the labels with images of hex stickers:
+One of the most incredible things about the R community, is our adoration of hex stickers - package logos in the shape of a hexagon. All of the core **`tidyverse`** packages have their own hex sticker. Rather than simply using the package name as the facet label in our plot, we could replace the labels with images of hex stickers, as shown in @fig-packages-sketch-2.
 
-![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center" fig-alt=""}
 
 ## Preparing a plot
 
 To prepare an initial draft of the plot in @fig-packages-sketch-1, we need to wrangle the following information from the data:
 
 * The date each package use relates to (currently embedded in a file name);
-* The number of package uses per day for each core {tidyverse} package; and 
+* The number of package uses per day for each core **`tidyverse`** package; and 
 * Which package was used the most often?
 
 ### Data wrangling
 
-Since we're going to focus on the core {tidyverse} packages, let's start by making a vector of the package names:
+Since we're going to focus on the core **`tidyverse`** packages, let's start by making a vector of the package names:
 
 ```{r}
 #| label: r-pkgs-core
@@ -198,57 +213,64 @@ core_tidyverse <- c(
 
 We can then use this vector to `filter()` the data and keep only rows where the `pkgs` column has a value in the `core_tidyverse` vector. \index{dplyr!filter} 
 
-The `relative_paths` are currently of the form `"yyyy/yyyy-mm-dd/yyyymmdd.R"`, and we want to extract the date from this file path. There are multiple ways of doing this - the easiest way is to extract the part of the file path that is between the two `/`. You could use functions from the {stringr} package [@stringr], which is designed for processing character strings. But we can alternatively make use of `separate_wider_delim()` from {tidyr}. This function allows you to separate a character string in one column, into multiple columns based on some delimiter. In this case, the delimiter will be `/`. By default, this will create three new columns for each section of the string: `yyyy`, `yyyy-mm-dd`, and `yyyymmdd.R`. We only want to keep the middle one, so we can use the trick of setting the names of columns we don't want to keep to `NA`. Instead, we'll create only one new column called `date`. \index{tidyr!separate\_wider\_delim} \index{stringr}
+The `relative_paths` are currently of the form `"yyyy/yyyy-mm-dd/yyyymmdd.R"`, and we want to extract the date from this file path. There are multiple ways of doing this - the easiest way is to extract the part of the file path that is between the two `/`. Here, we can make use of `separate_wider_delim()` from **`tidyr`**. This function allows you to separate a character string in one column, into multiple columns based on some delimiter. In this case, the delimiter will be `/`. By default, this will create three new columns for each section of the string: `yyyy`, `yyyy-mm-dd`, and `yyyymmdd.R`. We only want to keep the middle one, so we can use the trick of setting the names of columns we don't want to keep to `NA`. Instead, we'll create only one new column called `date`. \index{tidyr!separate\_wider\_delim} 
 
-We also convert the `date` which is currently still a character string into a date object using `mutate()` and the `ymd()` function from {lubridate} (since the dates are specified in **y**ear, **m**onth, **d**ay format). Finally, we count how many observations there are of each package, per date. \index{dplyr!mutate} \index{dplyr!count} \index{lubridate!ymd}
+We then convert the `date` which is currently still a character string into a date object using `mutate()` and the `ymd()` function from **`lubridate`** (since the dates are specified in **y**ear, **m**onth, **d**ay format). Finally, we count how many observations there are of each package, per date. \index{dplyr!mutate} \index{dplyr!count} \index{lubridate!ymd}
 
 ```{r}
 #| label: r-pkgs-date
 r_pkgs_date <- r_pkgs |>
-  dplyr::filter(pkgs %in% core_tidyverse) |>
-  tidyr::separate_wider_delim(
+  filter(pkgs %in% core_tidyverse) |>
+  separate_wider_delim(
     relative_paths,
     delim = "/",
     names = c(NA, "date", NA)
   ) |>
-  dplyr::mutate(date = lubridate::ymd(date)) |>
-  dplyr::count(date, pkgs)
+  mutate(date = ymd(date)) |>
+  count(date, pkgs)
 ```
 
-We want the facets in our plot to be ordered from most to least used package, so let's calculate the total number of uses for each package. Here, we can use the `summarise()` function in {dplyr}, to add up the values in the `n` column, split by `pkgs`. Here, we're using the `.by` argument in `summarise()` but you could alternatively use `group_by(pkgs)` instead. We then arrange the rows of the data based on the updated summary `n` column. By default `arrange()` sorts in ascending order, so to sort in descending order we simply sort by `-n` instead. You could alternatively use `dplyr::desc(n)`. Finally, we extract the `pkgs` column as a vector using `pull()` from {dplyr}. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!pull} \index{dplyr!desc} \index{dplyr!group\_by}
+::: {#tip-packages-stringr .callout-tip}
+
+## Alternative approach using **`stringr`**
+
+Instead of using `separate_wider_delim()`, you could use functions from the **`stringr`** package [@stringr], which is designed for processing character strings. For example: \index{stringr}
+
+```{r}
+#| label: r-pkgs-stringr
+#| echo: true
+#| eval: false
+library(stringr)
+r_pkgs |>
+  mutate(date = str_extract(
+    relative_paths,
+    pattern = "(?<=/)[^/]+(?=/)"
+  ))
+```
+
+Here, we create a new `date` column using `mutate()` which consists of the part of the string in between the two `/`, extracted using `str_extract()` from **`stringr`**. The `pattern` is a *regular expression* (often shortened to *regex*) which is a sequence of characters that defines a search pattern. \index{stringr!str\_extract} \index{dplyr!mutate}
+
+This pattern breaks down as:
+
+* `(?<=/)`: look behind for a `/`
+* `[^/]+`: match one or more characters that are not `/`
+* `(?=/)`: look ahead for a `/`
+
+:::
+
+We want the facets in our plot to be ordered from most to least used package, so let's start by converting the `pkgs` column to a factor and set the levels equal to the vector of core **`tidyverse`** package names. This ensures that all core packages are included in the factor levels even if they do not appear in the data. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other **`tidyverse`** packages. Sometimes, it's important to visualise zeroes, so it's important that `tibble` is still represented in the data. \index{base!factor}
+
+We can then use `fct_reorder()` from the **`forcats`** package [@forcats] to sort the `pkgs` column based on the sum of values in the `n` column. We set `.desc` to `TRUE` to sort in descending order, and set `.default` to `-Inf` to place any unused factor levels at the end i.e. where they would appear if they had a count of 0.  \index{forcats!fct\_reorder}
 
 ```{r}
 #| label: r-pkgs-orders
-pkgs_ordered <- r_pkgs_date |>
-  dplyr::summarise(n = sum(n), .by = pkgs) |>
-  dplyr::arrange(-n) |>
-  dplyr::pull(pkgs)
-pkgs_ordered
-```
-
-What might strike you about this vector of ordered packages is that there are only 7 packages listed. If you look closely, you'll notice that `"tibble"` is missing. It's missing because it's never been used directly - that's not that surprising, since it's often used in the background of the other {tidyverse} packages. The question now is, should it still be included in the chart? Sometimes, it's important to visualise zeroes. So how do we add `tibble` into the data?
-
-The first thing we want to do is include it in the ordered list of packages that we'll later use to define a factor level. Since it's only one package, we *could* just manually add it to the end of the vector with `c(pkgs_ordered, "tibble")`. However, this isn't a very robust solution. If we had data for a different year and wanted to repeat this analysis, this code wouldn't work if `"tibble"` wasn't missing, or if another package was missing. 
-
-Let's find a generalizable way to figure out which core {tidyverse} packages are not included in the `pkgs_ordered` vector. We can use the `setdiff()` function from base R here. Running `setdiff(x, y)` tells you which elements of `x` are not in `y` (so it's important to get the choices of `x` and `y` the right way around). 
-
-The difference in the two vectors (in this case `"tibble"`) can then be appended to the end of the `pkgs_ordered` vector, to create a complete list of packages in order from most to least used, including zero usage:
-
-```{r}
-#| label: r-pkgs-levels-1
-pkgs_levels <- c(
-  pkgs_ordered,
-  setdiff(core_tidyverse, pkgs_ordered)
-)
-```
-
-Then, we use `mutate()` to convert the `pkgs` column of our data from a character string to a factor (ordered category) and set the `levels` equal to our new `pkgs_levels` vector: \index{dplyr!mutate} \index{base!factor}
-
-```{r}
-#| label: r-pkgs-levels-2
 plot_data <- r_pkgs_date |>
-  dplyr::mutate(
-    pkgs = factor(pkgs, levels = pkgs_levels)
+  mutate(
+    pkgs = factor(pkgs, levels = core_tidyverse),
+    pkgs = fct_reorder(pkgs, n,
+      .fun = sum,
+      .desc = TRUE, .default = -Inf
+    )
   )
 ```
 
@@ -261,13 +283,8 @@ We start our plot by passing `plot_data` into `ggplot()` to use this data as the
 We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We want our facet plots all in one line rather than arranged as a grid, so we set `nrow = 1` inside `facet_wrap()`. Although `"tibble"` is a level in our `pkgs` factor column, no observations of that factor level exist. To make sure it still appears as an (empty) facet, we set `drop = FALSE`. Otherwise, only 7 faceted plots would be shown. \index{ggplot2!facet\_wrap}
 
 ```{r}
-#| label: r-pkgs-ggplot2
-#| warning: false
-library(ggplot2)
-```
-```{r}
 #| label: fig-r-pkgs-base-plot-1
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
 #| fig-alt: ""
 #| warning: true
 basic_plot <- ggplot(plot_data) +
@@ -287,9 +304,9 @@ You might notice two things here:
 * alongside the plot, a (slightly confusing) warning message is returned;
 * the ordering of the plot doesn't look quite right.
 
-You might also notice the large spike in the {ggplot2} facet which shows 141 uses of the {ggplot2} package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
+You might also notice the large spike in the **`ggplot2`** facet which shows 141 uses of the **`ggplot2`** package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
 
-Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the {stringr} package looks much larger than the area for the {readr} package - even though it should be smaller. It also looks as though there are no values in the {forcats} facet - but we know this isn't true for {forcats}, only for {tibble}. Why is this happening?
+Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the **`stringr`** package looks much larger than the area for the **`readr``** package - even though it should be smaller. It also looks as though there are no values in the **`forcats`** facet - but we know this isn't true for **`forcats`**, only for **`tibble`**. Why is this happening?
 
 The problem is that 0 is not included in the data. The areas are being drawn between only the strictly positive values, never going back down to 0. For packages that are used a lot but only in a few scripts, this makes their area larger than packages that are used once or twice in many scripts.
 
@@ -315,12 +332,12 @@ This *is it a zero or is it missing?* question has highlighted a few important a
 
 Let's go ahead and add in zeros where they should be. We know that the `date` and `pkgs` columns are complete: there are no missing values in the `date` column and we've already addressed the issue with the missing `"tibble"` values. We need to make sure that every possible combination of `date` and `pkgs` exists in the data: any that do not already exist should be added and given a value of `0` in the `n` column.
 
-We can use the `complete()` function from {tidyr} to *complete* the data. We pass in the `date` and `pkgs` columns to say which combinations of columns we need to make sure exist. By default, missing combinations are represented by `NA`, but we can override the `fill` argument to use `0` instead. \index{tidyr!complete}
+We can use the `complete()` function from **`tidyr`** to *complete* the data. We pass in the `date` and `pkgs` columns to say which combinations of columns we need to make sure exist. By default, missing combinations are represented by `NA`, but we can override the `fill` argument to use `0` instead. \index{tidyr!complete}
 
 ```{r}
 #| label: r-pkgs-new-data
 new_plot_data <- plot_data |>
-  tidyr::complete(
+  complete(
     date, pkgs,
     fill = list(n = 0)
   )
@@ -341,7 +358,7 @@ The `%+%` operator allows you to replace the current default data frame on an ex
 
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages, with facets ordered from most to least use. The ordering now looks correct."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering now looks correct."
 #| fig-alt: ""
 basic_plot <- basic_plot %+% new_plot_data
 basic_plot
@@ -363,13 +380,13 @@ bg_col <- "#3A3B3C"
 text_col <- "white"
 ```
 
-Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of the palettes in {rcartocolor} [@rcartocolor]. Again, similar to @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
+Let's also define a color palette that we'll use for the fill color of the area charts. As we did in @sec-turbines, we'll use one of the palettes in **`rcartocolor`** [@rcartocolor]. Again, similar to @sec-turbines, to avoid the gray color, we ask for one more color than we need and then throw away the gray color. We have 8 categories in our plot, so we ask for 9 colors using the `carto_pal()` function and then extract only the first 8. We'll use the `"Bold"` palette here. \index{rcartocolor!carto\_pal}
 
 To keep a more consistent color theme in the plot, we define our highlight color variable, `highlight_col`, to be the first color in our chosen color palette.
 
 ```{r}
 #| label: r-pkgs-cols-2
-col_palette <- rcartocolor::carto_pal(
+col_palette <- carto_pal(
   length(core_tidyverse) + 1, "Bold"
 )[1:length(core_tidyverse)]
 highlight_col <- col_palette[1]
@@ -379,7 +396,7 @@ We can then pass this `col_palette` vector into `scale_fill_manual()` function t
 
 ```{r}
 #| label: fig-r-pkgs-col-plot
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Each area chart is colored using a different color from the {rcartocolor} package."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Each area chart is colored using a different color from the `rcartocolor` package."
 #| fig-alt: ""
 col_plot <- basic_plot +
   scale_fill_manual(
@@ -390,18 +407,18 @@ col_plot
 
 ### Text and fonts
 
-Similar to @sec-programming, since code is the subject of the visualization, we might want to choose a font that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace font family originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from {sysfonts}.
+Similar to @sec-programming, since code is the subject of the visualization, we might want to choose a typeface that's consistent with that theme. Here we'll use *Source Code Pro*, a monospace typeface originally designed specifically for coding environments. It's loaded into R using `font_add_google()` from **`sysfonts`**.
 
-In this chapter, we'll use the same font for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
+In this chapter, we'll use the same typeface for the title and body text so we only need to define one variable, `body_font`. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
 #| label: r-pkgs-fonts
-sysfonts::font_add_google(
+font_add_google(
   name = "Source Code Pro",
   family = "source"
 )
-showtext::showtext_auto()
-showtext::showtext_opts(dpi = 300)
+showtext_auto()
+showtext_opts(dpi = 300)
 body_font <- "source"
 ```
 
@@ -416,12 +433,12 @@ social <- social_caption(
 )
 ```
 
-The subtitle includes a quote from the [{tidyverse} website](https://www.tidyverse.org/), so we'll format it in italics using `*`. We also use the `source_caption()` function we defined in @sec-turbines to create a caption with information about the data source, combined with the social icons to attribute the graphic. \index{source\_caption}
+The subtitle includes a quote from the [`tidyverse` website](https://www.tidyverse.org/), so we'll format it in italics using `*`. Package names are formatted in bold with `**`. We also use the `source_caption()` function we defined in @sec-turbines to create a caption with information about the data source, combined with the social icons to attribute the graphic. \index{source\_caption}
 
 ```{r}
 #| label: r-pkgs-text-1
-title <- "How many times did I use {tidyverse} packages for TidyTuesday?"
-st <- "The tidyverse is a collection of open source R packages that *share an underlying design philosophy, grammar, and data structures*. Of the 8 core tidyverse packages, {ggplot2} was my most used package for TidyTuesday visualizations in 2023."
+title <- "How many times did I use **tidyverse** packages for TidyTuesday?"
+st <- "The **tidyverse** is a collection of open source R packages that *share an underlying design philosophy, grammar, and data structures*. Of the 8 core **tidyverse** packages, **ggplot2** was my most used package for TidyTuesday visualizations in 2023."
 source_cap <- source_caption(
   source = "github.com/nrennie/tidytuesday",
   graphic = social,
@@ -459,19 +476,19 @@ There are multiple different ways to remove the axis labels. You can set `x = ""
 
 ### Adjusting scales and themes
 
-We can adjust the x- and y- axes labeling to deal with the over-crowding of the labels. By default, labels have been added on each facet, at every three months. Although the data only covers 2023, {ggplot2} also extends the x-axis to cover the beginning of 2024. We can adjust the `limits` and `breaks` of the x-axis scale to show only 2023, and have fewer labels. Since the values on the x-axis are dates, we use `scale_x_date()` to make the adjustments. This also means that the values we pass into the `breaks` and `limits` arguments of `scale_x_date()` should be dates, and so we again make use of `ymd()` from {lubridate}. We set the x-axis limits to be from January 1 to December 31 of 2023, and add labels on the first of January and July. \index{ggplot2!scale\_x\_date} \index{lubridate!ymd}
+We can adjust the x- and y- axes labeling to deal with the over-crowding of the labels. By default, labels have been added on each facet, at every three months. Although the data only covers 2023, **`ggplot2`** also extends the x-axis to cover the beginning of 2024. We can adjust the `limits` and `breaks` of the x-axis scale to show only 2023, and have fewer labels. Since the values on the x-axis are dates, we use `scale_x_date()` to make the adjustments. This also means that the values we pass into the `breaks` and `limits` arguments of `scale_x_date()` should be dates, and so we again make use of `ymd()` from **`lubridate`**. We set the x-axis limits to be from January 1 to December 31 of 2023, and add labels on the first of January and July. \index{ggplot2!scale\_x\_date} \index{lubridate!ymd}
 
 For the y-axis, we choose *nice* limits and breaks - setting the limits to between 0 and 150, with breaks every 50. To remove the excess space around the edge of each facet plot, we also set `expand = FALSE` in `coord_cartesian()`. \index{ggplot2!coord\_cartesian} 
 \index{ggplot2!scale\_y\_continuous} 
 
 ```{r}
 #| label: fig-r-pkgs-limits-plot
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
 #| fig-alt: ""
 limits_plot <- text_plot +
   scale_x_date(
-    limits = lubridate::ymd(c("20230101", "20231231")),
-    breaks = lubridate::ymd(c("20230101", "20230701")),
+    limits = ymd(c("20230101", "20231231")),
+    breaks = ymd(c("20230101", "20230701")),
     labels = c("Jan", "Jul")
   ) +
   scale_y_continuous(
@@ -482,7 +499,7 @@ limits_plot <- text_plot +
 limits_plot
 ```
 
-Let's edit the arguments of `theme()` to finalise our plot. There's a fairly large number of adjustments to make, so we'll do them in two stages.  \index{ggplot2!theme}
+Let's edit the arguments of `theme()` to finalise our plot. There's a fairly large number of adjustments to make, so we'll do them in two stages. \index{ggplot2!theme}
 
 We'll start by setting the default font family and base font size in the `text` argument through `element_text()`. We also remove the legend and add a little bit of space around the edges of the plot using the `margin()` function. \index{ggplot2!element\_text} \index{ggplot2!margin} \index{grid!unit}
 
@@ -514,19 +531,19 @@ init_theme_plot <- limits_plot +
   )
 ```
 
-Our final adjustments include specifying that we're using {ggtext} for the title and subtitle to allow the HTML and Markdown text to be processed correctly. We do this by using `element_textbox_simple()` from {ggtext} in the `plot.title` and `plot.subtitle` arguments, where we also set the font `color`, left-align it, and add a little padding around the edges. The title text is made slightly larger than normal by using the `rel()` function in size. Setting `plot.title.position = "plot"` means that the title and subtitle text is aligned with the edge of the whole plot, rather than the edge of the first facet plot. This gives a cleaner looker and avoids extra white created due to the width of the y-axis text. \index{ggplot2!rel} \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
+Our final adjustments include specifying that we're using **`ggtext`** for the title and subtitle to allow the HTML and Markdown text to be processed correctly. We do this by using `element_textbox_simple()` from **`ggtext`** in the `plot.title` and `plot.subtitle` arguments, where we also set the font `color`, left-align it, and add a little padding around the edges. The title text is made slightly larger than normal by using the `rel()` function in size. Setting `plot.title.position = "plot"` means that the title and subtitle text is aligned with the edge of the whole plot, rather than the edge of the first facet plot. This gives a cleaner looker and avoids extra white created due to the width of the y-axis text. \index{ggplot2!rel} \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
 
 We also make sure that the x- and y-axes labels and title are the correct color using `element_text()`. Finally, the grid lines are made thinner and semi-transparent using the `color` and `linewidth` arguments in `element_line()`. The minor grid lines are made a little bit more transparent than the major grid lines. \index{ggplot2!element\_line} 
 
 ```{r}
 #| label: fig-r-pkgs-theme-plot-2
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
 #| fig-alt: ""
 theme_plot <- init_theme_plot +
   theme(
     # title and subtitle text
     plot.title.position = "plot",
-    plot.title = ggtext::element_textbox_simple(
+    plot.title = element_textbox_simple(
       color = text_col,
       hjust = 0,
       halign = 0,
@@ -534,7 +551,7 @@ theme_plot <- init_theme_plot +
       face = "bold",
       size = rel(1.4)
     ),
-    plot.subtitle = ggtext::element_textbox_simple(
+    plot.subtitle = element_textbox_simple(
       color = text_col,
       hjust = 0,
       halign = 0,
@@ -564,22 +581,25 @@ This visualization is perfectly fine as it is, but we can still edit the facet l
 
 ### Using images as facet labels
 
-As we discussed in @sec-lemurs, packages such as {cowplot} [@cowplot], {egg} [@egg], {patchwork} [@patchwork], and {ggimage} [@ggimage] can all be used to plot images. Here, we want to use images for the facet labels, which lie outside of the plot panel. There are several good options for overlaying elements outside of the main plot area. The `inset_element()` function from {patchwork} can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly,the  `draw_image()` function from {cowplot} simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. \index{patchwork!inset\_element} \index{cowplot!draw\_image} \index{facet labels}
+As we discussed in @sec-lemurs, packages such as **`cowplot`** [@cowplot], **`egg`** [@egg], **`patchwork`** [@patchwork], and **`ggimage`** [@ggimage] can all be used to plot images. Here, we want to use images for the facet labels, which lie outside of the plot panel. There are several good options for overlaying elements outside of the main plot area. The `inset_element()` function from **`patchwork`** can add elements on top of existing plots (we'll see an example in @sec-time-zones). Similarly,the  `draw_image()` function from **`cowplot`** simplifies the process of combining plots and images. However, to edit the facet labels we don't actually need any additional packages beyond the ones we've already used to make the plot. \index{patchwork!inset\_element} \index{cowplot!draw\_image} \index{facet labels}
 
-We've used the {ggtext} package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with {ggtext} to format the facet labels!
+We've used the **`ggtext`** package [@ggtext] many times already to add styling through the use of both Markdown and HTML syntax. For example, we added lines breaks using `<br>` and colored text using `<span></span>`. The `<img>` tag is used to add images in HTML. So let's use that in combination with **`ggtext`** to format the facet labels!
 
-Before we get started, we need to get some images! The hex stickers for many R packages can be found at [github.com/rstudio/hex-stickers](https://github.com/rstudio/hex-stickers). For each of the 8 packages included in the plot, we can download the relevant hex sticker and **save it somewhere sensible**. Here, we'll save each image as a PNG file and the name of the file is the same as the name of the package e.g. the hex sticker for {dplyr} is saved as `dplyr.png` [@hex_dplyr]. To keep our directories looking clean and tidy, we might choose to save them in a folder. Here, we'll save them in a nested folder: `images/hex/`. This means the (relative) file path for our {dplyr} hex sticker is `images/hex/dplyr.png`. This is what we want to pass in as the image source in the `<img>` HTML tag for the {dplyr} facet label.
+Before we get started, we need to get some images! The hex stickers for many R packages can be found at {{< monolink "https://github.com/rstudio/hex-stickers" "github.com/rstudio/hex-stickers" >}}. For each of the 8 packages included in the plot, we can download the relevant hex sticker and **save it somewhere sensible**. Here, we'll save each image as a PNG file and the name of the file is the same as the name of the package e.g. the hex sticker for **`dplyr`** is saved as `dplyr.png` [@hex_dplyr]. To keep our directories looking clean and tidy, we might choose to save them in a folder. Here, we'll save them in a nested folder: `images/hex/`. This means the (relative) file path for our **`dplyr`** hex sticker is `images/hex/dplyr.png`. This is what we want to pass in as the image source in the `<img>` HTML tag for the **`dplyr`** facet label.
 
 This means we need to make two edits to our data:
 
 * including `<img>` tags in the `pkgs` column that is used as the faceting variable.
 * including `<img>` tags in the factor levels of the `pkgs` column to keep the correct ordering.
 
-Let's start with the factor levels. Currently, the factor levels are just the package names. Luckily, we've been smart enough to save the images with the package name as the file name. This means we can use `glue()` from the {glue} package to stick together the package names with the HTML code. Let's pass in the `pkgs_levels` vector we created earlier in to the end of the image file path, to create a new vector for the factor levels: \index{glue!glue}
+Let's start with the factor levels. Currently, the factor levels are just the package names. Luckily, we've been smart enough to save the images with the package name as the file name. This means we can use `glue()` from the **`glue`** package to stick together the package names with the HTML code.
+
+Let's first extract the factor levels of the `pkgs` column, and save it as a variable called `pkgs_levels`. We then append these names to the end of the image file path, to create a new vector for the factor levels: \index{glue!glue}
 
 ```{r}
 #| label: r-pkgs-new-levels-1
-new_levels <- glue::glue(
+pkgs_levels <- levels(new_plot_data$pkgs)
+new_levels <- glue(
   "<img src='images/hex/{pkgs_levels}.png'>"
 )
 ```
@@ -588,20 +608,20 @@ We can also control how the images appear within the `<img>` tag (to some extent
 
 ```{r}
 #| label: r-pkgs-new-levels-2
-new_levels <- glue::glue(
+new_levels <- glue(
   "&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs_levels}.png' width='20'>"
 )
 ```
 
-Now we need to do the same thing to the `pkgs` column. It's important that we overwrite the `pkgs` column here rather than making an entirely new column. This means that we can use the `%+%` operator to update the data and {ggplot2} will still be able to find the correct variable to facet by. We again use `glue()` to add the `pkgs` column into HTML `<img>` tags - being very careful to make sure that the new column values match exactly to the factor levels we defined in `new_levels`. This allows us to then apply these factor levels using `mutate()` to make sure the ordering of the packages from most to least used in retained. \index{dplyr!mutate} \index{glue!glue} \index{base!factor}
+Now we need to do the same thing to the `pkgs` column. It's important that we overwrite the `pkgs` column here rather than making an entirely new column. This means that we can use the `%+%` operator to update the data and **`ggplot2`** will still be able to find the correct variable to facet by. We again use `glue()` to add the `pkgs` column into HTML `<img>` tags - being very careful to make sure that the new column values match exactly to the factor levels we defined in `new_levels`. This allows us to then apply these factor levels using `mutate()` to make sure the ordering of the packages from most to least used in retained. \index{dplyr!mutate} \index{glue!glue} \index{base!factor}
 
 ```{r}
 #| label: r-pkgs-img-data
 plot_img_data <- new_plot_data |>
-  dplyr::mutate(
-    pkgs = glue::glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
+  mutate(
+    pkgs = glue("&nbsp;&nbsp;&nbsp;&nbsp;<img src='images/hex/{pkgs}.png' width='20'>")
   ) |>
-  dplyr::mutate(
+  mutate(
     pkgs = factor(pkgs, levels = new_levels)
   )
 ```
@@ -613,15 +633,15 @@ As we did earlier, let's update the data to use our new `plot_img_data` using th
 img_plot <- theme_plot %+% plot_img_data
 ```
 
-We also need to tell {ggplot2} that the facet labels are using HTML tags, just as we've done with the caption. We edit the `theme()` function further and update the styling for `strip.text.x`. We again use `element_textbox_simple()` from {ggtext}, and set `hjust` and `halign` both to 0.5. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
+We also need to tell **`ggplot2`** that the facet labels are using HTML tags, just as we've done with the caption. We edit the `theme()` function further and update the styling for `strip.text.x`. We again use `element_textbox_simple()` from **`ggtext`**, and set `hjust` and `halign` both to 0.5. \index{ggplot2!theme} \index{ggtext!element\_textbox\_simple}
 
 ```{r}
 #| label: fig-r-pkgs-final-plot
-#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core {tidyverse} packages. Hex stickers have replaced the text labels on the facets."
+#| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Hex stickers have replaced the text labels on the facets."
 #| fig-alt: ""
 img_plot +
   theme(
-    strip.text.x = ggtext::element_textbox_simple(
+    strip.text.x = element_textbox_simple(
       hjust = 0.5,
       halign = 0.5
     )
@@ -643,17 +663,17 @@ ggsave(
 
 ::: {#tip-packages-axis .callout-tip}
 
-## Facet label images using {marquee}
+## Facet label images using **`marquee`**
 
-You can do a very similar thing using the {marquee} package [@marquee] instead of {ggtext}. The images can be added to `pkgs` using standard Markdown syntax instead of HTML tags: \index{dplyr!mutate} \index{glue!glue}
+You can do a very similar thing using the **`marquee`** package [@marquee] instead of **`ggtext`**. The images can be added to `pkgs` using standard Markdown syntax instead of HTML tags: \index{dplyr!mutate} \index{glue!glue}
 
 ```{r}
 #| label: r-pkgs-marquee-1
 #| eval: false
 #| echo: true
 plot_img_data <- new_plot_data |>
-  dplyr::mutate(
-    pkgs = glue::glue("![](images/hex/{pkgs}.png)")
+  mutate(
+    pkgs = glue("![](images/hex/{pkgs}.png)")
   )
 ```
 
@@ -663,28 +683,29 @@ Remember that you'd also need to update the factor levels and the data used in t
 #| label: r-pkgs-marquee-2
 #| eval: false
 #| echo: true
+library(marquee)
 img_plot +
   theme(
-    strip.text.x = marquee::element_marquee(
+    strip.text.x = element_marquee(
       hjust = 0.5,
       width = 1
     )
   )
 ```
 
-However, controlling the sizing and placement of the images is (at the time of writing) a little bit more difficult with {marquee}.
+However, controlling the sizing and placement of the images is (at the time of writing) a little bit more difficult with **`marquee`**.
 
 :::
 
 ## Reflection
 
-Overall, this plot is very effective - it clearly shows the differing levels of R package use whilst still being eye-catching. However, there are still a few improvements that can be made. Other than for {ggplot2} and {dplyr}, it's quite hard to read the values as they are very small compared to the height of the y-axis. This is due to the high usage of {ggplot2} on a single occasion. Maybe using a logarithmic transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability. 
+Overall, this plot is very effective - it clearly shows the differing levels of R package use whilst still being eye-catching. However, there are still a few improvements that can be made. Other than for **`ggplot2`** and **`dplyr`**, it's quite hard to read the values as they are very small compared to the height of the y-axis. This is due to the high usage of **`ggplot2`** on a single occasion. Maybe using a logarithmic transformation of the y-axis would make it easier to see the very small values - although log transformations do have their own downsides in terms of interpretability. 
 
-The use of color could also be improved here. The colors are used to differentiate the different packages, and so don't provide any further information not already given by the facet labels - similar to @sec-museums. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the {stringr} hex sticker image is quite similar to the green used in the {dplyr} area chart - this is currently a little bit distracting. \index{color}
+The use of color could also be improved here. The colors are used to differentiate the different packages, and so don't provide any further information not already given by the facet labels - similar to @sec-museums. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the **`stringr`** hex sticker image is quite similar to the green used in the **`dplyr`** area chart - this is currently a little bit distracting. \index{color}
 
 ::: {.content-visible when-format="html"}
 
-Each plot created during the process of developing the original version of this visualization was captured using {camcorder}, and is shown in the gif below. If you'd like to learn more about how {camcorder} can be used in the data visualization process, see @sec-camcorder.
+Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
 ![](images/r-pkgs.gif){fig-align="center" fig-alt=""}
 
@@ -692,13 +713,14 @@ Each plot created during the process of developing the original version of this 
 
 ## Exercises
 
-In July 2024, TidyTuesday used the {funspotr} package to look at how [David Robinson has explored TidyTuesday data](https://github.com/dgrtwo/data-screencasts) in his [YouTube screencasts](https://youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8&si=jGBo0bcarEPV6cnn). You can load the data with:
+In July 2024, TidyTuesday used the **`funspotr`** package to look at how [David Robinson has explored TidyTuesday data](https://github.com/dgrtwo/data-screencasts) in his [YouTube screencasts](https://youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8&si=jGBo0bcarEPV6cnn). You can load the data with:
 
 ```{r}
 #| label: r-pkgs-ex-data
 #| echo: true
 #| eval: false
-tuesdata <- tidytuesdayR::tt_load("2024-07-09")
+library(tidytuesdayR)
+tuesdata <- tt_load("2024-07-09")
 drob_funs <- tuesdata$drob_funs
 ```
 
