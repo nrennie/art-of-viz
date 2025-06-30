@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>13&nbsp; US House elections: geography on a grid with geofacet – The Art of Data Visualization with ggplot2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./other-tricks.html" rel="next">
+<link href="./time-zones.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1SWN5BH1PZ"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
+</script>
+</head>
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualizing spatial data</a></li><li class="breadcrumb-item"><a href="./us-elections.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The Art of Data Visualization with ggplot2</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./author.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common charts don't need to be boring!</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./programming-languages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Programming languages: dumbbell charts with <strong><code>ggplot2</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./museums.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">UK museums: highlighting line charts with <strong><code>gghighlight</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bee-colonies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee colony losses: visualizing quantities with Poisson disk sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Making use of icons, fonts, and text</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind-turbines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Canadian wind turbines: waffle plots and pictograms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with <strong><code>ggtext</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nobel-laureates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize laureates: positioning text and parameterizing plots</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./images.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Working with images</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images in R</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">R packages: using images for custom facet labels</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualizing spatial data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./doctors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Doctors across the world: making maps with <strong><code>ggplot2</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./time-zones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./us-elections.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliography</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">13.1</span> Data</a></li>
+  <li>
+<a href="#exploratory-work" id="toc-exploratory-work" class="nav-link" data-scroll-target="#exploratory-work"><span class="header-section-number">13.2</span> Exploratory work</a>
+  <ul class="collapse">
+<li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">13.2.1</span> Data exploration</a></li>
+  <li><a href="#exploratory-sketches" id="toc-exploratory-sketches" class="nav-link" data-scroll-target="#exploratory-sketches"><span class="header-section-number">13.2.2</span> Exploratory sketches</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">13.3</span> Preparing a plot</a>
+  <ul class="collapse">
+<li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">13.3.1</span> Data wrangling</a></li>
+  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">13.3.2</span> The first plot</a></li>
+  <li><a href="#faceting-with-geofacet" id="toc-faceting-with-geofacet" class="nav-link" data-scroll-target="#faceting-with-geofacet"><span class="header-section-number">13.3.3</span> Faceting with <strong><code>geofacet</code></strong></a></li>
+  </ul>
+</li>
+  <li>
+<a href="#advanced-styling" id="toc-advanced-styling" class="nav-link" data-scroll-target="#advanced-styling"><span class="header-section-number">13.4</span> Advanced styling</a>
+  <ul class="collapse">
+<li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">13.4.1</span> Colors</a></li>
+  <li><a href="#text-and-fonts" id="toc-text-and-fonts" class="nav-link" data-scroll-target="#text-and-fonts"><span class="header-section-number">13.4.2</span> Text and fonts</a></li>
+  <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">13.4.3</span> Adjusting themes</a></li>
+  <li><a href="#developing-a-custom-legend" id="toc-developing-a-custom-legend" class="nav-link" data-scroll-target="#developing-a-custom-legend"><span class="header-section-number">13.4.4</span> Developing a custom legend</a></li>
+  <li><a href="#joining-with-patchwork" id="toc-joining-with-patchwork" class="nav-link" data-scroll-target="#joining-with-patchwork"><span class="header-section-number">13.4.5</span> Joining with <strong><code>patchwork</code></strong></a></li>
+  </ul>
+</li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">13.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">13.6</span> Exercises</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualizing spatial data</a></li><li class="breadcrumb-item"><a href="./us-elections.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="sec-house" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><p>In this chapter, we’ll learn how to arrange faceted plots in a grid that resembles a geographic area with <strong><code>geofacet</code></strong>, and look at another approach for creating customized legends. </p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hafen/geofacet">geofacet</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/">glue</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="data" class="level2" data-number="13.1"><h2 data-number="13.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">13.1</span> Data</h2>
+<p>The MIT Election Data and Science Lab collects, analyzes, and shares data and results about elections in the United States of America, with the aim to improve democracy in the USA. This includes data on elections to the U.S. House of Representatives, at the constituency level <span class="citation" data-cites="elections_data">(<a href="references.html#ref-elections_data" role="doc-biblioref">MIT Election Data and Science Lab 2017</a>)</span>. The data is regularly updated, and a version of this dataset containing information about elections from 1976 to 2022 was used as a <a href="https://github.com/rfordatascience/tidytuesday/tree/main/data/2023/2023-11-07">TidyTuesday dataset in November 2023</a>. We can again load the data in using the <code><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load()</a></code> function from <strong><code>tidytuesdayR</code></strong>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-11-07"</span><span class="op">)</span></span>
+<span><span class="va">house</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">house</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are 32452 rows and 20 columns in the data. Let’s take a look at the first few rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> (or <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> if you prefer): </p>
+<div class="cell">
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">house</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 6 × 20
+   year state  state_po state_fips state_cen state_ic office
+  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt; 
+1  1976 ALABA… AL                1        63       41 US HO…
+2  1976 ALABA… AL                1        63       41 US HO…
+3  1976 ALABA… AL                1        63       41 US HO…
+4  1976 ALABA… AL                1        63       41 US HO…
+5  1976 ALABA… AL                1        63       41 US HO…
+6  1976 ALABA… AL                1        63       41 US HO…
+# ℹ 13 more variables: district &lt;chr&gt;, stage &lt;chr&gt;,
+#   runoff &lt;lgl&gt;, special &lt;lgl&gt;, candidate &lt;chr&gt;,
+#   party &lt;chr&gt;, writein &lt;lgl&gt;, mode &lt;chr&gt;,
+#   candidatevotes &lt;dbl&gt;, totalvotes &lt;dbl&gt;,
+#   unofficial &lt;lgl&gt;, version &lt;dbl&gt;, fusion_ticket &lt;lgl&gt;</code></pre>
+</div>
+</div>
+<p>There are many <code>state</code> columns, essentially providing similar information in different formats e.g.&nbsp;the <code>state</code> column provides the state name and the <code>state_po</code> column provides the state two-letter abbreviation. There is also a column to identify the constituency (district) within the state. The data gives information about candidates: their name, their political party affiliation, and how many votes they received in the elections they stood in. Other columns provide information about the election, including total number of votes cast, the electoral stage, whether it was a special election, and whether it was a runoff election. The <code>version</code> column contains a data which identifies which release version of the data it is.</p>
+</section><section id="exploratory-work" class="level2" data-number="13.2"><h2 data-number="13.2" class="anchored" data-anchor-id="exploratory-work">
+<span class="header-section-number">13.2</span> Exploratory work</h2>
+<p>The <code>house</code> data is very granular, and it’s unlikely we’ll be able to visualize all of the information in one chart. Therefore we can think about different ways of subsetting or aggregating the data. We might choose to focus on:</p>
+<ul>
+<li><p>State: We could look at voting patterns within a specific state, or aggregate to look at state-level data instead of constituency-level.</p></li>
+<li><p>Party: We have information on which party each candidate stood for in the election, including data on fusion tickets where candidates stand for multiple parties.</p></li>
+<li><p>Time: Data is provided from 1976 to 2022, and we might want to look at trends in vote share or vote counts over time.</p></li>
+</ul>
+<section id="data-exploration" class="level3" data-number="13.2.1"><h3 data-number="13.2.1" class="anchored" data-anchor-id="data-exploration">
+<span class="header-section-number">13.2.1</span> Data exploration</h3>
+<p>Let’s start by having a quick look at whether or not the number of votes has changed over time. The data goes back to 1976 and the population of the USA has increased by over 150% between the 1970 and 2020 censuses <span class="citation" data-cites="UScensuspop">(<a href="references.html#ref-UScensuspop" role="doc-biblioref">United States Census Bureau 2021a</a>)</span> so might we also expect a similar increase in votes? Let’s start by having a look at the number of candidate votes over time with a quick scatter plot made with <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">year</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">house</span><span class="op">$</span><span class="va">candidatevotes</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Number of candidate votes"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-scatterplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-scatterplot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.1: Scatter plot showing the number of candidate votes over time, where it’s clear that elections take place every two years and there has been little change over time.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>There doesn’t seem to be an especially interesting pattern in votes over time in <a href="#fig-elections-scatterplot" class="quarto-xref">Figure&nbsp;<span>13.1</span></a>, at least at first glance. However, it has highlighted a potential data issue. In most years, the highest values are around 300,000 but there are two observations in 2022 where the values are well over 1,000,000. We had a similar issue in <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a>, where some observations were the sum of other observations. This doesn’t seem to be the case here. For now, let’s exclude these and look at data where the number of candidate votes is below 600,000.</p>
+<p>We might also be interested in how the number of candidate votes varies by party, and we can use the <code><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot()</a></code> function to explore whether or not there are big differences: </p>
+<div class="cell">
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">candidatevotes</span> <span class="op">~</span> <span class="va">party</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">house</span><span class="op">[</span><span class="va">house</span><span class="op">$</span><span class="va">candidatevotes</span> <span class="op">&lt;</span> <span class="fl">600000</span>, <span class="op">]</span>,</span>
+<span>  horizontal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Number of candidate votes"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-boxplot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.2: Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes).
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>In <a href="#fig-elections-boxplot" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> there are a couple of interesting points to note. First, there are many, many unique <code>party</code> names because every independent candidate is listed as a different party name. This means that not all party names can actually by read off from the chart. Secondly, there are a lot of outliers shown in the data, which is highly skewed. Finally, there are a couple of parties that have a much higher numbers of votes. Inspecting the data confirms that these are, as we might guess, the Democratic Party and the Republican Party.</p>
+</section><section id="exploratory-sketches" class="level3" data-number="13.2.2"><h3 data-number="13.2.2" class="anchored" data-anchor-id="exploratory-sketches">
+<span class="header-section-number">13.2.2</span> Exploratory sketches</h3>
+<p>The Democratic and Republican parties have dominated elections during this time period. It’s unlikely we’d be able to draw any reliable insights about individual independent candidates because the numbers are so small, so let’s group all other party candidates together into an <em>other</em> category. We can look at combining <a href="#fig-elections-scatterplot" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> and <a href="#fig-elections-boxplot" class="quarto-xref">Figure&nbsp;<span>13.2</span></a>, alongside information about each state to look at whether there are changing patterns in vote share for the major parties over time and space.</p>
+<p>We might consider creating an area chart faceted by state showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. <a href="#fig-elections-sketch" class="quarto-xref">Figure&nbsp;<span>13.3</span></a> shows an example of what this might look like:</p>
+<div id="fig-elections-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-elections.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.3: Initial sketch of a faceted area chart arranged in a grid shaped like the United States.
+</figcaption></figure>
+</div>
+<p>Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly <em>busy</em>. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. Though the minimalist approach may look cleaner, it can also mean that it’s not as clear what’s being shown on a chart. Let’s add a <em>how to read this chart</em> explainer as a legend, created from a zoomed in version of one of the facet plots: </p>
+<div id="fig-elections-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-elections-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.4: Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.
+</figcaption></figure>
+</div>
+</section></section><section id="preparing-a-plot" class="level2" data-number="13.3"><h2 data-number="13.3" class="anchored" data-anchor-id="preparing-a-plot">
+<span class="header-section-number">13.3</span> Preparing a plot</h2>
+<p>In order to bring <a href="#fig-elections-sketch-2" class="quarto-xref">Figure&nbsp;<span>13.4</span></a> to life, we need to start by aggregating the <em>other</em> parties, and calculating the number of votes per party, year, and state.</p>
+<section id="data-wrangling" class="level3" data-number="13.3.1"><h3 data-number="13.3.1" class="anchored" data-anchor-id="data-wrangling">
+<span class="header-section-number">13.3.1</span> Data wrangling</h3>
+<p>To aggregate the <em>other</em> parties, we use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> from <strong><code>dplyr</code></strong> to update the existing <code>party</code> column. We create the new party categories using <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when()</a></code> and also take the opportunity to provide slightly better, alternative labels for the two dominant parties. </p>
+<p>The <code>stage</code> column contains information on whether the election was a general election (<code>"GEN"</code>) or primary election (<code>"PRI"</code>). To keep things simpler, we use <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> from <strong><code>dplyr</code></strong> to restrict the data to general elections only. We then use <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> to add up the number of votes in each year, state, and party category - remembering to <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup()</a></code> the data at the end! </p>
+<div class="cell">
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">house_data</span> <span class="op">&lt;-</span> <span class="va">house</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>party <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"REPUBLICAN"</span> <span class="op">~</span> <span class="st">"Republican Party"</span>,</span>
+<span>    <span class="va">party</span> <span class="op">==</span> <span class="st">"DEMOCRAT"</span> <span class="op">~</span> <span class="st">"Democratic Party"</span>,</span>
+<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Other"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">stage</span> <span class="op">==</span> <span class="st">"GEN"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">state_po</span>, <span class="va">party</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>votes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">candidatevotes</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are some years for which there were no <code>"Other"</code> candidates in some states, and so there are no rows for these values i.e.&nbsp;they are implicitly missing. As we saw in <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>, this can cause misleading area charts and results in a warning from <strong><code>ggplot2</code></strong>. As in <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>, these <em>missing</em> values are not actually missing, they are simply 0. We’ll do as we did before and make sure that every combination of <code>year</code>, <code>state_po</code>, and <code>party</code> exists in the data by using <code><a href="https://tidyr.tidyverse.org/reference/complete.html">complete()</a></code> from <strong><code>tidyr</code></strong>, and setting any <em>missing</em> combinations explicitly to 0. </p>
+<div class="cell">
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">house_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html">complete</a></span><span class="op">(</span></span>
+<span>    <span class="va">year</span>, <span class="va">state_po</span>, <span class="va">party</span>,</span>
+<span>    fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>votes <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="the-first-plot" class="level3" data-number="13.3.2"><h3 data-number="13.3.2" class="anchored" data-anchor-id="the-first-plot">
+<span class="header-section-number">13.3.2</span> The first plot</h3>
+<p>We’re once again going to create a faceted plot, as we did in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a>, and <a href="technology-adoption.html" class="quarto-xref"><span>Chapter 5</span></a>. There are two key differences with this plot:</p>
+<ul>
+<li>Instead of arranging the plots into a rectangular shape with a specified number of rows and columns, we want to arrange the plots in a way that resembles some underlying geography.</li>
+<li>There are far more facets (over 50) compared to the previous plots we’ve made (which have mostly had less than 10). Sometimes creating a large number of facets can be slow.</li>
+</ul>
+<p>It’s this second issue that means when developing faceted plots, especially when using large data or a complex visualization, it can be useful to create a single plot first. That is, filter the data and create a chart for just one level of the faceting category. This allows you to get the basics of your chart correct, before you start worrying about facet layout.</p>
+<p>We start by passing in our <code>plot_data</code> to the <code>data</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>, wrapped inside the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> which subsets the data to just California. We set up the aesthetic mapping to plot the year on the x-axis and the number of votes on the y-axis, split by party. </p>
+<p>We’ve already seen examples of making area charts in <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>, but we’re going to make a slight change in this chapter. Since we’re going to be comparing states (which each have very different population sizes, and therefore will have very different numbers of votes), rather than considering an area chart of number of votes, we’ll look at the proportion for each party. Luckily, we don’t have to calculate these percentages ourselves, since setting <code>position = "fill"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area()</a></code> does this for us. </p>
+<div class="cell">
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="va">state_po</span> <span class="op">==</span> <span class="st">"CA"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">votes</span>, fill <span class="op">=</span> <span class="va">party</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    position <span class="op">=</span> <span class="st">"fill"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-single-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-single-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-single-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-single-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.5: Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We now have a basic plot for one of the facet values.</p>
+<div id="tip-elections-piping" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;13.1: Piping data into <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Since the first argument of <code>ggplot</code> is <code>data</code>, this means that we <em>could</em> pipe the data into the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function rather than explicitly stating it as the first argument. For example, the code above could be re-written as:</p>
+<div class="cell">
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">state_po</span> <span class="op">==</span> <span class="st">"CA"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">votes</span>, fill <span class="op">=</span> <span class="va">party</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    position <span class="op">=</span> <span class="st">"fill"</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Though this may arguably look neater than nesting <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> inside <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>, you’re unlikely to see any other examples of piping into <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> for two reasons:</p>
+<ul>
+<li>The combination of <code>+</code> and <code>|&gt;</code> looks odd, and this outweighs the increased neatness from piping (personal opinion).</li>
+<li>It makes it easier to end up with very long, complicated code. Keeping the data wrangling and the plotting code separate often makes more sense.</li>
+</ul>
+</div>
+</div>
+<p>We can now pass the full data into <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> (rather than just the California subset) and add <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to create an area chart for each value in <code>state_po</code>. </p>
+<div class="cell" data-source-line-numbers="2,11">
+<div class="sourceCode" id="cb11" data-source-line-numbers="2,11" data-code-line-numbers="2,11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">plot_data</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">votes</span>, fill <span class="op">=</span> <span class="va">party</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    position <span class="op">=</span> <span class="st">"fill"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">basic_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">state_po</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-basic-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-basic-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-basic-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-basic-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.6: Faceted area chart arranged in a rectangular grid shaped, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>In <a href="#fig-elections-basic-plot" class="quarto-xref">Figure&nbsp;<span>13.6</span></a>, we can’t actually see any of our area charts, only the facet labels. This is a very common problem when working with large numbers of facet categories, and smaller chart sizes. We’ll deal with this problem a little bit later when adjusting the plot theme.</p>
+</section><section id="faceting-with-geofacet" class="level3" data-number="13.3.3"><h3 data-number="13.3.3" class="anchored" data-anchor-id="faceting-with-geofacet">
+<span class="header-section-number">13.3.3</span> Faceting with <strong><code>geofacet</code></strong>
+</h3>
+<p>To arrange the faceted plots into a grid that resembles the underlying geography, we’ll use the <strong><code>geofacet</code></strong> package <span class="citation" data-cites="geofacet">(<a href="references.html#ref-geofacet" role="doc-biblioref">Hafen 2023</a>)</span>. The <strong><code>geofacet</code></strong> package makes it easier to arrange facets in the shape of a map. This makes it easier to compare data across regions, like states or countries, in a grid format. There are many built-in grids for different geographical regions, including the several for the United States of America. However, you can also create your own custom facet grid if you prefer a different layout, or if no grid exists for the region you are plotting.</p>
+<p>To do faceting with <strong><code>geofacet</code></strong>, we use <code><a href="https://rdrr.io/pkg/geofacet/man/facet_geo.html">facet_geo()</a></code> instead of <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code>. It works in essentially the same way, and we start by using a <code>~</code> to indicate which column is the faceting column. However, there are two things that are a little bit different: </p>
+<ul>
+<li><p>We need to specify which grid layout we want to use. You can use the <code><a href="https://rdrr.io/pkg/geofacet/man/get_grid_names.html">get_grid_names()</a></code> function in <strong><code>geofacet</code></strong> to get a list of all of the valid grid names. They are named sensibly based on what region the grid is for e.g.&nbsp;<code>"us_state_grid1"</code> and <code>"eu_grid1"</code>. Here, we’ll use <code>"us_state_grid2"</code>.</p></li>
+<li><p>In order to map the data to the correct facet position on the grid, one of the columns in the data must align with the value in the <code>code</code> column of your chosen grid. In the <code>"us_state_grid2"</code> grid, the <code>code</code> column contains the two letter state abbreviations which matches the <code>state_po</code> column in our data. If you didn’t have the two letter abbreviations, you may need to do some data joining to attach them.</p></li>
+</ul>
+<p>If you have additional <em>states</em> (e.g.&nbsp;Puerto Rico can sometimes be listed in a US state column even though it isn’t) or are missing some states, you can still use <code><a href="https://rdrr.io/pkg/geofacet/man/facet_geo.html">facet_geo()</a></code>. However, it will only plot states listed in the facet grid, and you may get a warning message.</p>
+<div class="cell">
+<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/geofacet/man/facet_geo.html">facet_geo</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span><span class="va">state_po</span>,</span>
+<span>    grid <span class="op">=</span> <span class="st">"us_state_grid2"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">map_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-geofacet-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-geofacet-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-geofacet-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-geofacet-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.7: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We still have the same problem of not being able to see the details of the chart as there are so many, but you can see from just the facet titles, that the plots are now arranged in a grid that resembles the USA.</p>
+</section></section><section id="advanced-styling" class="level2" data-number="13.4"><h2 data-number="13.4" class="anchored" data-anchor-id="advanced-styling">
+<span class="header-section-number">13.4</span> Advanced styling</h2>
+<p>We’ll now style our charts to apply more intuitive colors, adjust the facet labels to allow the charts to be seen more easily, and create a custom legend that explains how to read this chart.</p>
+<section id="colors" class="level3" data-number="13.4.1"><h3 data-number="13.4.1" class="anchored" data-anchor-id="colors">
+<span class="header-section-number">13.4.1</span> Colors</h3>
+<p>In the USA, the Republican Party is represented by the color red and the Democratic Party by blue. As we discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, when choosing which colors to use for well-known categories, it’s important not to play into negative stereotypes (e.g.&nbsp;pink for girls). But it’s also important to use what is intuitive. Since these are colors that the parties have chosen to represent themselves, and because they are so well recognized, we’ll stick to red and blue. </p>
+<p>Since the visualization is already quite busy, we keep the background colors very simple - using only black and white.</p>
+<div class="cell">
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">blue_col</span> <span class="op">&lt;-</span> <span class="st">"#0015BC"</span></span>
+<span><span class="va">red_col</span> <span class="op">&lt;-</span> <span class="st">"#C41E3A"</span></span>
+<span><span class="va">other_col</span> <span class="op">&lt;-</span> <span class="st">"#AAAAAA"</span></span>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span>
+<span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"white"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then apply the colors to our plot using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code>, and assign each color to the relevant party label in <code>values</code>. Since we know we’re going to be creating our own legend later, we’ll remove the default legend by setting <code>guide = "none"</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">map_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Democratic Party"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
+<span>      <span class="st">"Republican Party"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
+<span>      <span class="st">"Other"</span> <span class="op">=</span> <span class="va">other_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="text-and-fonts" class="level3" data-number="13.4.2"><h3 data-number="13.4.2" class="anchored" data-anchor-id="text-and-fonts">
+<span class="header-section-number">13.4.2</span> Text and fonts</h3>
+<p>As in previous chapters, typefaces can be defined using the <strong><code>sysfonts</code></strong> and <strong><code>showtext</code></strong> packages. For the main font, we’ll use the <em>Roboto</em> typeface as we did in <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>. For the title text, we’ll use <em>Carter One</em>, a <a href="https://fonts.google.com/specimen/Carter+One">display font designed by Vernon Adams</a> inspired by typefaces used in mid 20th century advertising. It’s a bold typeface which works well for titles of visualizations. </p>
+<div class="cell">
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Roboto"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Carter One"</span>, family <span class="op">=</span> <span class="st">"Carter"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Roboto"</span></span>
+<span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"Carter"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We write text for the subtitle, using <code><a href="https://glue.tidyverse.org/reference/glue.html">glue()</a></code> to add HTML styling for colored text as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> and <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. The colored text serves as a legend (though we’ll later also add our own custom legend in addition), and the subtitle text provides information about what the chart shows. As in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. We also add the title text directly in the subtitle variable to enable easier placement of the text, again as we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"&lt;span style='font-size:10pt; font-family:{title_font}; color:{text_col};'&gt;Votes in US House Elections&lt;/span&gt;&lt;br&gt;Area charts indicate the percentage of votes for the &lt;span style='color:{blue_col};'&gt;Democratic Party&lt;/span&gt;, the &lt;span style='color:{red_col};'&gt;Republican Party&lt;/span&gt;, and &lt;span style='color:#aaaaaa;'&gt;Other&lt;/span&gt; parties in general elections between 1976 and 2022.&lt;br&gt;&lt;br&gt;**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab."</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We also use our <code>social_caption()</code> function defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which we’ll later add as a plot caption: </p>
+<div class="cell">
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
+<span>  icon_color <span class="op">=</span> <span class="va">blue_col</span>,</span>
+<span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then pass our subtitle, and caption text into the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function to add it to our plot. Since we want to position the subtitle text in an unusual place, we use the <code>tag</code> argument rather than <code>subtitle</code>, similar to what we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
+<span>    tag <span class="op">=</span> <span class="va">st</span>,</span>
+<span>    caption <span class="op">=</span> <span class="va">social</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="adjusting-themes" class="level3" data-number="13.4.3"><h3 data-number="13.4.3" class="anchored" data-anchor-id="adjusting-themes">
+<span class="header-section-number">13.4.3</span> Adjusting themes</h3>
+<p>We know that the facet labels are too large and are currently dominating the visualization as seen in <a href="#fig-elections-geofacet-plot" class="quarto-xref">Figure&nbsp;<span>13.7</span></a>. There are a few solutions to this:</p>
+<ul>
+<li><p>Make the facet labels much smaller. However, this can make them hard to read and renders the labels somewhat pointless.</p></li>
+<li><p>Increase the size of the chart. Here, we’re constrained by the physical width of the plot and can’t make it wider. Though we could make the plot taller, we’re then adding quite a lot of additional space simply for labels.</p></li>
+<li><p>Create our own custom facet labels.</p></li>
+</ul>
+<p>Here, we’re going to go for the third option. Later, we’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function to remove the default facet labels. For now, let’s think about what labels to add. To save space in the plot, the easiest way is to use inset facet labels - positioning the state label inside the area chart. This has the downside of hiding part of the data. However, we can make the text semi-transparent to allow both the state label and the area chart behind to be seen.</p>
+<p>We add text labels with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. The x-coordinate position of the text is set as the mean of the years in the full <code>plot_data</code> data to automatically position it in the middle of the chart. The y-coordinate position is set to <code>0.5</code> i.e.&nbsp;also in the middle of the chart since the <code>position = "fill"</code> argument scales the y-axis to be between <code>0</code> and <code>1</code>. The <code><a href="https://scales.r-lib.org/reference/alpha.html">alpha()</a></code> function is used to control the transparency of the text color. </p>
+<p>Note that we use a much smaller value of in <code><a href="https://scales.r-lib.org/reference/alpha.html">alpha()</a></code> than we normally would here. This is because there are actually multiple labels drawn on top of each other - one for each year, and party combination. Though this isn’t necessarily a problem, if we’re trying to create semi-transparent labels, stacking many copies of the same semi-transparent label on top of each other results in a pretty opaque label. Though we could filter the data to consider only one year and party, the <strong><code>geofacet</code></strong> package sometimes has issues rendering the labels correctly with this approach.</p>
+<div class="cell">
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot_1</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      y <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>      label <span class="op">=</span> <span class="va">state_po</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">title_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">bg_col</span>, <span class="fl">0.02</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">2.5</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As we’ve done in previous chapters we set <code>expand = FALSE</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian()</a></code> to remove the additional space around each plot panel. We also use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to remove any additional plot elements since we’re aiming for a minimal look and we’ll later design a custom legend that gives the reader all the information that would normally be conveyed by the axes labels and title. </p>
+<p>As in previous chapters we use the <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect()</a></code> function to set <code>plot.background</code> to our pre-defined background color variable. We also adjust the plot margins using <code>plot.margin</code>. Note that here we’re making the left plot margin very large, as this is where we’ll later position our custom legend. We discussed pros and cons of this approach in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>. </p>
+<p>We can position the title text to the left of the plot, in the wide margin by choosing negative values for <code>hjust</code>. Remember the <code>0</code> means left-aligned and <code>1</code> means right-aligned. Negative values essentially mean <em>very left aligned</em>! This works here because the title is a single line of text, but for multi-line text the text alignment can often look odd. That means that for the subtitle text (which is a short paragraph), we’re using <code>tag</code> instead of <code>subtitle</code> text. The <code>plot.tag.position</code> allows us to specify a vector of co-ordinates for where we want the text to appear - with negative x-coordinates also placing the text into the widened plot margin. It takes a little bit of trial and error to ensure that the <code>title</code> and <code>tag</code> text are aligned with each other. We again use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> to enable automatic text wrapping for the plot <code>tag</code> text, and for the caption to make the icons render correctly. </p>
+<p>We set both the <code>strip.background</code> and <code>strip.text</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank()</a></code> to remove all default facet labels, and use <code>panel.spacing</code> to control the amount of space between the facets and move them closer together. </p>
+<div class="cell">
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot_2</span> <span class="op">&lt;-</span> <span class="va">styled_plot_1</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Background elements</span></span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">bg_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">125</span><span class="op">)</span>,</span>
+<span>    plot.tag <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      maxwidth <span class="op">=</span> <span class="fl">0.65</span>,</span>
+<span>      lineheight <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>      size <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">rel</a></span><span class="op">(</span><span class="fl">1.0</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.caption <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      halign <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      maxwidth <span class="op">=</span> <span class="fl">0.65</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span>b <span class="op">=</span> <span class="fl">0</span>, t <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.50</span>, <span class="fl">0.77</span><span class="op">)</span>,</span>
+<span>    <span class="co"># Facet arguments</span></span>
+<span>    strip.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.spacing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="st">"lines"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">styled_plot_2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-plot-style-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-plot-style-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-plot-style-2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-plot-style-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.8: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. A large blank space appears on the left hand side, where a legend will later be placed.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="developing-a-custom-legend" class="level3" data-number="13.4.4"><h3 data-number="13.4.4" class="anchored" data-anchor-id="developing-a-custom-legend">
+<span class="header-section-number">13.4.4</span> Developing a custom legend</h3>
+<p>As we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we’ll design a custom legend. In <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, we used a bar chart as a legend which also served as another source of information in the visualization. In this chapter, our custom legend will instead serve as a <em>how to read this chart</em> explainer. </p>
+<p>We can take one of the facets, enlarge it, and add annotations to explain what data is shown on the chart. To keep the main chart looking clean, we don’t currently have any axes titles or labels. For example, it’s not immediately clear what years are covered by the data. This doesn’t need added to every chart, but should be annotated on the legend. To increase the accessibility of the chart, and to make sure we don’t rely on color alone as discussed in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a>, we’ll also add direct labels to identify the <em>Democratic Party</em> and <em>Republican Party</em> areas on the chart.</p>
+<p>Let’s start by filtering the data, to select only a single state. It doesn’t really matter which one we choose, although ideally one that has enough space for us to add the party labels directly on the chart. Here, we’ll use California (<code>"CA"</code>) for the legend plot. </p>
+<div class="cell">
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ca_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="va">state_po</span> <span class="op">==</span> <span class="st">"CA"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then reuse the code written for the main plot, passing in the <code>ca_data</code> to the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, then adding the aesthetic mapping and the area chart with <code><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area()</a></code>. The colors and custom state (facet) labels are added with <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> as discussed earlier in this chapter. </p>
+<div class="cell">
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ca_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ca_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">year</span>,</span>
+<span>      y <span class="op">=</span> <span class="va">votes</span>,</span>
+<span>      fill <span class="op">=</span> <span class="va">party</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    position <span class="op">=</span> <span class="st">"fill"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># label for state</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      y <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>      label <span class="op">=</span> <span class="va">state_po</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">title_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">bg_col</span>, <span class="fl">0.3</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">4</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># colors</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Democratic Party"</span> <span class="op">=</span> <span class="va">blue_col</span>,</span>
+<span>      <span class="st">"Republican Party"</span> <span class="op">=</span> <span class="va">red_col</span>,</span>
+<span>      <span class="st">"Other"</span> <span class="op">=</span> <span class="va">other_col</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    guide <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function to add: </p>
+<ul>
+<li><p>Two labels for the start and end year of the data. To keep these within the bounds of the plot, we left align the start label on the left, and right align the end label on the right.</p></li>
+<li><p>Two labels for the <em>Republican</em> and <em>Democratic</em> parties. We leave the <em>Other</em> category unlabeled as it’s very small, and it’s obviously the only category left over.</p></li>
+</ul>
+<p>As in the main plot, we also set <code>expand = FALSE</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian()</a></code> to remove the additional space around the edges. We also use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to remove any additional chart elements, since the annotations convey all the necessary information. </p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">p_inset</span> <span class="op">&lt;-</span> <span class="va">ca_plot</span> <span class="op">+</span></span>
+<span>  <span class="co"># year labels</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
+<span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>    hjust <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
+<span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>    hjust <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Party labels</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
+<span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Democratic Party"</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">3.5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span></span>
+<span>    geom <span class="op">=</span> <span class="st">"text"</span>,</span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html">range</a></span><span class="op">(</span><span class="va">ca_data</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"Republican Party"</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">3.5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">p_inset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-elections-inset-plot" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-elections-inset-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-elections-inset-plot-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elections-inset-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.9: A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Our custom legend is now ready to add to <a href="#fig-elections-plot-style-2" class="quarto-xref">Figure&nbsp;<span>13.8</span></a>.</p>
+</section><section id="joining-with-patchwork" class="level3" data-number="13.4.5"><h3 data-number="13.4.5" class="anchored" data-anchor-id="joining-with-patchwork">
+<span class="header-section-number">13.4.5</span> Joining with <strong><code>patchwork</code></strong>
+</h3>
+<p>Now, the last step is to join together our custom legend with the main plot. We’ve already left some blank space on the main plot for the legend to go in, so we’ll use the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function from <strong><code>patchwork</code></strong> <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> as we did in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>. We use the <code>left</code>, <code>right</code>, <code>top</code>, and <code>bottom</code> arguments to choose where the corners of the legend appear in relation to the main plot - getting these values correct takes some trial and error! Setting <code>align_to = "full"</code> allows us to choose the coordinates relative to the full chart area, rather than just the panel area as per the default settings. </p>
+<div class="cell">
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">final_plot</span> <span class="op">&lt;-</span> <span class="va">styled_plot_2</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element</a></span><span class="op">(</span></span>
+<span>  p <span class="op">=</span> <span class="va">p_inset</span>,</span>
+<span>  left <span class="op">=</span> <span class="fl">0.035</span>,</span>
+<span>  bottom <span class="op">=</span> <span class="fl">0.087</span>,</span>
+<span>  right <span class="op">=</span> <span class="fl">0.295</span>,</span>
+<span>  top <span class="op">=</span> <span class="fl">0.55</span>,</span>
+<span>  align_to <span class="op">=</span> <span class="st">"full"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">final_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-combine-plots" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-combine-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="us-elections_files/figure-html/fig-combine-plots-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-combine-plots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.10: Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We can then save it to a file with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>! </p>
+<div class="cell">
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<span>  filename <span class="op">=</span> <span class="st">"us-elections.png"</span>,</span>
+<span>  plot <span class="op">=</span> <span class="va">final_plot</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  height <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="reflection" class="level2" data-number="13.5"><h2 data-number="13.5" class="anchored" data-anchor-id="reflection">
+<span class="header-section-number">13.5</span> Reflection</h2>
+<p>This visualization summarise a large amount of complex information in a way that is fairly intuitive - the colors match recognisable party colors, the grid is arranged in the a shape that is instantly recognisable, and the area charts clearly indicate vote share over time. However, there are a few more improvements that could be made and other elements we may want to consider.</p>
+<p>Though use of state two-letter abbreviations saves space and avoids excessive text, it is more difficult for a reader to easily look up the state they are interested in - especially if they are less familiar with US geography. Perhaps adding some smaller text under the abbreviations, or creating an interactive version that provides state names upon hover, would make it easier.</p>
+<div id="tip-elections-interactive" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;13.2: Interactive charts from {ggplot2}
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Though this books focuses on creating static visualizations, you may also be interested in developing interactive charts for use in web-based outputs. There are many packages in R that enable you to make interactive visualizations, and a few that are particularly useful for <strong><code>ggplot2</code></strong> users: </p>
+<ul>
+<li><p><strong><code>plotly</code></strong> <span class="citation" data-cites="plotly">(<a href="references.html#ref-plotly" role="doc-biblioref">Sievert 2020</a>)</span>: allows you to build interactive graphics using the <code>plotly.js</code> JavaScript library. The <code>ggplotly()</code> function can transform a <strong><code>ggplot2</code></strong> plot to a <strong><code>plotly</code></strong> plot as a quick way to make interactive graphics.</p></li>
+<li><p><strong><code>ggiraph</code></strong> <span class="citation" data-cites="ggiraph">(<a href="references.html#ref-ggiraph" role="doc-biblioref">Gohel and Skintzos 2024</a>)</span>: allows you to add tooltips, zooming, and clickable elements to <strong><code>ggplot2</code></strong> graphics.</p></li>
+</ul>
+</div>
+</div>
+<p>Though the colors are intuitive, they are not the most accessible since they are of similar intensity. If we were to use the <code>cvd_grid()</code> function from <strong><code>colorblindr</code></strong> as we did in <a href="technology-adoption.html" class="quarto-xref"><span>Chapter 5</span></a>, these colors might look much less distinguishable. Choosing a combination of a lighter blue and bright red, or lighter red and bright blue would retain the intuitiveness of the colors, but improve accessibility. </p>
+<p>The use of area charts to show percentages is intuitive and sensible for this, since vote share is essentially what decides an election. However, it would also be interesting to see the counts of the number of votes - especially since states can have vastly different populations. A small change in percentage for a state with a large population may result in large changes in number of votes, but this wouldn’t be seen in our version of this visualization.</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using <strong><code>camcorder</code></strong>, and is shown in the gif below. If you’d like to learn more about how <strong><code>camcorder</code></strong> can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="images/elections.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
+</figure>
+</div>
+</section><section id="exercises" class="level2" data-number="13.6"><h2 data-number="13.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">13.6</span> Exercises</h2>
+<ul>
+<li><p>Instead of using California for the custom legend plot, create a plot showing the percentage of <em>total</em> votes across all states. Do you need to update the text to explain how to interpret the charts?</p></li>
+<li><p>Edit the visualization to show total number of votes rather than the percentage of the vote share. Do you see similar patterns? How can you choose the position of the facet label for the state in an automated way?</p></li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Anscombe1973" class="csl-entry" role="listitem">
+Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
+</div>
+<div id="ref-aphalo2024" class="csl-entry" role="listitem">
+Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
+</div>
+<div id="ref-egg" class="csl-entry" role="listitem">
+Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2’: Custom Geom, Custom Themes, Plot Alignment, Labelled Panels, Symmetric Scales, and Fixed Panel Size</span></em>. <a href="https://CRAN.R-project.org/package=egg">https://CRAN.R-project.org/package=egg</a>.
+</div>
+<div id="ref-imager" class="csl-entry" role="listitem">
+Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
+</div>
+<div id="ref-bridson2007" class="csl-entry" role="listitem">
+Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
+</div>
+<div id="ref-Brown2009" class="csl-entry" role="listitem">
+Brown, Mark J.F., and Paxton, Robert J. 2009. <span>“The Conservation of Bees: A Global Perspective.”</span> <em>Apidologie</em> 40 (3): 410–16. <a href="https://doi.org/10.1051/apido/2009019">https://doi.org/10.1051/apido/2009019</a>.
+</div>
+<div id="ref-geomtextpath" class="csl-entry" role="listitem">
+Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
+</div>
+<div id="ref-cartocolors" class="csl-entry" role="listitem">
+CARTO. 2016. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://carto.com/carto-colors/">https://carto.com/carto-colors/</a>.
+</div>
+<div id="ref-extrafont" class="csl-entry" role="listitem">
+Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using Fonts</em>. <a href="https://CRAN.R-project.org/package=extrafont">https://CRAN.R-project.org/package=extrafont</a>.
+</div>
+<div id="ref-dumbbell" class="csl-entry" role="listitem">
+Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
+</div>
+<div id="ref-technology_data" class="csl-entry" role="listitem">
+Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+</div>
+<div id="ref-pak" class="csl-entry" role="listitem">
+Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
+</div>
+<div id="ref-remotes" class="csl-entry" role="listitem">
+Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
+</div>
+<div id="ref-ggview" class="csl-entry" role="listitem">
+Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
+</div>
+<div id="ref-tidyplots" class="csl-entry" role="listitem">
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+</div>
+<div id="ref-ggpattern" class="csl-entry" role="listitem">
+FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
+</div>
+<div id="ref-flaticon" class="csl-entry" role="listitem">
+Flaticon.com. 2024. <span>“<span>Wind Power Flaticon</span>.”</span> <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">https://www.flaticon.com/free-icon/wind-power_5670189</a>.
+</div>
+<div id="ref-fontawesome" class="csl-entry" role="listitem">
+Font Awesome. 2024. <span>“<span>Font Awesome 6</span>.”</span> <a href="https://fontawesome.com/" class="uri">https://fontawesome.com/</a>.
+</div>
+<div id="ref-Hullman2021" class="csl-entry" role="listitem">
+Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
+</div>
+<div id="ref-viridis" class="csl-entry" role="listitem">
+Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-ggiraph" class="csl-entry" role="listitem">
+Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
+</div>
+<div id="ref-GAcharts" class="csl-entry" role="listitem">
+Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
+</div>
+<div id="ref-geofacet" class="csl-entry" role="listitem">
+Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
+</div>
+<div id="ref-harmon2024" class="csl-entry" role="listitem">
+Harmon, Jon. 2024. <em><span class="nocase">Web APIs with R</span></em>. <span>CRC Press</span>. <a href="https://wapir.io/">https://wapir.io/</a>.
+</div>
+<div id="ref-lintr" class="csl-entry" role="listitem">
+Hester, Jim, Florent Angly, Russ Hyde, Michael Chirico, Kun Ren, Alexander Rosenstock, and Indrajeet Patil. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
+</div>
+<div id="ref-glue" class="csl-entry" role="listitem">
+Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Interpreted String Literals</em>. <a href="https://glue.tidyverse.org/">https://glue.tidyverse.org/</a>.
+</div>
+<div id="ref-camcorder" class="csl-entry" role="listitem">
+Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plot History</em>. <a href="https://CRAN.R-project.org/package=camcorder">https://CRAN.R-project.org/package=camcorder</a>.
+</div>
+<div id="ref-tidytuesdayR" class="csl-entry" role="listitem">
+———. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
+</div>
+<div id="ref-paletteer" class="csl-entry" role="listitem">
+Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
+</div>
+<div id="ref-fontawesomeR" class="csl-entry" role="listitem">
+Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
+</div>
+<div id="ref-zones_data" class="csl-entry" role="listitem">
+Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+</div>
+<div id="ref-img_jax" class="csl-entry" role="listitem">
+Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+</div>
+<div id="ref-kays2020" class="csl-entry" role="listitem">
+Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
+</div>
+<div id="ref-r4rest" class="csl-entry" role="listitem">
+Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-Vizumap" class="csl-entry" role="listitem">
+Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
+</div>
+<div id="ref-museums_data" class="csl-entry" role="listitem">
+Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
+</div>
+<div id="ref-rnaturalearth" class="csl-entry" role="listitem">
+Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
+</div>
+<div id="ref-Matejka2017" class="csl-entry" role="listitem">
+Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> In, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
+</div>
+<div id="ref-cats_data" class="csl-entry" role="listitem">
+McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
+</div>
+<div id="ref-Apiculture" class="csl-entry" role="listitem">
+Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
+</div>
+<div id="ref-poissoned" class="csl-entry" role="listitem">
+mikefc. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
+</div>
+<div id="ref-MetBrewer" class="csl-entry" role="listitem">
+Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
+</div>
+<div id="ref-elections_data" class="csl-entry" role="listitem">
+MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
+</div>
+<div id="ref-styler" class="csl-entry" role="listitem">
+Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</span>: Non-Invasive Pretty Printing of <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=styler">https://CRAN.R-project.org/package=styler</a>.
+</div>
+<div id="ref-tibble" class="csl-entry" role="listitem">
+Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
+</div>
+<div id="ref-Muth2018" class="csl-entry" role="listitem">
+Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span>
+</div>
+<div id="ref-turbines_data" class="csl-entry" role="listitem">
+Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
+</div>
+<div id="ref-rcartocolor" class="csl-entry" role="listitem">
+Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-magick" class="csl-entry" role="listitem">
+Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
+</div>
+<div id="ref-doctors_data" class="csl-entry" role="listitem">
+Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
+</div>
+<div id="ref-sf" class="csl-entry" role="listitem">
+Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Standardized Support for Spatial Vector Data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
+</div>
+<div id="ref-ggforce" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Accelerating <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggforce">https://CRAN.R-project.org/package=ggforce</a>.
+</div>
+<div id="ref-patchwork" class="csl-entry" role="listitem">
+———. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
+</div>
+<div id="ref-Pedersen2025" class="csl-entry" role="listitem">
+———. 2025. <span>“<span class="nocase">Fonts in R</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
+</div>
+<div id="ref-marquee" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-systemfonts" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, Jeroen Ooms, and Devon Govett. 2024. <em><span class="nocase">systemfonts: System Native Font Finding</span></em>. <a href="https://CRAN.R-project.org/package=systemfonts">https://CRAN.R-project.org/package=systemfonts</a>.
+</div>
+<div id="ref-ragg" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.
+</div>
+<div id="ref-pldb_data" class="csl-entry" role="listitem">
+PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Database.”</span> <em><span>PLDB</span></em>.
+</div>
+<div id="ref-sysfonts" class="csl-entry" role="listitem">
+Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
+</div>
+<div id="ref-showtext" class="csl-entry" role="listitem">
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+</div>
+<div id="ref-rproj" class="csl-entry" role="listitem">
+R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-tidytuesday" class="csl-entry" role="listitem">
+R4DS Online Learning Community. 2023. <span>“Tidy Tuesday: A Weekly Social Data Project.”</span> <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
+</div>
+<div id="ref-social_icons" class="csl-entry" role="listitem">
+Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span>.”</span> <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
+</div>
+<div id="ref-template_files" class="csl-entry" role="listitem">
+———. 2023b. <span>“Creating Template Files with <span>R</span>.”</span> <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
+</div>
+<div id="ref-streamline" class="csl-entry" role="listitem">
+———. 2023c. <span>“Four Ways to Streamline Your <span>R</span> Workflows.”</span> <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
+</div>
+<div id="ref-ggtextcircle" class="csl-entry" role="listitem">
+———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
+</div>
+<div id="ref-nobel" class="csl-entry" role="listitem">
+———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+</div>
+<div id="ref-pkgs_data" class="csl-entry" role="listitem">
+———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+</div>
+<div id="ref-signif2024a" class="csl-entry" role="listitem">
+Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
+</div>
+<div id="ref-Reynolds2025" class="csl-entry" role="listitem">
+Reynolds, Gina. 2025. <span>“<span class="nocase">Everyday ggplot2 extension</span>.”</span> <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
+</div>
+<div id="ref-hex_forcats" class="csl-entry" role="listitem">
+RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
+</div>
+<div id="ref-hex_ggplot2" class="csl-entry" role="listitem">
+———. 2018b. <span>“<span class="nocase">ggplot2</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
+</div>
+<div id="ref-hex_purrr" class="csl-entry" role="listitem">
+———. 2018c. <span>“<span class="nocase">purrr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
+</div>
+<div id="ref-hex_readr" class="csl-entry" role="listitem">
+———. 2018d. <span>“<span class="nocase">readr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
+</div>
+<div id="ref-hex_tibble" class="csl-entry" role="listitem">
+———. 2018e. <span>“<span class="nocase">tibble</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
+</div>
+<div id="ref-hex_dplyr" class="csl-entry" role="listitem">
+———. 2020a. <span>“<span class="nocase">dplyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
+</div>
+<div id="ref-hex_stringr" class="csl-entry" role="listitem">
+———. 2020b. <span>“<span class="nocase">stringr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
+</div>
+<div id="ref-hex_tidyr" class="csl-entry" role="listitem">
+———. 2020c. <span>“<span class="nocase">tidyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
+</div>
+<div id="ref-ggalt" class="csl-entry" role="listitem">
+Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</span>: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’Ggplot2’</em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
+</div>
+<div id="ref-waffle" class="csl-entry" role="listitem">
+Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
+</div>
+<div id="ref-lattice" class="csl-entry" role="listitem">
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+</div>
+<div id="ref-openxlsx" class="csl-entry" role="listitem">
+Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-owidapi" class="csl-entry" role="listitem">
+Scheuch, Christoph. 2025. <em><span class="nocase">owidapi</span>: Access the Our World in Data Chart API</em>. <a href="https://doi.org/10.32614/CRAN.package.owidapi">https://doi.org/10.32614/CRAN.package.owidapi</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
+</div>
+<div id="ref-Schloss" class="csl-entry" role="listitem">
+Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
+</div>
+<div id="ref-funspotr" class="csl-entry" role="listitem">
+Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-plotly" class="csl-entry" role="listitem">
+Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with r, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.
+</div>
+<div id="ref-ggrepel" class="csl-entry" role="listitem">
+Slowikowski, Kamil. 2024. <em><span class="nocase">ggrepel: Automatically Position Non-Overlapping Text Labels with ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggrepel">https://CRAN.R-project.org/package=ggrepel</a>.
+</div>
+<div id="ref-visdat" class="csl-entry" role="listitem">
+Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole Data Frames</span>.”</span> <em>JOSS</em> 2 (16): 355. <a href="https://doi.org/10.21105/joss.00355">https://doi.org/10.21105/joss.00355</a>.
+</div>
+<div id="ref-naniar" class="csl-entry" role="listitem">
+Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principles to Facilitate Missing Data Exploration, Visualization and Assessment of Imputations.”</span> <em>Journal of Statistical Software</em> 105 (7): 1–31. <a href="https://doi.org/10.18637/jss.v105.i07">https://doi.org/10.18637/jss.v105.i07</a>.
+</div>
+<div id="ref-Tol2021" class="csl-entry" role="listitem">
+Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
+</div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
+<div id="ref-UScensus" class="csl-entry" role="listitem">
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+</div>
+<div id="ref-bees_data" class="csl-entry" role="listitem">
+United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
+</div>
+<div id="ref-crsuggest" class="csl-entry" role="listitem">
+Walker, Kyle. 2022. <em>Crsuggest: Obtain Suggested Coordinate Reference System Information for Spatial Data</em>. <a href="https://CRAN.R-project.org/package=crsuggest">https://CRAN.R-project.org/package=crsuggest</a>.
+</div>
+<div id="ref-Wanzer2021" class="csl-entry" role="listitem">
+Wanzer, Dana Linnell, Tarek Azzam, Natalie D. Jones, and Darrel Skousen. 2021. <span>“The Role of Titles in Enhancing Data Visualization.”</span> <em>Evaluation and Program Planning</em> 84: 101896. https://doi.org/<a href="https://doi.org/10.1016/j.evalprogplan.2020.101896">https://doi.org/10.1016/j.evalprogplan.2020.101896</a>.
+</div>
+<div id="ref-ggplot2" class="csl-entry" role="listitem">
+Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
+</div>
+<div id="ref-forcats" class="csl-entry" role="listitem">
+———. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
+</div>
+<div id="ref-stringr" class="csl-entry" role="listitem">
+———. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-readxl" class="csl-entry" role="listitem">
+Wickham, Hadley, and Jennifer Bryan. 2023. <em><span class="nocase">readxl: Read Excel Files</span></em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.
+</div>
+<div id="ref-r4ds" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em><span>R</span> for Data Science</em>. Second Edition. O-Reilly. <a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>.
+</div>
+<div id="ref-dplyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis Vaughan. 2023. <em><span class="nocase">dplyr</span>: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.
+</div>
+<div id="ref-purrr" class="csl-entry" role="listitem">
+Wickham, Hadley, and Lionel Henry. 2023. <em><span class="nocase">purrr</span>: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.
+</div>
+<div id="ref-readr" class="csl-entry" role="listitem">
+Wickham, Hadley, Jim Hester, and Jennifer Bryan. 2024. <em><span class="nocase">readr</span>: Read Rectangular Text Data</em>. <a href="https://CRAN.R-project.org/package=readr">https://CRAN.R-project.org/package=readr</a>.
+</div>
+<div id="ref-scales" class="csl-entry" role="listitem">
+Wickham, Hadley, Thomas Lin Pedersen, and Dana Seidel. 2023. <em><span class="nocase">scales</span>: Scale Functions for Visualization</em>. <a href="https://CRAN.R-project.org/package=scales">https://CRAN.R-project.org/package=scales</a>.
+</div>
+<div id="ref-tidyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Davis Vaughan, and Maximilian Girlich. 2024. <em><span class="nocase">tidyr</span>: Tidy Messy Data</em>. <a href="https://CRAN.R-project.org/package=tidyr">https://CRAN.R-project.org/package=tidyr</a>.
+</div>
+<div id="ref-ggtextures" class="csl-entry" role="listitem">
+Wilke, Claus. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
+</div>
+<div id="ref-cowplot" class="csl-entry" role="listitem">
+Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot Theme and Plot Annotations for <span class="nocase">’ggplot2’</span></em>. <a href="https://wilkelab.org/cowplot/">https://wilkelab.org/cowplot/</a>.
+</div>
+<div id="ref-ggtext" class="csl-entry" role="listitem">
+Wilke, Claus O., and Brenton M. Wiernik. 2022. <em><span class="nocase">ggtext</span>: Improved Text Rendering Support for <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggtext">https://CRAN.R-project.org/package=ggtext</a>.
+</div>
+<div id="ref-nobel_data" class="csl-entry" role="listitem">
+www.nobelprize.org. 2024. <span>“<span>Nobel Prize API Version 2.1</span>.”</span> <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
+</div>
+<div id="ref-owidR" class="csl-entry" role="listitem">
+York, Piers. 2023. <em><span class="nocase">owidR</span>: Import Data from Our World in Data</em>. <a href="<https://github.com/piersyork/owidR>">&lt;https://github.com/piersyork/owidR&gt;</a>.
+</div>
+<div id="ref-ggimage" class="csl-entry" role="listitem">
+Yu, Guangchuang. 2023. <em><span class="nocase">ggimage: Use Image in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggimage">https://CRAN.R-project.org/package=ggimage</a>.
+</div>
+<div id="ref-gghighlight" class="csl-entry" role="listitem">
+Yutani, Hiroaki. 2023. <em><span class="nocase">gghighlight</span>: Highlight Lines and Points in <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=gghighlight">https://CRAN.R-project.org/package=gghighlight</a>.
+</div>
+<div id="ref-lemurs_data" class="csl-entry" role="listitem">
+Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, and Anne D. Yoder. 2014. <span>“<span class="nocase">Life history profiles for 27 strepsirrhine primate taxa generated using captive data from the Duke Lemur Center</span>.”</span> <em>Scientific Data</em> 1 (1). <a href="https://doi.org/10.1038/sdata.2014.19">https://doi.org/10.1038/sdata.2014.19</a>.
+</div>
+</div>
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./time-zones.html" class="pagination-link" aria-label="Time zones: spatial data and mapping with **`sf`**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./other-tricks.html" class="pagination-link" aria-label="Other tips and tricks">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+<script src="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.js" defer="true"></script>
+</body></html>

@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>12&nbsp; Time zones: spatial data and mapping with sf – The Art of Data Visualization with ggplot2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./us-elections.html" rel="next">
+<link href="./doctors.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e1f2a4632985dffc2c80318c992baf5.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ec23f442c78d85c15f6059023f4f1cc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1SWN5BH1PZ"></script><script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
+</script>
+</head>
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualizing spatial data</a></li><li class="breadcrumb-item"><a href="./time-zones.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">The Art of Data Visualization with ggplot2</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./author.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./common-charts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Common charts don't need to be boring!</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./programming-languages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Programming languages: dumbbell charts with <strong><code>ggplot2</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./museums.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">UK museums: highlighting line charts with <strong><code>gghighlight</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bee-colonies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bee colony losses: visualizing quantities with Poisson disk sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Making use of icons, fonts, and text</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wind-turbines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Canadian wind turbines: waffle plots and pictograms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cats: data-driven annotations with <strong><code>ggtext</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nobel-laureates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Nobel Prize laureates: positioning text and parameterizing plots</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./images.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Working with images</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lemurs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Lemurs: manipulating images in R</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">R packages: using images for custom facet labels</span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./spatial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visualizing spatial data</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./doctors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Doctors across the world: making maps with <strong><code>ggplot2</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./time-zones.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./us-elections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></span></a>
+  </div>
+</li>
+      </ul>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./other-tricks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Other tips and tricks</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliography</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Appendix</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">12.1</span> Data</a></li>
+  <li>
+<a href="#exploratory-work" id="toc-exploratory-work" class="nav-link" data-scroll-target="#exploratory-work"><span class="header-section-number">12.2</span> Exploratory work</a>
+  <ul class="collapse">
+<li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">12.2.1</span> Data exploration</a></li>
+  <li><a href="#exploratory-sketches" id="toc-exploratory-sketches" class="nav-link" data-scroll-target="#exploratory-sketches"><span class="header-section-number">12.2.2</span> Exploratory sketches</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">12.3</span> Preparing a plot</a>
+  <ul class="collapse">
+<li><a href="#maps-with-rnaturalearth" id="toc-maps-with-rnaturalearth" class="nav-link" data-scroll-target="#maps-with-rnaturalearth"><span class="header-section-number">12.3.1</span> Maps with <strong><code>rnaturalearth</code></strong></a></li>
+  <li><a href="#spatial-objects-with-sf" id="toc-spatial-objects-with-sf" class="nav-link" data-scroll-target="#spatial-objects-with-sf"><span class="header-section-number">12.3.2</span> Spatial objects with <strong><code>sf</code></strong></a></li>
+  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">12.3.3</span> The first plot</a></li>
+  <li><a href="#colors" id="toc-colors" class="nav-link" data-scroll-target="#colors"><span class="header-section-number">12.3.4</span> Colors</a></li>
+  <li><a href="#fonts" id="toc-fonts" class="nav-link" data-scroll-target="#fonts"><span class="header-section-number">12.3.5</span> Fonts</a></li>
+  <li><a href="#creating-a-custom-bar-chart-legend" id="toc-creating-a-custom-bar-chart-legend" class="nav-link" data-scroll-target="#creating-a-custom-bar-chart-legend"><span class="header-section-number">12.3.6</span> Creating a custom bar chart legend</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#advanced-styling" id="toc-advanced-styling" class="nav-link" data-scroll-target="#advanced-styling"><span class="header-section-number">12.4</span> Advanced styling</a>
+  <ul class="collapse">
+<li><a href="#applying-colors" id="toc-applying-colors" class="nav-link" data-scroll-target="#applying-colors"><span class="header-section-number">12.4.1</span> Applying colors</a></li>
+  <li><a href="#editing-the-axes" id="toc-editing-the-axes" class="nav-link" data-scroll-target="#editing-the-axes"><span class="header-section-number">12.4.2</span> Editing the axes</a></li>
+  <li><a href="#adding-text" id="toc-adding-text" class="nav-link" data-scroll-target="#adding-text"><span class="header-section-number">12.4.3</span> Adding text</a></li>
+  <li><a href="#adjusting-themes" id="toc-adjusting-themes" class="nav-link" data-scroll-target="#adjusting-themes"><span class="header-section-number">12.4.4</span> Adjusting themes</a></li>
+  <li><a href="#joining-plots-with-patchwork" id="toc-joining-plots-with-patchwork" class="nav-link" data-scroll-target="#joining-plots-with-patchwork"><span class="header-section-number">12.4.5</span> Joining plots with <strong><code>patchwork</code></strong></a></li>
+  </ul>
+</li>
+  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection"><span class="header-section-number">12.5</span> Reflection</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">12.6</span> Exercises</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./spatial.html">Visualizing spatial data</a></li><li class="breadcrumb-item"><a href="./time-zones.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></a></li></ol></nav><div class="quarto-title">
+<h1 class="title"><span id="sec-time-zones" class="quarto-section-identifier"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Time zones: spatial data and mapping with <strong><code>sf</code></strong></span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header><p>In this chapter we’ll learn how to obtain map data using <strong><code>rnaturalearth``**, manipulate spatial data using **</code>sf<code>** and plot it with **</code>ggplot2`</strong>, and add a custom bar chart legend to a map of the world. </p>
+<p><strong>Packages required in this chapter</strong>:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/">glue</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rnaturalearth/">rnaturalearth</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="data" class="level2" data-number="12.1"><h2 data-number="12.1" class="anchored" data-anchor-id="data">
+<span class="header-section-number">12.1</span> Data</h2>
+<p>The <a href="https://data.iana.org/time-zones/tz-link.html">IANA (Internet Assigned Numbers Authority) tz database</a> contains data on the history of local time for different locations around the world <span class="citation" data-cites="zones_data">(<a href="references.html#ref-zones_data" role="doc-biblioref">Internet Assigned Numbers Authority 2023</a>)</span>. The website states that <em>“each main entry in the database represents a timezone for a set of civil-time clocks that have all agreed since 1970.”</em> Many websites use the data in the IANA tz database to operate.</p>
+<p>The time zones data was used as a <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-28/readme.md">TidyTuesday dataset in March 2023</a>, where the data wrangling code was adapted from code by <a href="https://gist.github.com/DavisVaughan">Davis Vaughan</a>. There are actually four data sets included but we’ll focus on the <code>timezones</code> data for now. We can load the data into R using the <code><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load()</a></code> function from the <strong><code>tidytuesdayR</code></strong> package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2023-03-28"</span><span class="op">)</span></span>
+<span><span class="va">timezones</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">timezones</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The data contains information for 4 different variables on 337 time zones. The <code>zone</code> column contains the time zone name; the <code>latitude</code> and <code>longitude</code> columns contain coordinates for the time zones <em>principal location</em> e.g.&nbsp;biggest city; and the <code>comments</code> column contains comments from the original time zone definition file.</p>
+</section><section id="exploratory-work" class="level2" data-number="12.2"><h2 data-number="12.2" class="anchored" data-anchor-id="exploratory-work">
+<span class="header-section-number">12.2</span> Exploratory work</h2>
+<p>Let’s start by looking at what the <code>timezones</code> data looks like!</p>
+<section id="data-exploration" class="level3" data-number="12.2.1"><h3 data-number="12.2.1" class="anchored" data-anchor-id="data-exploration">
+<span class="header-section-number">12.2.1</span> Data exploration</h3>
+<p>Let’s inspect the first few rows of the data using <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">timezones</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code># A tibble: 6 × 4
+  zone              latitude longitude comments      
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;         
+1 Africa/Abidjan        5.32     -4.03 &lt;NA&gt;          
+2 Africa/Algiers       36.8       3.05 &lt;NA&gt;          
+3 Africa/Bissau        11.8     -15.6  &lt;NA&gt;          
+4 Africa/Cairo         30.0      31.2  &lt;NA&gt;          
+5 Africa/Casablanca    33.6      -7.58 &lt;NA&gt;          
+6 Africa/Ceuta         35.9      -5.32 Ceuta, Melilla</code></pre>
+</div>
+</div>
+<p>The first thing that jumps out is the <code>comments</code> column which appears to have a lot of missing data. Let’s plot it to confirm, making use of the <code><a href="https://rdrr.io/r/base/NA.html">is.na()</a></code> function to plot only the counts of missing and non-missing data: </p>
+<div class="cell">
+<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">timezones</span><span class="op">$</span><span class="va">comments</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-barplot-na" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-barplot-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-barplot-na-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-barplot-na-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.1: A bar chart of the number of missing values in the <code>comments</code> column, where <code>TRUE</code> represents missing.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Almost 40% of the time zones have no comments associated with them. Inspecting the data further tells us that these comments typically offer clarification or an alternative for the timezone name. Although we could explore how the presence of these comments varies across the globe, we’ll use <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> from <strong><code>dplyr</code></strong> to drop the <code>comments</code> column for now since it’s not the most interesting thing to plot in the data.</p>
+<p>The first column, <code>zone</code>, contains information on the timezone name - it’s typically in the form of <code>"Continent/City"</code>. To explore the spread of time zones across continents, we need to split this variable into two (or extract just the continent name from the timezone name). We can use <code><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html">separate_wider_delim()</a></code> from <strong><code>tidyr</code></strong> to create two new columns from the <code>zone</code> column, splitting on the <code>/</code> character. Some of the timezone names have two <code>/</code> in their name e.g.&nbsp;<code>"America/North_Dakota/New_Salem"</code> meaning there are <em>too many</em> pieces for two columns. We can tell <code><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html">separate_wider_delim()</a></code> to merge the last pieces since it still uniquely specifies the location. </p>
+<div class="cell">
+<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">timezones_data</span> <span class="op">&lt;-</span> <span class="va">timezones</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">comments</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html">separate_wider_delim</a></span><span class="op">(</span></span>
+<span>    cols <span class="op">=</span> <span class="va">zone</span>,</span>
+<span>    delim <span class="op">=</span> <span class="st">"/"</span>,</span>
+<span>    names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"continent"</span>, <span class="st">"place"</span><span class="op">)</span>,</span>
+<span>    too_many <span class="op">=</span> <span class="st">"merge"</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can explore how many time zones there are per continent, again using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function. In <a href="#fig-timezones-barplot-loc" class="quarto-xref">Figure&nbsp;<span>12.2</span></a>, we can see that the first part of the time zone names don’t quite map to continents since there are nine values - but they do map onto large geographic regions. </p>
+<div class="cell">
+<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">timezones_data</span><span class="op">$</span><span class="va">continent</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-barplot-loc" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-barplot-loc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-barplot-loc-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-barplot-loc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.2: A bar chart of the number of defined time zones in each of nine geographic regions.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Of course, when we have coordinate data, the most obvious thing to do is plot those coordinates on a map!</p>
+</section><section id="exploratory-sketches" class="level3" data-number="12.2.2"><h3 data-number="12.2.2" class="anchored" data-anchor-id="exploratory-sketches">
+<span class="header-section-number">12.2.2</span> Exploratory sketches</h3>
+<p>Given that we have a latitude and longitude data for the principal locations (usually largest cities) within each time zone, the first map idea that springs to mind is a world map with the time zone locations plotted as points:</p>
+<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-time-zones.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.3: Initial sketch of time zone locations as points on a world map.
+</figcaption></figure>
+</div>
+<p>We could color the points based on the geographic region (continent) they belong to. As we’ve already seen, if we do this in <strong><code>ggplot2</code></strong>, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will show the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn’t take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).</p>
+<div id="fig-time-zones-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/sketch-time-zones-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-zones-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.4: Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.
+</figcaption></figure>
+</div>
+<p>A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) makes it easier to read, and helps to prevent the visualization from becoming very wide and short.</p>
+</section></section><section id="preparing-a-plot" class="level2" data-number="12.3"><h2 data-number="12.3" class="anchored" data-anchor-id="preparing-a-plot">
+<span class="header-section-number">12.3</span> Preparing a plot</h2>
+<p>To make our plot, we need to get some background map data and understand how to work with multiple spatial data files at once.</p>
+<section id="maps-with-rnaturalearth" class="level3" data-number="12.3.1"><h3 data-number="12.3.1" class="anchored" data-anchor-id="maps-with-rnaturalearth">
+<span class="header-section-number">12.3.1</span> Maps with <strong><code>rnaturalearth</code></strong>
+</h3>
+<p>Before we start plotting points on a map, we need a map of the world that we can use as a background to show the underlying countries. In <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>, we used <code>map_data</code> from <strong><code>ggplot2</code></strong>. Here, let’s look at an alternative using the <strong><code>rnaturalearth</code></strong> package <span class="citation" data-cites="rnaturalearth">(<a href="references.html#ref-rnaturalearth" role="doc-biblioref">Massicotte and South 2023</a>)</span>.</p>
+<p>The <strong><code>rnaturalearth</code></strong> package allows you to interact with <a href="https://www.naturalearthdata.com/">Natural Earth</a> map data. You can download polygons for different geographic regions using the <code><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries()</a></code> function. The default is to download data for all countries: </p>
+<div class="cell">
+<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">world</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-timezones-rnatearth" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;12.1: Polygons for a specific country with <strong><code>rnaturalearth</code></strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you wanted only the polygon(s) for a specific country or region, you can specify the <code>country</code> argument:</p>
+<div class="cell">
+<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">uk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span></span>
+<span>  country <span class="op">=</span> <span class="st">"united kingdom"</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For specified countries, the <code><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states()</a></code> function provides administrative level 1 polygons e.g.&nbsp;major within-country regions such as states.</p>
+</div>
+</div>
+<p>The default output from the <code><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries()</a></code> function is an <code>sf</code> object - where <code>sf</code> stands for <em>Simple Features</em>. Simple Features is a standardized model for representing geometric objects such as points, lines, and polygons in spatial databases and geographic information systems (GIS). The <strong><code>sf</code></strong> package <span class="citation" data-cites="sf">(<a href="references.html#ref-sf" role="doc-biblioref">Pebesma 2018</a>)</span> implements simple features in R, allowing simple features to be represented as a <code>data.frame</code> (or <code>tibble</code>). </p>
+<p>Since <code>sf</code> objects in R can be thought of as fancy data.frames, this means they can be plotted using <strong><code>ggplot2</code></strong>. In fact, <strong><code>ggplot2</code></strong> has built-in capabilities for plotting <code>sf</code> objects - through the <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> function. That means that we can build maps from <code>sf</code> objects, in the same we we build other types of charts: by starting with the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, and then layering on the <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> geometry. </p>
+<div class="cell">
+<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">world</span><span class="op">)</span></span>
+<span><span class="va">bg_map</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-bg-map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-bg-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-bg-map-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bg-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.5: Map of the world showing country outlines, with the default gray background.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>You’ll notice that there’s one key difference - there’s no aesthetic mapping using the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. Since the spatial coordinates are embedded within the <code>sf</code> object, there’s no need to explicitly map the <code>x</code> and <code>y</code> variables. The <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> function can directly extract and use the embedded coordinates for plotting.</p>
+</section><section id="spatial-objects-with-sf" class="level3" data-number="12.3.2"><h3 data-number="12.3.2" class="anchored" data-anchor-id="spatial-objects-with-sf">
+<span class="header-section-number">12.3.2</span> Spatial objects with <strong><code>sf</code></strong>
+</h3>
+<p>Though you can combine <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code> with other functions and non-<code>sf</code> data, such as <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>, it’s often easier to convert the other data to <code>sf</code> objects first. The main reason for this is to ensure the <em>coordinate reference system (CRS)</em> is the same for both geometries. Coordinate reference systems define how the Earth’s three-dimensional surface is represented, either in a three-dimensional coordinate system (e.g.&nbsp;latitude and longitude) or as a two-dimensional projected map. There are many different coordinate reference systems, each commonly used for different areas of the world. If you’re combining multiple spatial objects, they may have different coordinate reference systems. For example, using the British National Grid (BNG) CRS, London has the following coordinates: <code>X = 492983</code> and <code>Y = 188837</code>. Under the World Geodetic System 1984 (WGS84) CRS, London has the following coordinates: <code>Longitude (X) = 1.200235W</code> and <code>Latitude (Y) = 53.870659N</code>. You can imagine how these two coordinates cannot be plotted on the same map without transforming them first.</p>
+<p>In R, you can use the <strong><code>sf</code></strong> package to set or transform between different coordinate reference systems. The easiest way is by using EPSG codes - numerical identifiers assigned to specific coordinate reference systems. The WGS84 uses EPSG code <code>4326</code>. This is the coordinate reference system used in the <code>world</code> data that we’re using for the background map. You can check using the <code><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_crs()</a></code> function from <strong><code>sf</code></strong> which retrieves the CRS from an object: </p>
+<div class="cell">
+<div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_crs</a></span><span class="op">(</span><span class="va">world</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre data-code-line-numbers=""><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]</code></pre>
+</div>
+</div>
+<p>To make sure the CRS of the <code>timezones</code> data matches the CRS of the <code>world</code> data, we can set the CRS of the <code>timezones</code> data as <code>4326</code>. At the moment, the <code>timezones</code> data is not a spatial object - it’s just a simple <code>data.frame</code> that contains two columns with latitude and longitude information. First, we need to convert it into an <code>sf</code> object using the <code><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf()</a></code> function from <strong><code>sf</code></strong>, also specifying the column names that relate to the coordinates data. </p>
+<p>The latitude and longitude coordinates given in the <code>timezones</code> data are in the <code>EPSG:4326</code> CRS, so we don’t need to convert the CRS - just set it. We know it’s in <code>EPSG:4326</code> because this information is given to us with the data, and we can set it using the <code>crs</code> argument of <code><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf()</a></code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">timezones_sf</span> <span class="op">&lt;-</span> <span class="va">timezones_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span></span>
+<span>    coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span>,</span>
+<span>    crs <span class="op">=</span> <span class="fl">4326</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tip-timezones-crs" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;12.2: Dealing with an unknown CRS
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you don’t know which CRS your coordinates are in, the best thing to do is go back to the source of the data to see if you can find that information. Otherwise, you may wish to try the <code>guess_crs()</code> function from <strong><code>crsuggest</code></strong> <span class="citation" data-cites="crsuggest">(<a href="references.html#ref-crsuggest" role="doc-biblioref">Walker 2022</a>)</span> which will <em>guess</em> potential coordinate reference systems for data that are lacking a defined CRS. </p>
+<p>You can then use the <code><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_set_crs()</a></code> function to set the coordinate reference system. .</p>
+</div>
+</div>
+</section><section id="the-first-plot" class="level3" data-number="12.3.3"><h3 data-number="12.3.3" class="anchored" data-anchor-id="the-first-plot">
+<span class="header-section-number">12.3.3</span> The first plot</h3>
+<p>Since the time zones coordinates are now stored as an <code>sf</code> object, we can plot it in the same way as the <code>world</code> data. We pass in the <code>timezones_sf</code> object to the <code>data</code> argument, and specify that we want to color the points based on the <code>continent</code> column by passing this into the <code>color</code> argument inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function: </p>
+<div class="cell">
+<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_map</span> <span class="op">&lt;-</span> <span class="va">bg_map</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">timezones_sf</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">basic_map</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-basic-map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-basic-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-basic-map-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-basic-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.6: Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We now have a basic map with points colored by region, and the default legend added on the right hand side. Let’s get started on a better, custom legend.</p>
+<p>Before we create a new legend for the map, we need to define which colors will be used in the legend (and the rest of the plot).</p>
+</section><section id="colors" class="level3" data-number="12.3.4"><h3 data-number="12.3.4" class="anchored" data-anchor-id="colors">
+<span class="header-section-number">12.3.4</span> Colors</h3>
+<p>As we’ve done in previous chapters, we start by defining a text color, highlight color, and background color as variables. </p>
+<div class="cell">
+<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"#2F4F4F"</span></span>
+<span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#508080"</span></span>
+<span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#F0F5F5"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we define a named vector of colors, mapping the names of the regions to different hex codes. It can be difficult to find a qualitative color palette with enough colors (one for each of the nine regions) that remains colorblind safe. Paul Tol discusses several options for qualitative palettes in his <a href="https://personal.sron.nl/~pault/"><em>Colour schemes and templates</em> blog post</a> <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span>. Here, we use the <em>muted qualitative color scheme</em> palette <span class="citation" data-cites="Tol2021">(<a href="references.html#ref-Tol2021" role="doc-biblioref">Tol 2021</a>)</span> which has 10 colors (including a pale gray for missing data) and is colorblind safe: </p>
+<div class="cell">
+<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_palette</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"#CC6677"</span>, <span class="st">"#332288"</span>, <span class="st">"#DDCC77"</span>,</span>
+<span>  <span class="st">"#117733"</span>, <span class="st">"#88CCEE"</span>, <span class="st">"#882255"</span>,</span>
+<span>  <span class="st">"#44AA99"</span>, <span class="st">"#999933"</span>, <span class="st">"#AA4499"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">col_palette</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">timezones_sf</span><span class="op">$</span><span class="va">continent</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="fonts" class="level3" data-number="12.3.5"><h3 data-number="12.3.5" class="anchored" data-anchor-id="fonts">
+<span class="header-section-number">12.3.5</span> Fonts</h3>
+<p>Similarly, we also load any typefaces we want to use. Again, for this visualization we’re using Google Fonts, so we can make use of the <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> function in <strong><code>sysfonts</code></strong>. For the title, we’ll use <em>Fraunces</em>, an old style serif typeface inspired by those used in the 20th century. For the body text, we’ll use <em>Commissioner</em>, a sans serif typeface. As we’ve done in previous chapters, we use <code><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto()</a></code> to use <strong><code>showtext</code></strong> automatically for plotting fonts, and set the desired resolution using <code><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts()</a></code> to set the dpi. </p>
+<div class="cell">
+<div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Commissioner"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Fraunces"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Commissioner"</span></span>
+<span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"Fraunces"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="creating-a-custom-bar-chart-legend" class="level3" data-number="12.3.6"><h3 data-number="12.3.6" class="anchored" data-anchor-id="creating-a-custom-bar-chart-legend">
+<span class="header-section-number">12.3.6</span> Creating a custom bar chart legend</h3>
+<p>There are many ways to make a bar chart in <strong><code>ggplot2</code></strong> - the two most often used are <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code>. What’s the difference? Well, <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar()</a></code> is essentially a special version of <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> that counts up how many observations are in each category for you. For this visualization, we’re going to use the category counts for other purposes besides just defining the height of the bars so we’ll do the counting ourselves and use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> instead. </p>
+<p>We’ll use the <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> function from <strong><code>dplyr</code></strong> to count how many observations of each geographical region are present in the <code>continent</code> column. We could use either the <code>timezones_sf</code> data or the <code>timezones_data</code> here as the input data. If you try both, you’ll notice that, as we expect, the count column (<code>n</code>) is the same in both cases, but that the two outputs are not identical! When you run <code>count(timezones_data, continent)</code>, you get a 2 column <code>data.frame</code>. When you run <code>count(timezones_sf, continent)</code> you get an 3 column <code>data.frame</code> that remains an <code>sf</code> object. This is because the <code>geometry</code> column in <code>sf</code> can be described as <em>sticky</em> - you often (though not always) want the <code>sf</code> class to be preserved after any operations. You can remove it using the <code><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry()</a></code> function from <strong><code>sf</code></strong>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bar_data</span> <span class="op">&lt;-</span> <span class="va">timezones_sf</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">continent</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s plot a basic bar chart, by starting (as we always do) with passing our new <code>bar_data</code> object into the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function. We also add the aesthetic mapping via the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function and place the <code>continent</code> on the x-axis and the count (<code>n</code>) on the y-axis. We then draw the columns of the bar chart using <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code>: </p>
+<div class="cell">
+<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">bar_data</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">continent</span>, y <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-bar-plot-0" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-bar-plot-0-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-bar-plot-0-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-0-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.7: Bar chart showing the number of time zone locations in each continent.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>To make it work effectively as a legend, we need to do two things:</p>
+<ul>
+<li>Color the bars based on the <code>continent</code> column.</li>
+<li>Add labels directly to the bars instead, and remove the x-axis labels and legend.</li>
+</ul>
+<div id="tip-timezones-bar-colors" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;12.3: Adding color to bar charts
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you were just creating a normal bar chart (not to be used as a legend) then adding colors to the bars might make your plot look brighter but it doesn’t add any additional information. The categories can already be distinguished by the labels on the x-axis.</p>
+</div>
+</div>
+<p>Let’s remake our bar chart, this time also mapping <code>fill</code> and <code>label</code> to the <code>continent</code> column in the aesthetic mapping. Adding <code>label</code> to the aesthetic mapping in <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> won’t affect our bar chart in any way since we aren’t (yet) adding <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> but there’s no harm in adding it as a global aesthetic mapping here anyway. We’ll also use <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> to set the colors used to those defined in the <code>col_palette</code> vector we created earlier. </p>
+<div class="cell">
+<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bar_plot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">bar_data</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">continent</span>, y <span class="op">=</span> <span class="va">n</span>,</span>
+<span>      fill <span class="op">=</span> <span class="va">continent</span>, label <span class="op">=</span> <span class="va">continent</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="va">col_palette</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">bar_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-bar-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-bar-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-bar-plot-1-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.8: Bar chart showing the number of time zone locations in each geographical region, with different colors for each region.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Now we can add the text labels directly to the bars. But where should they go? It’s quite common to add category labels in line with the end of the bar but that might not work well here. If we add labels within the bars, for regions with few time zones where the bars are short, the text will be very squashed. If we add labels outside the bars, for regions with many time zones where the bars are long, the text will run off the graph or extend the height of the visualization. Neither is ideal. But maybe we could have the best of both worlds. We want to add labels under the following conditions:</p>
+<p>When the bars are long, text should:</p>
+<ul>
+<li>appear inside the bar and be right-aligned;</li>
+<li>be light in color to contrast the dark bar backgrounds;</li>
+</ul>
+<p>And conversely, when the bars are short, text should:</p>
+<ul>
+<li>appear outside the bar and be left-aligned;</li>
+<li>be dark in color to contrast the light plot background;</li>
+</ul>
+<p>It might take a little bit of trial and error to find the value that defines a bar as being <em>short</em> or <em>tall</em>. Here, we’ll use <code>45</code>. If a region has more than <code>45</code> time zones, it’s classed as a <em>tall</em> bar. Otherwise, it’s <em>short</em>.</p>
+<p>We want to map the alignment and color of the text to a (transformation of) the <code>n</code> column in the data set. This sounds like something that should go into an aesthetic mapping in the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. We already know the <code>color</code> argument can be used to map the text color. The <code>hjust</code> and <code>vjust</code> arguments are used for horizontal and vertical positioning of text. Unfortunately, within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, neither <code>hjust</code> nor <code>vjust</code> can be used inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. </p>
+<p>Luckily, the <strong><code>ggtext</code></strong> package once again comes to the rescue! We can use the <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox()</a></code> function from <strong><code>ggtext</code></strong> instead of <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>. It works very similarly to <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> but it allows us to map variables to <code>hjust</code> and <code>vjust</code>. </p>
+<p>We’ll use <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when()</a></code> from <strong><code>dplyr</code></strong> to specify the settings for the <code>hjust</code> argument, depending on the value of <code>n</code>. When <code>n</code> is greater than <code>45</code>, <code>hjust</code> should be <code>1</code> to use right alignment, otherwise it should be <code>0</code> to use left alignment. If you wanted to, you could create a new column in the data instead of using <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when()</a></code> directly inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. </p>
+<p>Since <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox()</a></code> the draws a box, we need to control both (i) the alignment of the box relative to the coordinates using <code>hjust</code>, and (ii) the alignment of the text within the box using <code>halign</code>. Within <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox()</a></code> we also use <code>orientation = "left-rotated"</code> to rotate the text anti-clockwise by 90 degrees (similar to using <code>angle = 90</code> in <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>). We can remove the background fill color and box outline by setting both <code>fill = NA</code> and <code>box.color = NA</code>, and set the size and font family options using the <code>size</code> and <code>family</code> arguments (where we pass in our <code>body_font</code> variable we defined earlier).</p>
+<div id="tip-timezones-text-align" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;12.4: Alignment of text
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In <strong><code>ggplot2</code></strong>, <code>hjust</code> (and <code>halign</code>) controls horizontal alignment and <code>vjust</code> (and <code>valign</code>) controls vertical alignment. When text is rotated, the non-rotated alignment arguments should be used. For example, although we’re moving the text up and down, we still use <code>hjust</code> to align the text.</p>
+</div>
+</div>
+<p>We use a similar process for setting the color of the text - using <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when()</a></code> to specify if the text should use the <code>bg_col</code> or <code>text_col</code> color based on whether or not it is greater than 45. Note that we wrap the <code>bg_col</code> and <code>text_col</code> variables inside the <code><a href="https://rdrr.io/r/base/AsIs.html">I()</a></code> function to use these variables <em>as is</em> rather than treating them as a variable to map to. </p>
+<p>Finally, we can also use <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to remove all existing theme elements, and <code>theme(legend.position = "none")</code> to remove the legend. </p>
+<div class="cell">
+<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">legend_plot</span> <span class="op">&lt;-</span> <span class="va">bar_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox</a></span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
+<span>      hjust <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="va">n</span> <span class="op">&gt;</span> <span class="fl">45</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">0</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      halign <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="va">n</span> <span class="op">&gt;</span> <span class="fl">45</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">0</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      color <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="va">n</span> <span class="op">&gt;</span> <span class="fl">45</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">bg_col</span><span class="op">)</span>,</span>
+<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">text_col</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>    fill <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    box.color <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    orientation <span class="op">=</span> <span class="st">"left-rotated"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    legend.position <span class="op">=</span> <span class="st">"none"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">legend_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-bar-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-bar-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-bar-plot-2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-bar-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.9: A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Now we have a much nicer looking custom legend. We can apply some nicer styling to our main map before we join the two together!</p>
+</section></section><section id="advanced-styling" class="level2" data-number="12.4"><h2 data-number="12.4" class="anchored" data-anchor-id="advanced-styling">
+<span class="header-section-number">12.4</span> Advanced styling</h2>
+<p>We have multiple elements of our plots that we need to improve:</p>
+<ul>
+<li>the background map should use our defined colors rather than the defaults;</li>
+<li>the points should also use our defined colors;</li>
+<li>a title and subtitle should be added using our defined typefaces;</li>
+</ul>
+<section id="applying-colors" class="level3" data-number="12.4.1"><h3 data-number="12.4.1" class="anchored" data-anchor-id="applying-colors">
+<span class="header-section-number">12.4.1</span> Applying colors</h3>
+<p>Let’s start by re-drawing the background map but using our <code>text_col</code> for the border color and a semi-transparent version of our <code>highlight_col</code> for the fill color. We can use the <code><a href="https://scales.r-lib.org/reference/alpha.html">alpha()</a></code> function from <strong><code>ggplot2</code></strong> to set the transparency to 30% (0.3). </p>
+<p>We’ll also re-draw the points again with a small adjustment - let’s change the shape that’s used for the points. You can set the shape using the <code>pch</code> (or <code>shape</code>) argument. There are 25 different options available for <code>pch</code>, which can be specified using the numbers 1 to 25. The shape we’ll use here is a circle with a dot in the middle. Unfortunately, this isn’t one of the 25 available options so we’ll have to make it ourselves. We can draw the dot in the middle using the default shape but making it a little smaller. We can add the circle by choosing <code>pch = 21</code> (which allows you to control both the <code>fill</code> and <code>color</code> of the shape) and making it a little bit bigger with a transparent fill. </p>
+<div class="cell">
+<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Apply colors to background map</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">world</span>,</span>
+<span>    color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>    fill <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">highlight_col</span>, <span class="fl">0.3</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Draw points for time zone locations</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">timezones_sf</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Draw outer circle</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">timezones_sf</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">continent</span><span class="op">)</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">1.6</span>,</span>
+<span>    pch <span class="op">=</span> <span class="fl">21</span>,</span>
+<span>    fill <span class="op">=</span> <span class="st">"transparent"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">basic_map</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-basic-map-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-basic-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-basic-map-2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-basic-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.10: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>We also apply the same colors for (both of) the points as we did for the bar chart (remembering to use <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code> rather than <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> for points). </p>
+<div class="cell">
+<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_map</span> <span class="op">&lt;-</span> <span class="va">basic_map</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">col_palette</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="editing-the-axes" class="level3" data-number="12.4.2"><h3 data-number="12.4.2" class="anchored" data-anchor-id="editing-the-axes">
+<span class="header-section-number">12.4.2</span> Editing the axes</h3>
+<p>Before we add the title and subtitle text, we need to make some space for it (and the legend that we’ll add later). Let’s set the limits of the x- and y- axes using <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous()</a></code>. We extend the lower limit of the y-axis beyond the range of the data, leaving blank space at the bottom where we can overlay the text. We also adjust the <code>breaks</code> in the x-axis scale to make the grid lines closer together. The choice of grid lines every <code>15</code> x values might seem like an odd choice, but every fifteen degrees difference in longitude (x-axis) is approximately one hour of time difference (since Earth rotates 360 degrees in 24 hours, or 15 degrees per hour)! </p>
+<p>It will take some (probably a lot of) trial and error to figure out exactly how much you need to extend the y-axis by. Here, we want the height of the blank space to be about half the height of the map area. Using <code>st_bbox(world)</code> to return the bounding box of the <code>world</code> map data, you’ll see that the y-axis of the world map ranges between -90 to +83.6. This means extending the y-axis by around 80 or 90 is a good starting point. We also remove the extra padding around the sides by setting <code>expand = FALSE</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf()</a></code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">axes_map</span> <span class="op">&lt;-</span> <span class="va">col_map</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span></span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>, <span class="fl">180</span>, by <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>,</span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">190</span>, <span class="fl">190</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span></span>
+<span>    limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">170</span>, <span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">axes_map</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-style-map-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-style-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-style-map-2-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-style-map-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.11: Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="adding-text" class="level3" data-number="12.4.3"><h3 data-number="12.4.3" class="anchored" data-anchor-id="adding-text">
+<span class="header-section-number">12.4.3</span> Adding text</h3>
+<p>We can create our custom Font Awesome icon caption, as described in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, which we’ll later add to the top of the visualization: </p>
+<div class="cell">
+<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
+<span>  icon_color <span class="op">=</span> <span class="va">highlight_col</span>,</span>
+<span>  font_color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>  font_family <span class="op">=</span> <span class="va">body_font</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, we can also add colored text within the subtitle to denote the categories. This might be unnecessary for this visualization since we have our custom bar chart legend, but reinforcing the color mapping won’t hurt. Here, we’ll use <strong><code>ggtext</code></strong> as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> (although you can also use <strong><code>marquee</code></strong> as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> if you prefer). This means we’ll be writing HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags and using <code><a href="https://glue.tidyverse.org/reference/glue.html">glue()</a></code> to pass in the colors from <code>col_palette</code> vector. Here, we’ll take a slightly different approach of calling the variables - using each vector element name instead of the index. This approach is a little more manual, but can be useful if you want the written text to be slightly different to the category name. The code is also often a little bit clearer to read! Rather than using our <code>source_caption()</code> function as we’ve done in previous chapters, we’ll add information about the source directly in the subtitle text. </p>
+<div class="cell">
+<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"Time zones tend to follow the boundaries between countries and their subdivisions instead of strictly following longitude. For every one-hour time, a point on the earth moves through 15 degrees of longitude. Each point relates to one of 337 time zones listed in the IANA time zone database. The colors show which time zones are in</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Africa\"]};'&gt;Africa &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"America\"]};'&gt;America &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Antarctica\"]};'&gt;Antarctica &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Asia\"]};'&gt;Asia &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Atlantic\"]};'&gt;Atlantic &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Australia\"]};'&gt;Australia &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Europe\"]};'&gt;Europe &lt;/span&gt;,</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Indian\"]};'&gt;Indian &lt;/span&gt;, and</span></span>
+<span><span class="st">&lt;span style='color:{col_palette[\"Pacific\"]};'&gt;Pacific &lt;/span&gt; zones.&lt;br&gt;**Data**: IANA tz database&lt;br&gt;"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We also specify some text for the visualization title. We’re going to join together the title and subtitle and plot them as one text object, so we also use HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags to set the font size, family, and color of the title.</p>
+<div class="cell">
+<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"&lt;span style='font-size:12pt; font-family:{title_font}; color:{text_col};'&gt;Time Zones of the World&lt;/span&gt;&lt;br&gt;"</span><span class="op">)</span></span>
+<span><span class="va">title_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"{title}{subtitle}"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We add the <code>social</code> caption to the map using the <code>tag</code> option in the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function - just as we did in <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>. When we edit the <code>theme</code> elements in the final step, we’ll specify a position for the tag. </p>
+<p>Unfortunately, we can’t have two <code>tag</code>s and since we also want a non-standard position for the title/subtitle text object, we’ll use <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox()</a></code> to add it instead. We specify the x- and y- coordinates of where we want the textbox to go (again, lots of trial and error!) and pass the <code>social</code> object in for the label. We also use the other arguments in <code><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox()</a></code> to set the font <code>size</code> and <code>family</code> as well as specify the alignment of the text and box (just as we did earlier when making the bar chart). The box fill and outline colors are removed by setting their arguments to <code>NA</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_map</span> <span class="op">&lt;-</span> <span class="va">axes_map</span> <span class="op">+</span></span>
+<span>  <span class="co"># add social icons</span></span>
+<span>  <span class="fu"><a href="https://wilkelab.org/ggtext/reference/geom_textbox.html">geom_textbox</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span>, y <span class="op">=</span> <span class="fl">93</span>, label <span class="op">=</span> <span class="va">social</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
+<span>    family <span class="op">=</span> <span class="va">body_font</span>,</span>
+<span>    size <span class="op">=</span> <span class="fl">2.3</span>,</span>
+<span>    fill <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    box.color <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>    halign <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>    hjust <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>    valign <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># add title and subtitle</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>tag <span class="op">=</span> <span class="va">title_text</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="adjusting-themes" class="level3" data-number="12.4.4"><h3 data-number="12.4.4" class="anchored" data-anchor-id="adjusting-themes">
+<span class="header-section-number">12.4.4</span> Adjusting themes</h3>
+<p>The final step is making a few small changes to the <strong><code>ggplot2</code></strong> theme. We start by removing all theme elements using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> and setting the <code>base_family</code> and <code>base_size</code> for the text. Although we don’t have many text elements in our visualization controlled by the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> functions, this will still affect the <code>tag</code> text. </p>
+<p>Using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function, we make some further edit to remove the default legend, change the background color to out <code>bg_col</code> variable, and add the grid lines back in with an almost transparent <code>text_col</code> color. The position of the <code>tag</code> text can be set using the <code>plot.tag.position</code> argument to place it in the bottom left of the plot. We also use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> to format the text in the <code>tag</code> since it includes the HTML <code>&lt;span&gt;&lt;/span&gt;</code> tags. Within <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code>, the <code>maxwidth</code> argument is used to set the width of the textbox, ensuring the only takes up the left hand side of the blank space at the bottom. The bar chart legend will go on the other side. </p>
+<div class="cell">
+<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_map</span> <span class="op">&lt;-</span> <span class="va">text_map</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
+<span>      fill <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>      color <span class="op">=</span> <span class="va">bg_col</span>,</span>
+<span>    <span class="op">)</span>,</span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/alpha.html">alpha</a></span><span class="op">(</span><span class="va">text_col</span>, <span class="fl">0.1</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="co"># add and position text</span></span>
+<span>    plot.tag.position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.01</span>, <span class="fl">0.12</span><span class="op">)</span>,</span>
+<span>    plot.tag <span class="op">=</span> <span class="fu"><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple</a></span><span class="op">(</span></span>
+<span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
+<span>      hjust <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      maxwidth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">200</span>, <span class="st">"pt"</span><span class="op">)</span>,</span>
+<span>      margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span></span>
+<span>        l <span class="op">=</span> <span class="fl">15</span>, t <span class="op">=</span> <span class="fl">5</span>, b <span class="op">=</span> <span class="fl">10</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">styled_map</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-style-map-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-style-map-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-style-map-4-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-style-map-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.12: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left.
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="joining-plots-with-patchwork" class="level3" data-number="12.4.5"><h3 data-number="12.4.5" class="anchored" data-anchor-id="joining-plots-with-patchwork">
+<span class="header-section-number">12.4.5</span> Joining plots with <strong><code>patchwork</code></strong>
+</h3>
+<p>Finally, we need to join the legend bar chart to our main plot. For this, we’ll use <strong><code>patchwork</code></strong> <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span>. The <strong><code>patchwork</code></strong> package allows you to combine multiple visualizations (including <strong><code>ggplot2</code></strong> graphics, base R plots, or <strong><code>gt</code></strong> tables) into a single layout. It’s very flexible, and you can add arrange plots easily into simple rows or columns, or create very complex layouts with many nested plots. The <strong><code>patchwork</code></strong> package also allows you to add inset plots i.e.&nbsp;a smaller plot placed within a larger plot to provide additional detail.</p>
+<div id="tip-timezones-patchwork" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;12.5: Arranging plots with <strong><code>patchwork</code></strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Although this book doesn’t contain examples of arranging multiple plots side-by-side, <strong><code>patchwork</code></strong> makes it very easy to do so. If you have two plots <code>g1</code> and <code>g2</code>, then you can arrange them side-by-side by simply running <code>g1 + g2</code>. More complex layouts can be achieved by specifying a grid of which plots should be placed where. The <strong><code>patchwork</code></strong> package also contains additional functions for adding multiplot annotations or titles, consistent themes across all subplots, and defining plot alignment across multiple pages. Read the package documentation at <a href="https://patchwork.data-imaginist.com/index.html">patchwork.data-imaginist.com</a> for examples.</p>
+</div>
+</div>
+<p>In this visualization, rather than the more traditional approach of arranging plots side by side, we instead want to position one plot (bar chart) on top of another (main map). We start with our <code>styled_map</code> and add the <code>legend_plot</code> on top using the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function. The four positions given in the <code><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element()</a></code> function are the left, bottom, right, and top outer bounds of the inset plot. The default unit is <code>npc</code> (normalized parent coordinates). In this setting the bottom left is <code>(0, 0)</code> and the top right is <code>(1, 1)</code>. This means specifying the <code>left</code> outer bound as 0.55 tells <strong><code>patchwork</code></strong> to start at the left hand side of the inset plot 55% of the way in from the left of the main plot. </p>
+<p>We also remove the added margin from around the edge of the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function and setting all of the margins to zero. Remember that when combining a <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> with a <code>patchwork</code> object, it’s added using the <code>&amp;</code> operator rather than <code>+</code>. </p>
+<div class="cell">
+<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_map</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/inset_element.html">inset_element</a></span><span class="op">(</span><span class="va">legend_plot</span>, <span class="fl">0.55</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.3</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-timezones-final-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-timezones-final-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="time-zones_files/figure-html/fig-timezones-final-plot-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timezones-final-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.13: Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>Now our map is finished and we can save it with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>! </p>
+<div class="cell">
+<div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<span>  filename <span class="op">=</span> <span class="st">"time-zones.png"</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  height <span class="op">=</span> <span class="fl">0.92</span> <span class="op">*</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="reflection" class="level2" data-number="12.5"><h2 data-number="12.5" class="anchored" data-anchor-id="reflection">
+<span class="header-section-number">12.5</span> Reflection</h2>
+<p>What could still be improved about this plot?</p>
+<p>Although the bar chart legend is an improvement on a boring, traditional legend, it could do with some further improvement. For example, it’s not immediately clear what the bar chart shows. With a little bit of time, readers probably put together the number of dots with the height of the bars but it could be more obvious. Adding numbers to the bar chart would also improve readability. Perhaps this could be with a traditional y-axis, or perhaps as more informative labels. For example, instead of a label that reads <code>"Africa"</code>, it could read <code>"Africa (18 time zones)"</code>.</p>
+<p>If we’re talking about improving readability of bar charts, an easy action is to make the bars (and therefore text) horizontal - it’s much easier to read text that’s the right way up!</p>
+<p>Each plot created during the process of developing the original version of this visualization was captured using <strong><code>camcorder</code></strong>, and is shown in the gif below. If you’d like to learn more about how <strong><code>camcorder</code></strong> can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="images/time-zones.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
+</figure>
+</div>
+</section><section id="exercises" class="level2" data-number="12.6"><h2 data-number="12.6" class="anchored" data-anchor-id="exercises">
+<span class="header-section-number">12.6</span> Exercises</h2>
+<ul>
+<li><p>Edit the bar chart legend to include information about the number of time zones in each geographic region.</p></li>
+<li><p>Edit the bar chart to have horizontal bars instead of vertical ones.</p></li>
+<li><p>Consider where the updated bar chart legend is positioned. Is the lower right corner still a good location if the bars are horizontal? Try moving it somewhere else.</p></li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Anscombe1973" class="csl-entry" role="listitem">
+Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
+</div>
+<div id="ref-aphalo2024" class="csl-entry" role="listitem">
+Aphalo, Pedro J. 2024. <em><span class="nocase">Learn R: As a Language</span></em>. Second Edition. CRC Press. <a href="https://www.learnr-book.info/">https://www.learnr-book.info/</a>.
+</div>
+<div id="ref-egg" class="csl-entry" role="listitem">
+Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2’: Custom Geom, Custom Themes, Plot Alignment, Labelled Panels, Symmetric Scales, and Fixed Panel Size</span></em>. <a href="https://CRAN.R-project.org/package=egg">https://CRAN.R-project.org/package=egg</a>.
+</div>
+<div id="ref-imager" class="csl-entry" role="listitem">
+Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
+</div>
+<div id="ref-bridson2007" class="csl-entry" role="listitem">
+Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
+</div>
+<div id="ref-Brown2009" class="csl-entry" role="listitem">
+Brown, Mark J.F., and Paxton, Robert J. 2009. <span>“The Conservation of Bees: A Global Perspective.”</span> <em>Apidologie</em> 40 (3): 410–16. <a href="https://doi.org/10.1051/apido/2009019">https://doi.org/10.1051/apido/2009019</a>.
+</div>
+<div id="ref-geomtextpath" class="csl-entry" role="listitem">
+Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
+</div>
+<div id="ref-cartocolors" class="csl-entry" role="listitem">
+CARTO. 2016. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://carto.com/carto-colors/">https://carto.com/carto-colors/</a>.
+</div>
+<div id="ref-extrafont" class="csl-entry" role="listitem">
+Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using Fonts</em>. <a href="https://CRAN.R-project.org/package=extrafont">https://CRAN.R-project.org/package=extrafont</a>.
+</div>
+<div id="ref-dumbbell" class="csl-entry" role="listitem">
+Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
+</div>
+<div id="ref-technology_data" class="csl-entry" role="listitem">
+Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+</div>
+<div id="ref-pak" class="csl-entry" role="listitem">
+Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
+</div>
+<div id="ref-remotes" class="csl-entry" role="listitem">
+Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2024. <em><span class="nocase">remotes: R Package Installation from Remote Repositories, Including ’GitHub’</span></em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.
+</div>
+<div id="ref-ggview" class="csl-entry" role="listitem">
+Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
+</div>
+<div id="ref-tidyplots" class="csl-entry" role="listitem">
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+</div>
+<div id="ref-ggpattern" class="csl-entry" role="listitem">
+FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
+</div>
+<div id="ref-flaticon" class="csl-entry" role="listitem">
+Flaticon.com. 2024. <span>“<span>Wind Power Flaticon</span>.”</span> <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">https://www.flaticon.com/free-icon/wind-power_5670189</a>.
+</div>
+<div id="ref-fontawesome" class="csl-entry" role="listitem">
+Font Awesome. 2024. <span>“<span>Font Awesome 6</span>.”</span> <a href="https://fontawesome.com/" class="uri">https://fontawesome.com/</a>.
+</div>
+<div id="ref-Hullman2021" class="csl-entry" role="listitem">
+Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
+</div>
+<div id="ref-viridis" class="csl-entry" role="listitem">
+Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+</div>
+<div id="ref-ggiraph" class="csl-entry" role="listitem">
+Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
+</div>
+<div id="ref-GAcharts" class="csl-entry" role="listitem">
+Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span>
+</div>
+<div id="ref-geofacet" class="csl-entry" role="listitem">
+Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
+</div>
+<div id="ref-harmon2024" class="csl-entry" role="listitem">
+Harmon, Jon. 2024. <em><span class="nocase">Web APIs with R</span></em>. <span>CRC Press</span>. <a href="https://wapir.io/">https://wapir.io/</a>.
+</div>
+<div id="ref-lintr" class="csl-entry" role="listitem">
+Hester, Jim, Florent Angly, Russ Hyde, Michael Chirico, Kun Ren, Alexander Rosenstock, and Indrajeet Patil. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
+</div>
+<div id="ref-glue" class="csl-entry" role="listitem">
+Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Interpreted String Literals</em>. <a href="https://glue.tidyverse.org/">https://glue.tidyverse.org/</a>.
+</div>
+<div id="ref-camcorder" class="csl-entry" role="listitem">
+Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plot History</em>. <a href="https://CRAN.R-project.org/package=camcorder">https://CRAN.R-project.org/package=camcorder</a>.
+</div>
+<div id="ref-tidytuesdayR" class="csl-entry" role="listitem">
+———. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
+</div>
+<div id="ref-paletteer" class="csl-entry" role="listitem">
+Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
+</div>
+<div id="ref-fontawesomeR" class="csl-entry" role="listitem">
+Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
+</div>
+<div id="ref-zones_data" class="csl-entry" role="listitem">
+Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+</div>
+<div id="ref-img_jax" class="csl-entry" role="listitem">
+Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+</div>
+<div id="ref-kays2020" class="csl-entry" role="listitem">
+Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. https://doi.org/<a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
+</div>
+<div id="ref-r4rest" class="csl-entry" role="listitem">
+Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-Vizumap" class="csl-entry" role="listitem">
+Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
+</div>
+<div id="ref-museums_data" class="csl-entry" role="listitem">
+Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
+</div>
+<div id="ref-rnaturalearth" class="csl-entry" role="listitem">
+Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
+</div>
+<div id="ref-Matejka2017" class="csl-entry" role="listitem">
+Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> In, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
+</div>
+<div id="ref-cats_data" class="csl-entry" role="listitem">
+McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+</div>
+<div id="ref-colorblindr" class="csl-entry" role="listitem">
+McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
+</div>
+<div id="ref-Apiculture" class="csl-entry" role="listitem">
+Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span>
+</div>
+<div id="ref-poissoned" class="csl-entry" role="listitem">
+mikefc. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
+</div>
+<div id="ref-MetBrewer" class="csl-entry" role="listitem">
+Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
+</div>
+<div id="ref-elections_data" class="csl-entry" role="listitem">
+MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
+</div>
+<div id="ref-styler" class="csl-entry" role="listitem">
+Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</span>: Non-Invasive Pretty Printing of <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=styler">https://CRAN.R-project.org/package=styler</a>.
+</div>
+<div id="ref-tibble" class="csl-entry" role="listitem">
+Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
+</div>
+<div id="ref-Muth2018" class="csl-entry" role="listitem">
+Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span>
+</div>
+<div id="ref-turbines_data" class="csl-entry" role="listitem">
+Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
+</div>
+<div id="ref-rcartocolor" class="csl-entry" role="listitem">
+Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://jakubnowosad.com/rcartocolor/">https://jakubnowosad.com/rcartocolor/</a>.
+</div>
+<div id="ref-magick" class="csl-entry" role="listitem">
+Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
+</div>
+<div id="ref-doctors_data" class="csl-entry" role="listitem">
+Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
+</div>
+<div id="ref-sf" class="csl-entry" role="listitem">
+Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Standardized Support for Spatial Vector Data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
+</div>
+<div id="ref-ggforce" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Accelerating <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggforce">https://CRAN.R-project.org/package=ggforce</a>.
+</div>
+<div id="ref-patchwork" class="csl-entry" role="listitem">
+———. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
+</div>
+<div id="ref-Pedersen2025" class="csl-entry" role="listitem">
+———. 2025. <span>“<span class="nocase">Fonts in R</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
+</div>
+<div id="ref-marquee" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
+</div>
+<div id="ref-systemfonts" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, Jeroen Ooms, and Devon Govett. 2024. <em><span class="nocase">systemfonts: System Native Font Finding</span></em>. <a href="https://CRAN.R-project.org/package=systemfonts">https://CRAN.R-project.org/package=systemfonts</a>.
+</div>
+<div id="ref-ragg" class="csl-entry" role="listitem">
+Pedersen, Thomas Lin, and Maxim Shemanarev. 2023. <em><span class="nocase">ragg</span>: Graphic Devices Based on <span>AGG</span></em>. <a href="https://CRAN.R-project.org/package=ragg">https://CRAN.R-project.org/package=ragg</a>.
+</div>
+<div id="ref-pldb_data" class="csl-entry" role="listitem">
+PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Database.”</span> <em><span>PLDB</span></em>.
+</div>
+<div id="ref-sysfonts" class="csl-entry" role="listitem">
+Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
+</div>
+<div id="ref-showtext" class="csl-entry" role="listitem">
+———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+</div>
+<div id="ref-rproj" class="csl-entry" role="listitem">
+R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-tidytuesday" class="csl-entry" role="listitem">
+R4DS Online Learning Community. 2023. <span>“Tidy Tuesday: A Weekly Social Data Project.”</span> <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
+</div>
+<div id="ref-social_icons" class="csl-entry" role="listitem">
+Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span>.”</span> <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
+</div>
+<div id="ref-template_files" class="csl-entry" role="listitem">
+———. 2023b. <span>“Creating Template Files with <span>R</span>.”</span> <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
+</div>
+<div id="ref-streamline" class="csl-entry" role="listitem">
+———. 2023c. <span>“Four Ways to Streamline Your <span>R</span> Workflows.”</span> <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
+</div>
+<div id="ref-ggtextcircle" class="csl-entry" role="listitem">
+———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
+</div>
+<div id="ref-nobel" class="csl-entry" role="listitem">
+———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+</div>
+<div id="ref-pkgs_data" class="csl-entry" role="listitem">
+———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+</div>
+<div id="ref-signif2024a" class="csl-entry" role="listitem">
+Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
+</div>
+<div id="ref-Reynolds2025" class="csl-entry" role="listitem">
+Reynolds, Gina. 2025. <span>“<span class="nocase">Everyday ggplot2 extension</span>.”</span> <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
+</div>
+<div id="ref-hex_forcats" class="csl-entry" role="listitem">
+RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
+</div>
+<div id="ref-hex_ggplot2" class="csl-entry" role="listitem">
+———. 2018b. <span>“<span class="nocase">ggplot2</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
+</div>
+<div id="ref-hex_purrr" class="csl-entry" role="listitem">
+———. 2018c. <span>“<span class="nocase">purrr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
+</div>
+<div id="ref-hex_readr" class="csl-entry" role="listitem">
+———. 2018d. <span>“<span class="nocase">readr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
+</div>
+<div id="ref-hex_tibble" class="csl-entry" role="listitem">
+———. 2018e. <span>“<span class="nocase">tibble</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
+</div>
+<div id="ref-hex_dplyr" class="csl-entry" role="listitem">
+———. 2020a. <span>“<span class="nocase">dplyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
+</div>
+<div id="ref-hex_stringr" class="csl-entry" role="listitem">
+———. 2020b. <span>“<span class="nocase">stringr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
+</div>
+<div id="ref-hex_tidyr" class="csl-entry" role="listitem">
+———. 2020c. <span>“<span class="nocase">tidyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
+</div>
+<div id="ref-ggalt" class="csl-entry" role="listitem">
+Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt</span>: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’Ggplot2’</em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
+</div>
+<div id="ref-waffle" class="csl-entry" role="listitem">
+Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
+</div>
+<div id="ref-lattice" class="csl-entry" role="listitem">
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+</div>
+<div id="ref-openxlsx" class="csl-entry" role="listitem">
+Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
+</div>
+<div id="ref-owidapi" class="csl-entry" role="listitem">
+Scheuch, Christoph. 2025. <em><span class="nocase">owidapi</span>: Access the Our World in Data Chart API</em>. <a href="https://doi.org/10.32614/CRAN.package.owidapi">https://doi.org/10.32614/CRAN.package.owidapi</a>.
+</div>
+<div id="ref-GGally" class="csl-entry" role="listitem">
+Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
+</div>
+<div id="ref-Schloss" class="csl-entry" role="listitem">
+Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
+</div>
+<div id="ref-funspotr" class="csl-entry" role="listitem">
+Shalloway, Bryan. 2023. <em><span class="nocase">funspotr: Spot R Functions &amp; Packages</span></em>. <a href="https://CRAN.R-project.org/package=funspotr">https://CRAN.R-project.org/package=funspotr</a>.
+</div>
+<div id="ref-plotly" class="csl-entry" role="listitem">
+Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with r, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.
+</div>
+<div id="ref-ggrepel" class="csl-entry" role="listitem">
+Slowikowski, Kamil. 2024. <em><span class="nocase">ggrepel: Automatically Position Non-Overlapping Text Labels with ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggrepel">https://CRAN.R-project.org/package=ggrepel</a>.
+</div>
+<div id="ref-visdat" class="csl-entry" role="listitem">
+Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole Data Frames</span>.”</span> <em>JOSS</em> 2 (16): 355. <a href="https://doi.org/10.21105/joss.00355">https://doi.org/10.21105/joss.00355</a>.
+</div>
+<div id="ref-naniar" class="csl-entry" role="listitem">
+Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principles to Facilitate Missing Data Exploration, Visualization and Assessment of Imputations.”</span> <em>Journal of Statistical Software</em> 105 (7): 1–31. <a href="https://doi.org/10.18637/jss.v105.i07">https://doi.org/10.18637/jss.v105.i07</a>.
+</div>
+<div id="ref-Tol2021" class="csl-entry" role="listitem">
+Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://personal.sron.nl/~pault/" class="uri">https://personal.sron.nl/~pault/</a>.
+</div>
+<div id="ref-UScensuspop" class="csl-entry" role="listitem">
+United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span>
+</div>
+<div id="ref-UScensus" class="csl-entry" role="listitem">
+———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span>
+</div>
+<div id="ref-bees_data" class="csl-entry" role="listitem">
+United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
+</div>
+<div id="ref-crsuggest" class="csl-entry" role="listitem">
+Walker, Kyle. 2022. <em>Crsuggest: Obtain Suggested Coordinate Reference System Information for Spatial Data</em>. <a href="https://CRAN.R-project.org/package=crsuggest">https://CRAN.R-project.org/package=crsuggest</a>.
+</div>
+<div id="ref-Wanzer2021" class="csl-entry" role="listitem">
+Wanzer, Dana Linnell, Tarek Azzam, Natalie D. Jones, and Darrel Skousen. 2021. <span>“The Role of Titles in Enhancing Data Visualization.”</span> <em>Evaluation and Program Planning</em> 84: 101896. https://doi.org/<a href="https://doi.org/10.1016/j.evalprogplan.2020.101896">https://doi.org/10.1016/j.evalprogplan.2020.101896</a>.
+</div>
+<div id="ref-ggplot2" class="csl-entry" role="listitem">
+Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
+</div>
+<div id="ref-forcats" class="csl-entry" role="listitem">
+———. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
+</div>
+<div id="ref-stringr" class="csl-entry" role="listitem">
+———. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-readxl" class="csl-entry" role="listitem">
+Wickham, Hadley, and Jennifer Bryan. 2023. <em><span class="nocase">readxl: Read Excel Files</span></em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.
+</div>
+<div id="ref-r4ds" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em><span>R</span> for Data Science</em>. Second Edition. O-Reilly. <a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>.
+</div>
+<div id="ref-dplyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis Vaughan. 2023. <em><span class="nocase">dplyr</span>: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.
+</div>
+<div id="ref-purrr" class="csl-entry" role="listitem">
+Wickham, Hadley, and Lionel Henry. 2023. <em><span class="nocase">purrr</span>: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.
+</div>
+<div id="ref-readr" class="csl-entry" role="listitem">
+Wickham, Hadley, Jim Hester, and Jennifer Bryan. 2024. <em><span class="nocase">readr</span>: Read Rectangular Text Data</em>. <a href="https://CRAN.R-project.org/package=readr">https://CRAN.R-project.org/package=readr</a>.
+</div>
+<div id="ref-scales" class="csl-entry" role="listitem">
+Wickham, Hadley, Thomas Lin Pedersen, and Dana Seidel. 2023. <em><span class="nocase">scales</span>: Scale Functions for Visualization</em>. <a href="https://CRAN.R-project.org/package=scales">https://CRAN.R-project.org/package=scales</a>.
+</div>
+<div id="ref-tidyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Davis Vaughan, and Maximilian Girlich. 2024. <em><span class="nocase">tidyr</span>: Tidy Messy Data</em>. <a href="https://CRAN.R-project.org/package=tidyr">https://CRAN.R-project.org/package=tidyr</a>.
+</div>
+<div id="ref-ggtextures" class="csl-entry" role="listitem">
+Wilke, Claus. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
+</div>
+<div id="ref-cowplot" class="csl-entry" role="listitem">
+Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot Theme and Plot Annotations for <span class="nocase">’ggplot2’</span></em>. <a href="https://wilkelab.org/cowplot/">https://wilkelab.org/cowplot/</a>.
+</div>
+<div id="ref-ggtext" class="csl-entry" role="listitem">
+Wilke, Claus O., and Brenton M. Wiernik. 2022. <em><span class="nocase">ggtext</span>: Improved Text Rendering Support for <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggtext">https://CRAN.R-project.org/package=ggtext</a>.
+</div>
+<div id="ref-nobel_data" class="csl-entry" role="listitem">
+www.nobelprize.org. 2024. <span>“<span>Nobel Prize API Version 2.1</span>.”</span> <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
+</div>
+<div id="ref-owidR" class="csl-entry" role="listitem">
+York, Piers. 2023. <em><span class="nocase">owidR</span>: Import Data from Our World in Data</em>. <a href="<https://github.com/piersyork/owidR>">&lt;https://github.com/piersyork/owidR&gt;</a>.
+</div>
+<div id="ref-ggimage" class="csl-entry" role="listitem">
+Yu, Guangchuang. 2023. <em><span class="nocase">ggimage: Use Image in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggimage">https://CRAN.R-project.org/package=ggimage</a>.
+</div>
+<div id="ref-gghighlight" class="csl-entry" role="listitem">
+Yutani, Hiroaki. 2023. <em><span class="nocase">gghighlight</span>: Highlight Lines and Points in <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=gghighlight">https://CRAN.R-project.org/package=gghighlight</a>.
+</div>
+<div id="ref-lemurs_data" class="csl-entry" role="listitem">
+Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, and Anne D. Yoder. 2014. <span>“<span class="nocase">Life history profiles for 27 strepsirrhine primate taxa generated using captive data from the Duke Lemur Center</span>.”</span> <em>Scientific Data</em> 1 (1). <a href="https://doi.org/10.1038/sdata.2014.19">https://doi.org/10.1038/sdata.2014.19</a>.
+</div>
+</div>
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./doctors.html" class="pagination-link" aria-label="Doctors across the world: making maps with **`ggplot2`**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Doctors across the world: making maps with <strong><code>ggplot2</code></strong></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./us-elections.html" class="pagination-link" aria-label="US House elections: geography on a grid with **`geofacet`**">
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">US House elections: geography on a grid with <strong><code>geofacet</code></strong></span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+<script src="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.js" defer="true"></script>
+</body></html>
