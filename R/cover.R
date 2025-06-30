@@ -66,7 +66,7 @@ inputs <- expand.grid(
   )
 col_df <- data.frame(
   col_grp = seq(1, n_x + 0.5, by = 0.5),
-  colour = rev(grDevices::colorRampPalette(col_palette)(n_x * 2)),
+  color = rev(grDevices::colorRampPalette(col_palette)(n_x * 2)),
   alpha = seq(0.2, 0.6, length.out = n_x * 2)
 )
 output <- make_hex_coords(
@@ -92,10 +92,10 @@ g1 <- ggplot() +
   theme_void() +
   theme(
     plot.background = element_rect(
-      fill = "white", colour = "white"
+      fill = "white", color = "white"
     ),
-    axis.line.x.bottom = element_line(colour = bg_col, linewidth = 1),
-    axis.line.y.left = element_line(colour = bg_col, linewidth = 1),
+    axis.line.x.bottom = element_line(color = bg_col, linewidth = 1),
+    axis.line.y.left = element_line(color = bg_col, linewidth = 1),
     plot.margin = margin(30, 30, 30, 30),
     aspect.ratio = 1
   )
@@ -124,10 +124,10 @@ g2 <- ggplot() +
   theme_void() +
   theme(
     plot.background = element_rect(
-      fill = "white", colour = "white"
+      fill = "white", color = "white"
     ),
-    axis.line.x.bottom = element_line(colour = bg_col, linewidth = 1),
-    axis.line.y.left = element_line(colour = bg_col, linewidth = 1),
+    axis.line.x.bottom = element_line(color = bg_col, linewidth = 1),
+    axis.line.y.left = element_line(color = bg_col, linewidth = 1),
     plot.margin = margin(30, 30, 30, 30),
     aspect.ratio = 1
   )
@@ -147,7 +147,7 @@ g3 <- ggplot() +
       y = cumsum(runif(10))
     ),
     mapping = aes(x = x, y = y),
-    colour = bg_col
+    color = bg_col
   ) +
   geom_line(
     data = data.frame(
@@ -155,15 +155,15 @@ g3 <- ggplot() +
       y = cumsum(runif(10, 0, 0.5))
     ),
     mapping = aes(x = x, y = y),
-    colour = col_palette[3]
+    color = col_palette[3]
   ) +
   theme_void() +
   theme(
     plot.background = element_rect(
-      fill = "white", colour = "white"
+      fill = "white", color = "white"
     ),
-    axis.line.x.bottom = element_line(colour = bg_col, linewidth = 1),
-    axis.line.y.left = element_line(colour = bg_col, linewidth = 1),
+    axis.line.x.bottom = element_line(color = bg_col, linewidth = 1),
+    axis.line.y.left = element_line(color = bg_col, linewidth = 1),
     plot.margin = margin(30, 30, 30, 30),
     aspect.ratio = 1
   )
@@ -184,7 +184,7 @@ ggplot() +
     data = output,
     mapping = aes(
       x = x, y = y, group = grp,
-      colour = alpha(colour, alpha)
+      color = alpha(color, alpha)
     ),
     fill = "transparent",
     linewidth = 0.4
@@ -221,7 +221,7 @@ ggplot() +
     x = 1.25, y = 2.4,
     label = "The Art of Visualization\nwith ggplot2",
     family = body_font,
-    colour = "white",
+    color = "white",
     hjust = 0,
     vjust = 1,
     size = 22,
@@ -233,19 +233,19 @@ ggplot() +
     x = 1.25, y = 6.9,
     label = "Nicola Rennie",
     family = body_font,
-    colour = "white",
+    color = "white",
     hjust = 0,
     vjust = 1,
     size = 18,
     fontface = "bold",
     size.unit = "pt"
   ) +
-  scale_colour_identity() +
+  scale_color_identity() +
   scale_y_reverse() +
   coord_fixed(expand = FALSE, clip = "off") +
   theme_void() +
   theme(
-    plot.background = element_rect(fill = bg_col, colour = bg_col),
+    plot.background = element_rect(fill = bg_col, color = bg_col),
     plot.margin = margin(-padding, -padding, -padding, -padding)
   )
 
