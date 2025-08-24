@@ -22,7 +22,13 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 In this chapter, we'll learn how to read in data from an Excel file via a URL, create waffle plots using the **`waffle`** package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Load data from Excel files, including those hosted online;
+* Create waffle plots using custom icons; and
+* Write your own source text function to keep a consistent style across different charts.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: turbines-pkgs-req
@@ -41,6 +47,20 @@ library(stringr)
 library(sysfonts)
 library(waffle)
 ```
+
+As in previous chapters, we'll again be using **`ggplot2`** for plotting, alongside **`dplyr`** for importing and manipulating data, with **`glue`** used again for creating data-driven character strings. The **`sysfonts`** and **`showtext`** packages will be used again for loading and rendering different fonts.
+
+This chapter introduces quite a few packages that we haven't used yet. Try not to be overwhelmed by the number of new ideas introduced - we'll use many of them again in later chapters to become more familiar with these packages!
+
+* **`GGally`**: for quick exploratory charts to look at relationships between variables.
+* **`marquee`**: for richtext formatting in charts, similar to the way we've used **`ggtext`** in previous chapters.
+* **`openxlsx`**: for importing data from Excel files.
+* **`rcartocolor`**: a color palette package.
+* **`readr`**: for importing data, including from both CSV and Excel files.
+* **`stringr`**: for manipulating character strings.
+* **`waffle`**: for creating waffle charts and pictograms.
+
+\index{GGally} \index{marquee} \index{openxlsx} \index{rcartocolor} \index{readr} \index{stringr} \index{waffle}
 
 ## Data
 
@@ -173,7 +193,7 @@ Let's start by exploring the hypothesis that wind turbines with a larger rotor d
 ```{r, echo=-1}
 #| label: fig-turbines-scatter
 #| fig-cap: "Scatter plot showing the relationship between rotor diameter and turbine capacity."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot showing the relationship between rotor diameter and turbine capacity. There looks to be some vertical lines forming from the points."
 par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(
   x = wind_turbines$`Rotor.diameter.(m)`,
@@ -206,10 +226,10 @@ For example, the **`GGally`** package [@GGally] makes it easy to create pairwise
 ```{r, echo=-1}
 #| label: fig-turbines-ggally
 #| fig-cap: "A 3x3 grid of comparisons between three columns in the `wind_turbines` data relationships using correlation, density plots, bar charts, scatter plots, and box plots."
-#| fig-alt: ""
+#| fig-alt: "A 3x3 grid of comparisons between three columns in the `wind_turbines` data relationships using correlation, density plots, bar charts, scatter plots, and box plots."
 #| fig-asp: 1
 #| message: false
-theme_set(theme_gray(base_size = 2))
+theme_set(theme_gray(base_size = 5))
 ggpairs(
   data = wind_turbines,
   columns = c(
@@ -220,6 +240,11 @@ ggpairs(
 )
 ```
 
+```{r}
+#|echo: false
+theme_set(theme_gray(base_size = 11))
+```
+
 :::
 
 Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
@@ -227,7 +252,7 @@ Let's instead look at the number of turbines in each region, by creating an orde
 ```{r, echo=-1}
 #| label: fig-turbines-barplot
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory."
-#| fig-alt: ""
+#| fig-alt: "Ordered bar chart showing the number of wind turbines commissioned in each province or territory. Ontario is highest at around 2500."
 par(mar = c(3.1, 6.6, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   sort(table(wind_turbines$`Province/Territory`)),
@@ -241,7 +266,7 @@ Most of the turbines are located in Ontario, but has this always been the case? 
 ```{r, echo=-1}
 #| label: fig-turbines-barplot-2
 #| fig-cap: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory."
-#| fig-alt: ""
+#| fig-alt: "Ordered bar chart showing the number of wind turbines commissioned in time period, with stacked bars showing how many are in each province or territory. It looks a bit of a jumbled mess with lots of different date formats."
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(
@@ -263,7 +288,7 @@ Rather than making a stacked bar chart for each year, which can make it difficul
 
 Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
 
-![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-sketch-turbines fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area charts showing packages use over time](images/sketch-turbines.png){#fig-sketch-turbines fig-align="center" fig-alt="Initial sketch of a faceted area charts showing packages use over time. Notes indicate color by province and how one icon represents X turbines."}
 
 We can make two slight variations to this basic version of the chart:
 
@@ -464,7 +489,7 @@ Finally, we add `facet_wrap()` to create a pictogram for each date range, placin
 ```{r}
 #| label: fig-turbines-base-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, where the region name is showing instead of the icons."
-#| fig-alt: ""
+#| fig-alt: "Pictogram showing the number of turbines per time period in each region, where the region name is showing instead of the icons. Lots of the text is overlapping."
 #| message: false
 basic_plot <- ggplot(data = plot_data) +
   geom_pictogram(
@@ -499,8 +524,8 @@ We can add `scale_label_pictogram()` from **`waffle`** to our plot to specify th
 
 ```{r}
 #| label: fig-turbines-icons-plot
-#| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines currently looking overcrowded."
-#| fig-alt: ""
+#| fig-cap: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines."
+#| fig-alt: "Pictogram showing the number of turbines per time period in each region, with fan icons indicating 20 turbines. Looks a little bit squashed."
 icons_plot <- basic_plot +
   scale_label_pictogram(
     values = "fan",
@@ -532,7 +557,7 @@ In the **`rcartocolor`** package, categorical palettes are referred to as *quali
 ```{r, echo=-1}
 #| label: fig-turbines-rcarto
 #| fig-cap: "All qualitative color palettes with at least 6 colors in the `rcartocolor` package."
-#| fig-alt: ""
+#| fig-alt: "All qualitative color palettes with at least 6 colors in the `rcartocolor` package."
 #| fig-asp: 0.8
 par(mar = c(2.1, 4.1, 1.1, 2.1))
 display_carto_all(
@@ -630,7 +655,7 @@ We add these text elements to our plot in the normal way, by passing them into t
 ```{r}
 #| label: fig-turbines-text-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with title and caption text showing asterisks that indicate bold text."
-#| fig-alt: ""
+#| fig-alt: "Pictogram showing the number of turbines per time period in each region, with title and caption text showing asterisks that indicate bold text. Text isn't properly rendered, but showing as raw markdown."
 text_plot <- col_plot +
   labs(
     title = title,
@@ -688,10 +713,10 @@ The **`marquee`** package relies on some of the more recent features in the R gr
 ```{r}
 #| label: fig-turbines-theme-plot
 #| fig-cap: "Pictogram showing the number of turbines per time period in each region, with colored text in the subtitle indicating which color maps to each region."
-#| fig-alt: ""
+#| fig-alt: "Pictogram showing the number of turbines per time period in each region, with colored text in the subtitle indicating which color maps to each region."
 scale_plot +
   theme_minimal(
-    base_size = 8
+    base_size = 7.5
   ) +
   theme(
     # spacing around text and plot
@@ -702,9 +727,12 @@ scale_plot +
     plot.background = element_rect(
       fill = bg_col, color = bg_col
     ),
-    panel.grid.major = element_line(
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(
       linewidth = 0.4
     ),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_blank(),
     # format text with marquee
     plot.title = element_marquee(
       color = text_col,
