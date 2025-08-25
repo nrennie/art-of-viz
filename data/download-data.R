@@ -10,14 +10,20 @@ download.file(
   destfile = "data/museums.csv"
 )
 
-# Lemurs
+# Bee colony losses
 download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/lemur_data.csv",
-  destfile = "data/lemur_data.csv"
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/colony.csv",
+  destfile = "data/colony.csv"
 )
 download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/taxonomy.csv",
-  destfile = "data/taxonomy.csv"
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/stressor.csv",
+  destfile = "data/stressor.csv"
+)
+
+# Animal surrenders
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-03-04/longbeach.csv",
+  destfile = "data/longbeach.csv"
 )
 
 # Canadian Wind Turbines
@@ -34,6 +40,22 @@ download.file(
   destfile = "data/cats_uk_reference.csv"
 )
 
+# Nobel Prize Laureates
+nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en")
+write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
+nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en")
+write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
+
+# Lemurs
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/lemur_data.csv",
+  destfile = "data/lemur_data.csv"
+)
+download.file(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-08-24/taxonomy.csv",
+  destfile = "data/taxonomy.csv"
+)
+
 # R package use
 files_to_check <-
   funspotr::list_files_github_repo("nrennie/tidytuesday",
@@ -46,36 +68,6 @@ r_pkgs <- files_to_check |>
   ) |>
   funspotr::unnest_results()
 write.csv(r_pkgs, "data/r_pkgs.csv", row.names = FALSE)
-
-# Global seafood
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/aquaculture-farmed-fish-production.csv",
-  destfile = "data/aquaculture-farmed-fish-production.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/capture-fisheries-vs-aquaculture.csv",
-  destfile = "data/capture-fisheries-vs-aquaculture.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/capture-fishery-production.csv",
-  destfile = "data/capture-fishery-production.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/fish-and-seafood-consumption-per-capita.csv",
-  destfile = "data/fish-and-seafood-consumption-per-capita.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/fish-stocks-within-sustainable-levels.csv",
-  destfile = "data/fish-stocks-within-sustainable-levels.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/global-fishery-catch-by-sector.csv",
-  destfile = "data/global-fishery-catch-by-sector.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-10-12/seafood-and-fish-production-thousand-tonnes.csv",
-  destfile = "data/seafood-and-fish-production-thousand-tonnes.csv"
-)
 
 # Doctors in an ageing population
 library(owidR)
@@ -93,25 +85,3 @@ download.file(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-07/house.csv",
   destfile = "data/house.csv"
 )
-
-## Technology adoption
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-19/technology.csv",
-  destfile = "data/technology.csv"
-)
-
-# Bee colony losses
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/colony.csv",
-  destfile = "data/colony.csv"
-)
-download.file(
-  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/stressor.csv",
-  destfile = "data/stressor.csv"
-)
-
-# Nobel Prize Laureates
-nobel_physics <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=phy&format=csv&csvLang=en")
-write.csv(nobel_physics, "data/nobel_physics.csv", row.names = FALSE)
-nobel_peace <- read.csv("http://api.nobelprize.org/2.1/laureates?limit=250&nobelPrizeCategory=pea&format=csv&csvLang=en")
-write.csv(nobel_peace, "data/nobel_peace.csv", row.names = FALSE)
