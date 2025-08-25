@@ -34,9 +34,15 @@ library(sysfonts)
 
 # Time zones: spatial data and mapping with **`sf`** {#sec-time-zones}
 
-In this chapter we'll learn how to obtain map data using **`rnaturalearth``**, manipulate spatial data using **`sf`** and plot it with **`ggplot2`**, and add a custom bar chart legend to a map of the world. \index{sf} \index{ggplot2} \index{rnaturalearth}
+In this chapter we'll learn how to obtain map data using **`rnaturalearth`**, manipulate spatial data using **`sf`** and plot it with **`ggplot2`**, and add a custom bar chart legend to a map of the world. \index{sf} \index{ggplot2} \index{rnaturalearth}
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Manipulate spatial data and change the coordinate reference system used;
+* Join data together from different sources and fix mismatches in the way country names are spelled; and
+* Combine multiple plots by overlaying one on top of the other.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: time-zones-pkgs-req
@@ -54,6 +60,14 @@ library(sysfonts)
 library(tidyr)
 library(tidytuesdayR)
 ```
+
+Several new packages are used in this chapter:
+
+* **`patchwork`**: for arranging and combining multiple plots (and tables) together, either in a grid layout or as inset elements.
+* **`rnaturalearth`**: allows you to download geographic data for different countries and regions, at a variety of resolutions and in different formats.
+* **`sf`**: provides a standardized way of representing spatial data, and has functions for manipulating it. It integrates easily with other **`tidyverse`** packages, including **`ggplot2`**.
+
+\index{sf} \index{rnaturalearth} \index{patchwork}
 
 ## Data
 
@@ -97,7 +111,7 @@ The first thing that jumps out is the `comments` column which appears to have a 
 ```{r, echo=-1}
 #| label: fig-timezones-barplot-na
 #| fig-cap: "A bar chart of the number of missing values in the `comments` column, where `TRUE` represents missing."
-#| fig-alt: ""
+#| fig-alt: "A bar chart of the number of missing values in the `comments` column, where `TRUE` represents missing."
 #| fig-asp: 0.7
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(table(is.na(timezones$comments)))
@@ -124,7 +138,7 @@ Now, we can explore how many time zones there are per continent, again using the
 ```{r, echo=-1}
 #| label: fig-timezones-barplot-loc
 #| fig-cap: "A bar chart of the number of defined time zones in each of nine geographic regions."
-#| fig-alt: ""
+#| fig-alt: "A bar chart of the number of defined time zones in each of nine geographic regions."
 #| fig-asp: 0.7
 par(mar = c(3.1, 2.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(table(timezones_data$continent))
@@ -136,11 +150,11 @@ Of course, when we have coordinate data, the most obvious thing to do is plot th
 
 Given that we have a latitude and longitude data for the principal locations (usually largest cities) within each time zone, the first map idea that springs to mind is a world map with the time zone locations plotted as points:
 
-![Initial sketch of time zone locations as points on a world map.](images/sketch-time-zones.png){#fig-time-zones-sketch fig-align="center" fig-alt=""}
+![Initial sketch of time zone locations as points on a world map.](images/sketch-time-zones.png){#fig-time-zones-sketch fig-align="center" fig-alt="Initial sketch of time zone locations as points on a world map."}
 
 We could color the points based on the geographic region (continent) they belong to. As we've already seen, if we do this in **`ggplot2`**, coloring based on a variable automatically adds a legend to the chart. Instead of the traditional legend using colored squares next to the category label, we could add our own custom legend - using a bar chart. The bars will show the number of time zones per region, and be colored in the same way as the points on the map. This bar chart legend below the map doesn't take up any more space than a traditional legend, but it does add information (or at least makes the existing information quicker and easier to process).
 
-![Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.](images/sketch-time-zones-2.png){#fig-time-zones-sketch fig-align="center" fig-alt=""}
+![Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right.](images/sketch-time-zones-2.png){#fig-time-zones-sketch fig-align="center" fig-alt="Initial sketch of points on a world map with text in the lower left corner, and a bar chart as a legend in the bottom right."}
 
 A title and subtitle can be added below the map, next to the bar chart. Positioning the text in a more square layout (rather than a long string of text across the top of the chart) makes it easier to read, and helps to prevent the visualization from becoming very wide and short.
 
@@ -184,7 +198,7 @@ Since `sf` objects in R can be thought of as fancy data.frames, this means they 
 ```{r}
 #| label: fig-timezones-bg-map
 #| fig-cap: "Map of the world showing country outlines, with the default gray background."
-#| fig-alt: ""
+#| fig-alt: "Map of the world showing country outlines, with the default gray background."
 #| fig-asp: 0.6
 bg_map <- ggplot() +
   geom_sf(data = world)
@@ -234,7 +248,7 @@ Since the time zones coordinates are now stored as an `sf` object, we can plot i
 ```{r}
 #| label: fig-timezones-basic-map
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map."
-#| fig-alt: ""
+#| fig-alt: "Points representing different time zone locations on a world map, with points colored by continent and a legend indicating color mapping on the right of the map."
 #| fig-asp: 0.6
 basic_map <- bg_map +
   geom_sf(
@@ -303,7 +317,7 @@ Let's plot a basic bar chart, by starting (as we always do) with passing our new
 ```{r}
 #| label: fig-timezones-bar-plot-0
 #| fig-cap: "Bar chart showing the number of time zone locations in each continent."
-#| fig-alt: ""
+#| fig-alt: "Bar chart showing the number of time zone locations in each continent."
 #| fig-asp: 0.7
 ggplot(
   data = bar_data,
@@ -330,7 +344,7 @@ Let's remake our bar chart, this time also mapping `fill` and `label` to the `co
 ```{r}
 #| label: fig-timezones-bar-plot-1
 #| fig-cap: "Bar chart showing the number of time zone locations in each geographical region, with different colors for each region."
-#| fig-alt: ""
+#| fig-alt: "Bar chart showing the number of time zone locations in each geographical region, with different colors for each region."
 #| fig-asp: 0.7
 bar_plot <-
   ggplot(
@@ -384,7 +398,7 @@ Finally, we can also use `theme_void()` to remove all existing theme elements, a
 ```{r}
 #| label: fig-timezones-bar-plot-2
 #| fig-cap: "A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent."
-#| fig-alt: ""
+#| fig-alt: "A minimalist bar chart showing the number of time zone locations in each continent, with labels on each bar naming the continent."
 #| fig-asp: 0.7
 legend_plot <- bar_plot +
   geom_textbox(
@@ -434,7 +448,7 @@ We'll also re-draw the points again with a small adjustment -  let's change the 
 ```{r}
 #| label: fig-timezones-basic-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side."
-#| fig-alt: ""
+#| fig-alt: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side."
 #| fig-asp: 0.6
 basic_map <- ggplot() +
   # Apply colors to background map
@@ -477,7 +491,7 @@ It will take some (probably a lot of) trial and error to figure out exactly how 
 ```{r}
 #| label: fig-timezones-style-map-2
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map."
-#| fig-alt: ""
+#| fig-alt: "Points representing different time zone locations on a world map, with points colored by geographical region. The default legend is shown on the right hand side, with a large blank space below the world map."
 #| fig-asp: 0.8
 axes_map <- col_map +
   scale_x_continuous(
@@ -560,7 +574,7 @@ Using the `theme()` function, we make some further edit to remove the default le
 ```{r}
 #| label: fig-timezones-style-map-4
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left."
-#| fig-alt: ""
+#| fig-alt: "Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left."
 styled_map <- text_map +
   theme_void(base_size = 6, base_family = body_font) +
   theme(
@@ -605,7 +619,7 @@ We also remove the added margin from around the edge of the plot using the `them
 ```{r}
 #| label: fig-timezones-final-plot
 #| fig-cap: "Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend."
-#| fig-alt: ""
+#| fig-alt: "Points representing different time zone locations on a world map, with points colored by geographical region. Title and subtitle are shown in the bottom left, with an inset bar chart shown on the bottom right being used as a legend."
 styled_map + inset_element(legend_plot, 0.55, 0, 1, 0.3) &
   theme(plot.margin = margin(0, 0, 0, 0))
 ```
@@ -635,7 +649,7 @@ If we're talking about improving readability of bar charts, an easy action is to
 
 Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
-![](images/time-zones.gif){fig-align="center" fig-alt=""}
+![](images/time-zones.gif){fig-align="center" fig-alt="Gif of the process of building the chart"}
 
 :::
 

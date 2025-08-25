@@ -230,6 +230,17 @@ ggplot() +
   ) +
   annotate(
     "text",
+    x = 1.25, y = 3.4,
+    label = "The TidyTuesday Cookbook",
+    family = body_font,
+    color = "white",
+    hjust = 0,
+    vjust = 1,
+    size = 16,
+    size.unit = "pt"
+  ) +
+  annotate(
+    "text",
     x = 1.25, y = 6.9,
     label = "Nicola Rennie",
     family = body_font,
