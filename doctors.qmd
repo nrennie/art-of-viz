@@ -41,7 +41,13 @@ library(sysfonts)
 
 In this chapter we'll learn how to identify open data sources, make maps with **`ggplot2`** using data from the **`maps`** package, and create title panels with an unorthodox use of facets.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Create a simple choropleth map using only functions available in the core **`ggplot2`** package;
+* Obtain country boundary data and understand why coordinate systems matter for spatial data; and
+* Manipulate plot elements in a **`ggplot2`** chart to create a colored background area for the plot title.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: doctors-pkgs-req
@@ -55,6 +61,8 @@ library(readr)
 library(showtext)
 library(sysfonts)
 ```
+
+This package introduces another new package, **`MetBrewer`**, which is another color palette package, similar to **`rcartocolor`** introduced in @sec-turbines. We also need to make sure the **`maps`** package is installed, although we don't need to explicitly load it with `library()` because we'll be accessing it through **`ggplot2`**.
 
 ## Data 
 
@@ -136,7 +144,7 @@ Often when there's a time component to data, one of the most obvious patterns to
 ```{r, echo=-1}
 #| label: fig-doctors-base-plot
 #| fig-cap: "Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R."
-#| fig-alt: ""
+#| fig-alt: "Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R."
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 plot(
   x = doctors$Year,
@@ -152,7 +160,7 @@ There seems to be a general increasing trend between 1960 and 2020. The other im
 
 The most common approach to visualizing spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it's very common to color the country based on the value of the variable. These are often termed *choropleth maps*.\index{choropleth map}
 
-![Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right](images/sketch-doctors.png){#fig-doctors-sketch fig-align="center" fig-alt=""}
+![Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right](images/sketch-doctors.png){#fig-doctors-sketch fig-align="center" fig-alt="Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right"}
 
 At this point, it's also often a good time to start thinking about the orientation and aspect ratio of the plot you'll create. This will depend a lot of where the plot is going to end up - for example, plots in a single column academic article will typically be landscape graphs. The choice of orientation and aspect ratio can also affect how clearly your data is displayed - choosing a very wide plot for time series data can stretch the series and obliterate any appearance of trend. With maps, you're a little bit more constrained because there is already an underlying aspect ratio in the plot you're creating. For this map, a landscape orientation with a 6x4 aspect ratio should work reasonably well. \index{aspect ratio} \index{orientation}
 
@@ -258,7 +266,7 @@ You could also use `geom_polygon()` to plot `map_data` instead of `geom_map()`, 
 ```{r}
 #| label: fig-doctors-basic-plot-1
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched."
-#| fig-alt: ""
+#| fig-alt: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched."
 basic_plot <- ggplot(
   data = map_data,
   mapping = aes(
@@ -304,7 +312,7 @@ These colors can then be passed into `scale_fill_gradientn()` from **`ggplot2`**
 ```{r}
 #| label: fig-doctors-style-plot-1
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme."
-#| fig-alt: ""
+#| fig-alt: "Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme."
 col_plot <- basic_plot +
   scale_fill_gradientn(
     colors = col_palette,
@@ -376,7 +384,7 @@ We also set the `plot.title`, `plot.subtitle`, and `plot.caption` to use `elemen
 ```{r}
 #| label: fig-doctors-style-plot-3
 #| fig-cap: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together."
-#| fig-alt: ""
+#| fig-alt: "Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together."
 text_plot +
   theme_void(base_size = 8, base_family = body_font) +
   theme(
@@ -429,7 +437,7 @@ Then we can use `facet_wrap()` and facet across the `label` column. Since there'
 ```{r}
 #| label: fig-doctors-style-plot-4
 #| fig-cap: "Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background."
-#| fig-alt: ""
+#| fig-alt: "Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background."
 styled_plot <- ggplot(
   data = map_data,
   mapping = aes(
@@ -554,7 +562,7 @@ The size of the legend is controlled through the `legend.key.width` and `legend.
 ```{r}
 #| label: fig-doctors-style-plot-5
 #| fig-cap: "Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page."
-#| fig-alt: ""
+#| fig-alt: "Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page."
 styled_plot2 +
   theme(
     # legend text
@@ -599,7 +607,7 @@ When the data was processed, the choice was made to plot a map showing the value
 
 Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
-![](images/doctors.gif){fig-align="center" fig-alt=""}
+![](images/doctors.gif){fig-align="center" fig-alt="Gif of the process of building the chart"}
 
 :::
 
