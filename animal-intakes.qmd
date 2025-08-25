@@ -44,18 +44,18 @@ library(tidytuesdayR)
 
 New packages:
 
-* **`colorblindr`**: 
-* **`ggforce`**:
-* **`lubridate`**: a packages for manipulating and creating date variables. You'll see more examples of **`lubridate`** in @sec-nobel and @sec-r-pkgs.
-* **`scales`**: You won't often have to use this package directly, but ggplot2 uses it in the background
+* **`colorblindr`**: for assessing the accessibility of color palettes and the use of color in charts.
+* **`ggforce`**: a package that extends the behavior of **`ggplot2`**, and provides additional *geoms* and *stats*.
+* **`lubridate`**: a package for manipulating and creating date variables. You'll see more examples of **`lubridate`** in @sec-nobel and @sec-r-pkgs.
+* **`scales`**: **`ggplot2`** uses the **`scales`** package in background for help with axis limits and labels. However, you can use the functions from **`scales`** directly to transform data, labels, and colors.
 
 \index{colorblindr} \index{ggforce} \index{lubridate} \index{scales}
 
 ## Data
 
-The Cross‐country Historical Adoption of Technology (CHAT) dataset [@technology_data] contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing *as broad a definition of technology as possible* [@technology_data].
+The Long Beach Animal Shelter dataset [@longbeach_data] contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2014. Here, the term *surrendered* refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.
 
-The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), so let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
+The animal shelter dataset was used as a TidyTuesday dataset in March 2025 (after being curated by [Lydia Gibson](https://github.com/lgibson7)), and the data is also available via the **`animalshelter`** package [@animalshelter]. Let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: longbeach-load-data-show
@@ -73,22 +73,22 @@ longbeach <- tuesdata$longbeach
 longbeach <- readr::read_csv("data/longbeach.csv")
 ```
 
-The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns.
+The `longbeach` data is reasonably large with `r nrow(longbeach)` rows and `r ncol(longbeach)` columns.
 
 ```{r}
 #| label: longbeach-head-data
 head(longbeach)
 ```
 
-The data is in long format with the `variable` (and `label`) columns containing information on what variable the row relates to e.g. `"% children who received a BCG immunization"` or `"Land naturally regenerating forest area 1000 ha"`. The `iso3c` column gives the ISO3 code for the country the row relates to, and similarly the `year` column relates to the relevant year. The `group` column details whether the variable is related to `"Consumption"`, `"Production"`, `"Non-Tech"` (such as GDP), or `"Creation"`. The `category` column contains information about which category the variable falls into e.g. `"Vaccines"` or `"Agriculture"`. Finally, the `value` column provides the value of the variable for the given year and country.
+Each row of the dataset relates to a different intake, with some animals appearing multiple times, as can be identified by the `animal_id` column. Further information on each individual animal is provided such as their name, the type of animal they are (e.g. cat or dog), what color they are, their sex, and their date of birth. Many of these columns have an excessive number of missing values, mainly due lack of information about animals that arrive as strays. Additional columns provide information about the intake including the date, the type and subtype (e.g. owner surrender or stray), and a free text response giving a reason for the intake. More detailed information is given on the geographic location of the capture or intake, including coordinate date and jurisdiction. Finally, data is also provided on the outcome for each animal, including when their outcome occured, the type and subtype (e.g. adopted or died). Some binary variables for different outcomes are also pre-calculated.
 
 ## Exploratory work
 
-Given the large scale of this data (in terms of time frame, spatially, and range of variables), there are many aspects we could look into further. What might be an interesting aspect of this data to visualize?
+Given the many different aspects of the animals and their intakes and outcomes that have been recorded, there are lots of variables that we could look into further. What might be an interesting aspect of this data to visualize?
 
 ### Data exploration
 
-As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot()` function. \index{graphics!barplot}
+As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `animal_type` using the `barplot()` function. \index{graphics!barplot}
 
 ```{r, echo=-1}
 #| label: fig-longbeach-barplot
@@ -102,7 +102,7 @@ barplot(
 )
 ```
 
-We have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changed over time, using the `heatmap()` function in base R: \index{stats!heatmap}
+We have lots of observations relating to cats, with dogs a fairly close second. This likely represents how common it is to have these types of animals as pets. We might also be interested in how the number of intakes has changed over time, as shown in @fig-longbeach-scatterplot.
 
 ```{r, echo=-1}
 #| label: fig-longbeach-scatterplot
@@ -116,9 +116,12 @@ plot(
 )
 ```
 
+We can see that there are some seasonal differences in the number of intakes, and that there seems to be a slight decrease during 2020 and 2021 - likely related to the COVID-19 pandemic affecting how many animals can be captured.
+
+It's perhaps more interesting to look at how the number of surrenders for different animal types has changed over time, using the `heatmap()` function in base R in @fig-longbeach-heatmap. \index{stats!heatmap}
 
 ```{r, echo=-1}
-#| label: fig-longbeach-heatmap
+#| label: 
 #| fig-cap: "Heatmap of number of animals surrendered of each type, each year. A lower number of animals of all types were surrendered in 2020 and 2021."
 #| fig-alt: "Heatmap of number of animals surrendered of each type, each year. A lower number of animals of all types were surrendered in 2020 and 2021."
 par(mar = c(3.1, 0, 2.1, 0))
@@ -134,15 +137,11 @@ heatmap(
 )
 ```
 
-Let's look into a specific variable in more detail. We need to narrow down the data we want to consider - there are `r length(unique(technology$label))` different questions (variables) contained in the data. You can check by running `length(unique(technology$label))`. One variable we could consider further is the percentage of children who received a measles immunization - indicated by the `"pctimmunizmeas"` level in the `variable` column. Let's create a quick scatter plot of how this percentage has been changing over time: \index{scatter plot}
+In @fig-longbeach-heatmap, we've used the `year()` function from **`lubridate`** to extract the year from the date variable to aggregate the data to annual values since there are very small numbers of some animal types.
 
-For obvious reasons (the timing of when the first measles vaccine was created and rolled out across the world), the data does not span for 200 years for this variable. Nonetheless, it looks like there is perhaps an increasing trend over time. It's a little bit difficult to see because we have data from lots of countries on one plot, including some whose values were already high at the start of the time series.
+Let's think about how we might visually represent this data in a more meaningful, and aesthetic way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we'll do here, readers might get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend. 
 
-A list of all ISO3 country codes can be obtained by running `unique(technology$iso3c)`, and from there we can choose a subset of countries we want to look at in more detail. Let's look at Great Britain, USA, Sweden, Brazil, New Zealand, and Venezuela, and store these choices in a vector called `countries`. 
-
-Although including all years of data would better allow us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 1980 and 2010 as we'll do here, readers get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. We can use the `filter()`\index{dplyr!filter} function from **`dplyr`**\index{dplyr} to filter our `technology` data set to consider only the rows showing data about the percentage of children who received a measles immunization, in the years 1980 or 2010, and relating to countries in our specified vector of `countries`.
-
-We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from **`dplyr`**.
+We can again use `year()` from **`lubridate`** to save the extracted years as a new column, use the `filter()`\index{dplyr!filter} function from **`dplyr`**\index{dplyr} to filter our `longbeach` dataset to consider only the rows for the years 2017 and 2023. Since some of the animal types have very small numbers, even when aggregating to annual data, we'll use `if_else()` to include more animal types in the `"other"` category that already exists. We then use `count()` from **`dplyr`** to count up how many of each animal type were surrendered in each of the years we're interested in.
 
 ```{r}
 #| label: filter-longbeach
@@ -163,9 +162,7 @@ intake_data <- longbeach |>
 head(intake_data)
 ```
 
-Our tidier data now shows just the percentage (`value`) of children who received a measles immunization in each country (`iso3c`), in each of 1980 and 2010 (`year`), How might we visualize this data?
-
-There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 1980 to 2010? Do we want to compare countries to each other? Do we just want to show the range of values in the data? In this data, the most interesting example is a comparison between 1980 and 2010. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
+Our data now shows just the number (`n`) of animals of each type (`animal_type`), in each of 2017 and 2023 (`year`). How might we visualize this data? There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 2017 to 2023? Do we want to look at the relative number of different animal types? Or do we just want to show the range of values in the data? In this data, perhaps the most interesting example is a comparison between 2017 and 2023. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
 
 At the time of writing, there isn't a built-in function in **`ggplot2`** to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, the initial sketch in @fig-longbeach-sketch might give you an idea of what we're aiming for.
 
@@ -185,7 +182,16 @@ Gauge charts are not a built-in feature of **`ggplot2`**, so we're going to have
 
 We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart natively in **`ggplot2`**. However, the use of polar coordinates in **`ggplot2`** often makes it difficult to add elements such as annotations in the position you'd like them to be in. So let's create a gauge chart a slightly different way! \index{ggplot2!geom\_col} \index{ggplot2!coord\_polar}
 
-The `value` in the data currently tells us the percentage of children who did have an immunization, we also need to calculate the percentage of children who did not - by subtracting `value` from 100. We can then pivot the data such that each country has two rows in the data: (i) one row for the *did have immunization* value in 1980 and 2010, and (ii) one row for the *did not have immunization* value in 1980 and 2010. We end up with something halfway in between wide and long format data. Let's also make the `YN` column (indicating a did/did not have immunization row) into a factor.
+A gauge chart is normally used to show progress toward a target or a limit. For example when considering data given as percentages, 100% is a common upper limit. For our data, if we knew the maximum capacity of the shelter, that would be an appropriate choice. However, since we don't have that information, we don't really have a *natural* limit. 
+
+So we need to decide on a reasonable one, such as:
+
+* The maximum number of all animals surrendered across all years
+* The maximum number of all animals surrendered across the selected years
+* The maximum number of animals of a single type surrendered across all years
+* The maximum number of animals of a single type surrendered across the selected years
+
+In some sense, the choice is fairly arbitrary and it depends on what you want to highlight. Here, we'll use the maximum number of animals of a single type surrendered across the selected years. We'll use `ceiling()` to round up to the nearest 500 to give us a *nicer* upper limit.  \index{base!ceiling}
 
 ```{r}
 #| label: wrangle-longbeach-0
@@ -194,7 +200,26 @@ upper_limit <- ceiling(max_intake / 500) * 500
 c(max_intake, upper_limit)
 ```
 
-use round with negative - digits to round to nearest ... . Here, we specifiically want ot round up (ceiling don't have digits)
+::: {#tip-longbeach-rounding .callout-tip}
+
+## Rounding numbers in R
+
+In R, the `round()` function can be used to round a number, with the `digits` argument specifying the level of precision. Supplying negative numbers, allows you to round to the nearest 10, 100, 1000 and so on. \index{base!round}
+
+```{r}
+#| label: longbeach-round-example
+round(1234, digits = -1)
+round(1234, digits = -2)
+round(1234, digits = -3)
+```
+
+However, for rounding to numbers that are not a power of 10, you can divide by that number, round it, and then multiply by the number again. Replace `round()` with `floor()` or `ceiling()` for specifically rounding down or up.
+
+:::
+
+Let's divide `n` by our chosen upper limit, to determine how much progress has been made towards that limit (`value`) for each category To make it easier for us to plot later on, we then also calculate how far away each category is from that limit (`no_value`). We no longer require the `n` column, so we use `select()` from **`dplyr`** to drop it. \index{dplyr!select} \index{dplyr!mutate}
+
+We then pivot our data to long format and back again using the `pivot_longer()` and `pivot_wider()` functions from **`tidyr`**. This results in each animal type having two rows in the data: (i) one row for the percentage to the limit in 2017 and 2023 and (ii) one row for the percentage from the limit in 2017 and 2023. \index{tidyr!pivot\_wider} \index{tidyr!pivot\_longer}
 
 ```{r}
 #| label: wrangle-longbeach-1
@@ -216,7 +241,7 @@ intake_YN <- intake_data |>
   mutate(YN = factor(YN))
 ```
 
-To enable us to work with the percentages more easily, we can convert them into values between 0 and 1 by dividing by 100, and drop the original columns. If you think about creating a stacked bar chart, we need to know the end point of each bar (the maximum y-axis value for each bar). This isn't the percentage of each group, it's the cumulative percentage of each group and the ones stacked below it. We use the `cumsum()` function to calculate the cumulative sum of the percentages across each year and country: \index{cumsum}
+If you think about creating a stacked bar chart (i.e. an unfurled gauge chart), we need to know the end point of each bar (the maximum y-axis value for each bar). This isn't the percentage for each group, it's the cumulative percentage for each group and the ones stacked below it. We use the `cumsum()` function to calculate the cumulative sum across each year and animal type: \index{cumsum}
 
 ```{r}
 #| label: wrangle-longbeach-2
@@ -229,7 +254,7 @@ plot_data <- intake_YN |>
 head(plot_data)
 ```
 
-You'll notice that the `ymax_*` values are always `1` for the `no_value` rows - this is because the `no_value` is the last bar so we will always have plotted 100% of the data by the time we've finished that bar. Note that the data is currently still grouped by `iso3c` - this will be important later!
+You'll notice that the `ymax_*` values are always `1` for the `no_value` rows - this is because the `no_value` is the last bar so we will always have plotted 100% of the data by the time we've finished that bar. Note that the data is currently still grouped by `animal_type` - this will be important later!
 
 ### The **`ggforce`** extension package
 
@@ -237,12 +262,12 @@ The **`ggforce`**\index{ggforce} extension package [@ggforce] contains many usef
 
 ### Gauge charts with **`ggforce`**
 
-The function that we're interested in for the purposes of creating a gauge chart is `geom_arc_bar()` \index{ggforce!geom\_arc\_bar}. The `geom_arc_bar()` function makes it possible to draw arcs in **`ggplot2`**. You can also use this function to create visualizations such as donut charts or sunburst plots. We'll use two calls to `geom_arc_bar()` to create the double gauge chart - one for the 1980 arc, and one for the 2010 arc. There are several required aesthetics when using `geom_arc_bar()`:
+The function that we're interested in for the purposes of creating a gauge chart is `geom_arc_bar()` \index{ggforce!geom\_arc\_bar}. The `geom_arc_bar()` function makes it possible to draw arcs in **`ggplot2`**. You can also use this function to create visualizations such as donut charts or sunburst plots. We'll use two calls to `geom_arc_bar()` to create the double gauge chart - one for the 2017 arc, and one for the 2023 arc. There are several required aesthetics when using `geom_arc_bar()`:
 
 * `x0`: The x-coordinate of the center of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice.
 * `y0`: The y-coordinate of the center of the circle that the gauge chart lies on. For us, this will be a constant value so we can choose any number - `0` seems like an obvious choice again.
 * `r0`: The inner radius (from `x0` and `y0`) of the arc.
-* `r`: The outer radius (from `x0` and `y0`) of the arc. The difference between `r0` and `r` determines how thick the gauge chart will be. For each of the two arcs we will draw, these will be constant. For the outer arc (2010), we can set `r0 = 0.7` and ` r = 1`, and for the inner arc (1980), we can set `r0 = 0.2` and ` r = 0.5`. Note that the difference between the radii is 0.3 for both arcs so they are equally thick.
+* `r`: The outer radius (from `x0` and `y0`) of the arc. The difference between `r0` and `r` determines how thick the gauge chart will be. For each of the two arcs we will draw, these will be constant. For the outer arc (2023), we can set `r0 = 0.7` and ` r = 1`, and for the inner arc (2017), we can set `r0 = 0.2` and ` r = 0.5`. Note that the difference between the radii is 0.3 for both arcs so they are equally thick.
 * `start`: The starting angle for each segment in the arc.
 * `end`: The ending angle for each segment in the arc.
 
@@ -262,7 +287,7 @@ There is almost certainly a nicer way of doing this in base R that contains fewe
 
 :::
 
-Let's start with the 1980 data. We start off by creating the `0` values for the minimum in the first stacked bar using `rep(0, length(countries))` - since we need one `0` for each country in 1980. We then want to get the `ymax_2017` values from `plot_data` except the last one. We therefore use `slice_head()` to get this subset of the rows (missing the last one in each country). Remember that `plot_data` is still grouped by `iso3c`. We then stick these `ymax_2017` to the `0` we created and pass them into a new column called `ymin_2017` using `mutate()`. The code for the 2010 arc is analogous. \index{dplyr!mutate} \index{dplyr!slice\_head} \index{dplyr!pull}
+Let's start with the 2017 data. We start off by creating the `0` values for the minimum in the first stacked bar using `rep(0, n_types)` - since we need one `0` for each animal type in 2017. We then want to get the `ymax_2017` values from `plot_data` except the last one. We therefore use `slice_head()` to get this subset of the rows (missing the last one in each animal type). Remember that `plot_data` is still grouped by `animal_type`. We then stick these `ymax_2017` to the `0` we created and pass them into a new column called `ymin_2017` using `mutate()`. The code for the 2023 arc is analogous. \index{dplyr!mutate} \index{dplyr!slice\_head} \index{dplyr!pull}
 
 ```{r}
 #| label: longbeach-gauge-data-1
@@ -271,7 +296,7 @@ n_types <- length(
 )
 ymin_data <- plot_data |>
   ungroup() |>
-  # start values for 1980 arc
+  # start values for 2017 arc
   mutate(
     ymin_2017 = c(rbind(
       rep(0, n_types),
@@ -279,7 +304,7 @@ ymin_data <- plot_data |>
         pull(ymax_2017))
     ))
   ) |>
-  # repeat for 2010
+  # repeat for 2023
   mutate(
     ymin_2023 = c(rbind(
       rep(0, n_types),
@@ -289,7 +314,7 @@ ymin_data <- plot_data |>
   )
 ```
 
-All of our variables are currently scaled between 0 and 1 (since they relate to percentages). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at $-\pi/2$ (instead of 0) and end at $\pi/2$ (instead of 1). We can use the `rescale()` function from the **`scales`** package [@scales] to define the range we want to scale `from` and `to`. \index{scales!rescale} 
+All of our variables are currently scaled between 0 and 1 (since they relate to percentages towards a limit). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at $-\pi/2$ (instead of 0) and end at $\pi/2$ (instead of 1). We can use the `rescale()` function from the **`scales`** package [@scales] to define the range we want to scale `from` and `to`. \index{scales!rescale} 
 
 We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from **`dplyr`** in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent **`dplyr`** from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
 
@@ -322,7 +347,7 @@ We're now finished with the data wrangling (finally!) and ready to create our fi
 
 We then add two arcs by using `geom_arc_bar()` twice. We set the `x0`, `y0`, `r0`, and `r` constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the `aes()` function because they are *required* aesthetics. We then pass the `ymin_*` and `ymax_*` columns in as the `start` and `end` aesthetics, and set the `fill` color based on the `YN` column. \index{ggforce!geom\_arc\_bar}
 
-We also use `facet_wrap()` to draw a pair of arcs for each country in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries. \index{ggplot2!facet\_wrap} 
+We also use `facet_wrap()` to draw a pair of arcs for each animal type in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries. \index{ggplot2!facet\_wrap} 
 
 ```{r}
 #| label: fig-longbeach-basic-plot-1
@@ -330,7 +355,7 @@ We also use `facet_wrap()` to draw a pair of arcs for each country in a separate
 #| fig-alt: ""
 #| warning: false
 basic_plot <- ggplot(data = gauge_data) +
-  # Outer 2010 arc
+  # Outer 2023 arc
   geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
@@ -339,7 +364,7 @@ basic_plot <- ggplot(data = gauge_data) +
       fill = YN
     )
   ) +
-  # Inner 1980 arc
+  # Inner 2017 arc
   geom_arc_bar(
     mapping = aes(
       x0 = 0, y0 = 0,
@@ -358,7 +383,7 @@ We now have a double gauge chart - but it could look a lot nicer (and more infor
 
 ### Colors
 
-Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black. \index{color}
+Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage towards the target i.e. the number of animals surrendered. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage remaining towards to target, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black. \index{color}
 
 ```{r}
 #| label: longbeach-colors
@@ -397,7 +422,7 @@ basic_plot <- ggplot(data = gauge_data) +
   facet_wrap(~animal_type, nrow = 2)
 ```
 
-Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**, setting both the color values but also more informative labels for the legend at the same time. \index{ggplot2!scale\_fill\_manual}
+Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-longbeach-color-plot
@@ -406,20 +431,19 @@ Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**, sett
 color_plot <- basic_plot +
   scale_fill_manual(
     breaks = c("value", "no_value"),
-    labels = c("Immunized", "Not Immunized"),
     values = c(highlight_col, second_col)
   )
 color_plot
 ```
 
-When choosing colors for a visualization, it's important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color blindness comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color blindness, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can't, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable [@GAcharts]. \index{accessibility} \index{legend} \index{color}
+When choosing colors for a visualization, it's important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color vision deficiency (also known as color blindness) comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color vision deficiency, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can't, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable [@GAcharts]. \index{accessibility} \index{legend} \index{color}
 
 There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is **`colorblindr`** [@colorblindr]. The **`colorblindr`** package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated **`ggplot2`** functions. At the time of writing, **`colorblindr`** is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
 
 ```{r, echo=2}
 #| label: fig-longbeach-cvd
-#| fig-cap: "A 2x2 grid of charts showing simulations of what the current chart looks like with four different types of color vision deficiency."
-#| fig-alt: "A 2x2 grid of charts showing simulations of what the current chart looks like with four different types of color vision deficiency, showing reasonably good contrast."
+#| fig-cap: "A 2x2 grid of charts showing simulations of how the current chart might appear to people with each of four different types of color vision deficiency."
+#| fig-alt: "A 2x2 grid of charts showing simulations of how the current chart might appear to people with each of four different types of color vision deficiency."
 #| fig-dpi: 250
 theme_set(theme_gray(base_size = 3))
 cvd_grid(color_plot)
@@ -440,7 +464,7 @@ showtext_opts(dpi = 300)
 body_font <- "Ubuntu"
 ```
 
-Let's define some text for the title and subtitle. Here, the title asks the reader a question, encouraging them to think and directing them to what they are looking at in the chart. The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualization, as well as the chart creator.
+Let's define some text for the title and subtitle. Here, the title defines the key message of the chart, ensuring a reader understands the main point even if they only glance at the graphic. The subtitle gives a brief explanation of how to interpret the plot, and reiterates the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualization, as well as the chart creator.
 
 ```{r}
 #| label: longbeach-text
@@ -582,9 +606,9 @@ We have a few different options for dealing with the legend. Some options might 
 
 * We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-time-zones and @sec-house. 
 
-* We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting the *Immunized* would be enough as there are only two categories. We'll look at ways to do this in R in @sec-turbines and @sec-cats.
+* We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting and explaining the dark pink category would be enough. We'll look at ways to do this in R in @sec-turbines and @sec-cats.
 
-Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the pink color represents the positive response data (percentage who have been immunized). 
+Here, there's an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the dark pink color represents the number of animals in the data (percentage towards the target). 
 
 So let's remove the legend, by setting `legend.position = "none"` inside `theme()`: \index{ggplot2!theme}
 
@@ -611,13 +635,13 @@ ggsave(
 
 ## Reflection
 
-Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2010 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change on arc length between 1980 and 2010, you'll get different answers to if you measured the proportional change in area for the two. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?
+Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2023 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change in arc length between 2017 and 2023, you'll get different answers to if you measured the proportional change in area for the two. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?
 
-* There's no reason to use country codes instead of country names in this situation, other than perhaps laziness. There is space available for the full names. Though many people could likely work out which countries are shown here by their country codes, there's no need to make readers figure it out on their own. Providing the country names explicitly gives a reader less work to do, meaning they can focus on what you're actually trying to show. 
+* The facet labels could be formatted a little nicer e.g. using capitalized letters, and perhaps using *wild animals* instead of just *wild*.
 
-* Similarly, providing the exact percentages as labelled text would make it easier to see what the change in immunization coverage is. It's pretty clear that there has been an increase across all six countries, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between Brazil and Sweden in 2010? It's too difficult to tell here.
+* Providing the exact counts as labelled text would make it easier to see what the change in surrenders. It's reasonably clear that there has been an decrease across all six animal types, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between dogs and cats in 2017? It's too difficult to tell here.
 
-* Although a full, traditional legend is may be unnecessary here, the addition of some colored text may add clarification that the pink area is what represents that data. We'll look at using colored text instead of a legend in @sec-turbines and @sec-cats.
+* Although a full, traditional legend may be unnecessary here, the addition of some colored text may add clarification that the pink area is what represents the main data. We'll look at using colored text instead of a legend in @sec-turbines and @sec-cats.
 
 ## Exercises
 
