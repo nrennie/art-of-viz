@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>8&nbsp; Nobel Prize laureates: positioning text and parameterizing plots – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -227,8 +227,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -386,7 +386,13 @@ window.Quarto = {
 
 
 </header><p>In this chapter, we’ll learn how to access data through an API, create custom text layouts, and build parameterized plot functions.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Build URLs in R in order to extract data from an API;</li>
+<li>Create a new type of plot with core functions in <strong><code>ggplot2</code></strong> by using a little bit of trigonometry; and</li>
+<li>Parameterise your plotting code to create a function, to make it easier to produce lots of similar graphics with a consistent layout.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -483,9 +489,9 @@ Tip&nbsp;8.1: Choosing an API Limit
 <span>  ylab <span class="op">=</span> <span class="st">"Year of award"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A scatter plot of awardee birth date against year of award, showing the expected increasing trend.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-scatter-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-scatter-1.png" class="img-fluid figure-img" alt="A scatter plot of awardee birth date against year of award, showing the expected increasing trend.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.1: A scatter plot of awardee birth date against year of award, showing the expected increasing trend.
@@ -504,9 +510,9 @@ Figure&nbsp;8.1: A scatter plot of awardee birth date against year of award, sho
 <span>  ylab <span class="op">=</span> <span class="st">"Age of Nobel Laureate"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-hist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-hist" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-hist-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-hist-1.png" class="img-fluid figure-img" alt="A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.2: A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested.
@@ -518,9 +524,9 @@ Figure&nbsp;8.2: A scatter plot showing the age of Nobel Prize awardees over tim
 <div class="cell">
 <div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">gender</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-gender-barplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-gender-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-gender-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-gender-barplot-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-gender-barplot-1.png" class="img-fluid figure-img" alt="A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-gender-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.3: A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees.
@@ -540,9 +546,9 @@ Figure&nbsp;8.3: A bar chart of the number of male and female Nobel Laureates in
 </ul>
 <p>Let’s say that the purpose of the visualization is to highlight the gender disparity in Nobel Prize awardees. Yes, the bar chart of how many male and female Nobel Laureates there are shows the disparity very clearly. It’s a simple message. But it’s not eye-catching. It’s not a visualization that really makes a reader stop and pay attention. And it aggregates data down to just two categories - ignoring that these are individual people.</p>
 <p>Instead, let’s think outside of the box are present the information in a very non-standard way:</p>
-<div id="fig-nobel-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-nobel-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketch of text arranged perpendicularly around a circle, with text color based on gender." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-nobel.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-nobel.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.4: Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.
@@ -559,9 +565,9 @@ Figure&nbsp;8.4: Initial sketch of text arranged perpendicularly around a circle
 <div class="cell">
 <div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">nobel_physics</span><span class="op">$</span><span class="va">category</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-barplot-category" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-barplot-category" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate).">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-barplot-category-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-barplot-category-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-barplot-category-1.png" class="img-fluid figure-img" alt="A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate).">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-barplot-category-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.5: A bar chart of the number of <em>Physics</em> laureates (with a surprise appearance of a Chemistry laureate).
@@ -609,9 +615,9 @@ Tip&nbsp;8.2: Why add annotations in R?
 <div class="cell">
 <div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fl">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="fig-nobel-sketch-theta" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-nobel-sketch-theta" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-sketch-theta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-nobel-theta.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-nobel-theta.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-sketch-theta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.6: Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.
@@ -672,9 +678,9 @@ y &amp; = r sin(\theta)
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-base-plot-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-base-plot-1.png" class="img-fluid figure-img" alt="The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels.
@@ -719,9 +725,9 @@ Figure&nbsp;8.7: The names of Nobel Prize in Physics awardees arranged in a semi
 <span>  <span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-base-plot-2-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-base-plot-2-1.png" class="img-fluid figure-img" alt="The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area.
@@ -772,9 +778,9 @@ Figure&nbsp;8.8: The names of Nobel Prize in Physics awardees arranged in a semi
 <span>  <span class="op">)</span></span>
 <span><span class="va">annotated_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-annotated" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-annotated" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-annotated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-annotated-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-annotated-1.png" class="img-fluid figure-img" alt="The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-annotated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category.
@@ -811,9 +817,9 @@ Figure&nbsp;8.9: The names of Nobel Prize in Physics awardees arranged in a C-sh
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-style-plot-1-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-style-plot-1-1.png" class="img-fluid figure-img" alt="The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.10: The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background.
@@ -846,9 +852,9 @@ Figure&nbsp;8.10: The names of Nobel Prize in Physics awardees arranged around a
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-style-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-style-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-style-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-style-plot-2-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-style-plot-2-1.png" class="img-fluid figure-img" alt="The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-style-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.11: The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color.
@@ -1032,9 +1038,9 @@ Tip&nbsp;8.4: Using fonts in functions
 <span><span class="op">)</span></span>
 <span><span class="va">peace_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-nobel-peace-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-nobel-peace-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-nobel-peace-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="nobel-laureates_files/figure-html/fig-nobel-peace-plot-1.png" class="img-fluid figure-img">
+<img src="nobel-laureates_files/figure-html/fig-nobel-peace-plot-1.png" class="img-fluid figure-img" alt="The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nobel-peace-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8.12: The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink.
@@ -1127,8 +1133,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -1184,6 +1190,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -1198,6 +1207,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>11&nbsp; Doctors across the world: making maps with ggplot2 – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -202,8 +202,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -359,7 +359,13 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 
 
 </header><p>In this chapter we’ll learn how to identify open data sources, make maps with <strong><code>ggplot2</code></strong> using data from the <strong><code>maps</code></strong> package, and create title panels with an unorthodox use of facets.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Create a simple choropleth map using only functions available in the core <strong><code>ggplot2</code></strong> package;</li>
+<li>Obtain country boundary data and understand why coordinate systems matter for spatial data; and</li>
+<li>Manipulate plot elements in a <strong><code>ggplot2</code></strong> chart to create a colored background area for the plot title.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -369,6 +375,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>This package introduces another new package, <strong><code>MetBrewer</code></strong>, which is another color palette package, similar to <strong><code>rcartocolor</code></strong> introduced in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>. We also need to make sure the <strong><code>maps</code></strong> package is installed, although we don’t need to explicitly load it with <code><a href="https://rdrr.io/r/base/library.html">library()</a></code> because we’ll be accessing it through <strong><code>ggplot2</code></strong>.</p>
+<p> </p>
 <section id="data" class="level2" data-number="11.1"><h2 data-number="11.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">11.1</span> Data</h2>
 <p>We’ll visualize data on <em>Medical doctors per 1,000 people</em> using the dataset from the Our World in Data website (<a href="https://ourworldindata.org/">ourworldindata.org</a>) <span class="citation" data-cites="doctors_data">(<a href="references.html#ref-doctors_data" role="doc-biblioref">Our World in Data 2019</a>)</span>. The aim of Our World in Data, according to their website, is to <em>publish the research and data to make progress against the world’s largest problems</em>. There are datasets on everything from energy and environment, to poverty and education, to name a few. Their website also has many examples of beautiful, effective data visualizations if you’re ever looking for inspiration.</p>
@@ -455,9 +463,9 @@ Tip&nbsp;11.3: Finding sources of data
 <span>  ylab <span class="op">=</span> <span class="st">"Physicians per 1,000 people"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-base-plot-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-base-plot-1.png" class="img-fluid figure-img" alt="Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.1: Simple non-styled scatterplot of number of physicians per 1,000 people over time showing an increasing trend, created in base R.
@@ -469,9 +477,9 @@ Figure&nbsp;11.1: Simple non-styled scatterplot of number of physicians per 1,00
 </section><section id="exploratory-sketches" class="level3" data-number="11.2.2"><h3 data-number="11.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">11.2.2</span> Exploratory sketches</h3>
 <p>The most common approach to visualizing spatial data is, of course, to plot it on a map. If the aim is to show how a variable changes across different countries (or other defined regions), it’s very common to color the country based on the value of the variable. These are often termed <em>choropleth maps</em>.</p>
-<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-doctors-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-doctors.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.2: Initial sketch of a map of the world, showing title enclosed in a box and legend positioned horizontally in the bottom right
@@ -582,9 +590,9 @@ Tip&nbsp;11.5: Alternatives to <code><a href="https://ggplot2.tidyverse.org/refe
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_map.html">geom_map</a></span><span class="op">(</span>map <span class="op">=</span> <span class="va">map_data</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-basic-plot-1-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-basic-plot-1-1.png" class="img-fluid figure-img" alt="Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.3: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched.
@@ -624,9 +632,9 @@ Figure&nbsp;11.3: Map of the world with countries colored based on number of doc
 <span>  <span class="op">)</span></span>
 <span><span class="va">col_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-style-plot-1-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-style-plot-1-1.png" class="img-fluid figure-img" alt="Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.4: Map of the world with countries colored based on number of doctors per 1,000 people, showing a different color scheme.
@@ -701,9 +709,9 @@ Figure&nbsp;11.4: Map of the world with countries colored based on number of doc
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-3" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-style-plot-3-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-style-plot-3-1.png" class="img-fluid figure-img" alt="Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.5: Map of the world with countries colored based on number of doctors per 1,000 people. The map looks stretched, and the fonts in the title and subtitle are close together.
@@ -789,9 +797,9 @@ Tip&nbsp;11.6: Choosing a column name
 <span>  <span class="op">)</span></span>
 <span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-4" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-style-plot-4-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-style-plot-4-1.png" class="img-fluid figure-img" alt="Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.6: Map of the world with duplicated title in the facet strip text, with dark text against a dark blue background.
@@ -881,9 +889,9 @@ Tip&nbsp;11.7: Styling guides in <strong><code>ggplot2</code></strong>
 <span>    legend.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-doctors-style-plot-5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-doctors-style-plot-5" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="doctors_files/figure-html/fig-doctors-style-plot-5-1.png" class="img-fluid figure-img">
+<img src="doctors_files/figure-html/fig-doctors-style-plot-5-1.png" class="img-fluid figure-img" alt="Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-doctors-style-plot-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11.7: Final styled plot showing a map of the world, with title inside a blue banner and a horizontal colorbar legend at the bottom right of the page.
@@ -905,7 +913,7 @@ Figure&nbsp;11.7: Final styled plot showing a map of the world, with title insid
 <p>When the data was processed, the choice was made to plot a map showing the values for the most recently available data. This means that for some countries the data is more recent (and therefore perhaps more reliable), whilst for others it’s much older. In fact, running <code>range(doctors$year)</code> shows that the most recent data in the plot is from 2019, whilst the oldest is from 1980 - a gap of almost 40 years! That makes it much harder to accurately compare between countries, and there’s no indication for each country on this map how recent the data is. Readers might end up drawing conclusions that show differences between countries, when actually the difference is between time periods. Showing uncertainty on maps is tricky, and there’s no straightforward solution here. Perhaps setting the colors to a binary scale showing whether the value is above or below average, with the intensity of the color denoting the recentness of the data, is one approach. The <strong><code>Vizumap</code></strong> package <span class="citation" data-cites="Vizumap">(<a href="references.html#ref-Vizumap" role="doc-biblioref">Lucchesi and Kuhnert 2020</a>)</span>, which provides functions for visualizing uncertainty on maps, could be used to create a bivariate map showing both the value and how recent it is. Or at least a more detailed explanation about the range of time the data relates to could be included within the subtitle.</p>
 <p>Each plot created during the process of developing the original version of this visualization was captured using <strong><code>camcorder</code></strong>, and is shown in the gif below. If you’d like to learn more about how <strong><code>camcorder</code></strong> can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/doctors.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
+<figure class="figure"><p><img src="images/doctors.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Gif of the process of building the chart"></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="11.6"><h2 data-number="11.6" class="anchored" data-anchor-id="exercises">
@@ -947,8 +955,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -1004,6 +1012,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -1018,6 +1029,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.

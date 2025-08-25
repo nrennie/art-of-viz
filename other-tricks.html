@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>14&nbsp; Other tips and tricks – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -202,8 +202,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -351,13 +351,28 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 
 
 </header><p>There are many functions within <strong><code>ggplot2</code></strong>, and many more within the wider community of extension packages, that the chapters in this book can’t cover. Some of those packages are used to add different geometries, a few are used behind the scenes to help streamline workflows, and a few are more generally useful R packages.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Preview images at the desired resolution, and record gifs showing the process of making a specific chart;</li>
+<li>Extract and re-use data from existing <strong><code>ggplot2</code></strong> charts;</li>
+<li>Format your code in a consistent way to make it easier to maintain and share;</li>
+<li>Create your template files and functions for pieces of code that you reuse often.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">camcorder</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/trevorld/ggpattern">ggpattern</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>This chapter introduces two new packages:</p>
+<ul>
+<li>
+<strong><code>camcorder</code></strong>: for automatically saving graphics, and creating gifs from the resulting images.</li>
+<li>
+<strong><code>ggpattern</code></strong>: allows you to use patterns (alongside or instead of colors) for the <code>fill</code> elements of plots. It includes simple patterns like stripes or dots, as well as more complex ones like gradient and image fills.</li>
+</ul>
+<p> </p>
 <section id="sec-camcorder" class="level2" data-number="14.1"><h2 data-number="14.1" class="anchored" data-anchor-id="sec-camcorder">
 <span class="header-section-number">14.1</span> Recording gifs with <strong><code>camcorder</code></strong>
 </h2>
@@ -490,6 +505,19 @@ Figure&nbsp;14.2: Pictogram of the number of wind turbines commissioned in diffe
 </div>
 </div>
 <p>If we wanted to color the icons based on the <code>Region</code> variable, we would need to have multiple copies of the image in different colors. We could combine the information in <a href="lemurs.html" class="quarto-xref"><span>Chapter 9</span></a> about manipulating and re-coloring images, along with the information in <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a> about defining image paths based on data values to do this programmatically.</p>
+<div id="tip-other-patterns" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;14.3: Pattern fills in R
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong><code>ggpattern</code></strong> package is not the only way to add pattern fills to charts in R. Since version 4.1.0 of R, patterns and gradients have been available through the <strong><code>grid</code></strong> package in base R, and version 3.5.0 of <strong><code>ggplot2</code></strong> built upon that functionality to make some pattern fills available as part of the core <strong><code>ggplot2</code></strong> package.</p>
+</div>
+</div>
 <p>One of the benefits of using <strong><code>ggplot2</code></strong> is that they are stored as lists, and all of the information about that plot is stored with it - even information you didn’t pass in! This allows you to use <code><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build()</a></code> to take a layout created by one <strong><code>ggplot2</code></strong> extension package and use it in an entirely different extension - meaning you can create custom plots by mixing and matching features of different extensions.</p>
 </section></section><section id="sec-code-style" class="level2" data-number="14.3"><h2 data-number="14.3" class="anchored" data-anchor-id="sec-code-style">
 <span class="header-section-number">14.3</span> Code formatting with <strong><code>lintr</code></strong> and <strong><code>styler</code></strong>
@@ -502,7 +530,7 @@ Figure&nbsp;14.2: Pictogram of the number of wind turbines commissioned in diffe
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;14.3: A new formatter for R
+Tip&nbsp;14.4: A new formatter for R
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -690,8 +718,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -747,6 +775,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -761,6 +792,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>4&nbsp; Bee colony losses: visualizing quantities with Poisson disk sampling – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -81,7 +81,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./technology-adoption.html" rel="next">
+<link href="./animal-intakes.html" rel="next">
 <link href="./museums.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -227,8 +227,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -544,7 +544,7 @@ Tip&nbsp;4.2: Avoid missing patterns about missingness
 </section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
 <p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <a href="#fig-bees-sketch-blank" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
-<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
+<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
 </div>
@@ -554,7 +554,7 @@ Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square repr
 </div>
 <p>Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>. This type of chart can be called a <em>dot density plot</em>, which is commonly used for geographic data. </p>
 <p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
-<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
+<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
 </div>
@@ -622,7 +622,7 @@ Tip&nbsp;4.3: Installing R packages from GitHub
 <span><span class="fu">install_github</span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Using <code>pak</code></strong></p>
-<p>An alternative to **<code>remotes``** is the **</code>pak<code>** package [@pak]. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using **</code>pak<code>**, use the</code>pkg_install()<code>function and again pass in the</code>“user/repository”` string: </p>
+<p>An alternative to <strong><code>remotes</code></strong> is the <strong><code>pak</code></strong> package <span class="citation" data-cites="pak">(<a href="references.html#ref-pak" role="doc-biblioref">Csárdi and Hester 2024</a>)</span>. In fact, it is actually an alternative way to install R packages from CRAN, Bioconductor, GitHub, URLs, git repositories, or local directories. To install a package from GitHub using <strong><code>pak</code></strong>, use the <code>pkg_install()</code> function and again pass in the <code>"user/repository"</code> string: </p>
 <div class="cell">
 <div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://pak.r-lib.org/">pak</a></span><span class="op">)</span></span>
 <span><span class="fu">pkg_install</span><span class="op">(</span><span class="st">"coolbutuseless/poissoned"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -927,8 +927,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -984,6 +984,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -998,6 +1001,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
@@ -1650,8 +1656,8 @@ Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, 
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./technology-adoption.html" class="pagination-link" aria-label="Technology adoption: making gauge charts with **`ggforce`**">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./animal-intakes.html" class="pagination-link" aria-label="Animal shelter intakes: making gauge charts with **`ggforce`**">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

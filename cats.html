@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>7&nbsp; Cats: data-driven annotations with ggtext – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -202,8 +202,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -362,7 +362,13 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 
 
 </header><p>In this chapter, we’ll learn how to create custom captions with social media icons, and add data-driven annotations to our plots.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Create a <em>bubble plot</em> using core <strong><code>ggplot2</code></strong> functions;</li>
+<li>Design data-driven but aesthetically pleasing annotations to highlight interesting data points; and</li>
+<li>Add social media icons to captions as a concise way of giving attribution for the graphic.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -374,6 +380,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>All of the packages that we’re using in this chapter are ones that we’ve used previously in other chapters. However, we’ll be going into a bit more depth on some of them and using new functions from some of them!</p>
 <section id="data" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">7.1</span> Data</h2>
 <p>Between 2013 and 2017, <span class="citation" data-cites="kays2020">Kays et al. (<a href="references.html#ref-kays2020" role="doc-biblioref">2020</a>)</span> recruited volunteers in the United States of America, the United Kingdom, Australia, and New Zealand who volunteered to attach GPS sensors to their pet cats. The data <span class="citation" data-cites="cats_data">(<a href="references.html#ref-cats_data" role="doc-biblioref">McDonald and Cole 2020</a>)</span> was collected because pet cats kill native species, such as birds, and this creates conservation issues. Studying how different cats move around when they’re not at home, can help us to understand the impact of pet cats on our environment. In this chapter, we’ll focus on the data from cats (and their owners!) based in the United Kingdom.</p>
@@ -399,9 +406,9 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span>  ylab <span class="op">=</span> <span class="st">"Latitude"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-map" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-map-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-map-1.png" class="img-fluid figure-img" alt="Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.1: Scatter plot showing the geographic coordinates obtained from the GPS data attached to pet cats. The lack of background map makes it hard to interpret without context, but some clusters can be seen.
@@ -435,9 +442,9 @@ Tip&nbsp;7.1: Remembering latitude and longitude
 <span>  main <span class="op">=</span> <span class="st">"Histogram of ground speed"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-speed-hist" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-speed-hist" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds! The x-axis goes up to 250000 metres per second.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-speed-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-speed-hist-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-speed-hist-1.png" class="img-fluid figure-img" alt="Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds! The x-axis goes up to 250000 metres per second.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-speed-hist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.2: Histogram of the ground speeds recorded from GPS sensors, showing a highly skewed distribution with some very high speeds!
@@ -450,9 +457,9 @@ Figure&nbsp;7.2: Histogram of the ground speeds recorded from GPS sensors, showi
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cats_reference</span><span class="op">$</span><span class="va">hrs_indoors</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-bar-hrs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-bar-hrs" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data. The distribution follows a bell curve.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-bar-hrs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-bar-hrs-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-bar-hrs-1.png" class="img-fluid figure-img" alt="Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data. The distribution follows a bell curve.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-bar-hrs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.3: Bar chart showing the number of cats that fall into each of the five categories for the average amount of time they spend indoors. Although the data may at first appear numeric, it is in fact categorical data.
@@ -469,9 +476,9 @@ Figure&nbsp;7.3: Bar chart showing the number of cats that fall into each of the
 <span>  ylab <span class="op">=</span> <span class="st">"Hours indoors"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors. There seems to be fewer data points than cats shown on the plot.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-scatter-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-scatter-1.png" class="img-fluid figure-img" alt="Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors. There seems to be fewer data points than cats shown on the plot.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.4: Scatter plot of the relationship between the age of pet cats and the average amount of time they spend indoors.
@@ -484,9 +491,9 @@ Figure&nbsp;7.4: Scatter plot of the relationship between the age of pet cats an
 </section><section id="exploratory-sketches" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">7.2.2</span> Exploratory sketches</h3>
 <p>Let’s take the idea from <a href="#fig-cats-scatter" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> but develop into a much more effective visualization, making particular use of text and annotations. We’ll update the chart to make a bubble chart. But we’ll also add annotations to highlight interesting aspects of the data e.g.&nbsp;the oldest cat, or the average amount of time spent indoors. <a href="#fig-cats-sketch" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> gives a basic illustration of how we might develop it: </p>
-<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-cats-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors. Boxes and arrows demonstrate captions highlighting specific points." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-cats.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors. Boxes and arrows demonstrate captions highlighting specific points.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the relationship between the age of pet cats and how much time they spend indoors.
@@ -523,9 +530,9 @@ Figure&nbsp;7.5: Initial sketch of a bubble plot with annotations, to show the r
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category. Legend values are 2.5, 5, and 7.5.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-base-plot-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-base-plot-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category. Legend values are 2.5, 5, and 7.5.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.6: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of circles indicating the number of cats in each category.
@@ -559,9 +566,9 @@ Figure&nbsp;7.6: Bubble plot of the relationship between the age of pet cats and
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">9</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers of 3, 6, and 9.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-base-plot-2-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-base-plot-2-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers of 3, 6, and 9.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors, with the size of purple circles indicating the number of cats in each category. The legend for size is now presented using whole numbers.
@@ -571,7 +578,7 @@ Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and
 </div>
 </section><section id="text-and-fonts" class="level3" data-number="7.4.2"><h3 data-number="7.4.2" class="anchored" data-anchor-id="text-and-fonts">
 <span class="header-section-number">7.4.2</span> Text and fonts</h3>
-<p>Here, we’ll use a <em>fun</em> typeface for the title, but keep use a clean and minimal typeface for the rest of the text. For the <code>body_font</code>, we’ll use <em>Ubuntu</em> as we did in <a href="technology-adoption.html" class="quarto-xref"><span>Chapter 5</span></a>. For the <code>title_font</code>, we’ll use <em>Chewy</em>, an almost cartoonish typeface that vaguely resembles handwriting. Both are Google Fonts and so we load them using <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> as we’ve done in previous chapters, and set up the relevant <strong><code>showtext</code></strong> options. </p>
+<p>Here, we’ll use a <em>fun</em> typeface for the title, but keep use a clean and minimal typeface for the rest of the text. For the <code>body_font</code>, we’ll use <em>Ubuntu</em> as we did in <a href="animal-intakes.html" class="quarto-xref"><span>Chapter 5</span></a>. For the <code>title_font</code>, we’ll use <em>Chewy</em>, an almost cartoonish typeface that vaguely resembles handwriting. Both are Google Fonts and so we load them using <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> as we’ve done in previous chapters, and set up the relevant <strong><code>showtext</code></strong> options. </p>
 <div class="cell">
 <div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Chewy"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Ubuntu"</span><span class="op">)</span></span>
@@ -623,9 +630,9 @@ Figure&nbsp;7.7: Bubble plot of the relationship between the age of pet cats and
 <span>  <span class="op">)</span></span>
 <span><span class="va">annotated_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-annot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-annot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots'.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-annot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-annot-1-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-annot-1-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots'.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-annot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.8: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called ‘Boots’.
@@ -649,6 +656,20 @@ Tip&nbsp;7.2: Non-overlapping labels
 </div>
 <p>To add clarity about which aspect of the plot the annotation refers to, we can add an arrow that points from the textbox to the relevant data point. Since we’re only adding one arrow, we’ll use the <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> function. When using <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code>, we need to specify what type of <em>geom</em> we want to use. Though we’re trying to add an arrow, this isn’t actually a geom. We need to add a line, and then decorate the end of the line with an arrow. If you want to add a straight line arrow, you can set <code>geom = "segment"</code>, but curved arrows often look less severe so we use <code>geom = "curve"</code>. </p>
 <p>We use need to tell <code><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate()</a></code> where to put the arrow. Don’t be fooled by thinking that these co-ordinate choices were perfect first time! It takes at least a little bit of trial and error to get the arrow positioned where we want it. We can use the x-axis in <a href="#fig-cats-annot-1" class="quarto-xref">Figure&nbsp;<span>7.8</span></a> as a guide for choosing what the <code>x</code> and <code>xend</code> values should be. The choice of <code>y</code> and <code>yend</code> values might look a little odd - why are we placing an arrow at around 5, when the y-axis suggests we want to place the arrow around 22? Remember that <code>hrs_indoors</code> is actually a factor column, not a numeric column. </p>
+<div id="tip-cats-pos-annot" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;7.3: Positioning annotations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you’re trying to position an annotation <em>just right</em> using <strong><code>ggplot2</code></strong>, it’s very easy to spend a lot of time making it slightly to the left, slightly to the right, up a little, and then a little more to the right, and so on.</p>
+<p>The <strong><code>ggannotate</code></strong> package <span class="citation" data-cites="ggannotate">(<a href="references.html#ref-ggannotate" role="doc-biblioref">Cowgill and Helveston 2021</a>)</span> will make your life a little bit easier. It’s a point-and-click tool which helps you to place your annotations exactly where you want them to go! </p>
+</div>
+</div>
 <p>Though you might expect <strong><code>ggplot2</code></strong> to complain when we try to place in arrow using numeric values on a discrete scale, surprisingly, it doesn’t. Since factors are essentially just ordered categories, R assigns the first level in the factor to <code>1</code>, the second level to <code>2</code>, and so on. This means you <em>can</em> convert factors to numeric variables - though be warned that the results might not always be what you expect! For our chart, we want to position the end of the arrow just below the <code>22.5</code> value which is the fifth category, so the <code>y</code> and <code>yend</code> values are slightly below <code>5</code>.</p>
 <p>We add some further styling to the line by specifying the width, the color, and how curved the line is. To add the arrow on the end of the line, we use the <code><a href="https://rdrr.io/r/grid/arrow.html">arrow()</a></code> function. This function allows us to define the length of the arrow - note this is the length of the arrowhead, rather than the entire arrow. We also specify that the type is <code>"closed"</code>, meaning that the arrowhead is a filled triangle. The default is <code>"open"</code> which, at smaller arrow sizes, sometimes looks less clear. </p>
 <div class="cell">
@@ -668,9 +689,9 @@ Tip&nbsp;7.2: Non-overlapping labels
 <span>  <span class="op">)</span></span>
 <span><span class="va">arrow_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-arrow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-arrow" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots', with an arrow pointing towards the data point for this cat.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-arrow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-arrow-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-arrow-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called 'Boots', with an arrow pointing towards the data point for this cat.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-arrow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.9: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A textbox in the top right indicates the oldest cat called ‘Boots’, with an arrow pointing towards the data point for this cat.
@@ -684,7 +705,7 @@ Figure&nbsp;7.9: Bubble plot of the relationship between the age of pet cats and
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;7.3: Highlighting observations in data
+Tip&nbsp;7.4: Highlighting observations in data
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -719,7 +740,7 @@ Tip&nbsp;7.3: Highlighting observations in data
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip&nbsp;7.4: Font Awesome icons in R
+Tip&nbsp;7.5: Font Awesome icons in R
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -805,9 +826,9 @@ Tip&nbsp;7.4: Font Awesome icons in R
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-text-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-text-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A title, subtitle, and caption has been added, although the caption appears with raw HTML code, rather than correctly formatted.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-text-plot-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-text-plot-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A title, subtitle, and caption has been added, although the caption appears with raw HTML code, rather than correctly formatted.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-text-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.10: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. A title, subtitle, and caption has been added, although the caption appears with raw HTML code, rather than correctly formatted.
@@ -857,9 +878,9 @@ Figure&nbsp;7.10: Bubble plot of the relationship between the age of pet cats an
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-cats-styled-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-cats-styled-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-cats-styled-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="cats_files/figure-html/fig-cats-styled-plot-1.png" class="img-fluid figure-img">
+<img src="cats_files/figure-html/fig-cats-styled-plot-1.png" class="img-fluid figure-img" alt="Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cats-styled-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats and the average amount of time they spend indoors. The text is now all correctly formatted, and the legend appears inset with a clear border between it and the plot.
@@ -883,7 +904,7 @@ Figure&nbsp;7.11: Bubble plot of the relationship between the age of pet cats an
 <p>Each plot created during the process of developing the original version of this visualization was captured using <strong><code>camcorder</code></strong>, and is shown in the gif below. If you’d like to learn more about how <strong><code>camcorder</code></strong> can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <p>The original version look at the relationship between age and ground speed (despite the issues with the reliability of the data).</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
+<figure class="figure"><p><img src="images/cats.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Gif of the process of building the chart"></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="7.6"><h2 data-number="7.6" class="anchored" data-anchor-id="exercises">
@@ -926,8 +947,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -983,6 +1004,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -997,6 +1021,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.

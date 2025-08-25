@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>10&nbsp; R packages: using images for custom facet labels – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -202,8 +202,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -360,7 +360,13 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 
 
 </header><p>In this chapter, we’ll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that’s already been made, and how to use images as category labels.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>analyse the contents of a GitHub repository to see which R functions and packages are used;</li>
+<li>build area plots that accurately portray missing data; and</li>
+<li>use HTML tags to replace the default facet labels with images in a programmatic way using automatic positioning.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/">forcats</a></span><span class="op">)</span></span>
@@ -375,6 +381,14 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>This chapter introduces two new packages:</p>
+<ul>
+<li>
+<strong><code>forcats</code></strong>: a package which makes it much easier to work with factors (categorical variables), which we’ll be using to reorder categories.</li>
+<li>
+<strong><code>funspotr</code></strong>: for analyzing R code, which we’ll be using to gather some data for visualizing.</li>
+</ul>
+<p> </p>
 <section id="data" class="level2" data-number="10.1"><h2 data-number="10.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">10.1</span> Data</h2>
 <p>In July 2024, TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> featured some examples of using the <strong><code>funspotr</code></strong> package <span class="citation" data-cites="funspotr">(<a href="references.html#ref-funspotr" role="doc-biblioref">Shalloway 2023</a>)</span> as datasets, suggested by <a href="https://github.com/brshallo">Bryan Shalloway</a>. The <strong><code>funspotr</code></strong> package was designed to help identify which R functions and packages are used in files and projects. Let’s try to identify which R functions and packages have been used in this GitHub repository of TidyTuesday visualizations: <a href="https://github.com/nrennie/tidytuesday">github.com/nrennie/tidytuesday</a>.</p>
@@ -449,9 +463,9 @@ Tip&nbsp;10.1: Base R or <strong><code>tidyverse</code></strong>?
 <span>  horiz <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-barplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-barplot-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-barplot-1.png" class="img-fluid figure-img" alt="Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.1: Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most.
@@ -474,18 +488,18 @@ Figure&nbsp;10.1: Ordered bar chart showing the number of times each package was
 <span class="header-section-number">10.2.2</span> Exploratory sketches</h3>
 <p>There are currently 38 packages listed in the data, many of them with one or two uses. That’s quite a lot of categories to visualize at once, so let’s narrow it down to only the <a href="https://www.tidyverse.org/packages/#core-tidyverse">core <strong><code>tidyverse</code></strong></a> packages <span class="citation" data-cites="tidyverse">(<a href="references.html#ref-tidyverse" role="doc-biblioref">Wickham et al. 2019</a>)</span>. We could visualise a simple bar chart (or variation of a bar chart) showing how often each core <strong><code>tidyverse</code></strong> package was used. But due to the structure of the file names, we also have information about <em>when</em> each package was used. So we could visualize usage over time, for each package.</p>
 <p>For each package, we could create an area (or line) chart showing usage over time using facets as we did in <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a>. This time, the categories don’t really have a natural order, so instead we’ll order the facets from most to least used. It might look something like <a href="#fig-packages-sketch-1" class="quarto-xref">Figure&nbsp;<span>10.2</span></a>.</p>
-<div id="fig-packages-sketch-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-packages-sketch-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketch of a faceted area charts showing packages use over time.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-packages-sketch-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-packages-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-packages-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a faceted area charts showing packages use over time.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-packages-sketch-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.2: Initial sketch of a faceted area charts showing packages use over time.
 </figcaption></figure>
 </div>
 <p>One of the most incredible things about the R community, is our adoration of hex stickers - package logos in the shape of a hexagon. All of the core <strong><code>tidyverse</code></strong> packages have their own hex sticker. Rather than simply using the package name as the facet label in our plot, we could replace the labels with images of hex stickers, as shown in <a href="#fig-packages-sketch-2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a>.</p>
-<div id="fig-packages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-packages-sketch-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-packages-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-packages-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-packages-2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-packages-sketch-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.3: Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.
@@ -589,9 +603,9 @@ Tip&nbsp;10.2: Alternative approach using <strong><code>stringr</code></strong>
 to min; returning Inf</code></pre>
 </div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-base-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-base-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering doesn't quite look correct.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-base-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-base-plot-1-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-base-plot-1-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering doesn't quite look correct.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-base-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.4: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages, with facets ordered from most to least use. The ordering doesn’t quite look correct.
@@ -605,7 +619,7 @@ Figure&nbsp;10.4: Faceted area charts showing package use over time for each of 
 <li>the ordering of the plot doesn’t look quite right.</li>
 </ul>
 <p>You might also notice the large spike in the <strong><code>ggplot2</code></strong> facet which shows 141 uses of the <strong><code>ggplot2</code></strong> package in a single script and wonder if this is an error. It’s not an error - it was actually used that many times!</p>
-<p>Let’s start by thinking about the second one of these issues and see if we can figure out what’s happening. We’ve specified that the facets should be ordered from most to least used in total. But the area for the <strong><code>stringr</code></strong> package looks much larger than the area for the <strong><code>readr``** package - even though it should be smaller. It also looks as though there are no values in the **</code>forcats<code>** facet - but we know this isn't true for **</code>forcats<code>**, only for **</code>tibble`</strong>. Why is this happening?</p>
+<p>Let’s start by thinking about the second one of these issues and see if we can figure out what’s happening. We’ve specified that the facets should be ordered from most to least used in total. But the area for the <strong><code>stringr</code></strong> package looks much larger than the area for the <strong><code>readr</code></strong> package - even though it should be smaller. It also looks as though there are no values in the <strong><code>forcats</code></strong> facet - but we know this isn’t true for <strong><code>forcats</code></strong>, only for <strong><code>tibble</code></strong>. Why is this happening?</p>
 <p>The problem is that 0 is not included in the data. The areas are being drawn between only the strictly positive values, never going back down to 0. For packages that are used a lot but only in a few scripts, this makes their area larger than packages that are used once or twice in many scripts.</p>
 <p>In our data set, if a package isn’t used in a script, there is no entry in the data. This makes sense since there are tens of thousands of packages and it would be much more difficult and time consuming to list every package that isn’t used, rather than just those that are. But in our case, these missing, unobserved values aren’t really missing values - they are 0 values.</p>
 <p>The warning message returned from the plot is also trying to tell us about this problem (the warning just isn’t very clear!)</p>
@@ -661,9 +675,9 @@ Tip&nbsp;10.3: Don’t ignore the warning signs!
 <div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op"><a href="https://ggplot2.tidyverse.org/reference/gg-add.html">%+%</a></span> <span class="va">new_plot_data</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering now looks correct.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-base-plot-2-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-base-plot-2-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering now looks correct.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.5: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages, with facets ordered from most to least use. The ordering now looks correct.
@@ -698,9 +712,9 @@ Figure&nbsp;10.5: Faceted area charts showing package use over time for each of 
 <span>  <span class="op">)</span></span>
 <span><span class="va">col_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-col-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-col-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Each area chart is colored using a different color from the `rcartocolor` package.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-col-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-col-plot-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-col-plot-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Each area chart is colored using a different color from the `rcartocolor` package.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-col-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.6: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages. Each area chart is colored using a different color from the <code>rcartocolor</code> package.
@@ -784,9 +798,9 @@ Tip&nbsp;10.4: Removing axis titles
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">limits_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-limits-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-limits-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-limits-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-limits-plot-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-limits-plot-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-limits-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.7: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap.
@@ -861,9 +875,9 @@ Figure&nbsp;10.7: Faceted area charts showing package use over time for each of 
 <span>  <span class="op">)</span></span>
 <span><span class="va">theme_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-theme-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-theme-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. The plot has a dark background, and white text (which no longer exceeds the plot area).">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-theme-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-theme-plot-2-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-theme-plot-2-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. The plot has a dark background, and white text (which no longer exceeds the plot area).">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-theme-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.8: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages. The plot has a dark background, and white text (which no longer exceeds the plot area).
@@ -920,9 +934,9 @@ Figure&nbsp;10.8: Faceted area charts showing package use over time for each of 
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-r-pkgs-final-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-r-pkgs-final-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Hex stickers have replaced the text labels on the facets.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-r-pkgs-final-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="r-packages_files/figure-html/fig-r-pkgs-final-plot-1.png" class="img-fluid figure-img">
+<img src="r-packages_files/figure-html/fig-r-pkgs-final-plot-1.png" class="img-fluid figure-img" alt="Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Hex stickers have replaced the text labels on the facets.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-r-pkgs-final-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10.9: Faceted area charts showing package use over time for each of the 8 core <code>tidyverse</code> packages. Hex stickers have replaced the text labels on the facets.
@@ -975,7 +989,7 @@ Tip&nbsp;10.5: Facet label images using <strong><code>marquee</code></strong>
 <p>The use of color could also be improved here. The colors are used to differentiate the different packages, and so don’t provide any further information not already given by the facet labels - similar to <a href="museums.html" class="quarto-xref"><span>Chapter 3</span></a>. A single color for all area plots would provide the same amount of information, but look a little bit less distracting. If we did still want to use different colors, we may consider matching them more closely to the colors in the hex sticker images. For example, the green in the <strong><code>stringr</code></strong> hex sticker image is quite similar to the green used in the <strong><code>dplyr</code></strong> area chart - this is currently a little bit distracting. </p>
 <p>Each plot created during the process of developing the original version of this visualization was captured using <strong><code>camcorder</code></strong>, and is shown in the gif below. If you’d like to learn more about how <strong><code>camcorder</code></strong> can be used in the data visualization process, see <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a>.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="images/r-pkgs.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt=""></p>
+<figure class="figure"><p><img src="images/r-pkgs.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Gif of the process of building the chart"></p>
 </figure>
 </div>
 </section><section id="exercises" class="level2" data-number="10.6"><h2 data-number="10.6" class="anchored" data-anchor-id="exercises">
@@ -1023,8 +1037,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -1080,6 +1094,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -1094,6 +1111,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.

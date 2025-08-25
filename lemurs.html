@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>9&nbsp; Lemurs: manipulating images in R – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1b3e43c72e8be34557c75123b0b69e0d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f5b2acc88b6bc6d153829f662ef47a57.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -204,8 +204,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./technology-adoption.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Technology adoption: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
+  <a href="./animal-intakes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Animal shelter intakes: making gauge charts with <strong><code>ggforce</code></strong></span></span></a>
   </div>
 </li>
       </ul>
@@ -369,7 +369,13 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 
 
 </header><p>In this chapter, we’ll cover how to load and manipulate images in R using the <strong><code>magick</code></strong> and <strong><code>imager</code></strong> packages. We’ll also look at how to combine images with plots using the <strong><code>cowplot</code></strong> package.</p>
-<p><strong>Packages required in this chapter</strong>:</p>
+<p>By the end of this chapter, you’ll be able to:</p>
+<ul>
+<li>Read images into R, convert between different formats, and perform simple operations like flipping and resizing;</li>
+<li>Remove the background from a photograph using algorithms in image processing packages; and</li>
+<li>Customize a plot to create space for an image overlay, and position the image programmatically.</li>
+</ul>
+<p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
@@ -381,6 +387,18 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/systemfonts">systemfonts</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>This chapter introduces four new packages:</p>
+<ul>
+<li>
+<strong><code>cowplot</code></strong>: a package for arranging multiple plots and adding annotations that allows you to have precise control over positioning of different elements. We’ll be using <strong><code>cowplot</code></strong> to add an image as an annotation.</li>
+<li>
+<strong><code>imager</code></strong>: provides an interface to the C++ library CImg which allows you to perform image manipulation in R, particularly pixel-level operations and analysis.</li>
+<li>
+<strong><code>magick</code></strong>: another different image processing package, based on the ImageMagick library, which is good for image editing tasks such as resizing and cropping.</li>
+<li>
+<strong><code>systemfonts</code></strong>: an alternative way of loading fonts into R that allows you to access and use the fonts installed on your operating system.</li>
+</ul>
+<p> </p>
 <section id="data" class="level2" data-number="9.1"><h2 data-number="9.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">9.1</span> Data</h2>
 <p>We’re going to be exploring data about lemurs from <a href="https://lemur.duke.edu/">Duke Lemur Center</a> in this chapter <span class="citation" data-cites="lemurs_data">(<a href="references.html#ref-lemurs_data" role="doc-biblioref">Zehr et al. 2014</a>)</span>. Duke Lemur Center houses hundreds of lemurs across many different species, and collect data on their lemur residents to better understand the factors that effect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by <a href="https://github.com/kierisi">Jesse Mostipak</a>), and so can be loaded into R using the <code><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load()</a></code> function from <strong><code>tidytuesdayR</code></strong> as we’ve done in previous chapters: </p>
@@ -428,9 +446,9 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span>  ylab <span class="op">=</span> <span class="st">"Age (months)"</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-scatter-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-scatter-1.png" class="img-fluid figure-img" alt="Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.1: Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.
@@ -449,9 +467,9 @@ Figure&nbsp;9.1: Scatter plot showing the relationship between weight and age pf
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-boxplot-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-boxplot-1.png" class="img-fluid figure-img" alt="Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.2: Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.
@@ -462,9 +480,9 @@ Figure&nbsp;9.2: Horizontal boxplots showing the range of weights observed for e
 </section><section id="exploratory-sketches" class="level3" data-number="9.2.2"><h3 data-number="9.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">9.2.2</span> Exploratory sketches</h3>
 <p>Given the variability in weights between species, we may wish to focus in on a single species. Let’s keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating <a href="#fig-lemurs-scatter" class="quarto-xref">Figure&nbsp;<span>9.1</span></a> for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognizable just by their common name, we’ll add an image of the lemur species in the bottom right corner to add more context to the chart.</p>
-<div id="fig-lemurs-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-lemurs-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-lemurs.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-lemurs.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.
@@ -478,8 +496,8 @@ Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship betwe
 <p>We want to subset the data to consider only one species of lemur. Unless you’re an expert in lemurs, you probably don’t know which taxonomy codes in the <code>lemurs</code> data relate to which species of lemur. We could join the <code>taxonomy</code> data to the <code>lemurs</code> data and then filter the data based on the joined <code>common_name</code> column. However, since the future data processing is so minimal, we could just browse through the <code>taxonomy</code> data, choose a species of lemur from the <code>common_name</code> column, and look up the relevant taxonomy code.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div class="reactable html-widget html-fill-item" id="htmlwidget-e63644b974d74b3772eb" style="width:auto;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e63644b974d74b3772eb">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"taxon":["CMED","DMAD","EALB","ECOL","ECOR","EFLA","EFUL","EMAC","EMON","ERUB","ERUF","ESAN","EUL","GMOH","HGG","LCAT","LTAR","MMUR","MZAZ","NCOU","NPYG","OGG","PCOQ","PPOT","VAR","VRUB","VVV"],"latin_name":["Cheirogaleus medius","Daubentonia madagascariensis","Eulemur albifrons","Eulemur collaris","Eulemur coronatus","Eulemur flavifrons","Eulemur fulvus","Eulemur macaco","Eulemur mongoz","Eulemur rubriventer","Eulemur rufus","Eulemur sanfordi","Eulemur Eulemur","Galago moholi","Hapalemur griseus griseus","Lemur catta","Loris tardigradus","Mircocebus murinus","Mirza coquereli","Nycticebus coucang","Nycticebus pygmaeus","Otolemur garnettii garnettii","Propithecus coquereli","Perodicticus potto","Varecia Varecia","Varecia rubra","Varecia variegata variegata"],"common_name":["Fat-tailed dwarf lemur","Aye-aye","White-fronted brown lemur","Collared brown lemur","Crowned lemur","Blue-eyed black lemur","Common brown lemur","Black lemur","Mongoose lemur","Red-bellied lemur","Red-fronted brown lemur","Sanford's brown lemur","hybrid","Mohol bushbaby","Eastern lesser bamboo lemur","Ring-tailed lemur","Slender loris","Gray mouse lemur","Northern giant mouse lemur","Slow loris","Pygmy slow loris","Northern greater galago","Coquerel's sifaka","Potto","hybrid","Red ruffed lemur","Black-and-white ruffed lemur"]},"columns":[{"id":"taxon","name":"taxon","type":"character"},{"id":"latin_name","name":"latin_name","type":"character"},{"id":"common_name","name":"common_name","type":"character"}],"dataKey":"dcf4058b01293d87a255ff375e14f98b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-e20550945ca324ad036f" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e20550945ca324ad036f">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"taxon":["CMED","DMAD","EALB","ECOL","ECOR","EFLA","EFUL","EMAC","EMON","ERUB","ERUF","ESAN","EUL","GMOH","HGG","LCAT","LTAR","MMUR","MZAZ","NCOU","NPYG","OGG","PCOQ","PPOT","VAR","VRUB","VVV"],"latin_name":["Cheirogaleus medius","Daubentonia madagascariensis","Eulemur albifrons","Eulemur collaris","Eulemur coronatus","Eulemur flavifrons","Eulemur fulvus","Eulemur macaco","Eulemur mongoz","Eulemur rubriventer","Eulemur rufus","Eulemur sanfordi","Eulemur Eulemur","Galago moholi","Hapalemur griseus griseus","Lemur catta","Loris tardigradus","Mircocebus murinus","Mirza coquereli","Nycticebus coucang","Nycticebus pygmaeus","Otolemur garnettii garnettii","Propithecus coquereli","Perodicticus potto","Varecia Varecia","Varecia rubra","Varecia variegata variegata"],"common_name":["Fat-tailed dwarf lemur","Aye-aye","White-fronted brown lemur","Collared brown lemur","Crowned lemur","Blue-eyed black lemur","Common brown lemur","Black lemur","Mongoose lemur","Red-bellied lemur","Red-fronted brown lemur","Sanford's brown lemur","hybrid","Mohol bushbaby","Eastern lesser bamboo lemur","Ring-tailed lemur","Slender loris","Gray mouse lemur","Northern giant mouse lemur","Slow loris","Pygmy slow loris","Northern greater galago","Coquerel's sifaka","Potto","hybrid","Red ruffed lemur","Black-and-white ruffed lemur"]},"columns":[{"id":"taxon","name":"taxon","type":"character"},{"id":"latin_name","name":"latin_name","type":"character"},{"id":"common_name","name":"common_name","type":"character"}],"dataKey":"dcf4058b01293d87a255ff375e14f98b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>There are 27 species of lemurs included in the data, and for the rest of the chapter we’ll focus in on <em>red ruffed lemurs</em>. Red ruffed lemurs have the taxonomy code <code>VRUB</code>. We use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> to retain only the rows of data with <code>"VRUB"</code> in the <code>taxon</code> column: </p>
@@ -503,9 +521,9 @@ Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship betwe
 <span>  <span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-base-plot-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-base-plot-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.4: Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.
@@ -529,9 +547,9 @@ Figure&nbsp;9.4: Scatter plot of how the weights of red ruffed lemurs change wit
 <span>  <span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-base-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-base-plot-2-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-base-plot-2-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-base-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.5: Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent.
@@ -643,9 +661,9 @@ Tip&nbsp;9.1: Setting a graphics device
 <span>  <span class="op">)</span></span>
 <span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-labels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-labels" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-labels-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-labels-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.6: Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text.
@@ -688,9 +706,9 @@ Figure&nbsp;9.6: Scatter plot of how the weights of red ruffed lemurs change wit
 <span>  <span class="op">)</span></span>
 <span><span class="va">theme_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-style-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-style-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-style-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-style-1-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-style-1-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-style-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.7: Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption.
@@ -705,9 +723,9 @@ Figure&nbsp;9.7: Scatter plot of how the weights of red ruffed lemurs change wit
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">90</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-margin-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-margin-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-margin-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-margin-1-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-margin-1-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-margin-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.8: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.
@@ -735,9 +753,9 @@ Figure&nbsp;9.8: Scatter plot of how the weights of red ruffed lemurs change wit
 <span>  <span class="op">)</span></span>
 <span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-margin-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-margin-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-margin-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-margin-2-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-margin-2-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-margin-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.9: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.
@@ -774,9 +792,9 @@ Tip&nbsp;9.2: Finding images for reuse
 <div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lemur_img</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/imager/man/load.image.html">load.image</a></span><span class="op">(</span><span class="st">"images/lemur.jpg"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">lemur_img</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-imager-read" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-imager-read" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-imager-read-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-imager-read-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-imager-read-1.png" class="img-fluid figure-img" alt="Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-imager-read-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.10: Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels.
@@ -807,9 +825,9 @@ Figure&nbsp;9.10: Image of a red ruffed lemur shown with plot axes which indicat
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">lemur_img</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/imager/man/highlight.html">highlight</a></span><span class="op">(</span><span class="va">detect_outline</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-img-outline" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-img-outline" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-img-outline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-img-outline-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-img-outline-1.png" class="img-fluid figure-img" alt="Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-img-outline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.11: Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background.
@@ -838,9 +856,9 @@ Figure&nbsp;9.11: Image of a red ruffed lemur with a red line indicating the bou
 <span>  <span class="fu"><a href="https://docs.ropensci.org/magick/reference/color.html">image_transparent</a></span><span class="op">(</span><span class="st">"black"</span><span class="op">)</span></span>
 <span><span class="va">lemur_nobg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-img-rmbg" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-img-rmbg" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-img-rmbg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-img-rmbg-1.png" class="img-fluid figure-img" width="205">
+<img src="lemurs_files/figure-html/fig-lemurs-img-rmbg-1.png" class="img-fluid figure-img" alt="Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar." width="205">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-img-rmbg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.12: Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur’s collar.
@@ -891,9 +909,9 @@ Tip&nbsp;9.3: R packages for combining plots and images
 <span>  <span class="op">)</span></span>
 <span><span class="va">final_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-img-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-lemurs-img-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-img-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-img-plot-1.png" class="img-fluid figure-img">
+<img src="lemurs_files/figure-html/fig-lemurs-img-plot-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-img-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9.13: Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner.
@@ -955,8 +973,8 @@ Chang, Winston. 2023. <em><span class="nocase">extrafont</span>: Tools for Using
 <div id="ref-dumbbell" class="csl-entry" role="listitem">
 Cheung, Foo. 2021. <em><span class="nocase">dumbbell</span>: Displaying Changes Between Two Points Using Dumbbell Plots</em>. <a href="https://CRAN.R-project.org/package=dumbbell">https://CRAN.R-project.org/package=dumbbell</a>.
 </div>
-<div id="ref-technology_data" class="csl-entry" role="listitem">
-Comin, D. A., and B. Hobijn. 2009. <span>“The <span>CHAT</span> Dataset.”</span> Working Paper 15319. Working Paper Series. National Bureau of Economic Research. <a href="https://doi.org/10.3386/w15319">https://doi.org/10.3386/w15319</a>.
+<div id="ref-ggannotate" class="csl-entry" role="listitem">
+Cowgill, Matt, and John Helveston. 2021. <em><span class="nocase">ggannotate: Interactively Annotate ggplot2 Plots</span></em>. <a href="https://github.com/MattCowgill/ggannotate">https://github.com/MattCowgill/ggannotate</a>.
 </div>
 <div id="ref-pak" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Jim Hester. 2024. <em><span class="nocase">pak: Another Approach to Package Installation</span></em>. <a href="https://CRAN.R-project.org/package=pak">https://CRAN.R-project.org/package=pak</a>.
@@ -1012,6 +1030,9 @@ Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plo
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
+<div id="ref-animalshelter" class="csl-entry" role="listitem">
+———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+</div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
@@ -1026,6 +1047,9 @@ Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. S
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
+</div>
+<div id="ref-longbeach_data" class="csl-entry" role="listitem">
+Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</span> City of Long Beach Animal Care Services. <a href="https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/">https://data.longbeach.gov/explore/dataset/animal-shelter-intakes-and-outcomes/information/</a>.
 </div>
 <div id="ref-Vizumap" class="csl-entry" role="listitem">
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
