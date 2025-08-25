@@ -37,7 +37,13 @@ library(sysfonts)
 
 In this chapter, we'll learn how to arrange faceted plots in a grid that resembles a geographic area with **`geofacet`**, and look at another approach for creating customized legends. \index{geofacet} \index{patchwork}
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Arrange small multiple plots of US state-level data into a grid reflecting the underlying geography of the states;
+* Replace facet labels with larger, semi-transparent custom annotations; and
+* Create a zoomed-in *how to read this plot* legend to allow for more minimalist small multiples.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: elections-pkgs-req
@@ -54,6 +60,8 @@ library(sysfonts)
 library(tidyr)
 library(tidytuesdayR)
 ```
+
+This package introduces only one new package, **`geofacet`**, which is used for arranging a grid of plots in the shape of a geographic area. The package comes with many predefined grids for different countries and regions, but you can also create your own custom grids. \index{geofacet}
 
 ## Data
 
@@ -101,7 +109,7 @@ Let's start by having a quick look at whether or not the number of votes has cha
 ```{r, echo=-1}
 #| label: fig-elections-scatterplot
 #| fig-cap: "Scatter plot showing the number of candidate votes over time, where it's clear that elections take place every two years and there has been little change over time."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot showing the number of candidate votes over time, where it's clear that elections take place every two years and there has been little change over time."
 #| fig-asp: 0.8
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.6, cex.names = 0.6)
 plot(
@@ -119,7 +127,7 @@ We might also be interested in how the number of candidate votes varies by party
 ```{r, echo=-1}
 #| label: fig-elections-boxplot
 #| fig-cap: "Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes)."
-#| fig-alt: ""
+#| fig-alt: "Box plot showing the number of candidate votes for each party, with many party labels being hidden due to the large number of unique parties (with small numbers of votes)."
 #| fig-asp: 1.2
 par(mar = c(4.1, 7.1, 1.1, 1.1), cex.axis = 0.4, cex.names = 0.4)
 boxplot(
@@ -140,11 +148,11 @@ The Democratic and Republican parties have dominated elections during this time 
 
 We might consider creating an area chart faceted by state showing the percentage of votes for the Democratic party, the Republican party, and other parties. States that are geographically close together may be more likely to exhibit similar patterns. Rather than arranging the faceted area charts in a rectangular grid, it would make more sense to arrange them based on their geographic location. This would enable easier comparison of patterns across states. @fig-elections-sketch shows an example of what this might look like:
 
-![Initial sketch of a faceted area chart arranged in a grid shaped like the United States.](images/sketch-elections.png){#fig-elections-sketch fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area chart arranged in a grid shaped like the United States.](images/sketch-elections.png){#fig-elections-sketch fig-align="center" fig-alt="Initial sketch of a faceted area chart arranged in a grid shaped like the United States."}
 
 Often in facet charts, the x- and y- axes are shown multiple times. This can often make a chart, especially when using a geographic layout like this, look overly *busy*. We might choose to create a very minimalist set of facet charts, and use colored text as a legend, as we did in @sec-turbines and @sec-lemurs. Though the minimalist approach may look cleaner, it can also mean that it's not as clear what's being shown on a chart. Let's add a *how to read this chart* explainer as a legend, created from a zoomed in version of one of the facet plots: \index{area chart}
 
-![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections-2.png){#fig-elections-sketch-2 fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side.](images/sketch-elections-2.png){#fig-elections-sketch-2 fig-align="center" fig-alt="Initial sketch of a faceted area chart arranged in a grid shaped like the United States. An enlarged version of one area chart is used as a legend on the left hand side."}
 
 ## Preparing a plot
 
@@ -162,7 +170,7 @@ house_data <- house |>
   mutate(party = case_when(
     party == "REPUBLICAN" ~ "Republican Party",
     party == "DEMOCRAT" ~ "Democratic Party",
-    TRUE ~ "Other"
+    TRUE ~ "other"
   )) |>
   filter(stage == "GEN") |>
   group_by(year, state_po, party) |>
@@ -170,7 +178,7 @@ house_data <- house |>
   ungroup()
 ```
 
-There are some years for which there were no `"Other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from **`ggplot2`**. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from **`tidyr`**, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
+There are some years for which there were no `"other"` candidates in some states, and so there are no rows for these values i.e. they are implicitly missing. As we saw in @sec-r-pkgs, this can cause misleading area charts and results in a warning from **`ggplot2`**. As in @sec-r-pkgs, these *missing* values are not actually missing, they are simply 0. We'll do as we did before and make sure that every combination of `year`, `state_po`, and `party` exists in the data by using `complete()` from **`tidyr`**, and setting any *missing* combinations explicitly to 0. \index{tidyr!complete}
 
 ```{r}
 #| label: elections-wrangling2
@@ -197,7 +205,7 @@ We've already seen examples of making area charts in @sec-museums and @sec-r-pkg
 ```{r}
 #| label: fig-elections-single-plot
 #| fig-cap: "Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied."
-#| fig-alt: ""
+#| fig-alt: "Area chart showing the percentage of votes for different political party categories for California. The default colors, styling, and legend have been applied."
 #| warning: false
 basic_plot <- ggplot(
   data = filter(plot_data, state_po == "CA")
@@ -246,7 +254,7 @@ We can now pass the full data into `ggplot()` (rather than just the California s
 ```{r}
 #| label: fig-elections-basic-plot
 #| fig-cap: "Faceted area chart arranged in a rectangular grid shaped, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
-#| fig-alt: ""
+#| fig-alt: "Faceted area chart arranged in a rectangular grid shaped, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
 #| warning: false
 #| source-line-numbers: "2,11"
 basic_plot <- ggplot(
@@ -279,7 +287,7 @@ If you have additional *states* (e.g. Puerto Rico can sometimes be listed in a U
 ```{r}
 #| label: fig-elections-geofacet-plot
 #| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
-#| fig-alt: ""
+#| fig-alt: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. The area charts cannot be seen due to the size of the facet labels."
 #| warning: false
 map_plot <- basic_plot +
   facet_geo(
@@ -320,7 +328,7 @@ col_plot <- map_plot +
     values = c(
       "Democratic Party" = blue_col,
       "Republican Party" = red_col,
-      "Other" = other_col
+      "other" = other_col
     ),
     guide = "none"
   )
@@ -342,11 +350,11 @@ body_font <- "Roboto"
 title_font <- "Carter"
 ```
 
-We write text for the subtitle, using `glue()` to add HTML styling for colored text as we did in @sec-cats and @sec-lemurs. The colored text serves as a legend (though we'll later also add our own custom legend in addition), and the subtitle text provides information about what the chart shows. As in @sec-time-zones, we'll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. We also add the title text directly in the subtitle variable to enable easier placement of the text, again as we did in @sec-time-zones. \index{glue!glue}
+We write text for the subtitle, using `glue()` to add HTML styling for colored text as we did in @sec-cats and @sec-lemurs. The colored text serves as a legend (though we'll later also add our own custom legend in addition), and the subtitle text provides information about what the chart shows. The colored text is formatted as bold text to make it a little bit easier to read. As in @sec-time-zones, we'll add the information about the source of the data on a new line at the end of subtitle, rather than in the caption. We also add the title text directly in the subtitle variable to enable easier placement of the text, again as we did in @sec-time-zones. \index{glue!glue}
 
 ```{r}
 #| label: elections-text
-st <- glue("<span style='font-size:10pt; font-family:{title_font}; color:{text_col};'>Votes in US House Elections</span><br>Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>Democratic Party</span>, the <span style='color:{red_col};'>Republican Party</span>, and <span style='color:#aaaaaa;'>Other</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
+st <- glue("<span style='font-size:10pt; font-family:{title_font}; color:{text_col};'>Votes in US House Elections</span><br>Area charts indicate the percentage of votes for the <span style='color:{blue_col};'>**Democratic Party**</span>, the <span style='color:{red_col};'>**Republican Party**</span>, and <span style='color:#aaaaaa;'>**other**</span> parties in general elections between 1976 and 2022.<br><br>**Data**: U.S. House 1976–2022. MIT Election Data and Science Lab.")
 ```
 
 We also use our `social_caption()` function defined in @sec-cats, which we'll later add as a plot caption: \index{social\_caption}
@@ -414,7 +422,7 @@ We set both the `strip.background` and `strip.text` arguments to `element_blank(
 ```{r}
 #| label: fig-elections-plot-style-2
 #| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. A large blank space appears on the left hand side, where a legend will later be placed."
-#| fig-alt: ""
+#| fig-alt: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. A large blank space appears on the left hand side, where a legend will later be placed."
 #| warning: false
 styled_plot_2 <- styled_plot_1 +
   coord_cartesian(expand = FALSE) +
@@ -492,7 +500,7 @@ ca_plot <- ggplot(data = ca_data) +
     values = c(
       "Democratic Party" = blue_col,
       "Republican Party" = red_col,
-      "Other" = other_col
+      "other" = other_col
     ),
     guide = "none"
   )
@@ -509,7 +517,7 @@ As in the main plot, we also set `expand = FALSE` inside `coord_cartesian()` to 
 ```{r}
 #| label: fig-elections-inset-plot
 #| fig-cap: "A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors."
-#| fig-alt: ""
+#| fig-alt: "A custom legend plot consisting of a zoomed in version of the California facet with additional annotations indicating the time period and categories represented by different colors."
 #| fig-asp: 1
 #| fig-width: 3
 #| fig-align: center
@@ -568,7 +576,7 @@ Now, the last step is to join together our custom legend with the main plot. We'
 ```{r}
 #| label: fig-combine-plots
 #| fig-cap: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side."
-#| fig-alt: ""
+#| fig-alt: "Faceted area chart arranged in a grid shaped like the United States, showing percentage of votes per party over time. An enlarged version of the area chart for California is used as a legend on the left hand side."
 #| warning: false
 final_plot <- styled_plot_2 + inset_element(
   p = p_inset,
@@ -621,7 +629,7 @@ The use of area charts to show percentages is intuitive and sensible for this, s
 
 Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
-![](images/elections.gif){fig-align="center" fig-alt=""}
+![](images/elections.gif){fig-align="center" fig-alt="Gif of the process of building the chart"}
 
 :::
 
