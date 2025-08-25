@@ -40,7 +40,13 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 In this chapter, we'll cover how to load and manipulate images in R using the **`magick`** and **`imager`** packages. We'll also look at how to combine images with plots using the **`cowplot`** package.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Read images into R, convert between different formats, and perform simple operations like flipping and resizing; 
+* Remove the background from a photograph using algorithms in image processing packages; and 
+* Customize a plot to create space for an image overlay, and position the image programmatically.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: lemurs-pkgs-req
@@ -56,6 +62,13 @@ library(magick)
 library(systemfonts)
 library(tidytuesdayR)
 ```
+
+This chapter introduces four new packages:
+
+* **`cowplot`**: a package for arranging multiple plots and adding annotations that allows you to have precise control over positioning of different elements. We'll be using **`cowplot`** to add an image as an annotation.
+* **`imager`**: provides an interface to the C++ library CImg which allows you to perform image manipulation in R, particularly pixel-level operations and analysis.
+* **`magick`**: another different image processing package, based on the ImageMagick library, which is good for image editing tasks such as resizing and cropping. 
+* **`systemfonts`**: an alternative way of loading fonts into R that allows you to access and use the fonts installed on your operating system.
 
 ## Data
 
@@ -103,7 +116,7 @@ Let's focus in on the growth curve idea, and look at the relationship between le
 ```{r, echo=-1}
 #| label: fig-lemurs-scatter
 #| fig-cap: "Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern."
 par(mar = c(4.1, 4.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 plot(
   x = lemurs$age_at_wt_mo,
@@ -118,7 +131,7 @@ We know that there are `r nrow(taxonomy)` species of lemur in the data, and, eve
 ```{r, echo=-1}
 #| label: fig-lemurs-boxplot
 #| fig-cap: "Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species."
-#| fig-alt: ""
+#| fig-alt: "Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species."
 #| fig-asp: 1.2
 par(mar = c(3.1, 3.1, 2.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 boxplot(
@@ -135,7 +148,7 @@ boxplot(
 
 Given the variability in weights between species, we may wish to focus in on a single species. Let's keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating @fig-lemurs-scatter for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognizable just by their common name, we'll add an image of the lemur species in the bottom right corner to add more context to the chart.
 
-![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center" fig-alt=""}
+![Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.](images/sketch-lemurs.png){#fig-lemurs-sketch fig-align="center" fig-alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go."}
 
 ## Preparing a plot
 
@@ -174,7 +187,7 @@ Starting with the `ggplot()` function, we pass in the subset of our data on red 
 ```{r}
 #| label: fig-lemurs-base-plot
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping."
 #| message: false
 basic_plot <- ggplot() +
   geom_point(
@@ -193,7 +206,7 @@ Even though the data shown in @fig-lemurs-base-plot is a subset of the full data
 ```{r}
 #| label: fig-lemurs-base-plot-2
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by orange circles. Both shapes are slightly transparent."
 #| source-line-numbers: "8,10,11"
 basic_plot <- ggplot() +
   geom_point(
@@ -333,7 +346,7 @@ The title, subtitle, and caption text can then be added to the plot using the `l
 ```{r}
 #| label: fig-lemurs-labels
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise triangles and females by purple circles. The subtitle text runs off the page, and the caption is incorrectly formatted as raw HTML text."
 text_plot <- col_plot +
   labs(
     title = title,
@@ -355,7 +368,7 @@ Setting `plot.title.position` and `plot.caption.position` to `"plot"` aligns the
 ```{r}
 #| label: fig-lemurs-style-1
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with the plot now having a beige background, subtitle text correctly wrapped, and attribution of data and graphic in the caption."
 theme_plot <- text_plot +
   theme_minimal(base_size = 6, base_family = body_font) +
   theme(
@@ -391,7 +404,7 @@ We're going to add the image to the right hand side of the plot. The approach we
 ```{r}
 #| label: fig-lemurs-margin-1
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text."
 theme_plot +
   theme(
     plot.margin = margin(5, 90, 5, 5)
@@ -411,7 +424,7 @@ We also remove the title by setting `axis.title.y.right` to `element_blank()`. \
 ```{r}
 #| label: fig-lemurs-margin-2
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width."
 styled_plot <- theme_plot +
   scale_y_continuous(sec.axis = dup_axis()) +
   theme(
@@ -453,7 +466,7 @@ We're going to start with the **`imager`** package and use it to read the image 
 ```{r, echo=-1}
 #| label: fig-lemurs-imager-read
 #| fig-cap: "Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels."
-#| fig-alt: ""
+#| fig-alt: "Image of a red ruffed lemur shown with plot axes which indicate the size of the image in pixels."
 par(mar = c(3.1, 4.1, 2.1, 2.1))
 lemur_img <- load.image("images/lemur.jpg")
 plot(lemur_img)
@@ -483,7 +496,7 @@ It takes a little bit of trial and error to choose the best values for these arg
 ```{r, echo=-1}
 #| label: fig-lemurs-img-outline
 #| fig-cap: "Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background."
-#| fig-alt: ""
+#| fig-alt: "Image of a red ruffed lemur with a red line indicating the boundary between the main part of the image and the background."
 #| fig-show: hold
 par(mar = c(3.1, 4.1, 2.1, 2.1))
 detect_outline <- px.flood(
@@ -522,7 +535,7 @@ Note that since the image is always the first argument of the `image_*()` functi
 ```{r}
 #| label: fig-lemurs-img-rmbg
 #| fig-cap: "Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar."
-#| fig-alt: ""
+#| fig-alt: "Image of a red ruffed lemur with the background removed, as well as a small portion of the lemur's collar."
 lemur_nobg <- cimg2magick(lemur_img) |>
   image_flop() |>
   image_transparent("black")
@@ -564,7 +577,7 @@ With **`cowplot`**, we start by using the `ggdraw()` function which sets up a la
 ```{r}
 #| label: fig-lemurs-img-plot
 #| fig-cap: "Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner."
-#| fig-alt: ""
+#| fig-alt: "Scatter plot of how the weights of red ruffed lemurs change with age, with an image of a red ruffed lemur overlaid in the bottom right corner."
 #| warning: false
 final_plot <- ggdraw(styled_plot) +
   draw_image(
