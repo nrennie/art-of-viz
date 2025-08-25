@@ -43,7 +43,13 @@ library(sysfonts)
 
 In this chapter, we'll learn about how to collect data on which packages and functions are used in R code, replacing the underlying data in a plot that's already been made, and how to use images as category labels.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* analyse the contents of a GitHub repository to see which R functions and packages are used;
+* build area plots that accurately portray missing data; and
+* use HTML tags to replace the default facet labels with images in a programmatic way using automatic positioning.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: r-pkgs-pkgs-req
@@ -62,6 +68,11 @@ library(showtext)
 library(sysfonts)
 library(tidyr)
 ```
+
+This chapter introduces two new packages:
+
+* **`forcats`**: a package which makes it much easier to work with factors (categorical variables), which we'll be using to reorder categories.
+* **`funspotr`**: for analyzing R code, which we'll be using to gather some data for visualizing.
 
 ## Data
 
@@ -155,7 +166,7 @@ As an aside, this highlights that combining base R and **`tidyverse`** packages 
 ```{r, echo=-1}
 #| label: fig-r-pkgs-barplot
 #| fig-cap: "Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most."
-#| fig-alt: ""
+#| fig-alt: "Ordered bar chart showing the number of times each package was used in 2023. The ggplot2 package is used most."
 #| fig-asp: 1
 par(mar = c(3.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
@@ -185,11 +196,11 @@ There are currently `r length(unique(r_pkgs$pkgs))` packages listed in the data,
 
 For each package, we could create an area (or line) chart showing usage over time using facets as we did in @sec-museums. This time, the categories don't really have a natural order, so instead we'll order the facets from most to least used. It might look something like @fig-packages-sketch-1.
 
-![Initial sketch of a faceted area charts showing packages use over time.](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area charts showing packages use over time.](images/sketch-packages-1.png){#fig-packages-sketch-1 fig-align="center" fig-alt="Initial sketch of a faceted area charts showing packages use over time."}
 
 One of the most incredible things about the R community, is our adoration of hex stickers - package logos in the shape of a hexagon. All of the core **`tidyverse`** packages have their own hex sticker. Rather than simply using the package name as the facet label in our plot, we could replace the labels with images of hex stickers, as shown in @fig-packages-sketch-2.
 
-![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center" fig-alt=""}
+![Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels.](images/sketch-packages-2.png){#fig-packages-sketch-2 fig-align="center" fig-alt="Initial sketch of a faceted area charts showing packages use over time, with hex stickers instead of text labels."}
 
 ## Preparing a plot
 
@@ -285,7 +296,7 @@ We then add `facet_wrap()` to create small multiple plots, split by `pkgs`. We w
 ```{r}
 #| label: fig-r-pkgs-base-plot-1
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering doesn't quite look correct."
 #| warning: true
 basic_plot <- ggplot(plot_data) +
   geom_area(
@@ -306,7 +317,7 @@ You might notice two things here:
 
 You might also notice the large spike in the **`ggplot2`** facet which shows 141 uses of the **`ggplot2`** package in a single script and wonder if this is an error. It's not an error - it was actually used that many times!
 
-Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the **`stringr`** package looks much larger than the area for the **`readr``** package - even though it should be smaller. It also looks as though there are no values in the **`forcats`** facet - but we know this isn't true for **`forcats`**, only for **`tibble`**. Why is this happening?
+Let's start by thinking about the second one of these issues and see if we can figure out what's happening. We've specified that the facets should be ordered from most to least used in total. But the area for the **`stringr`** package looks much larger than the area for the **`readr`** package - even though it should be smaller. It also looks as though there are no values in the **`forcats`** facet - but we know this isn't true for **`forcats`**, only for **`tibble`**. Why is this happening?
 
 The problem is that 0 is not included in the data. The areas are being drawn between only the strictly positive values, never going back down to 0. For packages that are used a lot but only in a few scripts, this makes their area larger than packages that are used once or twice in many scripts.
 
@@ -359,7 +370,7 @@ The `%+%` operator allows you to replace the current default data frame on an ex
 ```{r}
 #| label: fig-r-pkgs-base-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering now looks correct."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages, with facets ordered from most to least use. The ordering now looks correct."
 basic_plot <- basic_plot %+% new_plot_data
 basic_plot
 ```
@@ -397,7 +408,7 @@ We can then pass this `col_palette` vector into `scale_fill_manual()` function t
 ```{r}
 #| label: fig-r-pkgs-col-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Each area chart is colored using a different color from the `rcartocolor` package."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Each area chart is colored using a different color from the `rcartocolor` package."
 col_plot <- basic_plot +
   scale_fill_manual(
     values = col_palette
@@ -484,7 +495,7 @@ For the y-axis, we choose *nice* limits and breaks - setting the limits to betwe
 ```{r}
 #| label: fig-r-pkgs-limits-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. A title and subtitle has been added but runs of the page. However, the x-axis labels no longer overlap."
 limits_plot <- text_plot +
   scale_x_date(
     limits = ymd(c("20230101", "20231231")),
@@ -538,7 +549,7 @@ We also make sure that the x- and y-axes labels and title are the correct color 
 ```{r}
 #| label: fig-r-pkgs-theme-plot-2
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. The plot has a dark background, and white text (which no longer exceeds the plot area)."
 theme_plot <- init_theme_plot +
   theme(
     # title and subtitle text
@@ -638,7 +649,7 @@ We also need to tell **`ggplot2`** that the facet labels are using HTML tags, ju
 ```{r}
 #| label: fig-r-pkgs-final-plot
 #| fig-cap: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Hex stickers have replaced the text labels on the facets."
-#| fig-alt: ""
+#| fig-alt: "Faceted area charts showing package use over time for each of the 8 core `tidyverse` packages. Hex stickers have replaced the text labels on the facets."
 img_plot +
   theme(
     strip.text.x = element_textbox_simple(
@@ -707,7 +718,7 @@ The use of color could also be improved here. The colors are used to differentia
 
 Each plot created during the process of developing the original version of this visualization was captured using **`camcorder`**, and is shown in the gif below. If you'd like to learn more about how **`camcorder`** can be used in the data visualization process, see @sec-camcorder.
 
-![](images/r-pkgs.gif){fig-align="center" fig-alt=""}
+![](images/r-pkgs.gif){fig-align="center" fig-alt="Gif of the process of building the chart"}
 
 :::
 
