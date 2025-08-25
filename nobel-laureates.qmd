@@ -42,7 +42,13 @@ library(sysfonts)
 
 In this chapter, we'll learn how to access data through an API, create custom text layouts, and build parameterized plot functions. 
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* Build URLs in R in order to extract data from an API; 
+* Create a new type of plot with core functions in **`ggplot2`** by using a little bit of trigonometry; and 
+* Parameterise your plotting code to create a function, to make it easier to produce lots of similar graphics with a consistent layout.
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
 #| label: nobel-pkgs-req
@@ -57,6 +63,8 @@ library(readr)
 library(showtext)
 library(sysfonts)
 ```
+
+This chapter introduces another new package that we haven't seen in previous chapters. We'll be using the **`lubridate`** package for manipulating dates. You'll see more examples of **`lubridate`** in @sec-r-pkgs.
 
 ## Data
 
@@ -166,7 +174,7 @@ Let's start by exploring the relationship between year of birth and year of awar
 ```{r, echo=-1}
 #| label: fig-nobel-scatter
 #| fig-cap: "A scatter plot of awardee birth date against year of award, showing the expected increasing trend."
-#| fig-alt: ""
+#| fig-alt: "A scatter plot of awardee birth date against year of award, showing the expected increasing trend."
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 plot(
   x = nobel_physics$birthdate,
@@ -181,7 +189,7 @@ We might be interested in seeing whether this relationship is changing over time
 ```{r, echo=-1}
 #| label: fig-nobel-hist
 #| fig-cap: "A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested."
-#| fig-alt: ""
+#| fig-alt: "A scatter plot showing the age of Nobel Prize awardees over time, with a slight increasing trend suggested."
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 award_age <- nobel_physics$year -
   year(nobel_physics$birthdate)
@@ -198,7 +206,7 @@ It looks like the age of awardees might be increasing slightly - this could be i
 ```{r, echo=-1}
 #| label: fig-nobel-gender-barplot
 #| fig-cap: "A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees."
-#| fig-alt: ""
+#| fig-alt: "A bar chart of the number of male and female Nobel Laureates in Physics, with a much higher number of male awardees."
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 barplot(table(nobel_physics$gender))
 ```
@@ -218,7 +226,7 @@ Let's say that the purpose of the visualization is to highlight the gender dispa
 
 Instead, let's think outside of the box are present the information in a very non-standard way:
 
-![Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.](images/sketch-nobel.png){#fig-nobel-sketch fig-align="center" fig-alt=""}
+![Initial sketch of text arranged perpendicularly around a circle, with text color based on gender.](images/sketch-nobel.png){#fig-nobel-sketch fig-align="center" fig-alt="Initial sketch of text arranged perpendicularly around a circle, with text color based on gender."}
 
 A bar chart would be a quicker, more efficient way of displaying how many male and female Nobel Laureates there are. A visualization of the names of every single Nobel Laureate might be a quicker, more efficient way of catching someone's attention. This alternative visualization doesn't sacrifice accuracy of information, but it might take a reader a little bit longer to digest the information. Whether that's a sacrifice worth making comes back to what the purpose of the visualization is.
 
@@ -236,7 +244,7 @@ It's always worth double checking that we do actually only have the data we expe
 ```{r, echo=-1}
 #| label: fig-nobel-barplot-category
 #| fig-cap: "A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate)."
-#| fig-alt: ""
+#| fig-alt: "A bar chart of the number of *Physics* laureates (with a surprise appearance of a Chemistry laureate)."
 par(mar = c(4.1, 4.1, 1.1, 2.1))
 barplot(table(nobel_physics$category))
 ```
@@ -286,7 +294,7 @@ Let's start by defining a variable for the radius. It doesn't really matter what
 r <- 5
 ```
 
-![Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.](images/sketch-nobel-theta.png){#fig-nobel-sketch-theta fig-align="center" fig-alt=""}
+![Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates.](images/sketch-nobel-theta.png){#fig-nobel-sketch-theta fig-align="center" fig-alt="Sketch showing the relationship between the radius, angle, and position of the text in x- and y-coordinates."}
 
 Assuming that we know the radius and angle of a point, we can calculate the x- and y- coordinates of a point using the following equations: 
 
@@ -336,7 +344,7 @@ We pass `plot_data` into the `data` argument, and then set the aesthetic mapping
 ```{r}
 #| label: fig-nobel-base-plot
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Prize in Physics awardees arranged in a semi-circle, with color indicating awardee gender. The text is too large, creating many overlapping labels."
 #| message: false
 ggplot() +
   geom_text(
@@ -378,7 +386,7 @@ Now, let's remake our `basic_plot` - this time also setting the font `family` to
 ```{r}
 #| label: fig-nobel-base-plot-2
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Prize in Physics awardees arranged in a semicircle, with color indicating awardee gender. Much of the text lies outside of the plot area."
 basic_plot <- ggplot() +
   geom_text(
     data = plot_data,
@@ -430,7 +438,7 @@ We'll add two separate annotations: one for the title (*Nobel Prize Laureates*) 
 ```{r}
 #| label: fig-nobel-annotated
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Prize in Physics awardees arranged in a C-shape, with female awardees highlighted in a darker color. The text runs outside the plotting area, with annotations added to indicate the award category."
 annotated_plot <- col_plot +
   annotate("text",
     x = 10, y = 0,
@@ -484,7 +492,7 @@ The limits of the plot also need to be extended. The scales are currently based 
 ```{r}
 #| label: fig-nobel-style-plot-1
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Prize in Physics awardees arranged around a circle, with female awardees highlighted in a darker color. The default grid lines remain in the background."
 styled_plot <- text_plot +
   scale_x_continuous(limits = c(-9, 12)) +
   scale_y_continuous(limits = c(-7.5, 7.5)) +
@@ -503,7 +511,7 @@ We can some further, final customization by changing the following `theme()` ele
 ```{r}
 #| label: fig-nobel-style-plot-2
 #| fig-cap: "The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Prize in Physics awardees arranged in an anti-clockwise direction, with female awardees highlighted in a darker color."
 styled_plot +
   theme_void(base_size = 6, base_family = body_font) +
   theme(
@@ -724,7 +732,7 @@ Then we pass the `"Peace"` category into our `category_plot()` function, alongsi
 ```{r}
 #| label: fig-nobel-peace-plot
 #| fig-cap: "The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink."
-#| fig-alt: ""
+#| fig-alt: "The names of Nobel Peace Prize awardees arranged in an anti-clockwise direction, with female awardees highlighted in pink."
 peace_plot <- category_plot(
   "Peace",
   nobel_peace,
