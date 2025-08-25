@@ -12,14 +12,20 @@ fig-asp: 0.7
 #| file: R/options.R
 ```
 
-# Technology adoption: making gauge charts with **`ggforce`** {#sec-technology}
+# Animal shelter intakes: making gauge charts with **`ggforce`** {#sec-longbeach}
 
 In this chapter we'll discover how to create gauge charts, a type of chart not native to **`ggplot2`**, with the help of the **`ggforce`** extension package.
 
-**Packages required in this chapter**:
+By the end of this chapter, you'll be able to:
+
+* ;
+* ; and
+* .
+
+We begin by loading the packages required in this chapter.
 
 ```{r}
-#| label: technology-pkgs-req
+#| label: longbeach-pkgs-req
 #| warning: false
 #| message: false
 library(colorblindr)
@@ -27,6 +33,7 @@ library(dplyr)
 library(ggforce)
 library(ggplot2)
 library(ggtext)
+library(lubridate)
 library(scales)
 library(showtext)
 library(sysfonts)
@@ -41,6 +48,10 @@ New packages:
 * **`ggforce`**: 
 * **`scales`**: 
 
+This chapter introduces another new package that we haven't seen in previous chapters. We'll be using the **`lubridate`** package for manipulating dates. You'll see more examples of **`lubridate`** in @sec-nobel and @sec-r-pkgs.
+
+\index{lubridate}
+
 ## Data
 
 The Cross‐country Historical Adoption of Technology (CHAT) dataset [@technology_data] contains information on the adoption of over 100 technologies in more than 150 countries, spanning over 200 years. Most of the data is annual data, and covers technology categories including, but not limited to, agriculture, communications, transport, and finance - encompassing *as broad a definition of technology as possible* [@technology_data].
@@ -48,26 +59,26 @@ The Cross‐country Historical Adoption of Technology (CHAT) dataset [@technolog
 The CHAT dataset was used as a TidyTuesday dataset in July 2022 (after being suggested by [Tom Mock](https://github.com/jthomasmock)), so let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
 ```{r}
-#| label: technology-load-data-show
+#| label: longbeach-load-data-show
 #| eval: false
 #| echo: true
-tuesdata <- tt_load("2022-07-19")
-technology <- tuesdata$technology
+tuesdata <- tt_load("2025-03-04")
+longbeach <- tuesdata$longbeach
 ```
 
 ```{r}
-#| label: technology-load-data-hide
+#| label: longbeach-load-data-hide
 #| output: false
 #| echo: false
 #| eval: true
-technology <- readr::read_csv("data/technology.csv")
+longbeach <- readr::read_csv("data/longbeach.csv")
 ```
 
 The `technology` data is reasonably large with `r nrow(technology)` rows and `r ncol(technology)` columns.
 
 ```{r}
-#| label: technology-head-data
-head(technology)
+#| label: longbeach-head-data
+head(longbeach)
 ```
 
 The data is in long format with the `variable` (and `label`) columns containing information on what variable the row relates to e.g. `"% children who received a BCG immunization"` or `"Land naturally regenerating forest area 1000 ha"`. The `iso3c` column gives the ISO3 code for the country the row relates to, and similarly the `year` column relates to the relevant year. The `group` column details whether the variable is related to `"Consumption"`, `"Production"`, `"Non-Tech"` (such as GDP), or `"Creation"`. The `category` column contains information about which category the variable falls into e.g. `"Vaccines"` or `"Agriculture"`. Finally, the `value` column provides the value of the variable for the given year and country.
@@ -81,12 +92,12 @@ Given the large scale of this data (in terms of time frame, spatially, and range
 As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `category` using the `barplot()` function. \index{graphics!barplot}
 
 ```{r, echo=-1}
-#| label: fig-technology-barplot
+#| label: fig-longbeach-barplot
 #| fig-cap: "Bar chart of number of observations (all years, countries, and variables) in each category."
 #| fig-alt: ""
 par(mar = c(2.1, 8.1, 1.1, 1.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
-  table(technology$category),
+  table(longbeach$animal_type),
   las = 1,
   horiz = TRUE
 )
@@ -95,12 +106,25 @@ barplot(
 We have lots of observations relating to variables in the agriculture and transport categories. We could also look at how the number of values in these categories has changed over time, using the `heatmap()` function in base R: \index{stats!heatmap}
 
 ```{r, echo=-1}
-#| label: fig-technology-heatmap
+#| label: fig-longbeach-scatterplot
+#| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
+#| fig-alt: ""
+par(mar = c(3.1, 2.1, 2.1, 2.1), cex = 0.5)
+plot(
+  x = table(longbeach$intake_date),
+  xlab = "", ylab = "Number of animals",
+  main = "Number of animals surrendered per day"
+)
+```
+
+
+```{r, echo=-1}
+#| label: fig-longbeach-heatmap
 #| fig-cap: "Heatmap of number of observations (all countries and variables) in each category, each year. An increasing number of observations are seen in recent years."
 #| fig-alt: ""
 par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
-  table(technology$category, technology$year),
+  table(longbeach$animal_type, year(longbeach$intake_date)),
   # prevent re-ordering
   Rowv = NA,
   Colv = NA,
@@ -113,22 +137,6 @@ heatmap(
 
 Let's look into a specific variable in more detail. We need to narrow down the data we want to consider - there are `r length(unique(technology$label))` different questions (variables) contained in the data. You can check by running `length(unique(technology$label))`. One variable we could consider further is the percentage of children who received a measles immunization - indicated by the `"pctimmunizmeas"` level in the `variable` column. Let's create a quick scatter plot of how this percentage has been changing over time: \index{scatter plot}
 
-```{r, echo=-1}
-#| label: fig-technology-scatterplot
-#| fig-cap: "Scatter plot of percentage children who received a measles immunization between 1980 and 2019, hinting at an upward trend."
-#| fig-alt: ""
-par(mar = c(3.1, 2.1, 2.1, 2.1), cex = 0.5)
-pctimmunizmeas_df <- subset(
-  technology, variable == "pctimmunizmeas"
-)
-plot(
-  x = pctimmunizmeas_df$year,
-  y = pctimmunizmeas_df$value,
-  xlab = "", ylab = "",
-  main = "Percentage of children who received a measles immunization"
-)
-```
-
 For obvious reasons (the timing of when the first measles vaccine was created and rolled out across the world), the data does not span for 200 years for this variable. Nonetheless, it looks like there is perhaps an increasing trend over time. It's a little bit difficult to see because we have data from lots of countries on one plot, including some whose values were already high at the start of the time series.
 
 A list of all ISO3 country codes can be obtained by running `unique(technology$iso3c)`, and from there we can choose a subset of countries we want to look at in more detail. Let's look at Great Britain, USA, Sweden, Brazil, New Zealand, and Venezuela, and store these choices in a vector called `countries`. 
@@ -138,32 +146,31 @@ Although including all years of data would better allow us to consider trends in
 We no longer need the `group`, `category`, `variable`, or `label` columns, as these are constant for our data so we can remove these columns using `select()`\index{dplyr!select} from **`dplyr`**.
 
 ```{r}
-#| label: filter-technology
-# subset of countries to look at further
-countries <- c("GBR", "USA", "SWE", "BRA", "NZL", "VEN")
-
-# subset data for specific topic, years, and countries
-measles_data <- technology |>
-  filter(
-    label == "% children who received a measles immunization",
-    year %in% c(1980, 2010),
-    iso3c %in% countries
+#| label: filter-longbeach
+# subset data for years and combine aninmal types
+intake_data <- longbeach |>
+  mutate(
+    year = year(intake_date),
+    animal_type = if_else(animal_type %in% c("dog", "cat", "bird", "wild", "reptile"), animal_type, "other")
   ) |>
-  select(-c(group, category, variable, label))
-head(measles_data)
+  filter(
+    year %in% c(2017, 2023)
+  ) |>
+  count(year, animal_type)
+head(intake_data)
 ```
 
 Our tidier data now shows just the percentage (`value`) of children who received a measles immunization in each country (`iso3c`), in each of 1980 and 2010 (`year`), How might we visualize this data?
 
 There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 1980 to 2010? Do we want to compare countries to each other? Do we just want to show the range of values in the data? In this data, the most interesting example is a comparison between 1980 and 2010. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
 
-At the time of writing, there isn't a built-in function in **`ggplot2`** to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, the initial sketch in @fig-technology-sketch might give you an idea of what we're aiming for.
+At the time of writing, there isn't a built-in function in **`ggplot2`** to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, the initial sketch in @fig-longbeach-sketch might give you an idea of what we're aiming for.
 
 ### Exploratory sketches
 
 You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts. 
 
-![Initial sketches of a ideas for visualising data for a single country.](images/sketch-technology.png){#fig-technology-sketch fig-align="center" fig-alt=""}
+![Initial sketches of a ideas for visualising data for a single country.](images/sketch-longbeach.png){#fig-longbeach-sketch fig-align="center" fig-alt=""}
 
 Gauge charts often also include a dial (or needle) to highlight the value further, but that gets a little bit complicated when we have multiple gauges. So let's leave that for now. \index{gauge chart}
 
@@ -178,14 +185,31 @@ We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart nat
 The `value` in the data currently tells us the percentage of children who did have an immunization, we also need to calculate the percentage of children who did not - by subtracting `value` from 100. We can then pivot the data such that each country has two rows in the data: (i) one row for the *did have immunization* value in 1980 and 2010, and (ii) one row for the *did not have immunization* value in 1980 and 2010. We end up with something halfway in between wide and long format data. Let's also make the `YN` column (indicating a did/did not have immunization row) into a factor.
 
 ```{r}
-#| label: wrangle-technology-1
-measles_YN <- measles_data |>
-  mutate(no_value = 100 - value) |>
+#| label: wrangle-longbeach-0
+max_intake <- intake_data |>
+  group_by(year) |>
+  summarise(total = sum(n)) |>
+  pull(total) |>
+  max() |>
+  ceiling()
+upper_limit <- round(max_intake, digits = -3)
+c(max_intake, upper_limit)
+```
+
+
+```{r}
+#| label: wrangle-longbeach-1
+intake_YN <- intake_data |>
+  mutate(
+    value = n / upper_limit,
+    no_value = 1 - value
+  ) |>
+  select(-n) |> 
   pivot_longer(
     cols = c(value, no_value),
     names_to = "YN",
     values_to = "perc"
-  ) |>
+  ) |> 
   pivot_wider(
     names_from = "year",
     values_from = "perc"
@@ -196,17 +220,12 @@ measles_YN <- measles_data |>
 To enable us to work with the percentages more easily, we can convert them into values between 0 and 1 by dividing by 100, and drop the original columns. If you think about creating a stacked bar chart, we need to know the end point of each bar (the maximum y-axis value for each bar). This isn't the percentage of each group, it's the cumulative percentage of each group and the ones stacked below it. We use the `cumsum()` function to calculate the cumulative sum of the percentages across each year and country: \index{cumsum}
 
 ```{r}
-#| label: wrangle-technology-2
-plot_data <- measles_YN |>
+#| label: wrangle-longbeach-2
+plot_data <- intake_YN |>
+  group_by(animal_type) |>
   mutate(
-    perc_1980 = `1980` / 100,
-    perc_2010 = `2010` / 100
-  ) |>
-  select(-c(`1980`, `2010`)) |>
-  group_by(iso3c) |>
-  mutate(
-    ymax_1980 = cumsum(perc_1980),
-    ymax_2010 = cumsum(perc_2010)
+    ymax_2017 = cumsum(`2017`),
+    ymax_2023 = cumsum(`2023`)
   )
 head(plot_data)
 ```
@@ -232,11 +251,11 @@ The last part of data wrangling we need to do is compute the `start` and `end` v
 
 ### Computing aesthetics
 
-The end values are easy - these are the `ymax_1980` and `ymax_2010` columns that we already have. We need to compute the equivalent `ymin_1980` and `ymin_2010` values: what are the minimum values in each stacked bar chart?
+The end values are easy - these are the `ymax_2017` and `ymax_2023` columns that we already have. We need to compute the equivalent `ymin_2017` and `ymin_2023` values: what are the minimum values in each stacked bar chart?
 
 Think again about stacked bar charts instead of gauge charts for a second (since it's a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero - it's right at the bottom. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we've actually already computed all the values we need and stored them in `plot_data`. We just need to rearrange them a bit.
 
-::: {#tip-technology-ymin .callout-tip}
+::: {#tip-longbeach-ymin .callout-tip}
 
 ## Just because you can doesn't mean you should
 
@@ -244,26 +263,27 @@ There is almost certainly a nicer way of doing this in base R that contains fewe
 
 :::
 
-Let's start with the 1980 data. We start off by creating the `0` values for the minimum in the first stacked bar using `rep(0, length(countries))` - since we need one `0` for each country in 1980. We then want to get the `ymax_1980` values from `plot_data` except the last one. We therefore use `slice_head()` to get this subset of the rows (missing the last one in each country). Remember that `plot_data` is still grouped by `iso3c`. We then stick these `ymax_1980` to the `0` we created and pass them into a new column called `ymin_1980` using `mutate()`. The code for the 2010 arc is analogous. \index{dplyr!mutate} \index{dplyr!slice\_head} \index{dplyr!pull}
+Let's start with the 1980 data. We start off by creating the `0` values for the minimum in the first stacked bar using `rep(0, length(countries))` - since we need one `0` for each country in 1980. We then want to get the `ymax_2017` values from `plot_data` except the last one. We therefore use `slice_head()` to get this subset of the rows (missing the last one in each country). Remember that `plot_data` is still grouped by `iso3c`. We then stick these `ymax_2017` to the `0` we created and pass them into a new column called `ymin_2017` using `mutate()`. The code for the 2010 arc is analogous. \index{dplyr!mutate} \index{dplyr!slice\_head} \index{dplyr!pull}
 
 ```{r}
-#| label: technology-gauge-data-1
+#| label: longbeach-gauge-data-1
+n_types <- length(unique(plot_data$animal_type))
 ymin_data <- plot_data |>
   ungroup() |>
   # start values for 1980 arc
   mutate(
-    ymin_1980 = c(rbind(
-      rep(0, length(countries)),
+    ymin_2017 = c(rbind(
+      rep(0, n_types),
       (slice_head(plot_data, n = -1) |>
-        pull(ymax_1980))
+        pull(ymax_2017))
     ))
   ) |>
   # repeat for 2010
   mutate(
-    ymin_2010 = c(rbind(
-      rep(0, length(countries)),
+    ymin_2023 = c(rbind(
+      rep(0, n_types),
       (slice_head(plot_data, n = -1) |>
-        pull(ymax_2010))
+        pull(ymax_2023))
     ))
   )
 ```
@@ -272,7 +292,7 @@ All of our variables are currently scaled between 0 and 1 (since they relate to 
 
 We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from **`dplyr`** in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent **`dplyr`** from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
 
-::: {#tip-technology-mutate .callout-tip}
+::: {#tip-longbeach-mutate .callout-tip}
 
 ## Older versions of `mutate()`
 
@@ -281,7 +301,7 @@ In older versions of **`dplyr`**, the `mutate_at()` function would have been use
 :::
 
 ```{r}
-#| label: technology-gauge-data-2
+#| label: longbeach-gauge-data-2
 gauge_data <- ymin_data |>
   mutate(
     across(
@@ -304,8 +324,8 @@ We then add two arcs by using `geom_arc_bar()` twice. We set the `x0`, `y0`, `r0
 We also use `facet_wrap()` to draw a pair of arcs for each country in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries. \index{ggplot2!facet\_wrap} 
 
 ```{r}
-#| label: fig-technology-basic-plot-1
-#| fig-cap: "Initial plot created using `geom_arc_bar()` from `ggforce`, facetted by different countries."
+#| label: fig-longbeach-basic-plot-1
+#| fig-cap: "Initial plot created using `geom_arc_bar()` from `ggforce`, faceted by different animal types."
 #| fig-alt: ""
 #| warning: false
 basic_plot <- ggplot(data = gauge_data) +
@@ -314,7 +334,7 @@ basic_plot <- ggplot(data = gauge_data) +
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
-      start = ymin_2010, end = ymax_2010,
+      start = ymin_2023, end = ymax_2023,
       fill = YN
     )
   ) +
@@ -323,11 +343,11 @@ basic_plot <- ggplot(data = gauge_data) +
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
-      start = ymin_1980, end = ymax_1980,
+      start = ymin_2017, end = ymax_2017,
       fill = YN
     )
   ) +
-  facet_wrap(~iso3c, nrow = 2)
+  facet_wrap(~animal_type, nrow = 2)
 basic_plot
 ```
 
@@ -340,7 +360,7 @@ We now have a double gauge chart - but it could look a lot nicer (and more infor
 Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage who did have immunizations. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage who did not have immunizations, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black. \index{color}
 
 ```{r}
-#| label: technology-colors
+#| label: longbeach-colors
 highlight_col <- "#990C58"
 second_col <- "#949398"
 bg_col <- "#DEDEDE"
@@ -350,7 +370,7 @@ text_col <- "black"
 Before we add the new colors to our gauge chart, let's remove the black outline from around the segments - they're quite thick lines which don't add anything to the plot. There will be sufficient contrast between the segments with the new colors we've chosen. You can remove the outline from the arc by setting `color = NA` outside of the aesthetic mapping: \index{ggforce!geom\_arc\_bar} \index{ggplot2!ggplot} \index{ggplot2!facet\_wrap} \index{ggplot2!aes}
 
 ```{r}
-#| label: fig-technology-basic-plot-2
+#| label: fig-longbeach-basic-plot-2
 #| fig-cap: "A second version of the initial plot created using `geom_arc_bar()` from `ggforce`, facetted by different countries, with the outline color removed."
 #| fig-alt: ""
 #| source-line-numbers: "9,18"
@@ -359,7 +379,7 @@ basic_plot <- ggplot(data = gauge_data) +
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.7, r = 1,
-      start = ymin_2010, end = ymax_2010,
+      start = ymin_2023, end = ymax_2023,
       fill = YN
     ),
     color = NA
@@ -368,18 +388,18 @@ basic_plot <- ggplot(data = gauge_data) +
     mapping = aes(
       x0 = 0, y0 = 0,
       r0 = 0.2, r = 0.5,
-      start = ymin_1980, end = ymax_1980,
+      start = ymin_2017, end = ymax_2017,
       fill = YN
     ),
     color = NA
   ) +
-  facet_wrap(~iso3c, nrow = 2)
+  facet_wrap(~animal_type, nrow = 2)
 ```
 
 Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**, setting both the color values but also more informative labels for the legend at the same time. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
-#| label: fig-technology-color-plot
+#| label: fig-longbeach-color-plot
 #| fig-cap: "Edited version of the previous plot with colors changed from defaults to gray and dark pink."
 #| fig-alt: ""
 color_plot <- basic_plot +
@@ -396,7 +416,7 @@ When choosing colors for a visualization, it's important not to rely too heavily
 There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is **`colorblindr`** [@colorblindr]. The **`colorblindr`** package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated **`ggplot2`** functions. At the time of writing, **`colorblindr`** is not available on CRAN but can be installed from GitHub, using the methods described in @sec-bees. \index{colorblindr!cvd\_grid}
 
 ```{r, echo=2}
-#| label: fig-technology-cvd
+#| label: fig-longbeach-cvd
 #| fig-cap: "A 2x2 grid of charts showing simulations of what our chart looks like with four different types of color vision deficiency."
 #| fig-alt: ""
 #| fig-dpi: 250
@@ -412,7 +432,7 @@ Note that the default color palette in **`ggplot2`** does not show any different
 As we've seen in previous chapters, we can load in Google fonts using the **`sysfonts`**\index{sysfonts} and **`showtext`**\index{showtext} packages. Here, we'll keep it clean and minimal by using the `"Ubuntu"` typeface for both the title and the body. \index{sysfonts!font\_add\_google} \index{showtext!showtext\_auto} \index{showtext!showtext\_opts}
 
 ```{r}
-#| label: technology-fonts
+#| label: longbeach-fonts
 font_add_google(name = "Ubuntu")
 showtext_auto()
 showtext_opts(dpi = 300)
@@ -422,7 +442,7 @@ body_font <- "Ubuntu"
 Let's define some text for the title and subtitle. Here, the title asks the reader a question, encouraging them to think and directing them to what they are looking at in the chart. The subtitle gives a brief explanation of how to interpret the plot, and the main conclusion that we want the reader to take away. The `caption` variable identifies the source of the data for this visualization, as well as the chart creator.
 
 ```{r}
-#| label: technology-text
+#| label: longbeach-text
 title <- "What percentage of children are immunized against measles?"
 subtitle <- "The inner pink bar represents the percentage of children who received a measles immunization in 1980, whilst the outer pink bar represents the percentage in 2010. An increase in immunization levels between 1980 and 2010 is seen across all six countries."
 caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
@@ -431,20 +451,20 @@ caption <- "Data: data.nber.org (10.3386/w15319) | Graphic: N. Rennie"
 Since the axis labels do not make too much sense for `geom_arc_bar()` plots, we'll remove them later when using the `theme`\index{ggplot2!theme} functions. Instead, we can add our own labels using `geom_text()`\index{ggplot2!geom\_text} to the end of the gauges. To make it easier, we can construct a small `data.frame` specifically for adding text labels. This includes the `x`, and `y` coordinates where the text should be positioned (you can read these off from the graph we already have since we haven't yet deleted the axis labels), as well as the `label` that should appear.
 
 ```{r}
-#| label: technology-text-df
+#| label: longbeach-text-df
 text_df <- data.frame(
   x = c(0.35, 0.85),
   y = c(-0.1, -0.1),
-  label = c(1980, 2010)
+  label = c(2017, 2023)
 )
 ```
 
 We can then add this text to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the typeface and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from **`ggplot2`**.
 
 ```{r}
-#| label: fig-technology-text
+#| label: fig-longbeach-text
 #| fig-cap: "Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle."
-#| fig-alt: ""
+#| fig-alt: "Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle."
 text_plot <- color_plot +
   geom_text(
     data = text_df,
@@ -467,9 +487,9 @@ We'll start by removing all of the theme elements such as the gray background, g
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()` \index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
 ```{r}
-#| label: fig-technology-style-1
+#| label: fig-longbeach-style-1
 #| fig-cap: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed."
-#| fig-alt: ""
+#| fig-alt: "Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed"
 theme_plot <- text_plot +
   coord_fixed() +
   theme_void(base_size = 8.5, base_family = body_font)
@@ -494,7 +514,7 @@ Let's fix the first two of these issues by editing the `theme()` elements:
 \index{ggplot2!rel}
 
 ```{r}
-#| label: fig-technology-style-2
+#| label: fig-longbeach-style-2
 #| fig-cap: "Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title."
 #| fig-alt: ""
 styled_plot <- theme_plot +
@@ -530,7 +550,7 @@ styled_plot
 
 We're almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it's leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it. The highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot e.g. when using `coord_fixed()` or spatial co-ordinates as we'll see in @sec-time-zones, since the wrong choice can result in cropped plots or extra white space. \index{ggplot2!coord\_fixed} 
 
-::: {#tip-technology-aspect .callout-tip}
+::: {#tip-longbeach-aspect .callout-tip}
 
 ## Choosing an aspect ratio
 
@@ -540,7 +560,7 @@ There are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choos
 
 :::
 
-::: {#tip-technology-width .callout-tip}
+::: {#tip-longbeach-width .callout-tip}
 
 ## Choosing a width 
 
@@ -567,7 +587,7 @@ Here, there's an argument to be made that any form of legend is in fact unnecess
 So let's remove the legend, by setting `legend.position = "none"` inside `theme()`: \index{ggplot2!theme}
 
 ```{r}
-#| label: fig-technology-style-3
+#| label: fig-longbeach-style-3
 #| fig-cap: "Final styling of gauge chart to remove the legend, providing more space for the chart area."
 #| fig-alt: ""
 styled_plot +
@@ -577,11 +597,11 @@ styled_plot +
 Then save it with `ggsave()`: \index{ggplot2!ggsave}
 
 ```{r}
-#| label: technology-save
+#| label: longbeach-save
 #| eval: false
 #| echo: true
 ggsave(
-  filename = "technology-adoption.png",
+  filename = "longbeach-adoption.png",
   width = 5,
   height = 0.7 * 5
 )
