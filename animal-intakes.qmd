@@ -47,7 +47,7 @@ New packages:
 * **`colorblindr`**: for assessing the accessibility of color palettes and the use of color in charts.
 * **`ggforce`**: a package that extends the behavior of **`ggplot2`**, and provides additional *geoms* and *stats*.
 * **`lubridate`**: a package for manipulating and creating date variables. You'll see more examples of **`lubridate`** in @sec-nobel and @sec-r-pkgs.
-* **`scales`**: **`ggplot2`** uses the **`scales`** package in background for help with axis limits and labels. However, you can use the functions from **`scales`** directly to transform data, labels, and colors.
+* **`scales`**: **`ggplot2`** uses the **`scales`** package in the background for help with axis limits and labels. However, you can use the functions from **`scales`** directly to transform data, labels, and colors.
 
 \index{colorblindr} \index{ggforce} \index{lubridate} \index{scales}
 
@@ -88,13 +88,13 @@ Given the many different aspects of the animals and their intakes and outcomes t
 
 ### Data exploration
 
-As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `animal_type` using the `barplot()` function. \index{graphics!barplot}
+As in other chapters in this book, we'll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each `animal_type` using the `barplot()` function in @fig-longbeach-barplot. \index{graphics!barplot}
 
 ```{r, echo=-1}
 #| label: fig-longbeach-barplot
 #| fig-cap: "Bar chart of total number of animals surrendered, by animal type."
 #| fig-alt: "Bar chart of total number of animals surrendered, by animal type. Cats are highest."
-par(mar = c(2.1, 8.1, 1.1, 1.1), cex.axis = 0.5, cex.names = 0.5)
+par(mar = c(2.1, 6.1, 1.1, 1.1), cex.axis = 0.5, cex.names = 0.5)
 barplot(
   table(longbeach$animal_type),
   las = 1,
@@ -126,7 +126,10 @@ It's perhaps more interesting to look at how the number of surrenders for differ
 #| fig-alt: "Heatmap of number of animals surrendered of each type, each year. A lower number of animals of all types were surrendered in 2020 and 2021."
 par(mar = c(3.1, 0, 2.1, 0))
 heatmap(
-  table(longbeach$animal_type, year(longbeach$intake_date)),
+  table(
+    longbeach$animal_type,
+    year(longbeach$intake_date)
+  ),
   # prevent re-ordering
   Rowv = NA,
   Colv = NA,
@@ -150,7 +153,10 @@ intake_data <- longbeach |>
   mutate(
     year = year(intake_date),
     animal_type = if_else(
-      animal_type %in% c("dog", "cat", "bird", "wild", "reptile"),
+      animal_type %in% c(
+        "dog", "cat", "bird",
+        "wild", "reptile"
+      ),
       animal_type,
       "other"
     )
@@ -170,7 +176,7 @@ At the time of writing, there isn't a built-in function in **`ggplot2`** to crea
 
 You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts. 
 
-![Initial sketches of a ideas for visualising data for a single country.](images/sketch-longbeach.png){#fig-longbeach-sketch fig-align="center" fig-alt=""}
+![Initial sketches of ideas for visualising data for a single animal type.](images/sketch-longbeach.png){#fig-longbeach-sketch fig-align="center" fig-alt="Initial sketches of ideas for visualising data for a single animal type."}
 
 Gauge charts often also include a dial (or needle) to highlight the value further, but that gets a little bit complicated when we have multiple gauges. So let's leave that for now. \index{gauge chart}
 
