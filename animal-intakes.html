@@ -390,9 +390,9 @@ window.Quarto = {
 </header><p>In this chapter we’ll discover how to create gauge charts, a type of chart not native to <strong><code>ggplot2</code></strong>, with the help of the <strong><code>ggforce</code></strong> extension package.</p>
 <p>By the end of this chapter, you’ll be able to:</p>
 <ul>
-<li>;</li>
-<li>; and</li>
-<li>.</li>
+<li>Create a gauge chart by programmatically calculating sizes of plot elements to use new <em>geom</em> functions from the <strong><code>ggforce</code></strong> package;</li>
+<li>See how choosing a different aspect ratio or coordinate system can change the look of a chart;</li>
+<li>Analyse your choice of color(s) to check if they are likely to be accessible to people with color vision deficiency.</li>
 </ul>
 <p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
@@ -408,7 +408,7 @@ window.Quarto = {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>New packages:</p>
+<p>This chapter introduces several new packages, that we haven’t yet used in previous chapters:</p>
 <ul>
 <li>
 <strong><code>colorblindr</code></strong>: for assessing the accessibility of color palettes and the use of color in charts.</li>
@@ -417,7 +417,7 @@ window.Quarto = {
 <li>
 <strong><code>lubridate</code></strong>: a package for manipulating and creating date variables. You’ll see more examples of <strong><code>lubridate</code></strong> in <a href="nobel-laureates.html" class="quarto-xref"><span>Chapter 8</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>.</li>
 <li>
-<strong><code>scales</code></strong>: <strong><code>ggplot2</code></strong> uses the <strong><code>scales</code></strong> package in background for help with axis limits and labels. However, you can use the functions from <strong><code>scales</code></strong> directly to transform data, labels, and colors.</li>
+<strong><code>scales</code></strong>: <strong><code>ggplot2</code></strong> uses the <strong><code>scales</code></strong> package in the background for help with axis limits and labels. However, you can use the functions from <strong><code>scales</code></strong> directly to transform data, labels, and colors.</li>
 </ul>
 <p> </p>
 <section id="data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="data">
@@ -456,7 +456,7 @@ window.Quarto = {
 <p>Given the many different aspects of the animals and their intakes and outcomes that have been recorded, there are lots of variables that we could look into further. What might be an interesting aspect of this data to visualize?</p>
 <section id="data-exploration" class="level3" data-number="5.2.1"><h3 data-number="5.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">5.2.1</span> Data exploration</h3>
-<p>As in other chapters in this book, we’ll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each <code>animal_type</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function. </p>
+<p>As in other chapters in this book, we’ll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each <code>animal_type</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function in <a href="#fig-longbeach-barplot" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">animal_type</span><span class="op">)</span>,</span>
@@ -496,7 +496,10 @@ Figure&nbsp;5.2: Line chart showing number of animals surrendered per day, showi
 <p>It’s perhaps more interesting to look at how the number of surrenders for different animal types has changed over time, using the <code><a href="https://rdrr.io/r/stats/heatmap.html">heatmap()</a></code> function in base R in <a href="#fig-longbeach-heatmap" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>. </p>
 <div class="cell">
 <div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/heatmap.html">heatmap</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">animal_type</span>, <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">intake_date</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span></span>
+<span>    <span class="va">longbeach</span><span class="op">$</span><span class="va">animal_type</span>,</span>
+<span>    <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">intake_date</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  <span class="co"># prevent re-ordering</span></span>
 <span>  Rowv <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  Colv <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -525,7 +528,10 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    year <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">intake_date</span><span class="op">)</span>,</span>
 <span>    animal_type <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else</a></span><span class="op">(</span></span>
-<span>      <span class="va">animal_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"dog"</span>, <span class="st">"cat"</span>, <span class="st">"bird"</span>, <span class="st">"wild"</span>, <span class="st">"reptile"</span><span class="op">)</span>,</span>
+<span>      <span class="va">animal_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>        <span class="st">"dog"</span>, <span class="st">"cat"</span>, <span class="st">"bird"</span>,</span>
+<span>        <span class="st">"wild"</span>, <span class="st">"reptile"</span></span>
+<span>      <span class="op">)</span>,</span>
 <span>      <span class="va">animal_type</span>,</span>
 <span>      <span class="st">"other"</span></span>
 <span>    <span class="op">)</span></span>
@@ -552,12 +558,12 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 </section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
 <p>You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
-<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="" data-fig-align="center">
+<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketches of ideas for visualising data for a single animal type." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-longbeach.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="">
+<img src="images/sketch-longbeach.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketches of ideas for visualising data for a single animal type.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-longbeach-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.4: Initial sketches of a ideas for visualising data for a single country.
+Figure&nbsp;5.4: Initial sketches of ideas for visualising data for a single animal type.
 </figcaption></figure>
 </div>
 <p>Gauge charts often also include a dial (or needle) to highlight the value further, but that gets a little bit complicated when we have multiple gauges. So let’s leave that for now. </p>
