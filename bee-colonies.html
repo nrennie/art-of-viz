@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.33">
+<meta name="generator" content="quarto-1.7.34">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>4&nbsp; Bee colony losses: visualizing quantities with Poisson disk sampling – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -89,10 +89,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-425560e6e27c88e19529b7c03591d40d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-c3e9ed0836829b523c3e41ee67ee3be9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-1ce200fd2366f65ea86a30f1af979f95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-3f2177d04cbb2ca220b4c8f1836bac43.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -151,6 +151,13 @@ window.Quarto = {
   typesetMath
 };
 </script>
+<meta property="og:title" content="4&nbsp; Bee colony losses: visualizing quantities with Poisson disk sampling – The Art of Data Visualization with ggplot2">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://nrennie.rbind.io/art-of-viz/bee-colonies_files/figure-html/fig-bees-boxplot-1.png">
+<meta property="og:site_name" content="The Art of Data Visualization with ggplot2">
+<meta property="og:image:alt" content="Simple horizontal boxplot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below.">
+<meta property="og:image:height" content="990">
+<meta property="og:image:width" content="1500">
 </head>
 <body class="nav-sidebar floating quarto-light">
 
@@ -544,7 +551,7 @@ Tip&nbsp;4.2: Avoid missing patterns about missingness
 </section><section id="exploratory-sketches" class="level3" data-number="4.2.2"><h3 data-number="4.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">4.2.2</span> Exploratory sketches</h3>
 <p>For each state, let’s visualize the average number of colonies for each year. There are multiple ways we could do this: line charts or area charts are obvious first choices. Perhaps even a simple bar chart could be effective here. But let’s try to be a bit more creative, and a bit more artistic, in our choice of visualization. There are many ways we could represent the number of <em>things</em> (bee colonies) in each <em>combination of two variables</em> (state and year). We have data available for every combination of state and year, so let’s create a grid of states and years, as in <a href="#fig-bees-sketch-blank" class="quarto-xref">Figure&nbsp;<span>4.5</span></a>.</p>
-<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
+<div id="fig-bees-sketch-blank" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-blank-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees-blank.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of empty squares with columns identifying years, and rows for different US states">
 </div>
@@ -554,7 +561,7 @@ Figure&nbsp;4.5: Initial sketch showing a grid of squares, with each square repr
 </div>
 <p>Now in each grid square, we’re simply trying to show the number of <em>things</em>. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in <a href="#fig-bees-sketch" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>. This type of chart can be called a <em>dot density plot</em>, which is commonly used for geographic data. </p>
 <p>We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we’re most interested in).</p>
-<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
+<div id="fig-bees-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-bees-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-bees.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text.">
 </div>
@@ -1324,7 +1331,7 @@ Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, 
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/nrennie\.rbind\.io\/art-of-viz\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
