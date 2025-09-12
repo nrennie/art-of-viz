@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.34">
+<meta name="generator" content="quarto-1.8.24">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>5&nbsp; Animal shelter intakes: making gauge charts with ggforce – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -85,14 +85,15 @@ div.csl-indent {
 <link href="./bee-colonies.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-c3e9ed0836829b523c3e41ee67ee3be9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15ea27bac76f9890c21e80949f497921.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3f2177d04cbb2ca220b4c8f1836bac43.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c43190fbe1c113cfbc67da3b35af8548.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -136,7 +137,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -175,7 +176,9 @@ window.Quarto = {
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="./">The Art of Data Visualization with ggplot2</a> 
     </div>
@@ -403,7 +406,7 @@ window.Quarto = {
 </ul>
 <p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/clauswilke/colorblindr">colorblindr</a></span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/clauswilke/colorblindr">colorblindr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggforce.data-imaginist.com">ggforce</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
@@ -413,7 +416,7 @@ window.Quarto = {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/showtext">showtext</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/yixuan/sysfonts">sysfonts</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This chapter introduces several new packages, that we haven’t yet used in previous chapters:</p>
 <ul>
@@ -432,12 +435,12 @@ window.Quarto = {
 <p>The Long Beach Animal Shelter dataset <span class="citation" data-cites="longbeach_data">(<a href="references.html#ref-longbeach_data" role="doc-biblioref">Long Beach Animal Shelter 2025</a>)</span> contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2014. Here, the term <em>surrendered</em> refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.</p>
 <p>The animal shelter dataset was used as a TidyTuesday dataset in March 2025 (after being curated by <a href="https://github.com/lgibson7">Lydia Gibson</a>), and the data is also available via the <strong><code>animalshelter</code></strong> package <span class="citation" data-cites="animalshelter">(<a href="references.html#ref-animalshelter" role="doc-biblioref">Hvitfeldt 2025</a>)</span>. Let’s start by reading in the data using the <strong><code>tidytuesdayR</code></strong> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2025-03-04"</span><span class="op">)</span></span>
-<span><span class="va">longbeach</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">longbeach</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2025-03-04"</span><span class="op">)</span></span>
+<span><span class="va">longbeach</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">longbeach</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>longbeach</code> data is reasonably large with 29787 rows and 22 columns.</p>
 <div class="cell">
-<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 22
   animal_id animal_name animal_type primary_color
@@ -465,11 +468,11 @@ window.Quarto = {
 <span class="header-section-number">5.2.1</span> Data exploration</h3>
 <p>As in other chapters in this book, we’ll start with some basic exploratory plots in base R. For example, we may look at the distribution of variables in each <code>animal_type</code> using the <code><a href="https://rdrr.io/r/graphics/barplot.html">barplot()</a></code> function in <a href="#fig-longbeach-barplot" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">animal_type</span><span class="op">)</span>,</span>
 <span>  las <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  horiz <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of total number of animals surrendered, by animal type. Cats are highest.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -483,11 +486,11 @@ Figure&nbsp;5.1: Bar chart of total number of animals surrendered, by animal typ
 </div>
 <p>We have lots of observations relating to cats, with dogs a fairly close second. This likely represents how common it is to have these types of animals as pets. We might also be interested in how the number of intakes has changed over time, as shown in <a href="#fig-longbeach-scatterplot" class="quarto-xref">Figure&nbsp;<span>5.2</span></a>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">intake_date</span><span class="op">)</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Number of animals surrendered per day"</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-scatterplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Line chart showing number of animals surrendered per day, showing seasonal peaks and lower numbers during 2020-2021.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-scatterplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -502,7 +505,7 @@ Figure&nbsp;5.2: Line chart showing number of animals surrendered per day, showi
 <p>We can see that there are some seasonal differences in the number of intakes, and that there seems to be a slight decrease during 2020 and 2021 - likely related to the COVID-19 pandemic affecting how many animals can be captured.</p>
 <p>It’s perhaps more interesting to look at how the number of surrenders for different animal types has changed over time, using the <code><a href="https://rdrr.io/r/stats/heatmap.html">heatmap()</a></code> function in base R in <a href="#fig-longbeach-heatmap" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/heatmap.html">heatmap</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/heatmap.html">heatmap</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span></span>
 <span>    <span class="va">longbeach</span><span class="op">$</span><span class="va">animal_type</span>,</span>
 <span>    <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">longbeach</span><span class="op">$</span><span class="va">intake_date</span><span class="op">)</span></span>
@@ -514,7 +517,7 @@ Figure&nbsp;5.2: Line chart showing number of animals surrendered per day, showi
 <span>  margins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>  cexRow <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  cexCol <span class="op">=</span> <span class="fl">0.5</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-heatmap" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Heatmap of number of animals surrendered of each type, each year. A lower number of animals of all types were surrendered in 2020 and 2021.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-heatmap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -530,7 +533,7 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 <p>Let’s think about how we might visually represent this data in a more meaningful, and aesthetic way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we’ll do here, readers might get a <em>Wow, look how much things have changed!</em> message rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend.</p>
 <p>We can again use <code><a href="https://lubridate.tidyverse.org/reference/year.html">year()</a></code> from <strong><code>lubridate</code></strong> to save the extracted years as a new column, use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> to filter our <code>longbeach</code> dataset to consider only the rows for the years 2017 and 2023. Since some of the animal types have very small numbers, even when aggregating to annual data, we’ll use <code><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else()</a></code> to include more animal types in the <code>"other"</code> category that already exists. We then use <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> from <strong><code>dplyr</code></strong> to count up how many of each animal type were surrendered in each of the years we’re interested in.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset data for years and combine aninmal types</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset data for years and combine aninmal types</span></span>
 <span><span class="va">intake_data</span> <span class="op">&lt;-</span> <span class="va">longbeach</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    year <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">intake_date</span><span class="op">)</span>,</span>
@@ -547,7 +550,7 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 <span>    <span class="va">year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2017</span>, <span class="fl">2023</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">animal_type</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">intake_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">intake_data</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 3
    year animal_type     n
@@ -565,7 +568,7 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 </section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
 <p>You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
-<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketches of ideas for visualising data for a single animal type.">
+<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketches of ideas for visualising data for a single animal type." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-longbeach.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketches of ideas for visualising data for a single animal type.">
 </div>
@@ -590,9 +593,9 @@ Figure&nbsp;5.4: Initial sketches of ideas for visualising data for a single ani
 </ul>
 <p>In some sense, the choice is fairly arbitrary and it depends on what you want to highlight. Here, we’ll use the maximum number of animals of a single type surrendered across the selected years. We’ll use <code><a href="https://rdrr.io/r/base/Round.html">ceiling()</a></code> to round up to the nearest 500 to give us a <em>nicer</em> upper limit. </p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">max_intake</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">intake_data</span><span class="op">$</span><span class="va">n</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">max_intake</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">intake_data</span><span class="op">$</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">upper_limit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="va">max_intake</span> <span class="op">/</span> <span class="fl">500</span><span class="op">)</span> <span class="op">*</span> <span class="fl">500</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">max_intake</span>, <span class="va">upper_limit</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">max_intake</span>, <span class="va">upper_limit</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] 2228 2500</code></pre>
 </div>
@@ -609,15 +612,15 @@ Tip&nbsp;5.1: Rounding numbers in R
 <div class="callout-body-container callout-body">
 <p>In R, the <code><a href="https://rdrr.io/r/base/Round.html">round()</a></code> function can be used to round a number, with the <code>digits</code> argument specifying the level of precision. Supplying negative numbers, allows you to round to the nearest 10, 100, 1000 and so on. </p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] 1230</code></pre>
 </div>
-<div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] 1200</code></pre>
 </div>
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fl">1234</span>, digits <span class="op">=</span> <span class="op">-</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] 1000</code></pre>
 </div>
@@ -628,7 +631,7 @@ Tip&nbsp;5.1: Rounding numbers in R
 <p>Let’s divide <code>n</code> by our chosen upper limit, to determine how much progress has been made towards that limit (<code>value</code>) for each category To make it easier for us to plot later on, we then also calculate how far away each category is from that limit (<code>no_value</code>). We no longer require the <code>n</code> column, so we use <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> from <strong><code>dplyr</code></strong> to drop it. </p>
 <p>We then pivot our data to long format and back again using the <code><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer()</a></code> and <code><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html">pivot_wider()</a></code> functions from <strong><code>tidyr</code></strong>. This results in each animal type having two rows in the data: (i) one row for the percentage to the limit in 2017 and 2023 and (ii) one row for the percentage from the limit in 2017 and 2023. </p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">intake_YN</span> <span class="op">&lt;-</span> <span class="va">intake_data</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">intake_YN</span> <span class="op">&lt;-</span> <span class="va">intake_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    value <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="va">upper_limit</span>,</span>
 <span>    no_value <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="va">value</span></span>
@@ -643,17 +646,17 @@ Tip&nbsp;5.1: Rounding numbers in R
 <span>    names_from <span class="op">=</span> <span class="st">"year"</span>,</span>
 <span>    values_from <span class="op">=</span> <span class="st">"perc"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>YN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">YN</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>YN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">YN</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>If you think about creating a stacked bar chart (i.e.&nbsp;an unfurled gauge chart), we need to know the end point of each bar (the maximum y-axis value for each bar). This isn’t the percentage for each group, it’s the cumulative percentage for each group and the ones stacked below it. We use the <code><a href="https://rdrr.io/r/base/cumsum.html">cumsum()</a></code> function to calculate the cumulative sum across each year and animal type: </p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">intake_YN</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">intake_YN</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">animal_type</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    ymax_2017 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span><span class="op">(</span><span class="va">`2017`</span><span class="op">)</span>,</span>
 <span>    ymax_2023 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span><span class="op">(</span><span class="va">`2023`</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 6
 # Groups:   animal_type [3]
@@ -709,7 +712,7 @@ Tip&nbsp;5.2: Just because you can doesn’t mean you should
 </div>
 <p>Let’s start with the 2017 data. We start off by creating the <code>0</code> values for the minimum in the first stacked bar using <code>rep(0, n_types)</code> - since we need one <code>0</code> for each animal type in 2017. We then want to get the <code>ymax_2017</code> values from <code>plot_data</code> except the last one. We therefore use <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head()</a></code> to get this subset of the rows (missing the last one in each animal type). Remember that <code>plot_data</code> is still grouped by <code>animal_type</code>. We then stick these <code>ymax_2017</code> to the <code>0</code> we created and pass them into a new column called <code>ymin_2017</code> using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>. The code for the 2023 arc is analogous. </p>
 <div class="cell">
-<div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">n_types</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">n_types</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">$</span><span class="va">animal_type</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">ymin_data</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
@@ -729,7 +732,7 @@ Tip&nbsp;5.2: Just because you can doesn’t mean you should
 <span>      <span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head</a></span><span class="op">(</span><span class="va">plot_data</span>, n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">ymax_2023</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>All of our variables are currently scaled between 0 and 1 (since they relate to percentages towards a limit). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at <span class="math inline">\(-\pi/2\)</span> (instead of 0) and end at <span class="math inline">\(\pi/2\)</span> (instead of 1). We can use the <code><a href="https://scales.r-lib.org/reference/rescale.html">rescale()</a></code> function from the <strong><code>scales</code></strong> package <span class="citation" data-cites="scales">(<a href="references.html#ref-scales" role="doc-biblioref">Wickham, Pedersen, and Seidel 2023</a>)</span> to define the range we want to scale <code>from</code> and <code>to</code>. </p>
 <p>We want to apply this to every column of <code>ymin_data</code> that starts with a lowercase <code>"y"</code> i.e.&nbsp;all of the <code>ymax_*</code> and <code>ymin_*</code> columns so we use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> from <strong><code>dplyr</code></strong> in conjunction with the <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with()</a></code> column selector function. We need to make sure we set <code>ignore.case = FALSE</code> to prevent <strong><code>dplyr</code></strong> from trying to rescale the <code>YN</code> column as well. </p>
@@ -747,7 +750,7 @@ Tip&nbsp;5.3: Older versions of <code><a href="https://dplyr.tidyverse.org/refer
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gauge_data</span> <span class="op">&lt;-</span> <span class="va">ymin_data</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gauge_data</span> <span class="op">&lt;-</span> <span class="va">ymin_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html">across</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"y"</span>, ignore.case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -757,7 +760,7 @@ Tip&nbsp;5.3: Older versions of <code><a href="https://dplyr.tidyverse.org/refer
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gauge_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gauge_data</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 8
   animal_type YN       `2017` `2023` ymax_2017 ymax_2023
@@ -777,7 +780,7 @@ Tip&nbsp;5.3: Older versions of <code><a href="https://dplyr.tidyverse.org/refer
 <p>We then add two arcs by using <code><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar()</a></code> twice. We set the <code>x0</code>, <code>y0</code>, <code>r0</code>, and <code>r</code> constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function because they are <em>required</em> aesthetics. We then pass the <code>ymin_*</code> and <code>ymax_*</code> columns in as the <code>start</code> and <code>end</code> aesthetics, and set the <code>fill</code> color based on the <code>YN</code> column. </p>
 <p>We also use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to draw a pair of arcs for each animal type in a separate facet, choosing to use <code>nrow = 2</code> to give us a nice rectangular 3x2 grid of facets for our six countries. </p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Outer 2023 arc</span></span>
 <span>  <span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
@@ -797,7 +800,7 @@ Tip&nbsp;5.3: Older versions of <code><a href="https://dplyr.tidyverse.org/refer
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">animal_type</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -816,14 +819,14 @@ Figure&nbsp;5.5: Initial plot created using <code><a href="https://ggforce.data-
 <span class="header-section-number">5.4.1</span> Colors</h3>
 <p>Let’s start by defining some variables for our colors. Here, we define a pink <code>highlight_col</code> which we’ll use for the segment showing the percentage towards the target i.e.&nbsp;the number of animals surrendered. This should be a bright, eye-catching color as it’s the main point we’re trying to communicate. The <code>second_col</code> will be used to show the percentage remaining towards to target, so we can choose a color that is a little bit more similar to the background. The background (<code>bg_col</code>) will be a light gray, the <code>second_col</code> will be a medium gray, and the text (<code>text_col</code>) will be black. </p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#990C58"</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#990C58"</span></span>
 <span><span class="va">second_col</span> <span class="op">&lt;-</span> <span class="st">"#949398"</span></span>
 <span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#DEDEDE"</span></span>
-<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Before we add the new colors to our gauge chart, let’s remove the black outline from around the segments - they’re quite thick lines which don’t add anything to the plot. There will be sufficient contrast between the segments with the new colors we’ve chosen. You can remove the outline from the arc by setting <code>color = NA</code> outside of the aesthetic mapping: </p>
 <div class="cell" data-source-line-numbers="9,18">
-<div class="sourceCode" id="cb26" data-source-line-numbers="9,18" data-code-line-numbers="9,18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26" data-source-line-numbers="9,18" data-code-line-numbers="9,18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -842,16 +845,16 @@ Figure&nbsp;5.5: Initial plot created using <code><a href="https://ggforce.data-
 <span>    <span class="op">)</span>,</span>
 <span>    color <span class="op">=</span> <span class="cn">NA</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">animal_type</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">animal_type</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we can apply the colors using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> from <strong><code>ggplot2</code></strong>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">color_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">color_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
 <span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"no_value"</span><span class="op">)</span>,</span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">highlight_col</span>, <span class="va">second_col</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="va">color_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">color_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-color-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Edited version of the previous plot with colors changed from defaults to gray and dark pink.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-color-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -866,7 +869,7 @@ Figure&nbsp;5.6: Edited version of the previous plot with colors changed from de
 <p>When choosing colors for a visualization, it’s important not to rely too heavily on colors and legends for differentiating groups or communicating information. Color vision deficiency (also known as color blindness) comes in many different forms, and different types affect how people perceive colors in different ways. One way to check if your chart is accessible to people with color vision deficiency, is to view it in grayscale (black and white) and consider if it can be understood without color. If it can’t, consider choosing different colors, or using shapes and patterns to differentiate groups instead. Direct labeling of data and making sure that the order of the legend matches the order of the data can help when legends are unavoidable <span class="citation" data-cites="GAcharts">(<a href="references.html#ref-GAcharts" role="doc-biblioref">Government Analysis Function 2021</a>)</span>. </p>
 <p>There are several packages in R that can be used to investigate the accessibility of color palettes. One of them is <strong><code>colorblindr</code></strong> <span class="citation" data-cites="colorblindr">(<a href="references.html#ref-colorblindr" role="doc-biblioref">McWhite and Wilke 2024</a>)</span>. The <strong><code>colorblindr</code></strong> package allows you to create simulations of what your chart may look like to someone with color blindness. The package also includes colorblind friendly qualitative palettes with associated <strong><code>ggplot2</code></strong> functions. At the time of writing, <strong><code>colorblindr</code></strong> is not available on CRAN but can be installed from GitHub, using the methods described in <a href="bee-colonies.html" class="quarto-xref"><span>Chapter 4</span></a>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/colorblindr/man/cvd_grid.html">cvd_grid</a></span><span class="op">(</span><span class="va">color_plot</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/colorblindr/man/cvd_grid.html">cvd_grid</a></span><span class="op">(</span><span class="va">color_plot</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-cvd" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A 2x2 grid of charts showing simulations of how the current chart might appear to people with each of four different types of color vision deficiency.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-cvd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -883,28 +886,28 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of how the current cha
 <span class="header-section-number">5.4.2</span> Text and fonts</h3>
 <p>As we’ve seen in previous chapters, we can load in Google fonts using the <strong><code>sysfonts</code></strong> and <strong><code>showtext</code></strong> packages. Here, we’ll keep it clean and minimal by using the <code>"Ubuntu"</code> typeface for both the title and the body. </p>
 <div class="cell">
-<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Ubuntu"</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Ubuntu"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
-<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Ubuntu"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Ubuntu"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Let’s define some text for the title and subtitle. Here, the title defines the key message of the chart, ensuring a reader understands the main point even if they only glance at the graphic. The subtitle gives a brief explanation of how to interpret the plot, and reiterates the main conclusion that we want the reader to take away. The <code>caption</code> variable identifies the source of the data for this visualization, as well as the chart creator.</p>
 <div class="cell">
-<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"The number of animals surrendered is lower in 2023 compared to 2017"</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"The number of animals surrendered is lower in 2023 compared to 2017"</span></span>
 <span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="st">"The inner pink bar represents the number of animals surrendered in 2017, whilst the outer pink bar represents the number in 2023. A decrease is seen across all types of animals."</span></span>
-<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: City of Long Beach Animal Care Services | Graphic: N. Rennie"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">caption</span> <span class="op">&lt;-</span> <span class="st">"Data: City of Long Beach Animal Care Services | Graphic: N. Rennie"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Since the axis labels do not make too much sense for <code><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar()</a></code> plots, we’ll remove them later when using the <code>theme</code> functions. Instead, we can add our own labels using <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> to the end of the gauges. To make it easier, we can construct a small <code>data.frame</code> specifically for adding text labels. This includes the <code>x</code>, and <code>y</code> coordinates where the text should be positioned (you can read these off from the graph we already have since we haven’t yet deleted the axis labels), as well as the <code>label</code> that should appear.</p>
 <div class="cell">
-<div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.35</span>, <span class="fl">0.85</span><span class="op">)</span>,</span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="fl">0.1</span><span class="op">)</span>,</span>
 <span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2017</span>, <span class="fl">2023</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We can then add this text to the existing plot by adding a layer with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, noting that we need to specify the <code>data</code> argument as using the text <code>data.frame</code> we just created. We also need to specify the typeface and size directly within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, and can add the title and subtitle text created earlier using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from <strong><code>ggplot2</code></strong>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">text_df</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
@@ -916,7 +919,7 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of how the current cha
 <span>    subtitle <span class="op">=</span> <span class="va">subtitle</span>,</span>
 <span>    caption <span class="op">=</span> <span class="va">caption</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="va">text_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">text_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-text" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Previous plot with additional labels indicating the year on each gauge chart, as well as an added title and subtitle.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-text-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -933,10 +936,10 @@ Figure&nbsp;5.8: Previous plot with additional labels indicating the year on eac
 <p>We’ll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>. We can use the <code>base_family</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to set the typeface that will be used by default for any non-geom text elements that remain.</p>
 <p>You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> which forces a 1:1 aspect ratio on the plot panel.</p>
 <div class="cell">
-<div class="sourceCode" id="cb33" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">8.5</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span></span>
-<span><span class="va">theme_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">theme_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-style-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Edited version of previous plot with fixed coordinate system to prevent squashing, and all theme elements removed">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-style-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -964,7 +967,7 @@ Figure&nbsp;5.9: Edited version of previous plot with fixed coordinate system to
 </ul>
 <p></p>
 <div class="cell">
-<div class="sourceCode" id="cb34" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span></span>
 <span>      fill <span class="op">=</span> <span class="va">bg_col</span>, color <span class="op">=</span> <span class="va">bg_col</span></span>
@@ -993,7 +996,7 @@ Figure&nbsp;5.9: Edited version of previous plot with fixed coordinate system to
 <span>    <span class="op">)</span>,</span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="va">styled_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">styled_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-style-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Further styling of gauge chart to change background color, prevent overlapping in the subtitle text, and increase the size of the title.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-style-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1046,8 +1049,8 @@ Tip&nbsp;5.5: Choosing a width
 <p>Here, there’s an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the dark pink color represents the number of animals in the data (percentage towards the target).</p>
 <p>So let’s remove the legend, by setting <code>legend.position = "none"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb35" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-longbeach-style-3" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Final styling of gauge chart to remove the legend, providing more space for the chart area.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-style-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1061,11 +1064,11 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 </div>
 <p>Then save it with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
-<div class="sourceCode" id="cb36" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"animal-intakes.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.7</span> <span class="op">*</span> <span class="fl">5</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section></section><section id="reflection" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">5.5</span> Reflection</h2>
@@ -1490,13 +1493,14 @@ Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, 
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

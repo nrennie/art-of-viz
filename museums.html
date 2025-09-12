@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.34">
+<meta name="generator" content="quarto-1.8.24">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>3&nbsp; UK museums: highlighting line charts with gghighlight – The Art of Data Visualization with ggplot2</title>
 <style>
@@ -85,14 +85,15 @@ div.csl-indent {
 <link href="./programming-languages.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-c3e9ed0836829b523c3e41ee67ee3be9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15ea27bac76f9890c21e80949f497921.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3f2177d04cbb2ca220b4c8f1836bac43.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c43190fbe1c113cfbc67da3b35af8548.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -150,7 +151,9 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
     </div>
   </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="./">The Art of Data Visualization with ggplot2</a> 
     </div>
@@ -375,7 +378,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 </ul>
 <p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
-<div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yutannihilation.github.io/gghighlight/">gghighlight</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/ggtext/">ggtext</a></span><span class="op">)</span></span>
@@ -385,7 +388,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/">tibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dslc-io.github.io/tidytuesdayR/">tidytuesdayR</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/">viridis</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/">viridis</a></span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The new packages we’ll be exploring for the first time in this chapter are:</p>
 <ul>
@@ -404,8 +407,8 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <p>The <a href="https://museweb.dcs.bbk.ac.uk/data">Mapping Museums</a> project <span class="citation" data-cites="museums_data">(<a href="references.html#ref-museums_data" role="doc-biblioref">Mapping Museums 2021</a>)</span> has collected data relating to over 4,000 museums in the UK, covering museums from 1960 onward. The data can be downloaded from the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/home">museweb.dcs.bbk.ac.uk</a>. It was also used as a TidyTuesday <span class="citation" data-cites="tidytuesday">(<a href="references.html#ref-tidytuesday" role="doc-biblioref">R4DS Online Learning Community 2023</a>)</span> data set in November 2022 (after being suggested by <a href="https://github.com/jthomasmock">Tom Mock</a>), and we’ll use that version for this chapter.</p>
 <p>Let’s start by reading in the data using the <strong><code>tidytuesdayR</code></strong> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
-<div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-11-22"</span><span class="op">)</span></span>
-<span><span class="va">museums</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">museums</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2022-11-22"</span><span class="op">)</span></span>
+<span><span class="va">museums</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">museums</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The data contains information for 35 different variables on 4191 museums. After the first <code>museum_id</code> columns, the next 8 columns provide information on the location of the museum - including address and co-ordinates. The next set of columns provides information about the museums such as whether it’s an accredited museum, how it’s governed, what types of items it has, and when it was open. Since this is a collated data set, information is also provided on the original source of the data for some of these variables. The remaining columns provide information on the area in which the museum is located, including information about different deprivation indices and geo-demographic group (type of area e.g.&nbsp;<code>"University Towns and Cities"</code>). A full glossary of the terms used can be found on the Mapping Museums website at <a href="https://museweb.dcs.bbk.ac.uk/glossary">museweb.dcs.bbk.ac.uk/glossary</a>.</p>
 </section><section id="exploratory-work" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="exploratory-work">
@@ -422,7 +425,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <p>Some of the variables, such as <code>DOMUS_Subject_Matter</code> have quite a lot of missing values which makes it more difficult to visualize and interpret them. Although these columns definitely warrant further exploration, we’ll ignore them for now.</p>
 <p>Given the wealth of information around deprivation indices (8 different variables), that’s the first aspect of the data that jumps out. How does the number of museums vary by index of deprivation?</p>
 <div class="cell">
-<div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Area_Deprivation_index</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/barplot.html">barplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Area_Deprivation_index</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-barplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart of 10 bars, one for each level of deprivation from 1 to 10, which exhibits a bell-shaped curve with the maximum value around 600.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-barplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -464,7 +467,7 @@ Tip&nbsp;3.1: Alternative graphics packages
 <li>Or do we use faceting to split it into multiple smaller plots by deprivation index?</li>
 </ul>
 <p>If we go with line charts, and faceting by deprivation index, that might look something like this:</p>
-<div id="fig-museums-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text.">
+<div id="fig-museums-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text." data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="images/sketch-museums.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Sketch of 10 small charts arranged in 2 rows and 5 columns, labelled from 1-10. Scribbles indicate the position of the title and caption text.">
 </div>
@@ -483,11 +486,11 @@ Figure&nbsp;3.2: Initial sketch of a faceted line chart showing change over time
 <p>First, let’s drop any columns that we don’t actually need using the <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> function from <strong><code>dplyr</code></strong> - we only need the <code>Year_opened</code>, <code>Year_closed</code>, and <code>Area_Deprivation_index</code> columns to calculate the number of museums open each year. There are a few <code>NA</code> values in the <code>Area_Deprivation_index</code> column so we’ll drop those rows using <code><a href="https://tidyr.tidyverse.org/reference/drop_na.html">drop_na()</a></code> from <strong><code>tidyr</code></strong>.</p>
 <p>Now let’s start dealing with the year columns. If you look at the values, you’ll notice that they’re not exactly what you’d expect in a <em>year</em> column:</p>
 <div class="cell">
-<div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Year_opened</span>, <span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Year_opened</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] "2012:2012" "1971:1971" "1984:1984" "1971:1971"</code></pre>
 </div>
-<div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Year_closed</span>, <span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museums</span><span class="op">$</span><span class="va">Year_closed</span>, <span class="fl">4</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] "9999:9999" "2007:2017" "9999:9999" "2012:2012"</code></pre>
 </div>
@@ -495,7 +498,7 @@ Figure&nbsp;3.2: Initial sketch of a faceted line chart showing change over time
 <p>Each entry is in fact two years, separated by a <code>:</code>. According to the <a href="[museweb.dcs.bbk.ac.uk](https://museweb.dcs.bbk.ac.uk/home)">Mapping Museums glossary</a>, this is because these are actually date ranges. For some museums, it wasn’t possible to establish an exact opening or closing date, and instead a date range is given based on partial information. For example, a value of <code>"2007:2017"</code> means the museum opened (or closed) sometime between 2007 and 2017.</p>
 <p>Let’s separate out these year values into four columns instead of two using the <code><a href="https://tidyr.tidyverse.org/reference/separate_wider_delim.html">separate_wider_delim()</a></code> function from <strong><code>tidyr</code></strong> . We separate based on the <code>:</code>, and create two new columns, <code>opened1</code> and <code>opened2</code> from the <code>Year_opened</code> column. We do the same thing for the <code>Year_closed</code> closed column. We also want to make sure that these new columns are numeric rather than character columns, so we use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> from <strong><code>dplyr</code></strong> to convert them using <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> . We can also convert the <code>Area_Deprivation_index</code> to a factor rather than a numeric and make sure the order is correct.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">museum_subset</span> <span class="op">&lt;-</span> <span class="va">museums</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">museum_subset</span> <span class="op">&lt;-</span> <span class="va">museums</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
 <span>    <span class="va">Year_opened</span>, <span class="va">Year_closed</span>, <span class="va">Area_Deprivation_index</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -518,7 +521,7 @@ Figure&nbsp;3.2: Initial sketch of a faceted line chart showing change over time
 <span>      <span class="va">Area_Deprivation_index</span>,</span>
 <span>      levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span>
 <span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="tip-museums-separate" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -547,7 +550,7 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 </ul>
 <p>The same approach is then applied to create another new column called <code>opened</code>. There are no instances in the data where one of the closing dates is <code>NA</code> but the other is not, so we don’t need to worry about that. We can also tidy up the output by dropping any columns we don’t need, renaming the <code>Area_Deprivation_index</code> to something a little bit shorter and easier to work with, and arranging the data by level of deprivation. </p>
 <div class="cell">
-<div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">museum_data</span> <span class="op">&lt;-</span> <span class="va">museum_subset</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">museum_data</span> <span class="op">&lt;-</span> <span class="va">museum_subset</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html">across</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">closed1</span>, <span class="va">closed2</span><span class="op">)</span>,</span>
 <span>    <span class="op">~</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else</a></span><span class="op">(</span><span class="va">.x</span> <span class="op">==</span> <span class="fl">9999</span>, <span class="cn">NA_real_</span>, <span class="va">.x</span><span class="op">)</span></span>
@@ -562,11 +565,11 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Area_Deprivation_index</span>, <span class="va">opened</span>, <span class="va">closed</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>deprivation <span class="op">=</span> <span class="va">Area_Deprivation_index</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">deprivation</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">deprivation</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This gives us data that looks like this:</p>
 <div class="cell">
-<div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museum_data</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">museum_data</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code># A tibble: 6 × 3
   deprivation opened closed
@@ -582,24 +585,24 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 <p>The first entry in <code>museums_data</code> is a museum in the most deprived decile which opened in (approximately) 1988 and is still open.</p>
 <p>What we want to know is how many museums were open in a given year for each level of deprivation. Let’s create a function that takes three inputs: a year of interest, a level of deprivation, and the <code>museum_data</code>. Inside the function, we can then <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> the data to only the level of deprivation we’re interested in. Then we can count how many museums opened before or in the year we’re interested in. We can then do the same for how many museums closed (remembering to deal with the <code>NA</code> values for museums that are still open). The difference between the two will be how many were open in that year. </p>
 <div class="cell">
-<div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">num_year</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">year</span>, <span class="va">dep</span>, <span class="va">data</span> <span class="op">=</span> <span class="va">museum_data</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">num_year</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">year</span>, <span class="va">dep</span>, <span class="va">data</span> <span class="op">=</span> <span class="va">museum_data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">deprivation</span> <span class="op">==</span> <span class="va">dep</span><span class="op">)</span></span>
 <span>  <span class="va">num_open</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">opened</span> <span class="op">&lt;=</span> <span class="va">year</span><span class="op">)</span></span>
 <span>  <span class="va">num_closed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">closed</span> <span class="op">&lt;=</span> <span class="va">year</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="va">diff</span> <span class="op">&lt;-</span> <span class="va">num_open</span> <span class="op">-</span> <span class="va">num_closed</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">diff</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Let’s test it works:</p>
 <div class="cell">
-<div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">num_year</span><span class="op">(</span><span class="fl">1980</span>, <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">num_year</span><span class="op">(</span><span class="fl">1980</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>[1] 186</code></pre>
 </div>
 </div>
 <p>There were 186 museums open in 1980, in an area in the third deprivation decile. Now, we need to run this function for every combination of year (from <code>1960</code> to <code>2021</code>) and deprivation level (from <code>1</code> to <code>10</code>). There are many different ways of doing this in R, and we’re going to use the <strong><code>purrr</code></strong> package <span class="citation" data-cites="purrr">(<a href="references.html#ref-purrr" role="doc-biblioref">Wickham and Henry 2023</a>)</span>. We start by creating two variables with sequences of years and levels of deprivation - this is useful for testing if the code works because we can easily change it to a smaller number of years. Then we use <code>expand.grid</code> to create a <code>data.frame</code> with all of the combinations and pass this in as the first argument to <code>pmap_vec</code> from <strong><code>purrr</code></strong>. The second argument to <code>pmap_vec</code> is the function we want to apply (<code>num_year()</code>) that we defined above), where the first argument of <code>num_year()</code> comes from the first column of the grid of values, and the second argument from the second column. We can then convert the output into a matrix where each column is a level of deprivation, and each row is a year. </p>
 <div class="cell">
-<div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">all_years</span> <span class="op">&lt;-</span> <span class="fl">1960</span><span class="op">:</span><span class="fl">2021</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">all_years</span> <span class="op">&lt;-</span> <span class="fl">1960</span><span class="op">:</span><span class="fl">2021</span></span>
 <span><span class="va">deps</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/pmap.html">pmap_vec</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span><span class="va">all_years</span>, <span class="va">deps</span><span class="op">)</span>,</span>
@@ -609,11 +612,11 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 <span>  nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">all_years</span><span class="op">)</span>,</span>
 <span>  byrow <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now, our data looks like this:</p>
 <div class="cell">
-<div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre data-code-line-numbers=""><code>       1  2   3   4   5   6   7   8  9 10
 [1,] 103 78 110 125 125 124 122 110 76 51
@@ -626,7 +629,7 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 </div>
 <p>We’re almost ready to start plotting our data! We just need to convert this into a <code><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble()</a></code> (or <code>data.frame</code>), add the <code>year</code> column using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>, and put the data into a long format using <code>pivot_longer</code> from <strong><code>tidyr</code></strong> . We want to end up with a 3 column data set, where the 3 columns are: <code>year</code>, <code>deprivation</code>, and <code>museums</code> (number of open museums).</p>
 <div class="cell">
-<div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>year <span class="op">=</span> <span class="va">all_years</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span></span>
@@ -636,13 +639,13 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    deprivation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">deprivation</span>, levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section><section id="the-first-plot" class="level3" data-number="3.3.2"><h3 data-number="3.3.2" class="anchored" data-anchor-id="the-first-plot">
 <span class="header-section-number">3.3.2</span> The first plot</h3>
 <p>One of most common approaches to visualising multiple time series, is to plot multiple lines on the same plot. Although we’re already thinking about facets, it’s still worth seeing what those line charts look like. It can help us to understand the overall variability of the data. We can create the initial plot using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> to define the data and the aesthetic mapping with the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function. We have <code>year</code> on the x-axis, <code>museums</code> on the y-axis, and each line will have a different color based on <code>deprivation</code>. The actual lines are then added with <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line()</a></code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">year</span>,</span>
@@ -650,7 +653,7 @@ Tip&nbsp;3.2: Using <code><a href="https://tidyr.tidyverse.org/reference/separat
 <span>    color <span class="op">=</span> <span class="va">deprivation</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-basic-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A line chart with 10 lines showing the number of open museums for each level of deprivation. Many of the lines overlap and are similar colors, making it difficult to read the values. Line go from 1980 to 2020 and show a general increase from around 100 to 500.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-basic-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -670,12 +673,12 @@ Figure&nbsp;3.3: A line chart of total number of museums open per year for each 
 </ul>
 <p>Let’s go back to our previous idea, and try separating out the deprivation levels into different facets. We can do this using <code>facet_wrap(~deprivation, nrow = 2)</code> , with the <code>nrow</code> argument used to create that 5x2 grid we talked about earlier. Let’s also try changing <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line()</a></code> to <code><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area()</a></code>. Although line charts and area charts can both show the same data, line charts often cause us to focus more on the trend over time. In contrast, area charts often cause us to focus on the total volume over time - helping to highlight differences in total number of open museums over time rather than just increases and decreases. Remember to also change <code>color</code> to <code>fill</code> in the aesthetic mapping! </p>
 <div class="cell">
-<div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">museums</span>, fill <span class="op">=</span> <span class="va">deprivation</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">deprivation</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">deprivation</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-basic-plot-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="10 area charts arranged in a 5x2 grid, each one a different color and labeled based on deprivation. A legend appears on the right hand side. Areas in level 1, 2, and 10 appear smaller.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-basic-plot-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -715,7 +718,7 @@ Tip&nbsp;3.3: Specifying variables for facets
 </h3>
 <p>The second change can be implemented easily using the <strong><code>gghighlight</code></strong> package <span class="citation" data-cites="gghighlight">(<a href="references.html#ref-gghighlight" role="doc-biblioref">Yutani 2023</a>)</span>. <strong><code>gghighlight</code></strong> is a <strong><code>ggplot2</code></strong> extension package, specifically designed for highlighting points and lines based on some conditions. Let’s switch back to <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line()</a></code> and add <code><a href="https://yutannihilation.github.io/gghighlight/reference/gghighlight.html">gghighlight()</a></code>. We set <code>use_direct_label = FALSE</code> because <strong><code>gghighlight</code></strong> will otherwise add a label to each highlighted line - unnecessary since each line is labelled by it’s facet label already. </p>
 <div class="cell" data-source-line-numbers="11">
-<div class="sourceCode" id="cb21" data-source-line-numbers="11" data-code-line-numbers="11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-source-line-numbers="11" data-code-line-numbers="11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>    x <span class="op">=</span> <span class="va">year</span>,</span>
@@ -725,7 +728,7 @@ Tip&nbsp;3.3: Specifying variables for facets
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">deprivation</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://yutannihilation.github.io/gghighlight/reference/gghighlight.html">gghighlight</a></span><span class="op">(</span>use_direct_label <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://yutannihilation.github.io/gghighlight/reference/gghighlight.html">gghighlight</a></span><span class="op">(</span>use_direct_label <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-basic-plot-3" class="quarto-float quarto-figure quarto-figure-center anchored" alt="10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values range from around 100 to 500. A legend appears on the right hand side.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-basic-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -739,7 +742,7 @@ Figure&nbsp;3.5: A line chart of total number of museums open per year for each 
 </div>
 <p>We can also perform an additional bit of data wrangling to rescale the values by their 1960 levels. We start by filtering the data to only include data from the year 1960 and keeping only the <code>deprivation</code> and <code>museums</code> columns . Then, we join this baseline data back to our original data based on the <code>deprivation</code> level, and for each year calculate the percentage change since 1960 and save it in a new column called <code>change</code>. </p>
 <div class="cell">
-<div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lookup</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lookup</span> <span class="op">&lt;-</span> <span class="va">plot_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">==</span> <span class="fl">1960</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">deprivation</span>, <span class="va">museums</span><span class="op">)</span></span>
 <span></span>
@@ -753,18 +756,18 @@ Figure&nbsp;3.5: A line chart of total number of museums open per year for each 
 <span>    change <span class="op">=</span> <span class="op">(</span></span>
 <span>      <span class="fl">100</span> <span class="op">*</span> <span class="op">(</span><span class="va">museums</span> <span class="op">-</span> <span class="va">museums_1960</span><span class="op">)</span> <span class="op">/</span> <span class="va">museums_1960</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">deprivation</span>, <span class="va">change</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">deprivation</span>, <span class="va">change</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We can then re-do our line chart using the rescaled <code>change</code> data on the y-axis instead:</p>
 <div class="cell">
-<div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">new_plot_data</span>,</span>
 <span>  mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">change</span>, color <span class="op">=</span> <span class="va">deprivation</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">deprivation</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://yutannihilation.github.io/gghighlight/reference/gghighlight.html">gghighlight</a></span><span class="op">(</span>use_direct_label <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">basic_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">basic_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-basic-plot-4" class="quarto-float quarto-figure quarto-figure-center anchored" alt="10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-basic-plot-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -789,17 +792,17 @@ Figure&nbsp;3.6: A line chart of percentage increase in museums (compared to 196
 <span class="header-section-number">3.4.1</span> Colors</h3>
 <p>Let’s get started with choosing some colors. As discussed in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, we’ll save color codes as variables: either using hex codes or color names. Let’s use <code>"black"</code> for text, and <code>"#fafafa"</code> for the background color. The use of a light gray rather than white for the background is primarily personal preference - it’s less glaringly bright on a screen. Although, you do have to be a bit more careful around contrast of text against the background - hence the black text. </p>
 <div class="cell">
-<div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#FAFAFA"</span></span>
-<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#FAFAFA"</span></span>
+<span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"black"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For the colors of the lines, we can use the <strong><code>viridis</code></strong> package <span class="citation" data-cites="viridis">(<a href="references.html#ref-viridis" role="doc-biblioref">Garnier et al. 2024</a>)</span>. The <strong><code>viridis</code></strong> package provides multiple different color palettes which are designed to be visually pleasing, perceptually-uniform ,and colorblind friendly. The default viridis palette includes purples, blues, greens, then yellows. Viridis color palettes are most commonly used with continuous data, rather than categorical data. However, since the categories that we wish to color (levels of deprivation) are ordered, they will work well here too. The <strong><code>viridis</code></strong> package includes functions to add the colors to plots made with <strong><code>ggplot2</code></strong>. Here, we use the <code><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html">scale_color_viridis()</a></code> function, specify that we want a discrete palette and that the lowest values should have the yellow colors with <code>direction = -1</code> .</p>
 <div class="cell">
-<div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span></span>
 <span>    discrete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="va">col_plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">col_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-style-plot-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. A legend appears on the right hand side. Lines are colored yellows, blues, and purples.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-style-plot-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -815,10 +818,10 @@ Figure&nbsp;3.7: An updated version of the previous chart with colors chosen fro
 <span class="header-section-number">3.4.2</span> Text and fonts</h3>
 <p>Let’s start by loading in a different typeface using <code><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google()</a></code> from <strong><code>sysfonts</code></strong> and setting font options with <strong><code>showtext</code></strong> . <em>Raleway</em> is a minimalist, sans serif typeface, and we’ll use it for both body text and title text. We can save it as a single variable, <code>body_font</code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Raleway"</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/sysfonts/man/font_add_google.html">font_add_google</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Raleway"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_auto.html">showtext_auto</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/showtext/man/showtext_opts.html">showtext_opts</a></span><span class="op">(</span>dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
-<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Raleway"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Raleway"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="tip-museums-typeface" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -842,9 +845,9 @@ Tip&nbsp;3.4: Typeface vs.&nbsp;font vs.&nbsp;font family
 <p>We also need to define a title, subtitle, and caption. Adding a question as a title can help guide readers towards what you want them to see, but also force them to look for themselves. Here, we ask <em>Are there fewer museums opening in more deprived areas?</em> in the title - telling readers to look at changes across the levels of deprivation, but not giving them the answer straight away.</p>
 <p>The subtitle then goes onto explain what the answer is, and exactly what is shown in the chart. The caption is more extended here than you may see in many charts because it explains more about the source of the data and what the variables actually are. Understanding definitions of variables isn’t something we should ever take for granted. Unless you are already familiar with indices of deprivation, it may not be clear that <code>1</code> means higher levels of deprivation.</p>
 <div class="cell">
-<div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Are there fewer museums opening in more deprived areas?"</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"Are there fewer museums opening in more deprived areas?"</span></span>
 <span><span class="va">st</span> <span class="op">&lt;-</span> <span class="st">"The change in the estimated number of open museums since 1960 is significantly lower in areas with higher levels of deprivation. *Since around 2000, the number of open museums has stagnated across all areas, regardless of deprivation index. However, the rate of growth prior to this stagnation is lower in more deprived areas."</span></span>
-<span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="st">"*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).&lt;br&gt;&lt;br&gt;**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.&lt;br&gt;&lt;br&gt;N. Rennie | Data: museweb.dcs.bbk.ac.uk"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">cap</span> <span class="op">&lt;-</span> <span class="st">"*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).&lt;br&gt;&lt;br&gt;**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.&lt;br&gt;&lt;br&gt;N. Rennie | Data: museweb.dcs.bbk.ac.uk"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="tip-museums-html" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -861,12 +864,12 @@ Tip&nbsp;3.5: Adding line breaks using <code>&lt;br&gt;</code>
 </div>
 <p>Let’s add the title, subtitle, caption, and a y-axis label in using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function. We can also remove the default column name label on the x-axis as it’s very clear that the x-axis shows years. </p>
 <div class="cell">
-<div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="va">title</span>, subtitle <span class="op">=</span> <span class="va">st</span>, caption <span class="op">=</span> <span class="va">cap</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">""</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"% change in estimated number of\nopen museums since 1960**"</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section><section id="adjusting-themes" class="level3" data-number="3.4.3"><h3 data-number="3.4.3" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">3.4.3</span> Adjusting themes</h3>
@@ -877,7 +880,7 @@ Tip&nbsp;3.5: Adding line breaks using <code>&lt;br&gt;</code>
 <p>For the <code>plot.title</code>, <code>plot.subtitle</code>, and <code>plot.caption</code>, arguments, we use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> to make sure that any Markdown or HTML syntax is processed, and to automatically wrap the text in the subtitle and caption. The text is all left-aligned, with a <code>lineheight</code> of <code>0.5</code>, and set to use the <code>text_col</code> variable for the color. The title font is made slightly larger and in bold. The <code>axis.text</code> is also set to be <code>text_col</code> colored with a <code>lineheight</code> of <code>0.5</code> using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code>. </p>
 <p>Now, we have our final plot:</p>
 <div class="cell">
-<div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">300</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html">coord_cartesian</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">7</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
@@ -913,7 +916,7 @@ Tip&nbsp;3.5: Adding line breaks using <code>&lt;br&gt;</code>
 <span>      color <span class="op">=</span> <span class="va">text_col</span>,</span>
 <span>      lineheight <span class="op">=</span> <span class="fl">0.5</span></span>
 <span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-museums-style-plot-3" class="quarto-float quarto-figure quarto-figure-center anchored" alt="10 line charts arranged in a 5x2 grid, each with the same 10 lines, but one a different color and labeled based on deprivation. Values are percentages ranging from around 0 to 300. Lines are colored yellows, blues, and purples. No legend appears,but title, subtitle, and caption text have appeared.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-museums-style-plot-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -929,11 +932,11 @@ Figure&nbsp;3.8: A styled version of the previous plot - with a custom font, col
 <p>Formats such as PNG and JPG save <em>raster</em> images i.e.&nbsp;information is stored about each pixel. This means that they are able to capture highly detailed information. However, this also means that file sizes can be large. Raster images also don’t scale well - when you increase the size of an image, it tends to become blurry and lower in quality. Formats such as PDF or SVG are <em>vector</em> images i.e.&nbsp;information is stored about each line and shape in the image. This means it’s easier to rescale without losing quality, and file sizes can be smaller (at least for graphics that are not excessively complex).</p>
 <p>Raster images tend to be better for complex visualisations and images, or when fixed resolution is preferred such as in a website. Vector images tend to be better for graphics that are likely to need resizing or be interactive. For the remainder of this book, we’ll continue to save in PNG format for consistency in the print version of the book. </p>
 <div class="cell">
-<div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"museums.png"</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.67</span> <span class="op">*</span> <span class="fl">5</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section></section><section id="reflection" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">3.5</span> Reflection</h2>
@@ -1359,13 +1362,14 @@ Zehr, Sarah M., Richard G. Roach, David Haring, Julie Taylor, Freda H. Cameron, 
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
