@@ -78,7 +78,7 @@ The Canadian Wind Turbine data contains information licensed under the [Open Gov
 
 Though the **`readxl`** package [@readxl] package can be used to read Excel files stored locally, it doesn't work for reading in Excel files directly from a URL. We could visit the relevant {{< monolink "https://open.canada.ca/data/dataset/" "open.canada.ca/data/dataset" >}} website, manually download the file, and then read it in using  **`readxl`**. Alternatively, we can use the **`openxlsx`** package [@openxlsx] which allows us to pass in a URL.
 
-Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ({{< monolink "https://open.canada.ca/data/dataset/79fdad93-9025-49ad-ba16-c26d718cc070" "open.canada.ca/data/dataset/79fdad93-9025-49ad-ba16-c26d718cc070" >}}), and right-click on the link to the Excel file you can then copy the link address. We save that link address as a character string called `url`. If you plan to download other datasets from the same site, it can be useful to save the main website as the `base_url` variable so that you can reuse this string later.
+Of course, we still need to know what the URL of this file is. If you visit the following webpage for the wind turbines data ({{< monolink "https://open.canada.ca/data/dataset/79fdad93-9025-49ad-ba16-c26d718cc070" "open.canada.ca/data/dataset/79fdad93-9025-49ad-ba16-c26d718cc070" >}}), and right-click on the link to the Excel file, you can then copy the link address. We save that link address as a character string called `url`. If you plan to download other datasets from the same site, it can be useful to save the main website as the `base_url` variable so that you can reuse this string later.
 
 We then use the `read.xlsx()` function from **`openxlsx`**, where we pass in the `url` variable to the `xlsxFile` argument: \index{openxlsx!read.xlsx} 
 
@@ -144,11 +144,11 @@ The `read.xlsx()` function always skips empty rows at the start of the file. How
 
 ## Processing merged cells from Excel
 
-Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they're at the top of the file (e.g. with the title information) then using `startRow` might be enough. Otherwise, setting `fillMergedCells = TRUE` in `read.xlsx()` means that *the value in a merged cell is given to all cells within the merge* [@openxlsx].
+Merged cells are hard to deal with because it means your data no longer fits into a nice rectangular structure. It depends on where the merged cells are, and what they contain, how difficult they are to deal with. If they're at the top of the file (e.g., with the title information) then using `startRow` might be enough. Otherwise, setting `fillMergedCells = TRUE` in `read.xlsx()` means that *the value in a merged cell is given to all cells within the merge* [@openxlsx].
 
 :::
 
-We don't want to have to re-download the data from the URL each time we want to work on it (especially if the data may be updated), so let's save a copy locally. We could simply save the Excel file (or we could have used `download.file()` instead of `read_csv()`). However, it would be better to save it as a CSV file instead because they are smaller in size, and can be opened in a simple text editor. Luckily the `wind_turbines` data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using `write.csv()` with an appropriate file name (and setting `row.names = FALSE` to avoid adding an additional column of row names). \index{utils!write.csv}
+We don't want to have to redownload the data from the URL each time we want to work on it (especially if the data may be updated), so let's save a copy locally. We could simply save the Excel file (or we could have used `download.file()` instead of `read_csv()`). However, it would be better to save it as a CSV file instead because these files are smaller in size, and can be opened in a simple text editor. Luckily the `wind_turbines` data is well formatted - there are no merged cells, multiple sheets, or empty rows we need to deal with. This means we can save it as a CSV file using `write.csv()` with an appropriate file name (and setting `row.names = FALSE` to avoid adding an additional column of row names). \index{utils!write.csv}
 
 ```{r}
 #| label: turbines-download-2
@@ -188,7 +188,7 @@ There are quite a few variables that we might be interested in looking at here -
 
 ### Data exploration
 
-Let's start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step. The `Turbine.rated.capacity.(kW)` column is currently a character column even though it contains numeric values, so we wrap the column in `as.numeric()` before plotting it:
+Let's start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step (see @fig-turbines-scatter). The `Turbine.rated.capacity.(kW)` column is currently a character column even though it contains numeric values, so we wrap the column in `as.numeric()` before plotting it:
 
 ```{r, echo=-1}
 #| label: fig-turbines-scatter
@@ -211,7 +211,7 @@ This scatter plot highlights a few issues:
   
   > `Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion`
   
-  This comes from the `as.numeric` transformation of the `Turbine.rated.capacity.(kW)` column. If we inspect this column more closely, you'll see that there are a few unusual values such as `"1903/2126/2221"`. If we look at the `Notes` column for an explanation, we can see that these values exist because `"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"`. Unfortunately, we don't know which individual turbines this derating applies to which makes it difficult to create a scatter plot.
+  This comes from the `as.numeric` transformation of the `Turbine.rated.capacity.(kW)` column. If we inspect this column more closely, you'll see that there are a few unusual values such as `"1903/2126/2221"`. If we look at the `Notes` column for an explanation, we can see that these values exist because `"Some turbines derated such that the farm has an maximum operating capacity of 180 MW"`. Unfortunately, we don't know which individual turbines this derating applies to, which makes it difficult to create a scatter plot.
 
 * The other issue with this scatter plot is that many of the observations are the same, but it's not shown clearly on the plot. If we later wanted to fit some statistical models to explore this relationship further, a common assumption is that each observation is independent. That's not true here - many individual turbines belong to the same project, and so are the same model with the same rotor diameter and capacity. Instead, we might want to group the unique values and use the number of turbines of a particular model as a weighting. This could be better visualized as a bubble chart, with the size of the bubbles showing the number of turbines in each diameter-capacity combination.
 
@@ -221,7 +221,7 @@ This scatter plot highlights a few issues:
 
 Remember that you can use `View(wind_turbines)` to inspect the data in a more human-readable format. In addition to looking at the data, obtaining summaries of the columns, and creating exploratory graphics with base R, there are many packages available to help with exploratory data analysis. 
 
-For example, the **`GGally`** package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
+For example, the **`GGally`** package [@GGally] makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data (see @fig-turbines-ggally).
 
 ```{r, echo=-1}
 #| label: fig-turbines-ggally
@@ -247,7 +247,7 @@ theme_set(theme_gray(base_size = 11))
 
 :::
 
-Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading.
+Let's instead look at the number of turbines in each region, by creating an ordered bar chart. We use the `table()` function to get a count of the number per region, and `sort()` to order the counts from smallest to largest. We then use the `barplot()` function to make the chart, setting `horiz = TRUE` to make the bars horizontal for easier reading as shown in @fig-turbines-barplot.
 
 ```{r, echo=-1}
 #| label: fig-turbines-barplot
@@ -278,13 +278,13 @@ barplot(
 )
 ```
 
-As you can see from the y-axis of @fig-turbines-barplot-2, the `Commissioning.date` isn't always given as a year. Instead it's sometimes given as a year range. Let's start drafting out a more aesthetically pleasing version of this plot before we deal with processing the `Commissioning.date` data.
+As you can see from the y-axis of @fig-turbines-barplot-2, the `Commissioning.date` isn't always given as a year. Instead, it's sometimes given as a year range. Let's start drafting out a more aesthetically pleasing version of this plot before we deal with processing the `Commissioning.date` data.
 
 ### Exploratory sketches
 
-There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines in different multiyear time periods. The choice of these time periods is open to designer choice. For this visualization, let's start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
+There are some years for which we have very few observations, and some turbines for which we don't know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let's plot the number of turbines in different multiyear time periods. The choice of these time periods is open to the designer. For this visualization, let's start by considering four, 5-year time periods: 2000-2004, 2005-2009, 2010-2014, and 2015-2019.
 
-Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualized on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualise this (although partially colored squares are an option). \index{waffle chart} \index{pie chart}
+Rather than making a stacked bar chart for each year, which can make it difficult to compare one region to another, let's look at an alternative: a *waffle chart*. Waffle charts are sometimes referred to as *square pie charts*. Most commonly, they are visualized on a 10x10 grid, with each grid square representing 1%. The colors of the grid squares represent different categories. The advantage of waffle charts over pie charts (and to some extent bar charts), is that it's easy for a user to read the percentages - they can simply count the squares! The disadvantage is that if there is less than 1% of values in a category, there's no easy way to visualize this (although partially colored squares are an option). \index{waffle chart} \index{pie chart}
 
 Waffle charts can also be used to show counts rather than percentages. For example, each square may represent a wind turbine and the color of the square the region it is in. For example, a waffle chart of counts might look something like @fig-sketch-turbines.
 
@@ -292,7 +292,7 @@ Waffle charts can also be used to show counts rather than percentages. For examp
 
 We can make two slight variations to this basic version of the chart:
 
-* We have `r nrow(wind_turbines)` observations to plot which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.
+* We have `r nrow(wind_turbines)` observations to plot, which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.
 
 * Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a *pictogram*. The icons can be colored based on the region in the `Province/Territory` column. Instead of using a traditional legend that takes up lots of space, we could use colored text within the subtitle as an alternative.
 
@@ -302,24 +302,24 @@ We can make two slight variations to this basic version of the chart:
 
 In order to make a draft of @fig-sketch-turbines using **`ggplot2`**, there are a few things we need to prepare:
 
-* The `Commissioning.date` column needs processed to deal with the multiyear labels, and grouped into 5-year categories.
+* The `Commissioning.date` column needs to be processed to deal with the multiyear labels, and grouped into 5-year categories.
 * We need to decide how many wind turbines each icon will represent.
-* Some of the categories in the `Province/Territory` column may need grouped together because they have very small numbers, and might have less than the number of turbines represented by each icon.
+* Some of the categories in the `Province/Territory` column may need to be grouped together because they have very small numbers and might have fewer than the number of turbines represented by each icon.
 
 ### Data wrangling
 
 Let's start by dealing with the `Commissioning.date` column. There are three types of values in here:
 
-* Single year e.g. `"2019"`:  this is the ideal scenario and we don't need to do anything.
-* Two years separated by a `/` e.g. `"2001/2003"`: there are several options for dealing with this. We could either take the first year, the last year, or (if they are non-consecutive years) a mid-point of the year range. Here, we'll take the last year since this means that all wind turbines with that `Commissioning.date` will definitely have been commissioned by that date.
-* Three years separated by a `"/"` e.g. `"2005/2006/2012"`: this is more again more complex, but we'll take the last year for the same reasons as above.
+* Single year, e.g., `"2019"`:  this is the ideal scenario, and we don't need to do anything.
+* Two years separated by a `"/"`, e.g., `"2001/2003"`: there are several options for dealing with this. We could either take the first year, the last year, or (if they are non-consecutive years) a mid-point of the year range. Here, we'll take the last year since this means that all wind turbines with that `Commissioning.date` will definitely have been commissioned by that date.
+* Three years separated by a `"/"` e.g. `"2005/2006/2012"`: this is again more complex, but we'll take the last year for the same reasons as above.
 
 Essentially, this means that:
 
 * If there is no `"/"` in the `Commissioning.date`, we do nothing.
 * If there is one or more `"/"` in the `Commissioning.date`, we extract whatever comes after the last one.
 
-Let's make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the **`stringr`** package [@stringr]. We then use `str_match()` from **`stringr`** in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from **`dplyr`**, to if there was a `"/"` then use the output from `str_match()`, otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} \index{extract\_after\_last\_slash}
+Let's make a function that does exactly that, called `extract_after_last_slash()`. The input for this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using `str_detect()` from the **`stringr`** package [@stringr]. We then use `str_match()` from **`stringr`** in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The `str_match()` function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match, i.e., the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use `if_else()` from **`dplyr`**, to specify if there was a `"/"` then use the output from `str_match()`; otherwise keep the original value. \index{stringr!str\_detect} \index{stringr!str\_match} \index{dplyr!if\_else} \index{extract\_after\_last\_slash}
 
 ```{r}
 #| label: turbines-extract
@@ -349,7 +349,7 @@ The `if_else()` function from **`dplyr`** also preserves types. If you put a `Da
 
 :::
 
-Now, let's use our new `extract_after_last_slash()` function! Let's start by using `select()` to keep only the columns we actually need: `Province/Territory`, and `Commissioning.date`. We then create a new column called `Year` which is the output of applying the `extract_after_last_slash()` to the `Commissioning.date` column. Initially, this column is still a character string so we convert is to a number using `as.numeric()`: \index{dplyr!mutate} \index{dplyr!select} \index{base!as.numeric}
+Now, let's use our new `extract_after_last_slash()` function! Let's start by using `select()` to keep only the columns we actually need: `Province/Territory`, and `Commissioning.date`. We then create a new column called `Year` which is the output of applying the `extract_after_last_slash()` to the `Commissioning.date` column. Initially, this column is still a character string so we convert it to a number using `as.numeric()`: \index{dplyr!mutate} \index{dplyr!select} \index{base!as.numeric}
 
 ```{r}
 #| label: turbines-year-data
@@ -363,7 +363,7 @@ turbines_year <- wind_turbines |>
   )
 ```
 
-Now let's group the new `Year` column into categories. Our categories span 2000 to 2019, so we start by filtering out any rows that don't fit into this time frame using `filter()` from **`dplyr`**. We then use `case_when()` from **`dplyr`** to actually construct the categories. Here, we make use of the `seq()` function. The `seq(2000, 2004)` code creates a vector `2000 2001 2002 2003 2004`. If any the `Year` is equal to any of those values, then it goes into the `"2000 - 2004"` category. And so on. Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it's good practice to be explicit about what order the categories should have, so we can also set `Year_Group` to be a factor and specify the correct order. \index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor} \index{base!seq}
+Now let's group the new `Year` column into categories. Our categories span 2000 to 2019, so we start by filtering out any rows that don't fit into this time frame using `filter()` from **`dplyr`**. We then use `case_when()` from **`dplyr`** to actually construct the categories. Here, we make use of the `seq()` function. The `seq(2000, 2004)` code creates a vector `2000 2001 2002 2003 2004`. If the `Year` is equal to any of those values, then it goes into the `"2000 - 2004"` category. And so on. Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it's good practice to be explicit about what order the categories should have, so we can also set `Year_Group` to be a factor and specify the correct order. \index{dplyr!filter} \index{dplyr!mutate} \index{dplyr!case\_when} \index{base!factor} \index{base!seq}
 
 ```{r}
 #| label: turbines-data-wrangling-1
@@ -394,11 +394,11 @@ turbines_year_group |>
   arrange(-n)
 ```
 
-First, let's rename the `Province/Territory` column to `Region` - a shorter name that will make it a little bit easier to work with. As well as the issue posed by small numbers in categories, twelve categories is also a fairly large number to visualize. We might choose to group together the six smallest categories. The choice of six is fairly arbitrary - but we want a balance between lots of categories with small numbers and few categories with very high numbers. We use `mutate()` and `case_when()` again, to change the value in `Region` to `"other"` when the region is one of the six specified values. \index{dplyr!rename} \index{dplyr!mutate} \index{dplyr!case\_when}
+First, let's rename the `Province/Territory` column to `Region` - a shorter name that will make it a little bit easier to work with. As well as the issue posed by small numbers in categories, 12 categories is also a fairly large number to visualize. We might choose to group together the 6 smallest categories. The choice of 6 is fairly arbitrary - but we want a balance between lots of categories with small numbers and few categories with very high numbers. We use `mutate()` and `case_when()` again, to change the value in `Region` to `"other"` when the region is one of the 6 specified values. \index{dplyr!rename} \index{dplyr!mutate} \index{dplyr!case\_when}
 
-Then, we count up how many turbines were commissioned in each `Year_Group` and `Region` combination using `count()`. We also need to decide how many turbines each icon will represent. It will take a little bit of trial and error to decide on this value - depending on what resolution you want, and how big your final plot will be. Here, we used `20`. This means we divide the turbine count by `20` to obtain the number of icons required, rounding the values as we can only have whole icons. \index{dplyr!count}
+Then, we count up how many turbines were commissioned in each `Year_Group` and `Region` combination using `count()`. We also need to decide how many turbines each icon will represent. It will take a little bit of trial and error to decide on this value - depending on what resolution you want, and how big your final plot will be. Here, we used `20`. This means we divide the turbine count by `20` to obtain the number of icons required, rounding the values, as we can only have whole icons. \index{dplyr!count}
 
-We filter out any rows where the rounded count is `0` since these won't be plotted. As an aside, it's important to think about these values before we simply throw them away. For example, a region which had 9 turbines in a particular time period won't show up on this plot - since `9/20` is less than 0.5 and so is rounded to `0`. This is an unfortunate limitation of this type of waffle plot variation. \index{dplyr!filter}
+We filter out any rows where the rounded count is `0`, since these won't be plotted. As an aside, it's important to think about these values before we simply throw them away. For example, a region which had 9 turbines in a particular time period won't show up on this plot - since `9/20` is less than 0.5 and so is rounded to `0`. This is an unfortunate limitation of this type of waffle plot variation. \index{dplyr!filter}
   
 ```{r}
 #| label: turbines-data-wrangling-2
@@ -422,8 +422,7 @@ turbines_region <- turbines_year_group |>
   filter(n != 0)
 ```
 
-The `Region` variable will be plotted alphabetically be default, but this is rarely the most useful ordering. Instead, let's order by magnitude - with the exception of putting the `"other"` category last. 
-
+The `Region` variable will be plotted alphabetically by default, but this is rarely the most useful ordering. Instead, let's order by magnitude - with the exception of putting the `"other"` category last. 
 We start by using the `summarise()` function to add up the number of turbines across the different time periods, getting a total per `Region`. We then `arrange()` them in a descending order (note the `-` in front of the `n`). We then `filter()` out the `"other"` category and stick it on the end after extracting the `Region` column using `pull()`. \index{dplyr!summarise} \index{dplyr!arrange} \index{dplyr!filter} \index{dplyr!pull} 
 
 ```{r}
@@ -466,23 +465,23 @@ showtext_auto()
 showtext_opts(dpi = 300)
 ```
 
-::: {#tip-turbines-open .callout-tip}
+::: {#tip-turbines-font-awesome .callout-tip}
 
 ## Installing Font Awesome icons with **`waffle`**
 
-The **`waffle`** package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to approach described here. Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and means you don't have to install the font system wide - you only need to load it into R. \index{waffle!install\_fa\_fonts}
+The **`waffle`** package comes bundled with Font Awesome 5, and you can use the `install_fa_fonts()` function to help you install the font, as an alternative to the approach described here. Downloading and installing using the `font_add()` approach will give you access to a wider range of icons since it used the more recent **Font Awesome 6** fonts, and it means you don't have to install the font system wide - you only need to load it into R. \index{waffle!install\_fa\_fonts}
 
 :::
 
 Now we're ready to plot!
 
-### The first plot with **`waffle`**
+### First plot with **`waffle`**
 
-We're going to use the **`waffle`** package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with **`ggplot2`**. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons i.e. pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
+We're going to use the **`waffle`** package [@waffle] to create our plot. Though the package includes the `waffle()` function which allows you to create a waffle chart directly from a `data.frame`, it also includes `geom` functions to allow you to build charts in the way you normally would with **`ggplot2`**. The `geom_waffle()` function can be used to build traditional waffle charts with grid squares, and the `geom_pictogram()` function is used for waffle charts with icons, i.e., pictograms. We'll use `geom_pictogram()`. This means we start our plot as we normally do, by passing our data into `ggplot()`. \index{waffle!geom\_waffle} \index{waffle!geom\_pictogram} \index{ggplot2!ggplot}
 
-We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want the icon to vary with region. Instead, we want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region and we'll later use `scale_label_pictogram()` to make them all the same icon. The `values` argument is also a required aesthetic. We use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the `geom_pictogram()` function so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
+We then edit the aesthetic mapping in the `geom_pictogram()` function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don't want the icon to vary with region. Instead, we want to use the same icon for all categories. However, `geom_pictogram()` expects `label` to vary by category, so we map it to region, and we'll later use `scale_label_pictogram()` to make them all the same icon. The `values` argument is also a required aesthetic. We use the `n` column in the data to specify how many icons should be plotted for each category. The `x` and `y` coordinates are automatically calculated when we use the `geom_pictogram()` function, so we don't need to map these out in the `aes()` function.  \index{ggplot2!aes} \index{waffle!geom\_pictogram}
 
-We also edit a few other parameters of the `geom_pictogram()` function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it's also very common to put date variables on the x-axis. Setting `flip = TRUE` will stack the pictogram categories upwards, and allow the date categories to go on the x-axis. Setting `n_rows = 10` means that each row of the pictogram will contain 10 icons (remember that we've flipped rows and columns here). We can edit the `size` of the icons in the same way we would edit the font size in `geom_text()`, for example. It might take a little bit of trial and error to find the right size to make sure icons are large enough to see, but don't overlap. We also need to state that the icons come from Font Awesome 6 by setting `family = "Font Awesome 6"` (the same name as the `family` argument used in `font_add()`). \index{waffle!geom\_pictogram}
+We also edit a few other parameters of the `geom_pictogram()` function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it's also very common to put date variables on the x-axis. Setting `flip = TRUE` will stack the pictogram categories upward, and allow the date categories to go on the x-axis. Setting `n_rows = 10` means that each row of the pictogram will contain 10 icons (remember that we've flipped rows and columns here). We can edit the `size` of the icons in the same way we would edit the font size in `geom_text()`, for example. It might take a little bit of trial and error to find the right size to make sure icons are large enough to see, but don't overlap. We also need to state that the icons come from Font Awesome 6 by setting `family = "Font Awesome 6"` (the same name as the `family` argument used in `font_add()`). \index{waffle!geom\_pictogram}
 
 Finally, we add `facet_wrap()` to create a pictogram for each date range, placing them in a single row, and moving the facet label to the bottom of the chart. \index{ggplot2!facet\_wrap}
 
@@ -518,9 +517,9 @@ By default, `geom_pictogram()` and `geom_waffle()` both assume that the column m
 
 :::
 
-What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at {{< monolink "https://fontawesome.com/search" "fontawesome.com/search" >}} and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan` to name a few. We'll use `fan` [@fontawesome]. \index{Font Awesome}
+What you might immediately notice about @fig-turbines-base-plot is that there are no icons. Instead, the plot has printed the `Region` names (even though we've set `family = "Font Awesome 6"`). This is because we haven't defined which icons we want to use. To find an appropriate icon and what it's called, we can browse the Font Awesome website at {{< monolink "https://fontawesome.com/search" "fontawesome.com/search" >}} and search for related icons. For example, we might search for a *wind turbine* icon. Though Font Awesome wind turbine icons do exist, they are unfortunately only available with the Pro version. There are other free icons that sort of fit this theme: `wind`, `bolt` (to represent energy), or `fan`, to name a few. We'll use `fan` [@fontawesome]. \index{Font Awesome}
 
-We can add `scale_label_pictogram()` from **`waffle`** to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. We set `guide = "none"` to remove the legend for icons as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
+We can add `scale_label_pictogram()` from **`waffle`** to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R reuses elements of vectors. We set `guide = "none"` to remove the legend for icons, as they are all the same. Alternatively, you can later set `theme(legend.position = "none")` as we did in previous chapters to remove the legend. \index{waffle!scale\_label\_pictogram}
 
 ```{r}
 #| label: fig-turbines-icons-plot
@@ -534,7 +533,7 @@ icons_plot <- basic_plot +
 icons_plot
 ```
 
-You might also have noticed that the values on the y-axis are incorrect - there definitely more than 15 turbines in the 2010 - 2014 time frame! We'll deal with the axis in the next section.
+You might notice that the values on the y-axis in @fig-turbines-icons-plot are incorrect - there are definitely more than 15 turbines in the 2010-2014 time frame! We'll deal with the axis in the next section.
 
 ## Advanced styling
 
@@ -565,7 +564,7 @@ display_carto_all(
 )
 ```
 
-Although the **`rcartocolor`** package has the `scale_fill_carto_d()` function which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to re-use the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the **`rcartocolor`** package, the last color is often a gray color. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal} \index{color}
+Although the **`rcartocolor`** package has the `scale_fill_carto_d()` function which we could use directly in our plots, we'll still save the color palette as a vector of hex codes to allow us to reuse the colors more easily. As you can see in @fig-turbines-rcarto, in the qualitative palettes in the **`rcartocolor`** package, the last color is often gray. That's a great choice for representing missing data, but when we want different colors for categories it doesn't work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the `carto_pal()` function and then extract only the first 6. We'll use the `"Vivid"` palette here. \index{rcartocolor!carto\_pal} \index{color}
 
 We also make the `col_palette` vector a named vector by using the `names()` function, and using `region_levels` as the names. Although this isn't necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.
 
@@ -591,9 +590,9 @@ col_plot <- icons_plot +
 
 ### Adding styled text with **`marquee`**
 
-We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument inside `theme()` elements. But what if we want to make only *part* of the text bold? We can use the **`marquee`** package [@marquee] to add styling to text within in a string. The **`marquee`** package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with **`ggplot2`** or other graphics built with **`grid`**. \index{marquee}
+We've already seen in @sec-programming and @sec-museums how to format the title or subtitle text to be bold using the `face = "bold"` argument inside `theme()` elements. But what if we want to make only *part* of the text bold? We can use the **`marquee`** package [@marquee] to add styling to text within a string. The **`marquee`** package allows you to use Markdown syntax in text when you're making graphics in R, including in plots built with **`ggplot2`** or other graphics built with **`grid`**. \index{marquee}
 
-In Markdown, to make text bold, you enclose it inside two pairs of asterisks e.g. `**bold text**`. For example, if we wanted to put the entire title in bold font, we could write the title inside `**`. In the caption, we might want to embolden the words `Data` and `Graphic` to highlight that there are two different fields of information:
+In Markdown, to make text bold, you enclose it inside two pairs of asterisks, e.g., `**bold text**`. For example, if we wanted to put the entire title in bold font, we could write the title inside `**`. In the caption, we might want to **embolden** the words `Data` and `Graphic` to highlight that there are two different fields of information:
 
 ```{r}
 #| label: turbines-text-1
@@ -601,13 +600,13 @@ title <- "**Ontario is the province with the most wind turbines**"
 cap <- "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
 ```
 
-This type of formatting for the plot caption is something that we might like to re-use across multiple plots. And when we want to re-use code, it's almost always useful to make it into a function. Let's define a function called `source_caption()` which has three arguments:
+This type of formatting for the plot caption is something that we might like to reuse across multiple plots. And when we want to reuse code, it's almost always useful to make it into a function. Let's define a function called `source_caption()` which has three arguments:
 
 * `source`: a character string for the source of the data
 * `graphic`: a character string for the attribution of the visualization
 * `sep`: a character string for what should separate the two pieces of text, which has `" | "` as a default.
 
-We then use `glue()` from **`glue`** to stick these three arguments together, and include the bold formatting using `**`. Here we use namespacing (prefixing the function name with the package name and `::`) to make it easier to re-use this function in later chapters.
+We then use `glue()` from **`glue`** to stick these three arguments together, and include the bold formatting using `**`. Here we use namespacing (prefixing the function name with the package name and `::`) to make it easier to reuse this function in later chapters.
 
 ```{r}
 #| echo: true
@@ -626,9 +625,9 @@ cap <- source_caption(
 cap
 ```
 
-You can see that it's identical to the one we manually created earlier. We'll also re-use the `source_caption()` function in later chapters.
+You can see that it's identical to the one we manually created earlier. We'll also reuse the `source_caption()` function in later chapters.
 
-Let's move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we'll use colored text to denote the different categories. In **`marquee`**, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text i.e. `{.color text to color}`. For example, `{.red This is red text.}`. 
+Let's move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we'll use colored text to denote the different categories. In **`marquee`**, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text, i.e., `{.color text to color}`, for example, `{.red This is red text.}`. 
 
 We want to add the colors and the text to be colored in a programmatic way. We'll use square brackets to subset the values and names stored in the `col_palette` vector. Here, `col_palette[[1]]` extracts the hex code for the color of the first category, and `names(col_palette)[[1]]` extracts the name of the first category.
 
@@ -648,9 +647,9 @@ Let's see what our subtitle looks like when the variables have been evaluated:
 st
 ```
 
-This is the reason that we wanted the `"other"` category to be in lower case and in last position when constructing `region_levels` - to make the sentence read better.
+The reason we wanted the `"other"` category to be in lowercase and in last position when constructing `region_levels` is to make the sentence read better.
 
-We add these text elements to our plot in the normal way, by passing them into the `labs()` function: \index{ggplot2!labs}
+We add these text elements to our plot in the normal way, by passing them into the `labs()` function. \index{ggplot2!labs}
 
 ```{r}
 #| label: fig-turbines-text-plot
@@ -665,16 +664,16 @@ text_plot <- col_plot +
 text_plot
 ```
 
-You'll notice that the formatting hasn't been applied, and that the `**` have been rendered literally. We'll deal with this when we edit the arguments in `theme()` - we haven't actually used **`marquee`** yet to format the title text!
+You'll notice in @fig-turbines-text-plot that the formatting hasn't been applied, and that the `**` have been rendered literally. We'll deal with this when we edit the arguments in `theme()` - we haven't actually used **`marquee`** yet to format the title text!
 
 ### Adjusting scales and themes
 
 We can make a final few tweaks to our plot, to apply the formatting with **`marquee`** and make it look a little bit cleaner. Let's start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn't correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:
 
 * Each icon represents 20 turbines, so the y-axis labels are currently showing as 20 times smaller than they should be.
-* Within each facet, we row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be. 
+* Within each facet, a row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be. 
 
-Let's fix that by passing a function into the `labels` argument of `scale_y_continuous()`. The function takes the existing y-axis label, multiplies it by `10`, multiplies it by `20`, and formats it using a thousand separator comma. We set `expand = c(0, 0)` to remove the extra space at the top and bottom of the y-axis. Let's also choose slightly nicer break points for the y-axis - ranging from 0 to 4,000 with breaks every 1,000. Unfortunately, we need to specify the limits and the breaks on the original scale rather than on the label scale e.g. an break point of `15` is actually a break point of `15 * 20 * 10 = 3000`. Adding `coord_fixed()` helps to deal with the overlapping icons issue, by making each icon area square. \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
+Let's fix that by passing a function into the `labels` argument of `scale_y_continuous()`. The function takes the existing y-axis label, multiplies it by `10`, multiplies it by `20`, and formats it using a thousand separator comma. We set `expand = c(0, 0)` to remove the extra space at the top and bottom of the y-axis. Let's also choose slightly nicer break points for the y-axis - ranging from 0 to 4,000 with breaks every 1,000. Unfortunately, we need to specify the limits and the breaks on the original scale rather than on the label scale, e.g., a break point of `15` is actually a break point of `15 * 20 * 10 = 3000`. Adding `coord_fixed()` helps to deal with the overlapping icons issue, by making each icon area square. \index{ggplot2!scale\_y\_continuous} \index{ggplot2!coord\_fixed}
 
 ```{r}
 #| label: turbines-scale-plot
@@ -753,7 +752,7 @@ scale_plot +
   )
 ```
 
-And we're done and ready to save a copy! \index{ggplot2!ggsave}
+And we're done and ready to save a copy of @fig-turbines-theme-plot! \index{ggplot2!ggsave}
 
 ```{r}
 #| label: turbines-save
@@ -768,9 +767,9 @@ ggsave(
 
 ## Reflection
 
-The colored subtitle as an alternative to a legend is effective because it uses much less space than a traditional legend - leaving more room for the data. However, there are some elements of the subtitle that could still be improved. We've discussed already the limitations of waffle plots and pictograms in terms of the lack of representation of categories with small numbers. This means that we had to group some regions together, and so regions with fewer turbines have less information included in the chart. Perhaps the subtitle could be updated to explain to users that each icon represents 20 turbines, and that this means regions with 10 or fewer turbines are not represented.
+The colored subtitle as an alternative to a legend is effective because it uses much less space than a traditional legend - leaving more room for the data. However, there are some elements of the subtitle that could still be improved. We've discussed the limitations of waffle plots and pictograms in terms of the lack of representation of categories with small numbers. This means that we had to group some regions together, and so regions with fewer turbines have less information included in the chart. Perhaps the subtitle could be updated to explain to users that each icon represents 20 turbines, and that this means regions with 10 or fewer turbines are not represented.
 
-There's also some uncertainty around the date used, which isn't really explained in the chart. When processing the `Commissioning.date` column, we used the most recent date but that isn't necessarily always the best choice. A limitation of the data is that we also only have commissioning date, not installation date or date of first operation. This means that perhaps there are some values in the data that suggest a turbine exists in one time period when it hasn't yet been built. 
+There's also some uncertainty around the date used, which isn't really explained in the chart. When processing the `Commissioning.date` column, we used the most recent date, but that isn't necessarily always the best choice. A limitation of the data is that we also only have commissioning date, not installation date or date of first operation. This means that perhaps there are some values in the data that suggest a turbine exists in one time period when it hasn't yet been built. 
 
 Finally, we've used a `fan` icon because the Font Awesome wind turbine icon is only available in the Pro version. Using a wind turbine icon would be much clearer, and more consistent with the theme of the plot. We could look at using an alternative icon font, or we could perhaps use images instead. See @sec-ggbuild for a description of how we might replace the existing `fan` icons with a wind turbine icon from a different source.
 

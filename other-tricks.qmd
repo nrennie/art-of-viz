@@ -14,7 +14,7 @@ There are many functions within **`ggplot2`**, and many more within the wider co
 By the end of this chapter, you'll be able to:
 
 * Preview images at the desired resolution, and record gifs showing the process of making a specific chart;
-* Extract and re-use data from existing **`ggplot2`** charts;
+* Extract and reuse data from existing **`ggplot2`** charts;
 * Format your code in a consistent way to make it easier to maintain and share; 
 * Create your template files and functions for pieces of code that you reuse often.
 
@@ -32,7 +32,7 @@ library(ggplot2)
 
 This chapter introduces two new packages:
 
-* **`camcorder`**: for automatically saving graphics, and creating gifs from the resulting images.
+* **`camcorder`**: automatically save graphics, and create gifs from the resulting images.
 * **`ggpattern`**: allows you to use patterns (alongside or instead of colors) for the `fill` elements of plots. It includes simple patterns like stripes or dots, as well as more complex ones like gradient and image fills.
 
 \index{camcorder} \index{ggpattern}
@@ -56,7 +56,7 @@ If you're reading the online version of this book, you will have seen several ex
 
 ## Transparent backgrounds in gifs
 
-Some of the built-in themes in **`ggplot2`** have a transparent background. If you've used these at some point during the development process, when you viewed them in RStudio the background likely appeared white. The default background color in `gg_playback()` is `"black"` - meaning that your gif might not quite look as you expect. Instead set the background color to something more sensible, for example your `bg_col` variable.
+Some of the built-in themes in **`ggplot2`** have a transparent background. If you've used these at some point during the development process, when you viewed them in RStudio the background likely appeared white. The default background color in `gg_playback()` is `"black"` - meaning that your gif might not quite look as you expect. Instead, set the background color to something more sensible, for example your `bg_col` variable.
 
 :::
 
@@ -82,7 +82,7 @@ Have you ever spent ages tinkering with a plot you’re previewing in RStudio, b
 
 ## Choosing a plot resolution
 
-The RStudio Plots tab shows images at 96dpi, but the default in `ggsave()` is 300dpi. This is what causes the mismatch between the sizes of text and other elements. The default dpi in `gg_record()` is also 300dpi so it integrates nicely with `ggsave()`. \index{ggplot2!ggsave}
+The RStudio Plots tab shows images at 96 dpi, but the default in `ggsave()` is 300 dpi. This is what causes the mismatch between the sizes of text and other elements. The default dpi in `gg_record()` is also 300 dpi so it integrates nicely with `ggsave()`. \index{ggplot2!ggsave}
 
 :::
 
@@ -97,16 +97,16 @@ basic_plot <- readRDS("data/base_plot.rds")
 
 In @sec-turbines, we reflected that it would be better to use a wind turbine icons instead of the fan icon - since the data is about wind turbines! An alternative to the Font Awesome icons we used in @sec-turbines are icons from [Flaticon](https://www.flaticon.com/). You can download Flaticon icons as PNG images for free, as long as you provide attribution. More specifically, you can download a **Wind Power** icon from {{< monolink "https://www.flaticon.com/free-icon/wind-power_5670189" "www.flaticon.com/free-icon/wind-power_5670189" >}} [@flaticon]. Let's save it in an `images/` project directory. 
 
-Now instead of plotting icons as fonts, we want to plot icons as images. The problem is that:
+Now, instead of plotting icons as fonts, we want to plot icons as images. The problem is that:
 
-* we want to use the x- and y- coordinates for the icons provided by `geom_pictogram()`
-* we want to use an image instead of a font icon
+* we want to use the `x` and `y` coordinates for the icons provided by `geom_pictogram()`, and
+* we want to use an image instead of a font icon.
 
 These two things aren't currently compatible.
 
-### Extracting co-ordinates
+### Extracting coordinates
 
-We've already built the plot with `geom_pictogram()` from **`waffle`** so the x- and y- coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `basic_plot` we created in @sec-turbines. \index{waffle!geom\_pictogram} \index{ggplot2!ggplot\_build}
+We've already built the plot with `geom_pictogram()` from **`waffle`**, so the `x` and `y` coordinates have already been calculated. Luckily, we can use the `ggplot_build()` function to extract from the `basic_plot` we created in @sec-turbines. \index{waffle!geom\_pictogram} \index{ggplot2!ggplot\_build}
 
 ```{r}
 #| label: other-build-gg-1
@@ -133,7 +133,7 @@ new_data <- basic_built$data[[1]] |>
   )
 ```
 
-Let's use `geom_point()` as a quick sense check that the x- and y- coordinates are the values that we're expecting, faceting by our `Year_Group` column. You can see the similarity with @fig-turbines-base-plot.
+Let's use `geom_point()` as a quick sense check that the `x` and `y` coordinates are the values that we're expecting, faceting by our `Year_Group` column. You can see the similarity of @fig-other-rebuild with @fig-turbines-base-plot.
 
 ```{r}
 #| label: fig-other-rebuild
@@ -151,7 +151,7 @@ ggplot(
 
 ### Plotting with **`ggpattern`**
 
-Now instead of using `geom_point()` we want to plot images. We could use **`ggimage`** [@ggimage], or alternatively **`ggpattern`** [@ggpattern]. The **`ggpattern`** package provides more **`ggplot2`** `geom` functions which support filled areas with geometric or image patterns. We can use the `geom_tile_pattern()` function, and specify that we want to use an `"image"` pattern and supply the file name of the Flaticon image to `pattern_filename`. Setting `fill = "white"` gives a white background to the icons. We can also set `theme_void()` to remove all of the distracting background elements.
+Now instead of using `geom_point()` we want to plot images. We could use **`ggimage`** [@ggimage], or alternatively **`ggpattern`** [@ggpattern]. The **`ggpattern`** package provides more **`ggplot2`** `geom` functions which support filled areas with geometric or image patterns. We can use the `geom_tile_pattern()` function, and specify that we want to use an `"image"` pattern and supply the file name of the Flaticon image to `pattern_filename`. Setting `fill = "white"` gives a white background to the icons. We can also set `theme_void()` in @fig-other-flaticon to remove all of the distracting background elements.
 
 ```{r}
 #| label: fig-other-flaticon
@@ -172,7 +172,7 @@ ggplot(
   theme_void()
 ```
 
-If we wanted to color the icons based on the `Region` variable, we would need to have multiple copies of the image in different colors. We could combine the information in @sec-lemurs about manipulating and re-coloring images, along with the information in @sec-r-pkgs about defining image paths based on data values to do this programmatically.
+If we wanted to color the icons based on the `Region` variable, we would need to have multiple copies of the image in different colors. We could combine the information in @sec-lemurs about manipulating and recoloring images, along with the information in @sec-r-pkgs about defining image paths based on data values to do this programmatically.
 
 ::: {#tip-other-patterns .callout-tip}
 
@@ -188,7 +188,7 @@ One of the benefits of using **`ggplot2`** is that they are stored as lists, and
 
 Writing code that follows a consistent style can make it easier for other people to read, makes collaboration simpler, and can help pick up errors in your code more quickly. In R, the **`lintr`** package [@lintr] checks for adherence to a specified coding style and identifies possible syntax errors, then reports them so you can take action. \index{lintr}
 
-The **`styler`** package [@styler] goes one step further in terms of code styling, and actually styles your code for you. Although you may be a little bit skeptical of packages that overwrite scripts you’ve written, it makes it quick and easy to style code. Creating a keyboard shortcut for the `style_active_file()` function means you can apply code styling easily, without having to call a function manually or click a specific button [@streamline]. \index{styler!style\_active\_file}
+The **`styler`** package [@styler] goes one step further in terms of code styling, and it actually styles your code for you. Although you may be a little bit skeptical of packages that overwrite scripts you’ve written, it makes it quick and easy to style code. Creating a keyboard shortcut for the `style_active_file()` function means you can apply code styling easily, without having to call a function manually or click a specific button [@streamline]. \index{styler!style\_active\_file}
 
 ::: {#tip-other-air .callout-tip}
 
@@ -336,15 +336,15 @@ There are several components of this script that make it useful:
 
 * It defines variables and code snippets that are used repeatedly in different visualizations. For example, defining variables for the colors and fonts, or using the theme elements from **`ggtext`** to style the title and subtitle text.
 
-* There are also some elements of the script that are similar for each plot, but not exactly the same. For example, reading in the data using the **`tidytuesdayR`** package or saving the gif created by **`gcamcorder`**. Here, the code is changing based on the date associated with the TidyTuesday data. Instead of manually editing the date in the script in each location, a `date_str` variable is defined at the top of the script - meaning you only need to set the date once. 
+* There are also some elements of the script that are similar for each plot, but not exactly the same. For example, reading in the data using the **`tidytuesdayR`** package or saving the gif created by **`camcorder`**. Here, the code is changing based on the date associated with the TidyTuesday data. Instead of manually editing the date in the script in each location, a `date_str` variable is defined at the top of the script - meaning you only need to set the date once. 
 
-You can also create template files for other aspects of your data visualization workflow. For example, creating a `README.md` file for each visualization.
+You can also create template files for other aspects of your data visualization workflow, for example, creating a `README.md` file for each visualization.
 
 ## Writing your own helper functions
 
-As you've already seen in @sec-turbines and @sec-cats, creating functions for code you reuse frequently can save time and space. We created the `source_caption()` and `social_caption()` functions for adding a caption with data source attribution, and to write plot caption that contained Font Awesome icons. These functions have then been used in almost every subsequent chapter (and therefore also the template file described in the previous section). What other helper functions might be useful? \index{source\_caption} \index{social\_caption} 
+As you've already seen in @sec-turbines and @sec-cats, creating functions for code you reuse frequently can save time and space. We created the `source_caption()` and `social_caption()` functions to add a caption with data source attribution, and to write plot caption that contained Font Awesome icons. These functions have then been used in almost every subsequent chapter (and therefore also the template file described in the previous section). What other helper functions might be useful? \index{source\_caption} \index{social\_caption} 
 
-* To use the Font Awesome icons, you need to load the Font Awesome font files. We did this using `sysfonts::font_add()` and specifying a path to the font file. You might also want to load other fonts that aren't normally available on your system or through Google Fonts. You could write a function that loads (multiple) font files that you use often. You could go one step further and place the fonts and your font loading function into an R package. 
+* To use the Font Awesome icons, you need to load the Font Awesome font files. We did this using `sysfonts::font_add()` and specifying a path to the font file. You might also want to load other fonts that aren't normally available on your system or through Google Fonts. You could write a function that loads (multiple) font files that you use often. You could go one step further and place the fonts and your font-loading function into an R package. 
 
 * For the template file discussed in the previous section, the date was defined as a variable at the top of the script. Instead, you could create a function that takes the date as an argument. The function could then create your .R script, insert the date where it needs to go, and save the file to the desired location. 
 
