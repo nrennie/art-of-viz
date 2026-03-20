@@ -19,7 +19,7 @@ In this chapter, we'll learn how to explore patterns in missing data, install R 
 By the end of this chapter, you'll be able to:
 
 * Get a quick overview of a dataset as a heatmap, and visualize missing data;
-* Re-purpose a *dot density plot*, typically used for geographic data, to show trends over time as an alternative to bar charts; and
+* Repurpose a *dot density plot*, typically used for geographic data, to show trends over time as an alternative to bar charts; and
 * Use simulation to generate the required dots, and create another custom chart type using just the geometries available in **`ggplot2`**.
 
 \index{dot density plot}
@@ -52,7 +52,7 @@ We'll be using **`ggplot2`** for plotting, and **`ggtext`** for text styling as 
 
 As a major pollinator, bees are a vitally important part of our planet's ecosystem. However, their numbers are in decline due to factors including habitat loss, pesticide use, and diseases [@Brown2009]. The United States Department of Agriculture (USDA) annually publishes data on honey bee colonies, which includes information about the number of colonies, the size of colonies, the percentage of colonies lost or added, and factors that have been identified as colony health stressors [@bees_data].
 
-The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] data set in January 2022 (after being suggested by [Georgios Karamanis](https://github.com/gkaramanis)), and so can be loaded in using the **`tidytuesdayR`** package: \index{tidytuesdayR!tt\_load}
+The USDA honey bee colony data was used as a TidyTuesday [@tidytuesday] dataset in January 2022 (after being suggested by [Georgios Karamanis](https://github.com/gkaramanis)), and so it can be loaded using the **`tidytuesdayR`** package: \index{tidytuesdayR!tt\_load}
 
 ```{r}
 #| label: bees-data-show
@@ -73,7 +73,7 @@ colony <- readr::read_csv("data/colony.csv")
 
 Since this version of the data is based on the 2021 release, it includes data up to June 2021. If you want to work with a more recent publication of the data, it can be obtained from {{< monolink "https://usda.library.cornell.edu/concern/publications/rn301137d" "usda.library.cornell.edu/concern/publications/rn301137d" >}}.
 
-Two different data sets are included. The first, `colony`, contains information about the number and size of bee colonies in each US state per year since 2015. The second, `stressor`, contains information about different sources of health stressors for bee colonies and what percentage of colonies are affected by these stressors, again for different states and time periods.
+Two different datasets are included. The first, `colony`, contains information about the number and size of bee colonies in each US state per year since 2015. The second, `stressor`, contains information about different sources of health stressors for bee colonies and what percentage of colonies are affected by these stressors, again for different states and time periods.
 
 ## Exploratory work
 
@@ -85,8 +85,8 @@ Let's start by looking at a quick box plot of how the number of colonies (`colon
 
 ```{r, echo=-1}
 #| label: fig-bees-boxplot
-#| fig-cap: "Simple boxplot of number of bee colonies per year, showing a highly skewed distribution."
-#| fig-alt: "Simple horizontal boxplot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below."
+#| fig-cap: "Simple box plot of number of bee colonies per year, showing a highly skewed distribution."
+#| fig-alt: "Simple horizontal box plot of number of bee colonies per year, showing a highly skewed distribution with many large valued outliers on the right. None on the left since bounded by zero below."
 #| fig-asp: 0.66
 par(mar = c(2.1, 2.1, 1.1, 2.1))
 boxplot(
@@ -105,8 +105,8 @@ Let's start by trying to understand what's causing these outliers. Are they real
 ```{r, echo=-1}
 #| fig-asp: 1.2
 #| label: fig-bees-boxplot2
-#| fig-cap: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'."
-#| fig-alt: "Boxplot of the number of bee colonies per state, showing an issue with the definition of 'state'. California and North Dakota show higher ranges, but the highest value is for the United States i.e. is a sum of all other values."
+#| fig-cap: "Box plot of the number of bee colonies per state, showing an issue with the definition of 'state'."
+#| fig-alt: "Box plot of the number of bee colonies per state, showing an issue with the definition of 'state'. California and North Dakota show higher ranges, but the highest value is for the United States i.e. is a sum of all other values."
 par(mar = c(4.1, 4.1, 1.1, 2.1), cex.axis = 0.5, cex.names = 0.5)
 colony_2020 <- subset(colony, year == 2020)
 boxplot(
@@ -119,19 +119,19 @@ boxplot(
 )
 ```
 
-Though there are a few states (California, Florida, and North Dakota) with a much higher number of colonies, the main issue is that one of the *states* is the entirety of the United States i.e. the sum of all of the other values. You can also see from @fig-bees-boxplot2 that not all states are included individually - an `"Other States"` category is also included instead which groups some states (and perhaps regions).
+Though there are a few states (California, Florida, and North Dakota) with a much higher number of colonies, the main issue is that one of the *states* is the entirety of the United States, i.e., the sum of all of the other values. You can also see from @fig-bees-boxplot2 that not all states are included individually - an `"Other States"` category is also included instead which groups some states (and perhaps regions).
 
 ::: {#tip-bees-names .callout-tip}
 
 ## Choose appropriate column names
 
-It's unfortunately not uncommon for a column name to suggest one thing (e.g. each value relates to a state), but for that column to actually include other values as well (e.g. a country). If you're ever naming columns (especially for data you'll share with other people) choose appropriate column names to avoid confusion. For example, `region` would be a more appropriate column name here.
+It's unfortunately not uncommon for a column name to suggest one thing (e.g., each value relates to a state), but for that column to actually include other values as well (e.g., a country). If you're ever naming columns (especially for data you'll share with other people), choose appropriate column names to avoid confusion. For example, `region` would be a more appropriate column name here.
 
 :::
 
 The other aspect of our data that box plots don't tell us about is the missingness. Box plots only plot what's there, not what's not there. It's especially important to remember this step since base R graphics don't warn you about `NA` values in the way that **`ggplot2`** [@ggplot2] does. So how do we plot data that doesn't exist? \index{box plot} \index{missing data}
 
-The **`visdat`** package [@visdat] is an excellent way to take a quick look at your data. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we'll start by visualising just the data for one state. We can use the `subset()` function from base R to obtain just the data for Alabama. \index{visdat!vis\_miss} \index{base!subset}
+The **`visdat`** package [@visdat] is an excellent way to take a quick look at your data. It includes the `vis_miss()` function which, as the name suggests, allows you to get a quick visualization of which values are missing. To avoid creating an overwhelmingly large plot, we'll start by visualizing just the data for one state. We can use the `subset()` function from base R to obtain just the data for Alabama. \index{visdat!vis\_miss} \index{base!subset}
 
 ```{r}
 #| label: fig-bees-vismiss
@@ -142,7 +142,7 @@ colony_AL <- subset(colony, state == "Alabama")
 vis_miss(colony_AL)
 ```
 
-You may notice that the column names in the plot generated by `vis_miss()` in @fig-bees-vismiss are rotated and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: \index{visdat!vis\_miss} \index{visdat!abbreviate\_vars} \index{ggplot2!theme}
+You may notice that the column names in the plot generated by `vis_miss()` in @fig-bees-vismiss are rotated, and this causes the right-most column name to run off the edge of the chart area. There are two solutions that can help with this problem: \index{visdat!vis\_miss} \index{visdat!abbreviate\_vars} \index{ggplot2!theme}
 
 * Use the `abbreviate_vars()` function from **`visdat`** which abbreviates column names, and makes them less likely to exceed the available space.
 * Exploit the fact that the plot output from `vis_miss()` is made with **`ggplot2`**. This means we can use the `theme()` function to extend the space available in the plot's right margin.
@@ -159,13 +159,13 @@ colony_AL |>
   theme(plot.margin = margin(r = 25))
 ```
 
-In @fig-bees-vismiss-tip, the rows are ordered in time, and you can see that there is no particular pattern appearing. The `colony_reno_pct` column has the most missing data, and that there a short time period where all data (other than the time and state) is missing. If you were to recreate this visualization for other states, you would see a similar pattern. \index{missing data}
+In @fig-bees-vismiss-tip, the rows are ordered in time, and you can see that there is no particular pattern appearing. The `colony_reno_pct` column has the most missing data, and there is a short time period where all data (other than the time and state) is missing. If you were to recreate this visualization for other states, you would see a similar pattern. \index{missing data}
 
 Data is unavailable for all states during the period April-June 2019. This suggests that the data is not simply randomly missing, but there was perhaps a persistent data collection issue during this time period. Though it cannot be seen in @fig-bees-vismiss-tip, there is also (implicitly) missing data for the end of the last year in the data. This is due to the time when the data is reported, with annual data releases happening in August. This means we need to be careful with taking averages across years, as data is not complete for all years.
 
-For this chapter, we're not going to dive into methods for modelling, imputing, or removing missing values in data as that's a very big topic on its own. But whether or not you are explicitly addressing missing values, it's important to be aware of whether there are missing values, consider what aspect of the data collection processes might have caused them, and the impact this has on what conclusions you can draw.
+For this chapter, we're not going to dive into methods for modeling, imputing, or removing missing values in data, as that's a very big topic on its own. But whether or not you are explicitly addressing missing values, it's important to be aware of whether there are missing values, consider what aspect of the data collection processes might have caused them, and the impact this has on what conclusions you can draw.
 
-Instead, we'll limit our visualization to a quarter for which we have complete data e.g. perhaps only looking at annual trends in the `"January-March"` time period, though this approach does still have its limitations. The data is recorded quarterly, so there are four options for us to choose from: `"January-March"`, `"April-June"`, `"July-September"`, or `"October-December"`. Here, we'll focus on data for `"October-December"`. The reason for this choice is because this time period is regarded as the start of the seasonal cycle for honey bees colonies, and the *"condition of the colony at this time of year greatly affects its prosperity for the next year"* [@Apiculture].
+Instead, we'll limit our visualization to a quarter for which we have complete data, e.g., perhaps only looking at annual trends in the `"January-March"` time period, though this approach does still have its limitations. The data is recorded quarterly, so there are four options for us to choose from: `"January-March"`, `"April-June"`, `"July-September"`, or `"October-December"`. Here, we'll focus on data for `"October-December"`. The reason for this choice is because this time period is regarded as the start of the seasonal cycle for honey bees colonies, and the *"condition of the colony at this time of year greatly affects its prosperity for the next year"* [@Apiculture].
 
 ::: {#tip-bees-missing .callout-tip}
 
@@ -173,7 +173,7 @@ Instead, we'll limit our visualization to a quarter for which we have complete d
 
 By default, the **`visdat`** packages assumes that missing data is encoded as `NA`. This is not always true - especially when you're working with data that's been processed by other software before you receive it. It's not uncommon for missing values to be encoded using values such as `""`, `" "`, `99`, `999`, `-`, or `0`. The **`naniar`** package [@naniar] is very useful for summarizing and wrangling missing values. The `replace_with_na()` function from **`naniar`** can help you to replace unusual encoding of missing values with `NA` for easier data processing in R. \index{naniar!replace\_with\_na}
 
-It's also important to think about the ordering of the columns and rows when visualizing missing values. For example, if there is a column which holds a date, ordering the rows by date before visualising the missing data, will allow you to identify temporal patterns in the missingness. If the rows are ordered in some other way, you might miss this pattern.
+It's also important to think about the ordering of the columns and rows when visualizing missing values. For example, if there is a column which holds a date, ordering the rows by date before visualizing the missing data will allow you to identify temporal patterns in the missingness. If the rows are ordered in some other way, you might miss this pattern.
 
 :::
 
@@ -185,7 +185,7 @@ For each state, let's visualize the average number of colonies for each year. Th
 
 Now in each grid square, we're simply trying to show the number of *things*. How might you do that? You could draw a circle, where the size of the circle shows the number of things. Or you could color each square, where the intensity of the color shows the number of things. Or you could draw lots of points, where the number of points shows the number of things as in @fig-bees-sketch. This type of chart can be called a *dot density plot*, which is commonly used for geographic data. \index{dot density plot}
 
-We might also choose to visualise only a subset of states (either focusing on states in a specific region, or simple states we're most interested in). 
+We might also choose to visualize only a subset of states (either focusing on states in a specific region, or simple states we're most interested in). 
 
 ![Initial sketch showing a grid of squares, with the number of dots representing the number of bee colonies in each year and US state.](images/sketch-bees.png){#fig-bees-sketch fig-align="center" fig-alt="A sketch of a grid of squares with columns identifying years, and rows for some different US state. There are a varying number of dots in each square, and placeholder scribbles are used for title text."}
 
@@ -194,7 +194,7 @@ We might also choose to visualise only a subset of states (either focusing on st
 To bring this plot to life, we need to complete several tasks:
 
 * Calculate the average number of colonies per year, per state.
-* Simulate x- and y- coordinates for the points that will represent the number of colonies.
+* Simulate `x` and `y` coordinates for the points that will represent the number of colonies.
 * Plot the points.
 
 This is the type of chart that has a lot of (at times complex) preparation, but the plotting itself will be relatively straightforward.
@@ -235,15 +235,15 @@ state_levels <- plot_data |>
   pull(state)
 ```
 
-We'll convert the state column to a factor a little bit later, and this `state_levels` vector will provide us with the factor levels
+We'll convert the state column to a factor a little bit later, and this `state_levels` vector will provide us with the factor levels.
 
 Now we need to generate the points that will represent the number of honey bee colonies in each grid square, as we sketched in @fig-bees-sketch. We could do something simple, such as using the `runif()` function to generate `x` and `y` coordinates from a uniform distribution. However, this approach is likely to lead a plot that looks a bit messy. Randomness doesn't usually look very nice, and we would likely end up with lots of overlapping points. Instead, we want to generate points that don't overlap and are at least some minimum distance apart. To do this, we'll use *Poisson disk sampling*. \index{Poisson disk sampling}
 
 ### Poisson disk sampling with **`poissoned`**
 
-Poisson disk sampling is one way of generating *blue noise*, a type pattern where the points are mostly random but are fairly evenly distributed. In Poisson disk sampling, all of the points must be at least some distance, $r$ apart i.e. you can draw a *disk* of radius $r$ around each point and no other point will be included in the disk.
+Poisson disk sampling is one way of generating *blue noise*, a type pattern where the points are mostly random but are fairly evenly distributed. In Poisson disk sampling, all of the points must be at least some distance, $r$ apart, i.e., you can draw a *disk* of radius $r$ around each point and no other point will be included in the disk.
 
-There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point. The sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the **`poissoned`** package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimensions - though we'll stick to two dimensions here!
+There are several approaches to Poisson disk sampling. A naive (very slow) way of generating data is to sample a data point, then sample a second data point. If it is within $r$ of an existing data point, throw it away. Otherwise, accept it and add it to the data. Repeat. Thankfully, there are other, more computationally efficient approaches and, in R, the **`poissoned`** package [@poissoned] implements the approach outlined in @bridson2007. This package allows you to generate samples in two or three dimensions - though we'll stick to two dimensions here!
 
 ::: {#tip-bees-sampling .callout-tip}
 
@@ -275,9 +275,9 @@ The same function can be used for installing packages from CRAN e.g. `pkg_instal
 
 :::
 
-We need to generate the x- and y- coordinates of the points that will appear in each grid square. To do this, we'll use the `poisson2d()` function from **`poissoned`**. Since we're storing two coordinates (`x` and `y`) and the number of coordinate pairs will vary for each grid square, we'll store the output in a list column. We can add list columns in the same way we would add any other new column using the `mutate()` function from **`dplyr`**. Since we want to generate samples according to the values of `state`, `year`, and `colony_n` in each *row* of our data, we use the `rowwise()` function from **`dplyr`**. Since we're generating random data, we also need to make sure we set the random seed using `set.seed()` to ensure we get the same plot every time we run the code. \index{dplyr!mutate} \index{dplyr!rowwise} \index{base!set.seed}
+We need to generate the `x` and `y` coordinates of the points that will appear in each grid square. To do this, we'll use the `poisson2d()` function from **`poissoned`**. Since we're storing two coordinates (`x` and `y`) and the number of coordinate pairs will vary for each grid square, we'll store the output in a list column. We can add list columns in the same way we would add any other new column using the `mutate()` function from **`dplyr`**. Since we want to generate samples according to the values of `state`, `year`, and `colony_n` in each *row* of our data, we use the `rowwise()` function from **`dplyr`**. Since we're generating random data, we also need to make sure we set the random seed using `set.seed()` to ensure we get the same plot every time we run the code. \index{dplyr!mutate} \index{dplyr!rowwise} \index{base!set.seed}
 
-We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher i.e. there is an inverse relationship between `r` and `colony_n`. The default grid in `poisson2d()` goes from 0 to 10 on both axes. The values in `colony_n` range from `r format(min(plot_data$colony_n), scientific = FALSE)` to `r format(max(plot_data$colony_n), scientific = FALSE)`, meaning that if we simply set the minimum radius to `1/colony_n`, we end up with points that are only `r format(1/max(plot_data$colony_n), scientific = FALSE)` apart. That's a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set `r` to `200000/colony_n`. \index{poissoned!poisson2d}
+We want the area to be more populated and contain more points where the number of colonies is higher. This means the minimum radius between points should be smaller when the number of colonies is higher, i.e., there is an inverse relationship between `r` and `colony_n`. The default grid in `poisson2d()` goes from 0 to 10 on both axes. The values in `colony_n` range from `r format(min(plot_data$colony_n), scientific = FALSE, big.mark   = ",")` to `r format(max(plot_data$colony_n), scientific = FALSE, big.mark   = ",")`, meaning that if we simply set the minimum radius to `1/colony_n`, we end up with points that are only `r format(1/max(plot_data$colony_n), scientific = FALSE)` apart. That's a bit too small! We can multiply by a constant factor to increase this distance. After some trial and error, we set `r` to `200000/colony_n`. \index{poissoned!poisson2d}
 
 ```{r}
 #| label: bees-disk-sampling
@@ -328,16 +328,16 @@ bees_plot_data <- bees_grid |>
   )
 ```
 
-This generates a data set of the following form:
+This generates a dataset of the following form:
 
 ```{r}
 #| label: bees-disk-sampling-data
 bees_plot_data
 ```
 
-### The first plot
+### First plot
 
-As we've done in all previous chapters, we start our plot using the `ggplot()` function and pass in the default data and aesthetic mappings we'll use for all of the layers in the plot. To add the points we use `geom_point()`, in the same way if we were making a traditional scatter plot. \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes}
+As we've done in all previous chapters, we start our plot using the `ggplot()` function and pass in the default data and aesthetic mappings we'll use for all of the layers in the plot. To add the points, we use `geom_point()`, in the same way if we were making a traditional scatter plot. \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes}
 
 In @sec-programming and @sec-museums, we used `facet_wrap()` to create small multiple plots based on the levels of a categorical variable. Here we want to do something similar, but split based on the combination of levels from two categorical variables. We add the `facet_grid()` function to create this grid of small multiple plots, with `state` being the rows and `year` being the columns of the grid. Setting `switch = "both"` places the facet labels on the opposite side of the grid from the default. This places labels on the left for the states, and on the bottom for the years. \index{ggplot2!facet\_wrap} \index{ggplot2!facet\_grid}
 
@@ -354,7 +354,7 @@ basic_plot <- ggplot(
 basic_plot
 ```
 
-You'll notice that the points in @fig-bees-base-plot are slightly too large - the points for the California data are even distinguishable as points, it simply looks like a black square! We'll reduce the size of the points in the next iteration of the plot.
+You'll notice that the points in @fig-bees-base-plot are slightly too large - the points for the California data are not even distinguishable as points; they are so dense the square simply looks like a black square! We'll reduce the size of the points in the next iteration of the plot.
 
 ## Advanced styling
 
@@ -370,7 +370,7 @@ bg_col <- "#FECC27"
 highlight_col <- "black"
 ```
 
-Since we want to visualise the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color!
+Since we want to visualize the number of points within each grid square, there needs to be a clear distinction between the grid squares and the plot background. This means we need to make the background color of the plotting area a different color to the background color of the facet grid square. The overall plot background should be yellow but each grid square should have a black background, and then the points will be yellow again. In hindsight, perhaps `highlight_col` is not the best name to represent the `"black"` color!
 
 Let's remake the `basic_plot` from @fig-bees-base-plot, but changing the `color` of the points and making them smaller using the `size` argument: \index{ggplot2!ggplot} \index{ggplot2!geom\_point} \index{ggplot2!aes} \index{ggplot2!facet\_grid}
 
@@ -418,12 +418,12 @@ st <- "Bees are vital for the preservation of ecological balance and biodiversit
 cap <- "Data: USDA | Graphic: N. Rennie"
 ```
 
-We can then add this text using the `labs()` function, and setting the `title`, `subtitle`, and `caption`. The x- and y- axes are meaningless for this visualization since the data is represented by the number of points rather than their locations. We remove the x- and y- axis titles by setting them both to `NULL` in @fig-bees-text-plot. \index{ggplot2!labs}
+We can then add this text using the `labs()` function, and setting the `title`, `subtitle`, and `caption`. The x and y axes are meaningless for this visualization since the data is represented by the number of points rather than their locations. We remove the x- and y-axis titles by setting them both to `NULL` in @fig-bees-text-plot. \index{ggplot2!labs}
 
 ```{r}
 #| label: fig-bees-text-plot
-#| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page."
-#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption has been added though the subtitle runs off the side of the page."
+#| fig-cap: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption have been added though the subtitle runs off the side of the page."
+#| fig-alt: "A 6x6 grid with each grid square denoting a year between 2015-2020, and one of California, North Dakota, Florida, Texas, Idaho, or South Dakota. Within each square, the density of points represents the number of bee colonies. A title, subtitle, and caption have been added though the subtitle runs off the side of the page."
 text_plot <- basic_plot +
   labs(
     title = title,
@@ -456,9 +456,9 @@ The last step is adjusting the remaining theme elements: \index{ggplot2!element\
 
 * The text text color and margin for facet labels can be modified using the `strip.text` argument. Here, the text is changed separately for the x and y facet labels because we are adding slightly different margins to the text (upper margin for x-axis facets, right margin for y-axis facets). 
 
-* We change the title, subtitle, and caption text color to `highlight_col` and align the caption to the left using `element_text()`. Though the subtitle is defined using `element_textbox_simple()` from **`ggtext`** to enable automatic line wrapping of the long text as described in @sec-programming.
+* We change the title, subtitle, and caption text color to `highlight_col` and align the caption to the left using `element_text()`, though the subtitle is defined using `element_textbox_simple()` from **`ggtext`** to enable automatic line wrapping of the long text as described in @sec-programming.
 
-* We adjust the `plot.margin` to add space around edges of the plot, with slightly more space added on the right hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.
+* We adjust the `plot.margin` to add space around edges of the plot, with slightly more space added on the right-hand side. This makes the plot appear more balanced, as this additional space counteracts the space generated from the facet label text on the left.
 
 ```{r}
 #| label: bees-theme-plot-2
@@ -520,7 +520,7 @@ The bee-themed colors alongside the non-standard nature of this chart make it vi
 
 This version of the chart shows only data for six states, even though we know from our exploratory analysis that data is available for (almost) all states. Some explanation as to why these states have been chosen could be added in the subtitle, or data for all states could be shown - although this would result in a very long chart! The visualization also assigns each state equal chart area - perhaps implying that each state has an equal geographic area which is of course untrue. The chart shows there are a lot of bees in California. California is also the third largest state in terms of area [@UScensus] - maybe there's just more room for bees? Perhaps standardizing the data by state area (or state agricultural area) would provide an easier comparison between states. 
 
-Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger that might mean the numbers of bees isn't changing very much. But we don't see that when we only look at the number of colonies - we don't get a full picture of the data by limiting the chart to only a single variable.
+Another disadvantage of this chart is that it visualizes only one variable - the number of bee colonies. However, even when the number of colonies is lower, if the colony sizes are larger, that might mean the numbers of bees isn't changing very much. But we don't see that when we only look at the number of colonies - we don't get a full picture of the data by limiting the chart to only a single variable.
 
 Although this type of visualization has several disadvantages, and is far from perfect, hopefully it gives you an idea of how to think creatively about designing charts and how you might go about implementing them in R. 
 

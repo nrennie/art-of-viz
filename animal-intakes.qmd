@@ -20,7 +20,7 @@ By the end of this chapter, you'll be able to:
 
 * Create a gauge chart by programmatically calculating sizes of plot elements to use new *geom* functions from the **`ggforce`** package;
 * See how choosing a different aspect ratio or coordinate system can change the look of a chart;
-* Analyse your choice of color(s) to check if they are likely to be accessible to people with color vision deficiency.
+* Analyze your choice of color(s) to check if they are likely to be accessible to people with color vision deficiency.
 
 We begin by loading the packages required in this chapter.
 
@@ -45,7 +45,7 @@ library(tidytuesdayR)
 This chapter introduces several new packages, that we haven't yet used in previous chapters:
 
 * **`colorblindr`**: for assessing the accessibility of color palettes and the use of color in charts.
-* **`ggforce`**: a package that extends the behavior of **`ggplot2`**, and provides additional *geoms* and *stats*.
+* **`ggforce`**: a package that extends the behavior of **`ggplot2`** and provides additional *geoms* and *stats*.
 * **`lubridate`**: a package for manipulating and creating date variables. You'll see more examples of **`lubridate`** in @sec-nobel and @sec-r-pkgs.
 * **`scales`**: **`ggplot2`** uses the **`scales`** package in the background for help with axis limits and labels. However, you can use the functions from **`scales`** directly to transform data, labels, and colors.
 
@@ -53,7 +53,7 @@ This chapter introduces several new packages, that we haven't yet used in previo
 
 ## Data
 
-The Long Beach Animal Shelter dataset [@longbeach_data] contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2014. Here, the term *surrendered* refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.
+The Long Beach Animal Shelter dataset [@longbeach_data] contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2024. Here, the term *surrendered* refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.
 
 The animal shelter dataset was used as a TidyTuesday dataset in March 2025 (after being curated by [Lydia Gibson](https://github.com/lgibson7)), and the data is also available via the **`animalshelter`** package [@animalshelter]. Let's start by reading in the data using the **`tidytuesdayR`** R package [@tidytuesdayR] and looking at the definitions of the variables: \index{tidytuesdayR!tt\_load}
 
@@ -80,7 +80,7 @@ The `longbeach` data is reasonably large with `r nrow(longbeach)` rows and `r nc
 head(longbeach)
 ```
 
-Each row of the dataset relates to a different intake, with some animals appearing multiple times, as can be identified by the `animal_id` column. Further information on each individual animal is provided such as their name, the type of animal they are (e.g. cat or dog), what color they are, their sex, and their date of birth. Many of these columns have an excessive number of missing values, mainly due lack of information about animals that arrive as strays. Additional columns provide information about the intake including the date, the type and subtype (e.g. owner surrender or stray), and a free text response giving a reason for the intake. More detailed information is given on the geographic location of the capture or intake, including coordinate date and jurisdiction. Finally, data is also provided on the outcome for each animal, including when their outcome occured, the type and subtype (e.g. adopted or died). Some binary variables for different outcomes are also pre-calculated.
+Each row of the dataset relates to a different intake, with some animals appearing multiple times, as can be identified by the `animal_id` column. Further information on each individual animal is provided such as their name, the type of animal they are (e.g., cat or dog), what color they are, their sex, and their date of birth. Many of these columns have an excessive number of missing values, mainly due lack of information about animals that arrive as strays. Additional columns provide information about the intake including the date, the type and subtype (e.g., owner surrender or stray), and a free text response giving a reason for the intake. More detailed information is given on the geographic location of the capture or intake, including coordinate date and jurisdiction. Finally, data is also provided on the outcome for each animal, including when their outcome occurred, the type and subtype (e.g., adopted or died). Some binary variables for different outcomes are also pre-calculated.
 
 ## Exploratory work
 
@@ -142,13 +142,13 @@ heatmap(
 
 In @fig-longbeach-heatmap, we've used the `year()` function from **`lubridate`** to extract the year from the date variable to aggregate the data to annual values since there are very small numbers of some animal types.
 
-Let's think about how we might visually represent this data in a more meaningful, and aesthetic way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we'll do here, readers might get a *Wow, look how much things have changed!* message rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend. 
+Let's think about how we might visually represent this data in a more meaningful, and aesthetic, way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we'll do here, readers might say, *Wow, look how much things have changed!*, rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend. 
 
 We can again use `year()` from **`lubridate`** to save the extracted years as a new column, use the `filter()`\index{dplyr!filter} function from **`dplyr`**\index{dplyr} to filter our `longbeach` dataset to consider only the rows for the years 2017 and 2023. Since some of the animal types have very small numbers, even when aggregating to annual data, we'll use `if_else()` to include more animal types in the `"other"` category that already exists. We then use `count()` from **`dplyr`** to count up how many of each animal type were surrendered in each of the years we're interested in.
 
 ```{r}
 #| label: filter-longbeach
-# subset data for years and combine aninmal types
+# subset data for years and combine animal types
 intake_data <- longbeach |>
   mutate(
     year = year(intake_date),
@@ -168,15 +168,15 @@ intake_data <- longbeach |>
 head(intake_data)
 ```
 
-Our data now shows just the number (`n`) of animals of each type (`animal_type`), in each of 2017 and 2023 (`year`). How might we visualize this data? There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 2017 to 2023? Do we want to look at the relative number of different animal types? Or do we just want to show the range of values in the data? In this data, perhaps the most interesting example is a comparison between 2017 and 2023. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
+Our data now shows just the number (`n`) of animals of each type (`animal_type`), in each of 2017 and 2023 (`year`). How might we visualize this data? There are a few obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 2017 to 2023? Do we want to look at the relative number of different animal types? Or do we just want to show the range of values in the data? In this data, perhaps the most interesting example is a comparison between 2017 and 2023. Although a slope chart would likely work well for this data, we're going a little bit more experimental with a gauge chart.
 
 At the time of writing, there isn't a built-in function in **`ggplot2`** to create gauge charts. If you've never heard of a gauge chart\index{gauge chart}, the initial sketch in @fig-longbeach-sketch might give you an idea of what we're aiming for.
 
 ### Exploratory sketches
 
-You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts. 
+You can think of a gauge chart as a stacked bar chart which is curved over a half-circle. Here, rather than one stacked bar chart, we have two stacked bar charts. 
 
-![Initial sketches of ideas for visualising data for a single animal type.](images/sketch-longbeach.png){#fig-longbeach-sketch fig-align="center" fig-alt="Initial sketches of ideas for visualising data for a single animal type."}
+![Initial sketches of ideas for visualising data for a single animal type.](images/sketch-longbeach.png){#fig-longbeach-sketch fig-align="center" fig-alt="Initial sketches of ideas for visualizing data for a single animal type."}
 
 Gauge charts often also include a dial (or needle) to highlight the value further, but that gets a little bit complicated when we have multiple gauges. So let's leave that for now. \index{gauge chart}
 
@@ -186,9 +186,9 @@ Gauge charts are not a built-in feature of **`ggplot2`**, so we're going to have
 
 ### Data wrangling
 
-We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart natively in **`ggplot2`**. However, the use of polar coordinates in **`ggplot2`** often makes it difficult to add elements such as annotations in the position you'd like them to be in. So let's create a gauge chart a slightly different way! \index{ggplot2!geom\_col} \index{ggplot2!coord\_polar}
+We *could* use `geom_col()` and `coord_polar()` to try to make a gauge chart natively in **`ggplot2`**. However, the use of polar coordinates in **`ggplot2`** often makes it difficult to add elements such as annotations in the position you'd like them to be. So let's create a gauge chart a slightly different way! \index{ggplot2!geom\_col} \index{ggplot2!coord\_polar}
 
-A gauge chart is normally used to show progress toward a target or a limit. For example when considering data given as percentages, 100% is a common upper limit. For our data, if we knew the maximum capacity of the shelter, that would be an appropriate choice. However, since we don't have that information, we don't really have a *natural* limit. 
+A gauge chart is normally used to show progress toward a target or a limit. For example, when considering data given as percentages, 100% is a common upper limit. For our data, if we knew the maximum capacity of the shelter, that would be an appropriate choice. However, since we don't have that information, we don't really have a *natural* limit. 
 
 So we need to decide on a reasonable one, such as:
 
@@ -262,9 +262,9 @@ head(plot_data)
 
 You'll notice that the `ymax_*` values are always `1` for the `no_value` rows - this is because the `no_value` is the last bar so we will always have plotted 100% of the data by the time we've finished that bar. Note that the data is currently still grouped by `animal_type` - this will be important later!
 
-### The **`ggforce`** extension package
+### **`ggforce`** extension package
 
-The **`ggforce`**\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of **`ggplot2`**, many of them aimed at exploratory data visualization. We won't cover many of it's functions in this chapter, and instead we'll focus on how to use it to create gauge charts. **`ggforce`** is available on CRAN and can be installed with the usual `install.packages("ggforce")` command.
+The **`ggforce`**\index{ggforce} extension package [@ggforce] contains many useful functions which extend the behavior of **`ggplot2`**, many of them aimed at exploratory data visualization. We won't cover many of its functions in this chapter, and instead we'll focus on how to use it to create gauge charts. **`ggforce`** is available on CRAN and can be installed with the usual `install.packages("ggforce")` command.
 
 ### Gauge charts with **`ggforce`**
 
@@ -281,9 +281,9 @@ The last part of data wrangling we need to do is compute the `start` and `end` v
 
 ### Computing aesthetics
 
-The end values are easy - these are the `ymax_2017` and `ymax_2023` columns that we already have. We need to compute the equivalent `ymin_2017` and `ymin_2023` values: what are the minimum values in each stacked bar chart?
+The end values are easy: the `ymax_2017` and `ymax_2023` columns that we already have. We need to compute the equivalent `ymin_2017` and `ymin_2023` values: what are the minimum values in each stacked bar chart?
 
-Think again about stacked bar charts instead of gauge charts for a second (since it's a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero - it's right at the bottom. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we've actually already computed all the values we need and stored them in `plot_data`. We just need to rearrange them a bit.
+Think again about stacked bar charts instead of gauge charts for a second (since it's a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we've actually already computed all the values we need and stored them in `plot_data`. We just need to rearrange them a bit.
 
 ::: {#tip-longbeach-ymin .callout-tip}
 
@@ -322,7 +322,7 @@ ymin_data <- plot_data |>
 
 All of our variables are currently scaled between 0 and 1 (since they relate to percentages towards a limit). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at $-\pi/2$ (instead of 0) and end at $\pi/2$ (instead of 1). We can use the `rescale()` function from the **`scales`** package [@scales] to define the range we want to scale `from` and `to`. \index{scales!rescale} 
 
-We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"` i.e. all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from **`dplyr`** in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent **`dplyr`** from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
+We want to apply this to every column of `ymin_data` that starts with a lowercase `"y"`, i.e., all of the `ymax_*` and `ymin_*` columns so we use `mutate()` and `across()` from **`dplyr`** in conjunction with the `starts_with()` column selector function. We need to make sure we set `ignore.case = FALSE` to prevent **`dplyr`** from trying to rescale the `YN` column as well. \index{dplyr!starts\_with} \index{dplyr!across} \index{dplyr!mutate}
 
 ::: {#tip-longbeach-mutate .callout-tip}
 
@@ -347,13 +347,13 @@ gauge_data <- ymin_data |>
 head(gauge_data)
 ```
 
-### The first plot
+### First plot
 
 We're now finished with the data wrangling (finally!) and ready to create our first plot. As always, we start with the `ggplot()` function and pass in `gauge_data` that will be used for plotting the arcs. The aesthetics for each arc will vary so we'll hold off on passing them in globally. \index{ggplot2!ggplot} \index{ggplot2!aes}
 
 We then add two arcs by using `geom_arc_bar()` twice. We set the `x0`, `y0`, `r0`, and `r` constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the `aes()` function because they are *required* aesthetics. We then pass the `ymin_*` and `ymax_*` columns in as the `start` and `end` aesthetics, and set the `fill` color based on the `YN` column. \index{ggforce!geom\_arc\_bar}
 
-We also use `facet_wrap()` to draw a pair of arcs for each animal type in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries. \index{ggplot2!facet\_wrap} 
+We also use `facet_wrap()` to draw a pair of arcs for each animal type in a separate facet, choosing to use `nrow = 2` to give us a nice rectangular 3x2 grid of facets for our six countries as shown in @fig-longbeach-basic-plot-1. \index{ggplot2!facet\_wrap} 
 
 ```{r}
 #| label: fig-longbeach-basic-plot-1
@@ -385,11 +385,11 @@ basic_plot
 
 ## Advanced styling
 
-We now have a double gauge chart - but it could look a lot nicer (and more informative)!
+We now have a double gauge chart, but it could look a lot nicer (and more informative)!
 
 ### Colors
 
-Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage towards the target i.e. the number of animals surrendered. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage remaining towards to target, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black. \index{color}
+Let's start by defining some variables for our colors. Here, we define a pink `highlight_col` which we'll use for the segment showing the percentage towards the target i.e. the number of animals surrendered. This should be a bright, eye-catching color as it's the main point we're trying to communicate. The `second_col` will be used to show the percentage remaining towards the target, so we can choose a color that is a little bit more similar to the background. The background (`bg_col`) will be a light gray, the `second_col` will be a medium gray, and the text (`text_col`) will be black. \index{color}
 
 ```{r}
 #| label: longbeach-colors
@@ -428,7 +428,7 @@ basic_plot <- ggplot(data = gauge_data) +
   facet_wrap(~animal_type, nrow = 2)
 ```
 
-Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**. \index{ggplot2!scale\_fill\_manual}
+Now we can apply the colors using `scale_fill_manual()` from **`ggplot2`**, as shown in @fig-longbeach-color-plot. \index{ggplot2!scale\_fill\_manual}
 
 ```{r}
 #| label: fig-longbeach-color-plot
@@ -451,7 +451,7 @@ There are several packages in R that can be used to investigate the accessibilit
 #| fig-cap: "A 2x2 grid of charts showing simulations of how the current chart might appear to people with each of four different types of color vision deficiency."
 #| fig-alt: "A 2x2 grid of charts showing simulations of how the current chart might appear to people with each of four different types of color vision deficiency."
 #| fig-dpi: 250
-theme_set(theme_gray(base_size = 3))
+theme_set(theme_gray(base_size = 5))
 cvd_grid(color_plot)
 theme_set(theme_gray(base_size = 11))
 ```
@@ -490,7 +490,7 @@ text_df <- data.frame(
 )
 ```
 
-We can then add this text to the existing plot by adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the typeface and size directly within the `geom_text()` function, and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from **`ggplot2`**.
+We can then add this text to the existing plot by also adding a layer with `geom_text()`\index{ggplot2!geom\_text}, noting that we need to specify the `data` argument as using the text `data.frame` we just created. We also need to specify the typeface and size directly within the `geom_text()` function and can add the title and subtitle text created earlier using the `labs()` function\index{ggplot2!labs} from **`ggplot2`**.
 
 ```{r}
 #| label: fig-longbeach-text
@@ -513,7 +513,7 @@ text_plot
 
 ### Adjusting themes
 
-We'll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the typeface that will be used by default for any non-geom text elements that remain. 
+We'll start by removing all of the theme elements such as the gray background, grid lines, and axis labels from @fig-longbeach-text. The easiest way to do this is using `theme_void()`\index{ggplot2!theme\_void}. We can use the `base_family` argument of `theme_void()` to set the typeface that will be used by default for any non-geom text elements that remain. 
 
 You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding `coord_fixed()` \index{ggplot2!coord\_fixed} which forces a 1:1 aspect ratio on the plot panel.
 
@@ -527,10 +527,10 @@ theme_plot <- text_plot +
 theme_plot
 ```
 
-This looks better but it's still not great. What do we still need to improve with styling?
+@fig-longbeach-style-1 looks better, but it's still not great. What do we still need to improve with styling?
 
 * The title text doesn't stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a **bold** font would help?
-* The subtitle text doesn't fit onto the page but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from **`ggtext`**.
+* The subtitle text doesn't fit onto the page, but we can fix that with the help of the hopefully now familiar `element_textbox_simple()` function from **`ggtext`**.
 * Since we're using `coord_fixed()` to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.
 * The legend takes up a lot of space and isn't very informative.
 
@@ -580,7 +580,7 @@ styled_plot <- theme_plot +
 styled_plot
 ```
 
-We're almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it's leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it. The highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot e.g. when using `coord_fixed()` or spatial co-ordinates as we'll see in @sec-time-zones, since the wrong choice can result in cropped plots or extra white space. \index{ggplot2!coord\_fixed} 
+We're almost there, but the year label text in @fig-longbeach-style-2 remains slightly squashed. Part of the problem is how much space the legend takes up - it's leaving too much empty space in the top- and bottom-right corners, while taking away space from other places where we need more of it. This highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot, e.g., when using `coord_fixed()` or spatial coordinates as we'll see in @sec-time-zones, since the wrong choice can result in cropped plots or extra white space. \index{ggplot2!coord\_fixed} 
 
 ::: {#tip-longbeach-aspect .callout-tip}
 
@@ -588,7 +588,7 @@ We're almost there, but the year label text remains slightly squashed. Part of t
 
 Rather than thinking about width and height, it can often be more helpful to think about aspect ratio and width (or height). This often makes the process of increasing the image size a little bit easier. \index{aspect ratio}
 
-There are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you're creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.
+There are some aspect ratios that are commonly used, e.g., 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slides. If you're creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.
 
 :::
 
@@ -596,9 +596,9 @@ There are some aspect ratios that are commonly used e.g. 4x6, 5x7, or 1x1. Choos
 
 ## Choosing a width 
 
-Often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images e.g. low and high resolution.
+Often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images, e.g., low and high resolution.
 
-Changing the width (or resolution) of a plot, often also means changing other aspects e.g. the font sizes, which don't necessarily rescale larger. By setting a `base_size` and using `rel()` to edit individual font size elements, you minimize the amount of work. Viewing the plot in at desired size and resolution also makes it easier to set the sizes correctly. See @sec-camcorder for more information.
+Changing the width (or resolution) of a plot, often also means changing other aspects, e.g., the font sizes, which don't necessarily rescale larger. By setting a `base_size` and using `rel()` to edit individual font size elements, you minimize the amount of work. Viewing the plot in at desired size and resolution also makes it easier to set the sizes correctly. See @sec-camcorder for more information.
 
 :::
 
@@ -608,9 +608,9 @@ Although we could simply increase the height of the plot to stop the year labels
 
 We have a few different options for dealing with the legend. Some options might be:
 
-* Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. Repositioning the legend will be discussed in @sec-doctors.
+* Leave the legend as it is, but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. Repositioning the legend will be discussed in @sec-doctors.
 
-* We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom in @sec-time-zones and @sec-house. 
+* We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We'll look at how to design and use a custom legend in @sec-time-zones and @sec-house. 
 
 * We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting and explaining the dark pink category would be enough. We'll look at ways to do this in R in @sec-turbines and @sec-cats.
 
@@ -626,7 +626,7 @@ styled_plot +
   theme(legend.position = "none")
 ```
 
-Then save it with `ggsave()`: \index{ggplot2!ggsave}
+Then save @fig-longbeach-style-3 with `ggsave()`: \index{ggplot2!ggsave}
 
 ```{r}
 #| label: longbeach-save
@@ -641,11 +641,11 @@ ggsave(
 
 ## Reflection
 
-Are gauge charts the most effective method of visualising this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2023 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change in arc length between 2017 and 2023, you'll get different answers to if you measured the proportional change in area for the two. Here, 2023 values are consistently lower than 2017 values, yet they take up more space. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?
+Are gauge charts the most effective method of visualizing this data? No. Gauge charts have their own problems, some of which you can see here. Since the ring representing 2023 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change in arc length between 2017 and 2023, you'll get different answers than if you measured the proportional change in area for the two. Here, 2023 values are consistently lower than 2017 values, yet they take up more space. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?
 
-* The facet labels could be formatted a little nicer e.g. using capitalized letters, and perhaps using *wild animals* instead of just *wild*. Ordering the facets from overall highest to lowest, would also improve how easy it is to read.
+* The facet labels could be formatted a little nicer, e.g., using capitalized letters, and perhaps using *wild animals* instead of just *wild*. Ordering the facets from overall highest to lowest, would also improve how easy it is to read.
 
-* Providing the exact counts as labelled text would make it easier to see what the change in surrenders. It's reasonably clear that there has been an decrease across all six animal types, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between dogs and cats in 2017? It's too difficult to tell here.
+* Providing the exact counts as labeled text would make it easier to see what the change in surrenders is. It's reasonably clear that there has been an decrease across all six animal types, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What's the difference between dogs and cats in 2017? It's too difficult to tell here.
 
 * Obtain and use a more intuitive value for the upper limit, as our current choice is rather arbitrary. If none can be found, that's perhaps more motivation for returning to a simpler chart type such as a slope chart.
 
