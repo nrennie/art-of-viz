@@ -2,10 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.9.36">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>9&nbsp; Lemurs: manipulating images in R – The Art of Data Visualization with ggplot2</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -56,7 +59,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -85,15 +87,14 @@ div.csl-indent {
 <link href="./images.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-0a95de2c3be981c2e03029825b16c585.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e5c7bf9fbb22184c3d5797f9fbacf74.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3c5b6c81ffed3d0a6e9811c7a68a4075.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5c6db23daa683742b7bf794a809ab7ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -133,7 +134,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <meta property="og:description" content="">
 <meta property="og:image" content="https://nrennie.rbind.io/art-of-viz/lemurs_files/figure-html/fig-lemurs-scatter-1.png">
 <meta property="og:site_name" content="The Art of Data Visualization with ggplot2">
-<meta property="og:image:alt" content="Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.">
+<meta property="og:image:alt" content="Scatter plot showing the relationship between weight and age of lemurs. There are many data points on the plot, making it difficult to see any pattern.">
 <meta property="og:image:height" content="1005">
 <meta property="og:image:width" content="1500">
 </head>
@@ -337,7 +338,7 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">9.3</span> Preparing a plot</a>
   <ul class="collapse">
 <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">9.3.1</span> Data wrangling</a></li>
-  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">9.3.2</span> The first plot</a></li>
+  <li><a href="#first-plot" id="toc-first-plot" class="nav-link" data-scroll-target="#first-plot"><span class="header-section-number">9.3.2</span> First plot</a></li>
   </ul>
 </li>
   <li>
@@ -398,24 +399,24 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <p>This chapter introduces four new packages:</p>
 <ul>
 <li>
-<strong><code>cowplot</code></strong>: a package for arranging multiple plots and adding annotations that allows you to have precise control over positioning of different elements. We’ll be using <strong><code>cowplot</code></strong> to add an image as an annotation.</li>
+<strong><code>cowplot</code></strong>: arrange multiple plots and add annotations that allows you to have precise control over positioning of different elements. We’ll be using <strong><code>cowplot</code></strong> to add an image as an annotation.</li>
 <li>
 <strong><code>imager</code></strong>: provides an interface to the C++ library CImg which allows you to perform image manipulation in R, particularly pixel-level operations and analysis.</li>
 <li>
-<strong><code>magick</code></strong>: another different image processing package, based on the ImageMagick library, which is good for image editing tasks such as resizing and cropping.</li>
+<strong><code>magick</code></strong>: another different image processing package that based on the ImageMagick library, which is good for image editing tasks such as resizing and cropping.</li>
 <li>
 <strong><code>systemfonts</code></strong>: an alternative way of loading fonts into R that allows you to access and use the fonts installed on your operating system.</li>
 </ul>
 <p> </p>
 <section id="data" class="level2" data-number="9.1"><h2 data-number="9.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">9.1</span> Data</h2>
-<p>We’re going to be exploring data about lemurs from <a href="https://lemur.duke.edu/">Duke Lemur Center</a> in this chapter <span class="citation" data-cites="lemurs_data">(<a href="references.html#ref-lemurs_data" role="doc-biblioref">Zehr et al. 2014</a>)</span>. Duke Lemur Center houses hundreds of lemurs across many different species, and collect data on their lemur residents to better understand the factors that effect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by <a href="https://github.com/kierisi">Jesse Mostipak</a>), and so can be loaded into R using the <code><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load()</a></code> function from <strong><code>tidytuesdayR</code></strong> as we’ve done in previous chapters: </p>
+<p>We’re going to explore data about lemurs from <a href="https://lemur.duke.edu/">Duke Lemur Center</a> <span class="citation" data-cites="lemurs_data">(<a href="references.html#ref-lemurs_data" role="doc-biblioref">Zehr et al. 2014</a>)</span> which houses hundreds of lemurs across many different species and collects data on them to better understand the factors that affect lemur health, reproduction, and social interaction. The data was used as a TidyTuesday dataset in August 2021 (after being suggested and cleaned by <a href="https://github.com/kierisi">Jesse Mostipak</a>), and so it can be loaded into R using the <code><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load()</a></code> function from <strong><code>tidytuesdayR</code></strong> as we’ve done in previous chapters. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2021-08-24"</span><span class="op">)</span></span>
 <span><span class="va">lemurs</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">lemurs</span></span>
 <span><span class="va">taxonomy</span> <span class="op">&lt;-</span> <span class="va">tuesdata</span><span class="op">$</span><span class="va">taxonomy</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The <code>lemurs</code> data contains information on individual lemurs, and is the data set we’ll mainly focus on in this chapter. The data has 82609 rows and 54 columns, making it a reasonably large dataset. The first few rows can be inspected with <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>:</p>
+<p>The <code>lemurs</code> data contains information on individual lemurs, and is the dataset we’ll mainly focus on in this chapter. The data has 82,609 rows and 54 columns, making it a reasonably large dataset. The first few rows can be inspected with <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">lemurs</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -437,15 +438,15 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 #   dam_age_at_concep_y &lt;dbl&gt;, sire_id &lt;chr&gt;, …</code></pre>
 </div>
 </div>
-<p>The columns give information on the <code>taxon</code> code identifying the species of lemur, the name and sex of the lemur, the lemurs parents, whether they are still alive, the lemurs age and weight, and many other variables. Many of the columns give duplicated information since they express the same data in different units e.g.&nbsp;the lemur’s age is given in five different columns: in days, weeks, months, decimal months, and years.</p>
-<p>Though there are 82609 rows of data, this doesn’t mean that there are data on 82609 lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e.&nbsp;different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lemurs e.g.&nbsp;if a lemur is still alive, there will be no <code>age_at_death_y</code> value. This also means that if we wanted to process the missing data, we’d likely need to start with rule-based approach to decide which values should be <em>missing</em> and which ones are unexpectedly missing.</p>
-<p>The <code>taxonomy</code> data is essentially a look up table for the <code>taxon</code> column in the <code>lemurs</code> data. For each <code>taxon</code> code, the <code>taxonomy</code> data provides the Latin name (<code>latin_name</code>) for the species, as well as the common name (<code>common_name</code>). If desired, the two datasets could be joined using the <code>taxon</code> column.</p>
+<p>The columns give information on the <code>taxon</code> code identifying the species of lemur, the name and sex of the lemur, the lemur’s parents, whether they are still alive, the lemur’s age and weight, and many other variables. Many of the columns give duplicated information, since they express the same data in different units, e.g., the lemur’s age is given in five different columns: in days, weeks, months, decimal months, and years.</p>
+<p>Though there are 82,609 rows of data, this doesn’t mean that there are data on 82,609 lemurs. Each lemur has multiple rows of data associated with it, each corresponding to a date (i.e., different age and associated weight measurements). There are many missing values across the data since not all columns are relevant for all lemurs, e.g., if a lemur is still alive, there will be no <code>age_at_death_y</code> value. This also means that if we wanted to process the missing data, we’d likely need to start with a rule-based approach to decide which values should be <em>missing</em> and which ones are unexpectedly missing.</p>
+<p>The <code>taxonomy</code> data is essentially a lookup table for the <code>taxon</code> column in the <code>lemurs</code> data. For each <code>taxon</code> code, the <code>taxonomy</code> data provides the Latin name (<code>latin_name</code>) for the species, as well as the common name (<code>common_name</code>). If desired, the two datasets could be joined using the <code>taxon</code> column.</p>
 </section><section id="exploratory-work" class="level2" data-number="9.2"><h2 data-number="9.2" class="anchored" data-anchor-id="exploratory-work">
 <span class="header-section-number">9.2</span> Exploratory work</h2>
 <p>Given the size of the data and the diversity of the variables included, there are many aspects of it that we may wish to explore further. We could use the parental information to <a href="https://raw.githubusercontent.com/nrennie/data-viz-projects/refs/heads/main/Lemur%20Family%20Tree/images/lemur-family-tree.png">construct a family tree of lemurs</a>. We could compare the range of weights and ages across different species of lemurs. We could look at the <em>normal</em> growth curve for lemurs to identify which ones are outside of a normal weight range for their age. There are almost endless options!</p>
 <section id="data-exploration" class="level3" data-number="9.2.1"><h3 data-number="9.2.1" class="anchored" data-anchor-id="data-exploration">
 <span class="header-section-number">9.2.1</span> Data exploration</h3>
-<p>Let’s focus in on the growth curve idea, and look at the relationship between lemur age and weight. We can use the base R <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> function to create <a href="#fig-lemurs-scatter" class="quarto-xref">Figure&nbsp;<span>9.1</span></a>, showing the relationship between age in months and weight in grams. As we might expect with a data set containing 82609 data points, the scatter plot doesn’t clearly show any real pattern as there’s too much variability and many of the points overlap. </p>
+<p>Let’s focus in on the growth curve idea, and look at the relationship between lemur age and weight. We can use the base R <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> function to create <a href="#fig-lemurs-scatter" class="quarto-xref">Figure&nbsp;<span>9.1</span></a>, showing the relationship between age in months and weight in grams. As we might expect with a dataset containing 82,609 data points, the scatter plot doesn’t clearly show any real pattern, as there’s too much variability and many of the points overlap. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">lemurs</span><span class="op">$</span><span class="va">age_at_wt_mo</span>,</span>
@@ -454,12 +455,12 @@ gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
 <span>  ylab <span class="op">=</span> <span class="st">"Age (months)"</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.">
+<div id="fig-lemurs-scatter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot showing the relationship between weight and age of lemurs. There are many data points on the plot, making it difficult to see any pattern.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-scatter-1.png" class="img-fluid figure-img" alt="Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.">
+<img src="lemurs_files/figure-html/fig-lemurs-scatter-1.png" class="img-fluid figure-img" alt="Scatter plot showing the relationship between weight and age of lemurs. There are many data points on the plot, making it difficult to see any pattern.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.1: Scatter plot showing the relationship between weight and age pf lemurs. There are many data points on the plot, making it difficult to see any pattern.
+Figure&nbsp;9.1: Scatter plot showing the relationship between weight and age of lemurs. There are many data points on the plot, making it difficult to see any pattern.
 </figcaption></figure>
 </div>
 </div>
@@ -475,25 +476,25 @@ Figure&nbsp;9.1: Scatter plot showing the relationship between weight and age pf
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
+<div id="fig-lemurs-boxplot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Horizontal box plots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-boxplot-1.png" class="img-fluid figure-img" alt="Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
+<img src="lemurs_files/figure-html/fig-lemurs-boxplot-1.png" class="img-fluid figure-img" alt="Horizontal box plots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-boxplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.2: Horizontal boxplots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.
+Figure&nbsp;9.2: Horizontal box plots showing the range of weights observed for each species of lemur recorded in the data showing significant variability between and within species.
 </figcaption></figure>
 </div>
 </div>
 </div>
 </section><section id="exploratory-sketches" class="level3" data-number="9.2.2"><h3 data-number="9.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">9.2.2</span> Exploratory sketches</h3>
-<p>Given the variability in weights between species, we may wish to focus in on a single species. Let’s keep the chart reasonably simply and create a scatter plot of how lemur weights change with age - essentially recreating <a href="#fig-lemurs-scatter" class="quarto-xref">Figure&nbsp;<span>9.1</span></a> for a single species and working to make it much more professional looking. Since there are many different species of lemur and they are not all easily recognizable just by their common name, we’ll add an image of the lemur species in the bottom right corner to add more context to the chart.</p>
-<div id="fig-lemurs-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.">
+<p>Given the variability in weights between species, we may wish to focus in on a single species. Let’s keep the chart reasonably simple and create a scatter plot of how lemur weights change with age - essentially recreating <a href="#fig-lemurs-scatter" class="quarto-xref">Figure&nbsp;<span>9.1</span></a> for a single species and working to make it much more professional looking. Since there are many different species of lemur, and they are not all easily recognizable just by their common name, we’ll add an image of the lemur species in the bottom-right corner to add more context to the chart.</p>
+<div id="fig-lemurs-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indicating where title and subtitle text will go.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-lemurs.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.">
+<img src="images/sketch-lemurs.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indicating where title and subtitle text will go.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indiating where title and subtitle text will go.
+Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship between age and weight, with space allocated for an image and lines indicating where title and subtitle text will go.
 </figcaption></figure>
 </div>
 </section></section><section id="preparing-a-plot" class="level2" data-number="9.3"><h2 data-number="9.3" class="anchored" data-anchor-id="preparing-a-plot">
@@ -504,19 +505,19 @@ Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship betwe
 <p>We want to subset the data to consider only one species of lemur. Unless you’re an expert in lemurs, you probably don’t know which taxonomy codes in the <code>lemurs</code> data relate to which species of lemur. We could join the <code>taxonomy</code> data to the <code>lemurs</code> data and then filter the data based on the joined <code>common_name</code> column. However, since the future data processing is so minimal, we could just browse through the <code>taxonomy</code> data, choose a species of lemur from the <code>common_name</code> column, and look up the relevant taxonomy code.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div class="reactable html-widget html-fill-item" id="htmlwidget-96c7d2452d78724f7817" style="width:auto;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-96c7d2452d78724f7817">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"taxon":["CMED","DMAD","EALB","ECOL","ECOR","EFLA","EFUL","EMAC","EMON","ERUB","ERUF","ESAN","EUL","GMOH","HGG","LCAT","LTAR","MMUR","MZAZ","NCOU","NPYG","OGG","PCOQ","PPOT","VAR","VRUB","VVV"],"latin_name":["Cheirogaleus medius","Daubentonia madagascariensis","Eulemur albifrons","Eulemur collaris","Eulemur coronatus","Eulemur flavifrons","Eulemur fulvus","Eulemur macaco","Eulemur mongoz","Eulemur rubriventer","Eulemur rufus","Eulemur sanfordi","Eulemur Eulemur","Galago moholi","Hapalemur griseus griseus","Lemur catta","Loris tardigradus","Mircocebus murinus","Mirza coquereli","Nycticebus coucang","Nycticebus pygmaeus","Otolemur garnettii garnettii","Propithecus coquereli","Perodicticus potto","Varecia Varecia","Varecia rubra","Varecia variegata variegata"],"common_name":["Fat-tailed dwarf lemur","Aye-aye","White-fronted brown lemur","Collared brown lemur","Crowned lemur","Blue-eyed black lemur","Common brown lemur","Black lemur","Mongoose lemur","Red-bellied lemur","Red-fronted brown lemur","Sanford's brown lemur","hybrid","Mohol bushbaby","Eastern lesser bamboo lemur","Ring-tailed lemur","Slender loris","Gray mouse lemur","Northern giant mouse lemur","Slow loris","Pygmy slow loris","Northern greater galago","Coquerel's sifaka","Potto","hybrid","Red ruffed lemur","Black-and-white ruffed lemur"]},"columns":[{"id":"taxon","name":"taxon","type":"character"},{"id":"latin_name","name":"latin_name","type":"character"},{"id":"common_name","name":"common_name","type":"character"}],"dataKey":"dcf4058b01293d87a255ff375e14f98b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-ba5bfaa8419e14c1e483" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-ba5bfaa8419e14c1e483">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"taxon":["CMED","DMAD","EALB","ECOL","ECOR","EFLA","EFUL","EMAC","EMON","ERUB","ERUF","ESAN","EUL","GMOH","HGG","LCAT","LTAR","MMUR","MZAZ","NCOU","NPYG","OGG","PCOQ","PPOT","VAR","VRUB","VVV"],"latin_name":["Cheirogaleus medius","Daubentonia madagascariensis","Eulemur albifrons","Eulemur collaris","Eulemur coronatus","Eulemur flavifrons","Eulemur fulvus","Eulemur macaco","Eulemur mongoz","Eulemur rubriventer","Eulemur rufus","Eulemur sanfordi","Eulemur Eulemur","Galago moholi","Hapalemur griseus griseus","Lemur catta","Loris tardigradus","Mircocebus murinus","Mirza coquereli","Nycticebus coucang","Nycticebus pygmaeus","Otolemur garnettii garnettii","Propithecus coquereli","Perodicticus potto","Varecia Varecia","Varecia rubra","Varecia variegata variegata"],"common_name":["Fat-tailed dwarf lemur","Aye-aye","White-fronted brown lemur","Collared brown lemur","Crowned lemur","Blue-eyed black lemur","Common brown lemur","Black lemur","Mongoose lemur","Red-bellied lemur","Red-fronted brown lemur","Sanford's brown lemur","hybrid","Mohol bushbaby","Eastern lesser bamboo lemur","Ring-tailed lemur","Slender loris","Gray mouse lemur","Northern giant mouse lemur","Slow loris","Pygmy slow loris","Northern greater galago","Coquerel's sifaka","Potto","hybrid","Red ruffed lemur","Black-and-white ruffed lemur"]},"columns":[{"id":"taxon","name":"taxon","type":"character"},{"id":"latin_name","name":"latin_name","type":"character"},{"id":"common_name","name":"common_name","type":"character"}],"dataKey":"dcf4058b01293d87a255ff375e14f98b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<p>There are 27 species of lemurs included in the data, and for the rest of the chapter we’ll focus in on <em>red ruffed lemurs</em>. Red ruffed lemurs have the taxonomy code <code>VRUB</code>. We use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> to retain only the rows of data with <code>"VRUB"</code> in the <code>taxon</code> column: </p>
+<p>There are 27 species of lemurs included in the data, and for the rest of the chapter we’ll focus on <em>red ruffed lemurs</em>. Red ruffed lemurs have the taxonomy code <code>VRUB</code>. We use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> to retain only the rows of data with <code>"VRUB"</code> in the <code>taxon</code> column: </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vrub_lemurs</span> <span class="op">&lt;-</span> <span class="va">lemurs</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">taxon</span> <span class="op">==</span> <span class="st">"VRUB"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This is definitely the easiest data wrangling process in this book, and we’re ready to move on to creating the first draft of our plot!</p>
-</section><section id="the-first-plot" class="level3" data-number="9.3.2"><h3 data-number="9.3.2" class="anchored" data-anchor-id="the-first-plot">
-<span class="header-section-number">9.3.2</span> The first plot</h3>
-<p>Starting with the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, we pass in the subset of our data on red ruffed lemurs, and set the age (<code>age_at_wt_mo</code>) as the default variable on the x-axis and with the weight (<code>weight_g</code>) on the y-axis. We also use color to differentiate the <code>sex</code> of the lemurs. The scatter plot is then created by adding the <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> layer. </p>
+</section><section id="first-plot" class="level3" data-number="9.3.2"><h3 data-number="9.3.2" class="anchored" data-anchor-id="first-plot">
+<span class="header-section-number">9.3.2</span> First plot</h3>
+<p>Starting with the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function, we pass in the subset of our data on red ruffed lemurs, and set the age (<code>age_at_wt_mo</code>) as the default variable on the x-axis and the weight (<code>weight_g</code>) on the y-axis. We also use color to differentiate the <code>sex</code> of the lemurs. The scatter plot is then created by adding the <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code> layer. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
@@ -529,17 +530,17 @@ Figure&nbsp;9.3: Initial sketch of a scatter plot showing the relationship betwe
 <span>  <span class="op">)</span></span>
 <span><span class="va">basic_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.">
+<div id="fig-lemurs-base-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large, and many of them are overlapping.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-base-plot-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.">
+<img src="lemurs_files/figure-html/fig-lemurs-base-plot-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large, and many of them are overlapping.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-base-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.4: Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large and many of them are overlapping.
+Figure&nbsp;9.4: Scatter plot of how the weights of red ruffed lemurs change with age, with male lemurs indicated by turquoise circles and females by orange circles. The circles are too large, and many of them are overlapping.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>Even though the data shown in <a href="#fig-lemurs-base-plot" class="quarto-xref">Figure&nbsp;<span>9.4</span></a> is a subset of the full data, it still contains 4166 observations. This means that many of the points in <a href="#fig-lemurs-base-plot" class="quarto-xref">Figure&nbsp;<span>9.4</span></a> overlap, and it’s difficult to see how many points are actually in a specific area. Let’s edit the initial plot code. We can make the points slightly smaller by changing the <code>size</code> in <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>. We also make the points semi-transparent by setting <code>alpha = 0.6</code>. This is a useful technique when data points can overlap since areas of the chart with many points will appear darker, when the semi-transparent points are layered on top of each other. Since relying on color alone for visually identifying groups of data is not a good approach in terms of accessibility, we also map the <code>shape</code> of the points to the <code>sex</code> of the lemur. </p>
+<p>Even though the data shown in <a href="#fig-lemurs-base-plot" class="quarto-xref">Figure&nbsp;<span>9.4</span></a> is a subset of the full data, it still contains 4,166 observations. This means that many of the points in <a href="#fig-lemurs-base-plot" class="quarto-xref">Figure&nbsp;<span>9.4</span></a> overlap, and it’s difficult to see how many points are actually in a specific area. Let’s edit the initial plot code. We can make the points slightly smaller by changing the <code>size</code> in <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>. We also make the points semi-transparent by setting <code>alpha = 0.6</code>. This is a useful technique when data points can overlap since areas of the chart with many points will appear darker, when the semi-transparent points are layered on top of each other. Since relying on color alone for visually identifying groups of data is not a good approach in terms of accessibility, we also map the <code>shape</code> of the points to the <code>sex</code> of the lemur in <a href="#fig-lemurs-base-plot-2" class="quarto-xref">Figure&nbsp;<span>9.5</span></a>. </p>
 <div class="cell" data-source-line-numbers="8,10,11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-source-line-numbers="8,10,11" data-code-line-numbers="8,10,11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
@@ -570,25 +571,25 @@ Figure&nbsp;9.5: Scatter plot of how the weights of red ruffed lemurs change wit
 <p>Now it’s time to style and edit the plot to make it more aesthetically pleasing, accessible, and informative.</p>
 <section id="colors" class="level3" data-number="9.4.1"><h3 data-number="9.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">9.4.1</span> Colors</h3>
-<p>For the plot background and text, we’ll choose colors that might be found on a red ruffed lemur such as a light beige (<code>bg_col</code>) and warm brown (<code>text_col</code>). We also need to select two colors to represent the male and female lemurs. When choosing colors for categories, it’s important to choose colors that neither reinforce negative stereotypes nor contradict intuitive color choices. When choosing colors to represent gender or sex, it’s very common to see the stereotypical blue for boys, and pink for girls. We don’t want to reinforce the negative associations for different genders that these colors can have. Equally, we don’t want to make it confusing by choosing the opposite e.g.&nbsp;blue for girls and pink for boys. Instead, we’ll choose a purple for female lemurs (<code>f_col</code>) and turquoise for male lemurs (<code>m_col</code>). This is not an uncommon color combinations for representing gender, and other good options are discussed in Lisa Muth’s blog post <em>An Alternative to Pink &amp; Blue: Colors for Gender Data</em> <span class="citation" data-cites="Muth2018">(<a href="references.html#ref-Muth2018" role="doc-biblioref">Muth 2018</a>)</span>. </p>
+<p>For the plot background and text, we’ll choose colors that might be found on a red ruffed lemur such as a light beige (<code>bg_col</code>) and warm brown (<code>text_col</code>). We also need to select two colors to represent the male and female lemurs. When choosing colors for categories, it’s important to choose colors that neither reinforce negative stereotypes nor contradict intuitive color choices. When choosing colors to represent gender or sex, it’s very common to see the stereotypical blue for boys, and pink for girls. We don’t want to reinforce the negative associations for different genders that these colors can have. Equally, we don’t want to make it confusing by choosing the opposite, e.g., blue for girls and pink for boys. Instead, we’ll choose a purple for female lemurs (<code>f_col</code>) and turquoise for male lemurs (<code>m_col</code>). This is not an uncommon color combinations for representing gender, and other good options are discussed in Lisa Muth’s blog post <em>An Alternative to Pink &amp; Blue: Colors for Gender Data</em> <span class="citation" data-cites="Muth2018">(<a href="references.html#ref-Muth2018" role="doc-biblioref">Muth 2018</a>)</span>. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bg_col</span> <span class="op">&lt;-</span> <span class="st">"#F5F5DC"</span></span>
 <span><span class="va">text_col</span> <span class="op">&lt;-</span> <span class="st">"#4E2E12"</span></span>
 <span><span class="va">f_col</span> <span class="op">&lt;-</span> <span class="st">"#A053A1"</span></span>
 <span><span class="va">m_col</span> <span class="op">&lt;-</span> <span class="st">"#21ADA8"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The colors for male and female lemurs can then be applied to the plot using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code> where we explicitly map the color variables to the values in the data by naming the vector elements passed into <code>values</code>. We could create these color variables as a named vector as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, but since we want the labels to be different than the data values (e.g.&nbsp;<code>females</code> instead of <code>F</code>) it’s a similar amount of work to simply pass them in as variables - especially for only two categories. </p>
+<p>The colors for male and female lemurs can then be applied to the plot using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code> where we explicitly map the color variables to the values in the data by naming the vector elements passed into <code>values</code>. We could create these color variables as a named vector as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, but since we want the labels to be different than the data values (e.g., <code>females</code> instead of <code>F</code>), it’s a similar amount of work to simply pass them in as variables - especially for only two categories. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">col_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span></span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"F"</span> <span class="op">=</span> <span class="va">f_col</span>, <span class="st">"M"</span> <span class="op">=</span> <span class="va">m_col</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We’ll use colored text and icons in the subtitle to distinguish the two categories as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and so we’ll remove the legend by setting <code>legend.position = "none"</code> inside the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend e.g.&nbsp;color, we could set <code>guide = "none"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code>. This would result in a legend for shape only with the shapes shown in black by default. </p>
+<p>We’ll use colored text and icons in the subtitle to distinguish the two categories as we did in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and so we’ll remove the legend by setting <code>legend.position = "none"</code> inside the <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code> function a little bit later. Here, we technically have two legends in one - one for color, and one for shape. If we only wanted to remove one part of the legend, e.g., color, we could set <code>guide = "none"</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual()</a></code>. This would result in a legend for shape only with the shapes shown in black by default. </p>
 </section><section id="working-with-systemfonts" class="level3" data-number="9.4.2"><h3 data-number="9.4.2" class="anchored" data-anchor-id="working-with-systemfonts">
 <span class="header-section-number">9.4.2</span> Working with <strong><code>systemfonts</code></strong>
 </h3>
-<p>Rather than using a traditional legend for color and shape, we’re going to include colored text in the subtitle. Here, we’re also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately the <strong><code>showtext</code></strong> package, that we’ve been using to load the Font Awesome icon font and other Google fonts, doesn’t always play nicely with Unicode icons. We’ll look at an alternative font package: <strong><code>systemfonts</code></strong> <span class="citation" data-cites="systemfonts">(<a href="references.html#ref-systemfonts" role="doc-biblioref">Pedersen, Ooms, and Govett 2024</a>)</span>. As mentioned in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, the <strong><code>systemfonts</code></strong> package allows you to locate or load font files available on your local system.</p>
+<p>Rather than using a traditional legend for color and shape, we’re going to include colored text in the subtitle. Here, we’re also going to include some Unicode icons in the subtitle to identify how the circles and triangles map to the two categories. Unfortunately, the <strong><code>showtext</code></strong> package, we’ve been using to load the Font Awesome icon font and other Google fonts, doesn’t always play nicely with Unicode icons. We’ll look at an alternative font package: <strong><code>systemfonts</code></strong> <span class="citation" data-cites="systemfonts">(<a href="references.html#ref-systemfonts" role="doc-biblioref">Pedersen et al. 2024</a>)</span>. As mentioned in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>, the <strong><code>systemfonts</code></strong> package allows you to locate or load font files available on your local system.</p>
 <p>To register a font using <strong><code>systemfonts</code></strong>, we use the <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> function. It looks quite similar to the <code>font_add()</code> function from <strong><code>showtext</code></strong> for loading local fonts - see <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a> to compare them. Let’s load the Font Awesome Brand icons using <strong><code>systemfonts</code></strong> as an alternative approach to the one taken in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>. </p>
 <p>The first argument <code>name</code> will be the name that the font is known by in R. You can choose any name you want, but here we’ll make sure to use the same name as we did for the <code>family</code> argument in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, in order for our <code>social_caption()</code> function to still work. The <code>plain</code> argument is the the path to the font file.</p>
 <div class="cell">
@@ -607,13 +608,13 @@ Tip&nbsp;9.1: Setting a graphics device
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In R, a graphics device is the system that is used to render visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create e.g.&nbsp;png or pdf. The <strong><code>ragg</code></strong> package <span class="citation" data-cites="ragg">(<a href="references.html#ref-ragg" role="doc-biblioref">Pedersen and Shemanarev 2023</a>)</span> provides graphic devices for R based on the AGG library. </p>
-<p>It’s recommended to use <strong><code>ragg</code></strong> for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with <strong><code>systemfonts</code></strong> may not appear correctly. To use <strong><code>ragg</code></strong> for the graphics devices in RStudio, go to <code>Tools -&gt; Global Options -&gt; General -&gt; Graphics -&gt; Backend</code> and select <code>AGG</code>. In R Markdown or Quarto documents, you can add a set up chunk at the top to use ragg which includes <code>knitr::opts_chunk$set(dev = "ragg_png")</code>, or your device of choice. </p>
+<p>In R, a graphics device is the system that is used to render visual outputs (including plots). The graphics device used will vary depending on what operating system you are using and what type of output format you want to create, e.g., png or pdf. The <strong><code>ragg</code></strong> package <span class="citation" data-cites="ragg">(<a href="references.html#ref-ragg" role="doc-biblioref">Pedersen and Shemanarev 2023</a>)</span> provides graphic devices for R based on the AGG library. </p>
+<p>It’s recommended to use <strong><code>ragg</code></strong> for graphics in RStudio because it makes working with fonts easier and provides higher quality images. If you use a different graphics device, the icons or fonts loaded with <strong><code>systemfonts</code></strong> may not appear correctly. To use <strong><code>ragg</code></strong> for the graphics devices in RStudio, go to <code>Tools -&gt; Global Options -&gt; General -&gt; Graphics -&gt; Backend</code> and select <code>AGG</code>. In R Markdown or Quarto documents, you can add a set-up chunk at the top to use <strong><code>ragg</code></strong> which includes <code>knitr::opts_chunk$set(dev = "ragg_png")</code>, or your device of choice. </p>
 </div>
 </div>
 <p>We can also use <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> from <strong><code>systemfonts</code></strong> to load the fonts we’ll use for the title and body text of our plot. The difference here is that if, for example, we want to use fonts from Google Fonts, we first need to download the font files. </p>
-<p>For the body text, we’ll use <em>Lato</em>, a sans serif typeface designed by <a href="http://www.latofonts.com/team/">Łukasz Dziedzic</a>. The font files can be downloaded from <a href="https://fonts.google.com/specimen/Lato">fonts.google.com/specimen/Lato</a> or <a href="https://www.latofonts.com/lato-free-fonts/">www.latofonts.com/lato-free-fonts</a>. For the title, we’ll use <em>Passion One</em> - a typeface specifically designed for large titles! It can be downloaded from <a href="https://fonts.google.com/specimen/Passion+One">fonts.google.com/specimen/Passion+One</a>. When you download these typefaces, you’ll see that you don’t just download a single file, you actually download multiple files - one for each variation of the font that is available e.g.&nbsp;bold and italic.</p>
-<p>In <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code>, you pass these different font files into the relevant argument e.g.&nbsp;passing the font file for the bold version into the <code>bold</code> argument. Note that not all typefaces have every style available. Here, <em>Passion One</em> isn’t available in italic so we simply don’t pass anything into the <code>italic</code> argument when loading <code>Passion One</code>. If you’re not going to use a particular font style (for example, if you know you won’t write any text in bold when using Lato font) you don’t need to load this style in with <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code>. However, it can be useful to have it available, just in case you change your mind!</p>
+<p>For the body text, we’ll use <em>Lato</em>, a sans serif typeface designed by <a href="http://www.latofonts.com/team/">Łukasz Dziedzic</a>. The font files can be downloaded from <a href="https://fonts.google.com/specimen/Lato">fonts.google.com/specimen/Lato</a> or <a href="https://www.latofonts.com/lato-free-fonts/">www.latofonts.com/lato-free-fonts</a>. For the title, we’ll use <em>Passion One</em> - a typeface specifically designed for large titles! It can be downloaded from <a href="https://fonts.google.com/specimen/Passion+One">fonts.google.com/specimen/Passion+One</a>. When you download these typefaces, you’ll see that you don’t just download a single file, you actually download multiple files - one for each variation of the font that is available, e.g., bold and italic.</p>
+<p>In <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code>, you pass these different font files into the relevant argument, e.g., passing the font file for the bold version into the <code>bold</code> argument. Note that not all typefaces have every style available. Here, <em>Passion One</em> isn’t available in italic, so we simply don’t pass anything into the <code>italic</code> argument when loading <code>Passion One</code>. If you’re not going to use a particular font style (for example, if you know you won’t write any text in bold when using Lato font), you don’t need to load this style in with <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code>. However, it can be useful to have it available, just in case you change your mind!</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Lato"</span>,</span>
@@ -632,20 +633,20 @@ Tip&nbsp;9.1: Setting a graphics device
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">body_font</span> <span class="op">&lt;-</span> <span class="st">"Lato"</span></span>
 <span><span class="va">title_font</span> <span class="op">&lt;-</span> <span class="st">"Passion One"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>An alternative to using <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> is to install the font on your system, by right clicking on the downloaded font file and selecting <em>Install</em>. Then <strong><code>ragg</code></strong> should be able to find the font automatically. However, there may be reasons why you can’t or don’t want to prefer install a font system wide. Using <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> in a script also leaves a record of how the fonts were installed, rather than relying on other processes happening outside of R.</p>
+<p>An alternative to using <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> is to install the font on your system, by right-clicking on the downloaded font file and selecting <em>Install</em>. Then <strong><code>ragg</code></strong> should be able to find the font automatically. However, there may be reasons why you can’t or don’t want to install a font systemwide. Using <code><a href="https://systemfonts.r-lib.org/reference/register_font.html">register_font()</a></code> in a script also leaves a record of how the fonts were installed, rather than relying on other processes happening outside of R.</p>
 </section><section id="adding-text" class="level3" data-number="9.4.3"><h3 data-number="9.4.3" class="anchored" data-anchor-id="adding-text">
 <span class="header-section-number">9.4.3</span> Adding text</h3>
-<p>The title for the plot can be defined as a simple character string, which asks the reader a question and encourages them to engage with the plot. To write the subtitle text we’ll use the <code><a href="https://glue.tidyverse.org/reference/glue.html">glue()</a></code> function from <strong><code>glue</code></strong> to do two things: </p>
+<p>The title for the plot can be defined as a simple character string, which asks the reader a question and encourages them to engage with the plot. To write the subtitle text, we’ll use the <code><a href="https://glue.tidyverse.org/reference/glue.html">glue()</a></code> function from <strong><code>glue</code></strong> to do two things: </p>
 <ul>
 <li>Add colored text in the subtitle, as we did in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</li>
 <li>Create data-driven text, as we did in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a>.</li>
 </ul>
-<p>We’ll also use Unicode characters (for triangles and circles) in the subtitle to substitute the shape legend. Though the Unicode characters are not exactly identical to the shapes plotted on our chart, in the way that the colors are, the shapes are similar enough for this approach to work. The <code>&amp;#x25B2;</code> string adds a black triangle, and the <code>&amp;#x25CF</code> string adds a black circle. Though these define <em>black</em> shapes, they will appear in the color we desire. Here, <em>black</em> triangle really just means <em>filled in</em> triangle (with <em>white</em> triangle meaning <em>outline only</em> triangle). </p>
+<p>We’ll also use Unicode characters (for triangles and circles) in the subtitle to substitute the shape legend. Though the Unicode characters are not exactly identical to the shapes plotted on our chart, in the way that the colors are, the shapes are similar enough for this approach to work. The <code>&amp;#x25B2;</code> string adds a black triangle, and the <code>&amp;#x25CF</code> string adds a black circle. Though these define <em>black</em> shapes, they will appear in the color we desire. Here, a <em>black</em> triangle really just means a <em>filled-in</em> triangle (with <em>white</em> triangle meaning <em>outline only</em> triangle). </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">title</span> <span class="op">&lt;-</span> <span class="st">"How much does a red ruffed lemur weigh?"</span></span>
 <span><span class="va">subtitle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span><span class="st">"At Duke Lemur Center, red ruffed lemurs live to an average of {round(mean(vrub_lemurs$age_at_death_y, na.rm = TRUE), 1)} years, and mature at about 2 years old. Although it may appear that, once fully-grown, &lt;span style='color:{f_col}'&gt;females &amp;#x25CF;&lt;/span&gt; tend to weigh more than &lt;span style='color:{m_col}'&gt;males &amp;#x25B2;&lt;/span&gt;, this chart does not account for pregnancy."</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We’ll use the <code>social_caption()</code> function defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, to create a caption that includes Font Awesome icons for social media (using the colors we defined earlier). We then use the social media caption in the <code>source_caption()</code> function from <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a>, and also pass in Duke Lemur Center and the data publication as the source of the data. </p>
+<p>We’ll use the <code>social_caption()</code> function defined in <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, to create a caption that includes Font Awesome icons for social media (using the colors we defined earlier). We then use the social media caption in the <code>source_caption()</code> function from <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and also pass in Duke Lemur Center and the data publication as the source of the data. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">social</span> <span class="op">&lt;-</span> <span class="fu">social_caption</span><span class="op">(</span></span>
 <span>  icon_color <span class="op">=</span> <span class="va">f_col</span>,</span>
@@ -658,7 +659,7 @@ Tip&nbsp;9.1: Setting a graphics device
 <span>  graphic <span class="op">=</span> <span class="va">social</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The title, subtitle, and caption text can then be added to the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function, along with x- and y- axis labels showing the variables and units they are recorded in. </p>
+<p>The title, subtitle, and caption text can then be added to the plot using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function, along with x- and y-axis labels showing the variables and units they are recorded in. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">col_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span></span>
@@ -681,9 +682,9 @@ Figure&nbsp;9.6: Scatter plot of how the weights of red ruffed lemurs change wit
 </div>
 </section><section id="adjusting-themes" class="level3" data-number="9.4.4"><h3 data-number="9.4.4" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">9.4.4</span> Adjusting themes</h3>
-<p>Now we need to add some final styling to implement the background and text colors, as well as making sure the raw HTML code is processed correctly.</p>
+<p>Now we need to add some final styling to <a href="#fig-lemurs-labels" class="quarto-xref">Figure&nbsp;<span>9.6</span></a> to implement the background and text colors, as well as making sure the raw HTML code is processed correctly.</p>
 <p>We start with <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal()</a></code> as a base, which keeps the grid lines and axes but removes the gray background and dark axis ticks. We also set the base font size as size <code>6</code> and use our previously defined <code>body_font</code> variable as the base font family. We can then make a few further adjustments using <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>, where we remove the legend by setting <code>legend.position = "none"</code>, add a margin around the edge of the plot, and apply the selected background color using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect()</a></code>. </p>
-<p>Setting <code>plot.title.position</code> and <code>plot.caption.position</code> to <code>"plot"</code> aligns the title, subtitle, and caption with outside of the entire plot rather than the panel with the scatter plot - giving a cleaner, more balanced look. The title text is further adjusted with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code> to use the <code>title_font</code> family, increase it in size, change the color, and add a little bit more space at the bottom of it. As described in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, we use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> for the plot subtitle and caption to force the long text to wrap onto multiple lines, and to correctly process the HTML code in the caption. </p>
+<p>Setting <code>plot.title.position</code> and <code>plot.caption.position</code> to <code>"plot"</code> aligns the title, subtitle, and caption with the outside of the entire plot rather than the panel with the scatter plot - giving a cleaner, more balanced look. The title text is further adjusted with <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text()</a></code> to use the <code>title_font</code> family, increase it in size, change the color, and add a little bit more space at the bottom of it. As described in <a href="programming-languages.html" class="quarto-xref"><span>Chapter 2</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>, we use <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> from <strong><code>ggtext</code></strong> for the plot subtitle and caption in <a href="#fig-lemurs-style-1" class="quarto-xref">Figure&nbsp;<span>9.7</span></a> to force the long text to wrap onto multiple lines, and to correctly process the HTML code in the caption. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span>, base_family <span class="op">=</span> <span class="va">body_font</span><span class="op">)</span> <span class="op">+</span></span>
@@ -724,31 +725,31 @@ Figure&nbsp;9.7: Scatter plot of how the weights of red ruffed lemurs change wit
 </div>
 </div>
 </div>
-<p>We’re going to add the image to the right hand side of the plot. The approach we’re taking requires us to make some blank space. Perhaps the simplest approach is to increase the size of the margin on the right hand side of the plot using the <code>plot.margin</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>: </p>
+<p>We’re going to add the image to the right-hand side of the plot. The approach we’re taking requires us to make some blank space. Perhaps the simplest approach is to increase the size of the margin on the right-hand side of the plot using the <code>plot.margin</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>: </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">90</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-margin-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.">
+<div id="fig-lemurs-margin-1" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side of the plot and subtitle text.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-margin-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-margin-1-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.">
+<img src="lemurs_files/figure-html/fig-lemurs-margin-1-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side of the plot and subtitle text.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-margin-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.8: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side of the plot and subtitle text.
+Figure&nbsp;9.8: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side of the plot and subtitle text.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>However, as you can see in <a href="#fig-lemurs-margin-1" class="quarto-xref">Figure&nbsp;<span>9.8</span></a>, this approach results in the title and subtitle text also being squashed to the left hand side of the plot as it doesn’t extend into the margin. This may be desirable for some plots, but it doesn’t work well here. Another approach is to use the <code>expand</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous()</a></code> to increase the amount of space at the right hand side of the x-axis. However, since this extends the axis, this results in grid lines being included in the additional space. We <em>could</em> play around with the breaks and axis text to remove the unwanted components, but there’s an easier (slightly <em>hacky</em>) solution: add and edit a secondary y-axis. </p>
-<p>Secondary axes are almost always a poor choice of chart due to the fact that the choice of transformation for the secondary axis is entirely arbitrary but can hugely impact how the plot is interpreted. However, we’re not actually going to use the secondary axis to present data, we’re only going to use it to manipulate the layout of the plot background. To add some additional margin space on the right hand side, without squashing the title or adding grid lines in the margin, we can: </p>
+<p>However, as you can see in <a href="#fig-lemurs-margin-1" class="quarto-xref">Figure&nbsp;<span>9.8</span></a>, this approach results in the title and subtitle text also being squashed to the left-hand side of the plot, as it doesn’t extend into the margin. This may be desirable for some plots, but it doesn’t work well here. Another approach is to use the <code>expand</code> argument in <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous()</a></code> to increase the amount of space at the right-hand side of the x-axis. However, since this extends the axis, it results in grid lines being included in the additional space. We <em>could</em> play around with the breaks and axis text to remove the unwanted components, but there’s an easier (slightly <em>hacky</em>) solution: add and edit a secondary y-axis. </p>
+<p>Secondary axes are almost always a poor choice of chart due to the fact that the choice of transformation for the secondary axis is entirely arbitrary but can hugely impact how the plot is interpreted. However, we’re not actually going to use the secondary axis to present data, we’re only going to use it to manipulate the layout of the plot background. To add some additional margin space on the right-hand side, without squashing the title or adding grid lines in the margin, we can: </p>
 <ul>
-<li>Duplicate the y-axis to create a secondary y-axis on the right hand side by setting <code>sec.axis = dup_axis()</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous()</a></code>. The <code><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">sec_axis()</a></code> function could be used instead of <code><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis()</a></code>, but there’s no need to transform the axis in any way.</li>
-<li>Add lots of margin space to the secondary axis labels by expand the right margin using <code>margin = margin(r = 150)</code> for the <code>axis.text.y.right</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>.</li>
-<li>Then hide the secondary axis labels by making them the same color as the background through also setting <code>color = bg_col</code> for <code>axis.text.y.right</code>.</li>
+<li>Duplicate the y-axis to create a secondary y-axis on the right-hand side by setting <code>sec.axis = dup_axis()</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous()</a></code>. The <code><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">sec_axis()</a></code> function could be used instead of <code><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis()</a></code>, but there’s no need to transform the axis in any way.</li>
+<li>Add lots of margin space to the secondary axis labels by expanding the right margin using <code>margin = margin(r = 150)</code> for the <code>axis.text.y.right</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme()</a></code>.</li>
+<li>Hide the secondary axis labels by making them the same color as the background through also setting <code>color = bg_col</code> for <code>axis.text.y.right</code>.</li>
 </ul>
-<p>We also remove the title by setting <code>axis.title.y.right</code> to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank()</a></code>. </p>
+<p>We also remove the secondary axis title by setting <code>axis.title.y.right</code> to <code><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank()</a></code>. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">theme_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>sec.axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -761,24 +762,24 @@ Figure&nbsp;9.8: Scatter plot of how the weights of red ruffed lemurs change wit
 <span>  <span class="op">)</span></span>
 <span><span class="va">styled_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fig-lemurs-margin-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.">
+<div id="fig-lemurs-margin-2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side, though the subtitle text spans the full plot width.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-lemurs-margin-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="lemurs_files/figure-html/fig-lemurs-margin-2-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.">
+<img src="lemurs_files/figure-html/fig-lemurs-margin-2-1.png" class="img-fluid figure-img" alt="Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side, though the subtitle text spans the full plot width.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lemurs-margin-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.9: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right hand side though the subtitle text spans the full plot width.
+Figure&nbsp;9.9: Scatter plot of how the weights of red ruffed lemurs change with age, with additional space left blank on the right-hand side, though the subtitle text spans the full plot width.
 </figcaption></figure>
 </div>
 </div>
 </div>
-<p>We now have an appropriate space to place an image.</p>
+<p>We now have an appropriate space to place an image in <a href="#fig-lemurs-margin-2" class="quarto-xref">Figure&nbsp;<span>9.9</span></a>.</p>
 </section></section><section id="working-with-images" class="level2" data-number="9.5"><h2 data-number="9.5" class="anchored" data-anchor-id="working-with-images">
 <span class="header-section-number">9.5</span> Working with images</h2>
-<p>Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you’re just looking for a way to make your plot more eye catching! </p>
+<p>Though you might not often find instructions in data visualization books about working with images, there are many reasons why you may wish to overlay an image on top of a plot. Perhaps you need to add your company logo in the corner for more consistent branding. Or perhaps you’re just looking for a way to make your plot more eye-catching! </p>
 <section id="manipulating-images-with-magick-and-imager" class="level3" data-number="9.5.1"><h3 data-number="9.5.1" class="anchored" data-anchor-id="manipulating-images-with-magick-and-imager">
 <span class="header-section-number">9.5.1</span> Manipulating images with <strong><code>magick</code></strong> and <strong><code>imager</code></strong>
 </h3>
-<p>The <strong><code>magick</code></strong> package <span class="citation" data-cites="magick">(<a href="references.html#ref-magick" role="doc-biblioref">Ooms 2024</a>)</span> provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name just a few!). It supports multiple different image formats including PNG, JPG, and PDF. </p>
+<p>The <strong><code>magick</code></strong> package <span class="citation" data-cites="magick">(<a href="references.html#ref-magick" role="doc-biblioref">Ooms 2024</a>)</span> provides bindings to the ImageMagick image processing library, which allows you to manipulate images through rotating, scaling, cropping, or blurring them (to name a few!). It supports multiple different image formats including PNG, JPG, and PDF. </p>
 <p>The <strong><code>magick</code></strong> package is not the only R package that enables you to process and manipulate images. A popular alternative is the <strong><code>imager</code></strong> package <span class="citation" data-cites="imager">(<a href="references.html#ref-imager" role="doc-biblioref">Barthelme 2024</a>)</span> which is based on CImg, a C++ library by David Tschumperlé. Both packages have their strengths, and it’s easy to use both at the same time via the <code><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick()</a></code> and <code><a href="https://rdrr.io/pkg/imager/man/magick.html">magick2cimg()</a></code> conversion functions in <strong><code>imager</code></strong>. There are some operations that are easier in <strong><code>imager</code></strong>, and some that are easier in <strong><code>magick</code></strong>. In this chapter, we’re going to use both packages together to demonstrate how easy it is. </p>
 <div id="tip-lemurs-unsplash" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -791,7 +792,7 @@ Tip&nbsp;9.2: Finding images for reuse
 </div>
 <div class="callout-body-container callout-body">
 <p>When you’re adding a logo to your plot, it’s (reasonably) easy to know which image to use and where to find it. If you don’t already have the image you want to overlay, you also need to know how and where to find it.</p>
-<p>If you add images to plots that you don’t own, make sure you have permission to re-use the image and check that the license file allows you to. Sites such as Unsplash (<a href="https://unsplash.com/">unsplash.com</a>), Wikimedia Commons (<a href="https://commons.wikimedia.org/">commons.wikimedia.org</a>), or Pixabay (<a href="https://pixabay.com/">pixabay.com</a>) can be good places to find images that are free to re-use.</p>
+<p>If you add images to plots that you don’t own, make sure you have permission to reuse the image and check that the license file allows you to. Sites such as Unsplash (<a href="https://unsplash.com/">unsplash.com</a>), Wikimedia Commons (<a href="https://commons.wikimedia.org/">commons.wikimedia.org</a>), or Pixabay (<a href="https://pixabay.com/">pixabay.com</a>) can be good places to find images that are free to reuse.</p>
 </div>
 </div>
 <p>For this visualization, we’re going to use a photograph of a red ruffed lemur from <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">Unsplash</a> taken by <a href="https://unsplash.com/@lysrix">Jax</a> <span class="citation" data-cites="img_jax">(<a href="references.html#ref-img_jax" role="doc-biblioref">Jax (@lysrix) 2017</a>)</span>.</p>
@@ -810,10 +811,10 @@ Figure&nbsp;9.10: Image of a red ruffed lemur shown with plot axes which indicat
 </div>
 </div>
 </div>
-<p>You can view the image to check it’s been loaded correctly by running <code>plot(lemur_img)</code>, and you’ll see that it’s plotted on a traditional base R graphics grid, with the axes indicating the number of pixels. Don’t worry about how to deal with this background grid - we’ll deal with that a little bit later!</p>
+<p>You can view the image to check that it’s been loaded correctly by running <code>plot(lemur_img)</code>, and you’ll see that it’s plotted on a traditional base R graphics grid in <a href="#fig-lemurs-imager-read" class="quarto-xref">Figure&nbsp;<span>9.10</span></a>, with the axes indicating the number of pixels. Don’t worry about how to deal with this background grid - we’ll deal with that a little bit later!</p>
 <p>Though this is a fun image of a lemur, overlaying it on top of the plot in its raw format isn’t going to be the most aesthetically pleasing. The background of the image would be quite clear against the plot. It would be better if the image was simply of the lemur itself with a transparent background. There are many online tools and desktop software available that could remove the background for you, but we can also do this in R!</p>
-<p>Let’s start by cropping out as much of the background as possible. In <strong><code>imager</code></strong>, the <code><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Xc()</a></code> and <code><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Yc()</a></code> functions return pixel coordinates for an image, for x- and y- coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. </p>
-<p>Running <code>Xc(lemur_img) &lt;= 200</code> creates a pixel matrix where all values with an x-coordinate less than or equal to 200 are <code>TRUE</code>, and is otherwise <code>FALSE</code>. Setting these values to <code>0</code> turns those pixels to the color black. We can do something similar to remove sections where the x-coordinate is less than 275 and the y-coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis - it goes the opposite direction of most plots! </p>
+<p>Let’s start by cropping out as much of the background as possible. In <strong><code>imager</code></strong>, the <code><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Xc()</a></code> and <code><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Yc()</a></code> functions return pixel coordinates for an image, for <code>x</code> and <code>y</code> coordinates, respectively. Subsetting or updating the pixel value of an image based on pixel coordinates essentially works the same way as subsetting or updating a matrix value in R. </p>
+<p>Running <code>Xc(lemur_img) &lt;= 200</code> creates a pixel matrix where all values with an <code>x</code> coordinate less than or equal to 200 are <code>TRUE</code>, and is otherwise <code>FALSE</code>. Setting these values to <code>0</code> turns those pixels to the color black. We can do something similar to remove sections where the <code>x</code> coordinate is less than 275 and the <code>y</code> coordinate is greater than 320. It takes a little bit of trial and error to get these boundaries correct, but you can use the plot axis as a guide. Be careful with the y-axis; it goes the opposite direction of most plots! </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">px</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Xc</a></span><span class="op">(</span><span class="va">lemur_img</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">200</span></span>
 <span><span class="va">lemur_img</span><span class="op">[</span><span class="va">px</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
@@ -821,7 +822,7 @@ Figure&nbsp;9.10: Image of a red ruffed lemur shown with plot axes which indicat
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/imager/man/imcoord.html">Yc</a></span><span class="op">(</span><span class="va">lemur_img</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">320</span></span>
 <span><span class="va">lemur_img</span><span class="op">[</span><span class="va">px</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don’t (the background). The <code><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood()</a></code> function from <strong><code>imager</code></strong> allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the <code><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood()</a></code> function to select all pixels that are similar to it. The <code>x</code> and <code>y</code> arguments are used to specify the coordinates of the initial pixel to start with. The <code>sigma</code> argument specifies how different we want to allow the pixels to be with lower indicating very similar, and higher values of <code>sigma</code> allowing more different values to be selected. </p>
+<p>Now we need to remove the rest of the background. Luckily, there is quite a lot of contrast between the part of the image we want to keep (the lemur) and the part that we don’t (the background). The <code><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood()</a></code> function from <strong><code>imager</code></strong> allows you to select pixels that are similar to some initial pixel. This means we can select a pixel from the lemur, and then use the <code><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood()</a></code> function to select all pixels that are similar to it. The <code>x</code> and <code>y</code> arguments are used to specify the coordinates of the initial pixel to start with. The <code>sigma</code> argument specifies how different we want to allow the pixels to be. Lower values of <code>sigma</code> allow only very similar values to be selected, and higher values of <code>sigma</code> allow more different values to be selected. </p>
 <p>It takes a little bit of trial and error to choose the best values for these arguments, and we can visually inspect performance by plotting the boundary lines of the pixels that are considered similar. Passing in the output from <code><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood()</a></code> into <code><a href="https://rdrr.io/pkg/imager/man/highlight.html">highlight()</a></code> from <strong><code>imager</code></strong> draws a red outline around the <em>similar</em> pixels. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">detect_outline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/imager/man/px.flood.html">px.flood</a></span><span class="op">(</span></span>
@@ -852,12 +853,12 @@ Figure&nbsp;9.11: Image of a red ruffed lemur with a red line indicating the bou
 <span>  sigma <span class="op">=</span> <span class="fl">0.063</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>To make it easier to create a transparent background, we turn the non-similar parts of the image i.e.&nbsp;the areas outside of the selected pixel sets, to black. As we did when cropping the image, we do this by setting the pixel values to <code>0</code> i.e.&nbsp;no color.</p>
+<p>To make it easier to create a transparent background, we turn the non-similar parts of the image, i.e., the areas outside of the selected pixel sets, to black. As we did when cropping the image, we do this by setting the pixel values to <code>0</code>, i.e., no color.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lemur_img</span><span class="op">[</span><span class="va">detect_outline</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">detect_outline_2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We now want to turn the sections of the image that are pure black into transparent sections. The easiest way to do this is through the <code><a href="https://docs.ropensci.org/magick/reference/color.html">image_transparent()</a></code> function from <strong><code>magick</code></strong>. However, our <code>lemur_img</code> image is currently of a format designed to work with <strong><code>imager</code></strong>, and won’t work out of the box with <strong><code>magick</code></strong>. Luckily, the <code><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick()</a></code> function in the <strong><code>imager</code></strong> package converts it to a format that is compatible with <strong><code>magick</code></strong>. For some reason, the <code><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick()</a></code> also causes the image to be flipped horizontally. We can turn it back to the correct orientation using the <code><a href="https://docs.ropensci.org/magick/reference/transform.html">image_flop()</a></code> function in <strong><code>magick</code></strong>. </p>
-<p>Note that since the image is always the first argument of the <code>image_*()</code> functions in <strong><code>magick</code></strong> (and the output remains of the same class) we can use a piped workflow here, just as we do with <strong><code>tidyverse</code></strong> functions when working with data. Finally, we use the <code><a href="https://docs.ropensci.org/magick/reference/color.html">image_transparent()</a></code> function in <strong><code>magick</code></strong> to turn all pixels that are currently <code>"black"</code> transparent. </p>
+<p>We now want to turn the sections of the image that are pure black into transparent sections. The easiest way to do this is through the <code><a href="https://docs.ropensci.org/magick/reference/color.html">image_transparent()</a></code> function from <strong><code>magick</code></strong>. However, our <code>lemur_img</code> image is currently of a format designed to work with <strong><code>imager</code></strong>, and it won’t work out of the box with <strong><code>magick</code></strong>. Luckily, the <code><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick()</a></code> function in the <strong><code>imager</code></strong> package converts it to a format that is compatible with <strong><code>magick</code></strong>. For some reason, the <code><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick()</a></code> also causes the image to be flipped horizontally. We can turn it back to the correct orientation using the <code><a href="https://docs.ropensci.org/magick/reference/transform.html">image_flop()</a></code> function in <strong><code>magick</code></strong>. </p>
+<p>Since the image is always the first argument of the <code>image_*()</code> functions in <strong><code>magick</code></strong> (and the output remains of the same class), we can use a piped workflow here, just as we do with <strong><code>tidyverse</code></strong> functions when working with data. Finally, we use the <code><a href="https://docs.ropensci.org/magick/reference/color.html">image_transparent()</a></code> function in <strong><code>magick</code></strong> to turn all pixels that are currently <code>"black"</code> transparent. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lemur_nobg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/imager/man/magick.html">cimg2magick</a></span><span class="op">(</span><span class="va">lemur_img</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://docs.ropensci.org/magick/reference/transform.html">image_flop</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -874,7 +875,7 @@ Figure&nbsp;9.12: Image of a red ruffed lemur with the background removed, as we
 </div>
 </div>
 </div>
-<p>When you print the image with <strong><code>magick</code></strong>, it returns the image itself to the plot window, but also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white <em>collar</em> of the lemur has still been partially removed. It’s also a process that requires a lot of trial and error to find the right combination of argument values.</p>
+<p>When you print the image with <strong><code>magick</code></strong>, it returns the image itself to the plot window, but it also returns output to the console with information about the image dimensions, format, and file size. You can see that the process of turning the background transparent is not perfect, as the white <em>collar</em> of the lemur has still been partially removed. It’s also a process that requires a lot of trial and error to find the right combination of argument values.</p>
 </section><section id="adding-images-to-plots-with-cowplot" class="level3" data-number="9.5.2"><h3 data-number="9.5.2" class="anchored" data-anchor-id="adding-images-to-plots-with-cowplot">
 <span class="header-section-number">9.5.2</span> Adding images to plots with <strong><code>cowplot</code></strong>
 </h3>
@@ -891,7 +892,7 @@ Figure&nbsp;9.12: Image of a red ruffed lemur with the background removed, as we
 <span><span class="va">styled_plot</span> <span class="op">&lt;-</span> <span class="va">styled_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="va">cap</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The <strong><code>cowplot</code></strong> package <span class="citation" data-cites="cowplot">(<a href="references.html#ref-cowplot" role="doc-biblioref">C. O. Wilke 2024</a>)</span> extends <strong><code>ggplot2</code></strong> and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we’re more interested in the <strong><code>cowplot</code></strong> functionality for adding annotations and customization - including images. </p>
+<p>The <strong><code>cowplot</code></strong> package <span class="citation" data-cites="cowplot">(<a href="references.html#ref-cowplot" role="doc-biblioref">Wilke 2024</a>)</span> extends <strong><code>ggplot2</code></strong> and allows you to arrange, align, and combine multiple plots into a single visual. In this chapter, we’re more interested in the <strong><code>cowplot</code></strong> functionality for adding annotations and customization - including images. </p>
 <div id="tip-lemurs-arrange" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -902,10 +903,10 @@ Tip&nbsp;9.3: R packages for combining plots and images
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>There are several other R packages available for arranging different elements together e.g.&nbsp;combining multiple plots or adding images to plots. The most common for arranging charts is the <strong><code>patchwork</code></strong> package <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> which we’ll use in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> and <a href="us-elections.html" class="quarto-xref"><span>Chapter 13</span></a>. The <strong><code>egg</code></strong> package <span class="citation" data-cites="egg">(<a href="references.html#ref-egg" role="doc-biblioref">Auguie 2019</a>)</span> is another popular alternative, with the <code>geom_custom()</code> function being especially useful for adding images. The <strong><code>ggimage</code></strong> package <span class="citation" data-cites="ggimage">(<a href="references.html#ref-ggimage" role="doc-biblioref">Yu 2023</a>)</span> can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images e.g.&nbsp;file paths or image coordinates. </p>
+<p>There are several other R packages available for arranging different elements together, e.g., combining multiple plots or adding images to plots. The most common for arranging charts is the <strong><code>patchwork</code></strong> package <span class="citation" data-cites="patchwork">(<a href="references.html#ref-patchwork" role="doc-biblioref">Pedersen 2024</a>)</span> which we’ll use in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> and <a href="us-elections.html" class="quarto-xref"><span>Chapter 13</span></a>. The <strong><code>egg</code></strong> package <span class="citation" data-cites="egg">(<a href="references.html#ref-egg" role="doc-biblioref">Auguie 2019</a>)</span> is another popular alternative, with the <code>geom_custom()</code> function being especially useful for adding images. The <strong><code>ggimage</code></strong> package <span class="citation" data-cites="ggimage">(<a href="references.html#ref-ggimage" role="doc-biblioref">Yu 2023</a>)</span> can also be used to add images to charts, and is great when you are mapping columns of your data to properties of the images, e.g., file paths or image coordinates. </p>
 </div>
 </div>
-<p>With <strong><code>cowplot</code></strong>, we start by using the <code><a href="https://wilkelab.org/cowplot/reference/ggdraw.html">ggdraw()</a></code> function which sets up a layer on top of our <strong><code>ggplot2</code></strong> <code>styled_plot</code> object to allow us to draw on top of it. The <code><a href="https://wilkelab.org/cowplot/reference/draw_image.html">draw_image()</a></code> function is then used to add the <code>lemur_nobg</code> image on top. By default, the layer on top of the plot has coordinates running from 0 to 1, with <code>(0, 0)</code> being the lower left corner of the plot and <code>(1, 1)</code> the top right. Since we want to position the image in the bottom right hand corner, we set <code>hjust</code> and <code>halign</code> to <code>1</code>, to align the right hand side of the image with an <code>x</code> value of <code>1</code>. Setting <code>vjust</code> and <code>valign</code> to <code>0</code> aligns the bottom of the image with the to the <code>y</code>- value of <code>0</code>. The <code>width</code> defines how big the image is - some trial and error results in a choice of <code>0.4</code> for the image width. </p>
+<p>With <strong><code>cowplot</code></strong>, we start by using the <code><a href="https://wilkelab.org/cowplot/reference/ggdraw.html">ggdraw()</a></code> function which sets up a layer on top of our <strong><code>ggplot2</code></strong> <code>styled_plot</code> object to allow us to draw on top of it. The <code><a href="https://wilkelab.org/cowplot/reference/draw_image.html">draw_image()</a></code> function is then used to add the <code>lemur_nobg</code> image on top. By default, the layer on top of the plot has coordinates running from 0 to 1, with <code>(0, 0)</code> being the lower-left corner of the plot and <code>(1, 1)</code> the top-right. Since we want to position the image in the bottom-right-hand corner, we set <code>hjust</code> and <code>halign</code> to <code>1</code>, to align the right-hand side of the image with an <code>x</code> value of <code>1</code>. Setting <code>vjust</code> and <code>valign</code> to <code>0</code> aligns the bottom of the image with the <code>y</code> value of <code>0</code>. The <code>width</code> defines how big the image is - some trial and error results in a choice of <code>0.4</code> for the image width. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">final_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/ggdraw.html">ggdraw</a></span><span class="op">(</span><span class="va">styled_plot</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://wilkelab.org/cowplot/reference/draw_image.html">draw_image</a></span><span class="op">(</span></span>
@@ -927,7 +928,7 @@ Figure&nbsp;9.13: Scatter plot of how the weights of red ruffed lemurs change wi
 </div>
 </div>
 </div>
-<p>Finally, we save the image using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
+<p>Finally, we save <a href="#fig-lemurs-img-plot" class="quarto-xref">Figure&nbsp;<span>9.13</span></a> as an image using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"lemurs.png"</span>,</span>
@@ -936,11 +937,11 @@ Figure&nbsp;9.13: Scatter plot of how the weights of red ruffed lemurs change wi
 <span>  height <span class="op">=</span> <span class="fl">0.67</span> <span class="op">*</span> <span class="fl">5</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>When you add the image using <strong><code>cowplot</code></strong>, you may see some warnings returned in the console about some of the custom fonts not being found. However, as long as the fonts are appearing correctly on the chart, you can ignore these warnings.</p>
+<p>When you add the image using <strong><code>cowplot</code></strong>, you may see warnings returned in the console about some of the custom fonts not being found. However, as long as the fonts are appearing correctly on the chart, you can ignore these warnings.</p>
 </section></section><section id="reflection" class="level2" data-number="9.6"><h2 data-number="9.6" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">9.6</span> Reflection</h2>
-<p>Despite the complexity of the code behind it, this is a relatively simple plot. And that’s where the strengths of this visualization lie - it often takes a lot of work to create a clean and minimal chart. The lemur image adds a fun element to the chart and makes it more eye-catching and interesting without adding any additional complexity to the way the data is presented. The use of shapes in addition to color for distinguishing data for male and female lemurs is another strength as it increases the accessibility of the chart, making it available to a wider audience. However, there are still a few areas where improvements could be made. The obvious one is the background removal of the lemur image. As we noted earlier, some of the lemur’s white fur has been incorrectly removed as it’s a similar color to the background.</p>
-<p>The plot could be further improved by giving more consideration to the choice of axes - both x and y. Depending on what aspect of lemur ages or weights a reader is interested in, a different choice of axis may be more appropriate. For example, if the interest is in adult lemurs, subsetting the data to consider only lemurs above a certain age would work better. If the interest is in looking at when lemurs reaching their adult weight, looking at lemurs below a specific age or performing a transformation of the axis (e.g.&nbsp;logarithmic) would make it easier to see the point at which lemurs stop growing. Similarly, the y-axis uses grams as its units since this is how the weight data is recorded. For young lemurs, measuring on a scale of grams is appropriate. However, the majority of lemurs in the data are adults and so perhaps presenting the data in terms of kilograms might make more sense.</p>
+<p>Despite the complexity of the code behind it, this is a relatively simple plot. And that’s where the strengths of this visualization lie - it often takes a lot of work to create a clean and minimal chart. The lemur image adds a fun element to the chart and makes it more eye-catching and interesting without adding complexity to the way the data is presented. The use of shapes in addition to color for distinguishing data for male and female lemurs is another strength, as it increases the accessibility of the chart, making it available to a wider audience. However, there are still a few areas where improvements could be made. The obvious one is the background removal of the lemur image. As we noted earlier, some of the lemur’s white fur has been incorrectly removed, as it’s a similar color to the background.</p>
+<p>The plot could be further improved by giving more consideration to the choice of axes - both x and y. Depending on what aspect of lemur ages or weights a reader is interested in, a different choice of axis may be more appropriate. For example, if the interest is in adult lemurs, then subsetting the data to consider only lemurs above a certain age would work better. If the interest is in when lemurs reach their adult weight, then looking at lemurs below a specific age or performing a transformation of the axis (e.g., logarithmic) would make it easier to see the point at which lemurs stop growing. Similarly, the y-axis uses grams as its units since this is how the weight data is recorded. For young lemurs, measuring on a scale of grams is appropriate. However, the majority of lemurs in the data are adults and so perhaps presenting the data in terms of kilograms might make more sense.</p>
 <p>It’s not currently clear from this chart that each individual lemur has multiple weight measurements recorded. This means that the data points shown in the chart are not independent - a common assumption of many statistical models. Overall, this is a fun and easy-to-interpret chart that’s quite likely to draw people in to learn more about lemurs. However, if it’s a part of an exploratory step before statistical modelling, it may need a little bit more fine-tuning.</p>
 </section><section id="exercises" class="level2" data-number="9.7"><h2 data-number="9.7" class="anchored" data-anchor-id="exercises">
 <span class="header-section-number">9.7</span> Exercises</h2>
@@ -950,7 +951,7 @@ Figure&nbsp;9.13: Scatter plot of how the weights of red ruffed lemurs change wi
 </ul>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-Anscombe1973" class="csl-entry" role="listitem">
 Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
 </div>
@@ -964,16 +965,16 @@ Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2�
 Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
 </div>
 <div id="ref-vandenBrandv4" class="csl-entry" role="listitem">
-Brand, Teun van den. 2025. <span>“<span class="nocase">ggplot2 4.0.0</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/" class="uri">https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/</a>.
+Brand, Teun van den. 2025. <em><span class="nocase">ggplot2 4.0.0</span></em>. <a href="https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/" class="uri">Https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/</a>.
 </div>
 <div id="ref-bridson2007" class="csl-entry" role="listitem">
-Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
+Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> <em>ACM SIGGRAPH 2007 Sketches</em> (New York, NY, USA), SIGGRAPH ’07. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
 </div>
 <div id="ref-Brown2009" class="csl-entry" role="listitem">
 Brown, Mark J.F., and Paxton, Robert J. 2009. <span>“The Conservation of Bees: A Global Perspective.”</span> <em>Apidologie</em> 40 (3): 410–16. <a href="https://doi.org/10.1051/apido/2009019">https://doi.org/10.1051/apido/2009019</a>.
 </div>
 <div id="ref-geomtextpath" class="csl-entry" role="listitem">
-Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
+<span class="nocase">Cameron, Allan, and Teun van den Brand</span>. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
 </div>
 <div id="ref-cartocolors" class="csl-entry" role="listitem">
 CARTO. 2016. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://carto.com/carto-colors/">https://carto.com/carto-colors/</a>.
@@ -997,28 +998,28 @@ Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and D
 Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
 </div>
 <div id="ref-tidyplots" class="csl-entry" role="listitem">
-Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>, ahead of print. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
 </div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
-FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
+<span class="nocase">FC, Mike, Trevor L. Davis, and ggplot2 authors</span>. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
 <div id="ref-flaticon" class="csl-entry" role="listitem">
-Flaticon.com. 2024. <span>“<span>Wind Power Flaticon</span>.”</span> <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">https://www.flaticon.com/free-icon/wind-power_5670189</a>.
+Flaticon.com. 2024. <em><span>Wind Power Flaticon</span></em>. <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">Https://www.flaticon.com/free-icon/wind-power_5670189</a>.
 </div>
 <div id="ref-fontawesome" class="csl-entry" role="listitem">
-Font Awesome. 2024. <span>“<span>Font Awesome 6</span>.”</span> <a href="https://fontawesome.com/" class="uri">https://fontawesome.com/</a>.
+Font Awesome. 2024. <em><span>Font Awesome 6</span></em>. <a href="https://fontawesome.com/" class="uri">Https://fontawesome.com/</a>.
 </div>
 <div id="ref-Hullman2021" class="csl-entry" role="listitem">
 Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
-Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+Garnier, Simon, Ross, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
 </div>
 <div id="ref-ggiraph" class="csl-entry" role="listitem">
 Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
 </div>
 <div id="ref-GAcharts" class="csl-entry" role="listitem">
-Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span> <a href="https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/" class="uri">https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/</a>.
+Government Analysis Function. 2021. <em>Data Visualisation: Colours</em>. <a href="https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/" class="uri">Https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/</a>.
 </div>
 <div id="ref-geofacet" class="csl-entry" role="listitem">
 Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
@@ -1027,7 +1028,7 @@ Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase
 Harmon, Jon. 2024. <em><span class="nocase">Web APIs with R</span></em>. <span>CRC Press</span>. <a href="https://wapir.io/">https://wapir.io/</a>.
 </div>
 <div id="ref-lintr" class="csl-entry" role="listitem">
-Hester, Jim, Florent Angly, Russ Hyde, Michael Chirico, Kun Ren, Alexander Rosenstock, and Indrajeet Patil. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
+Hester, Jim, Florent Angly, Russ Hyde, et al. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
 </div>
 <div id="ref-glue" class="csl-entry" role="listitem">
 Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Interpreted String Literals</em>. <a href="https://glue.tidyverse.org/">https://glue.tidyverse.org/</a>.
@@ -1036,25 +1037,25 @@ Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Int
 Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plot History</em>. <a href="https://CRAN.R-project.org/package=camcorder">https://CRAN.R-project.org/package=camcorder</a>.
 </div>
 <div id="ref-tidytuesdayR" class="csl-entry" role="listitem">
-———. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
+Hughes, Ellis. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
 </div>
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
 <div id="ref-animalshelter" class="csl-entry" role="listitem">
-———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+Hvitfeldt, Emil. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
 </div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
 <div id="ref-zones_data" class="csl-entry" role="listitem">
-Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+Internet Assigned Numbers Authority. 2023. <em>The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data</em>. <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
 </div>
 <div id="ref-img_jax" class="csl-entry" role="listitem">
-Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+Jax (@lysrix). 2017. <em>Lemur</em>. <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
 </div>
 <div id="ref-kays2020" class="csl-entry" role="listitem">
-Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. <a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
+Kays, R., R. R. Dunn, A. W. Parsons, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. <a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
@@ -1066,31 +1067,31 @@ Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
 </div>
 <div id="ref-museums_data" class="csl-entry" role="listitem">
-Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
+Mapping Museums. 2021. <em>Mapping Museums Data</em>. <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
 </div>
 <div id="ref-rnaturalearth" class="csl-entry" role="listitem">
 Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
 </div>
 <div id="ref-Matejka2017" class="csl-entry" role="listitem">
-Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> In, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
+Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> May, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
-McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+McDonald, J. L., and H. Cole. 2020. <em>Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom]</em>. Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
 </div>
 <div id="ref-colorblindr" class="csl-entry" role="listitem">
 McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
-Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span> <a href="https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/" class="uri">https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</a>.
+Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <em>Seasonal Cycles of Activities in Colonies</em>. <a href="https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/" class="uri">Https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</a>.
 </div>
 <div id="ref-poissoned" class="csl-entry" role="listitem">
-mikefc. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
+<span class="nocase">mikefc</span>. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
 </div>
 <div id="ref-MetBrewer" class="csl-entry" role="listitem">
 Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
 </div>
 <div id="ref-elections_data" class="csl-entry" role="listitem">
-MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
+MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Version V12. Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
 </div>
 <div id="ref-styler" class="csl-entry" role="listitem">
 Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</span>: Non-Invasive Pretty Printing of <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=styler">https://CRAN.R-project.org/package=styler</a>.
@@ -1099,10 +1100,10 @@ Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</spa
 Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
 </div>
 <div id="ref-Muth2018" class="csl-entry" role="listitem">
-Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span> <a href="https://blog.datawrapper.de/gendercolor/" class="uri">https://blog.datawrapper.de/gendercolor/</a>.
+Muth, Lisa. 2018. <em>An Alternative to Pink &amp; Blue: Colors for Gender Data</em>. <a href="https://blog.datawrapper.de/gendercolor/" class="uri">Https://blog.datawrapper.de/gendercolor/</a>.
 </div>
 <div id="ref-turbines_data" class="csl-entry" role="listitem">
-Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
+Natural Resources Canada. 2021. <em>Canadian Wind Turbine Database</em>. Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
 </div>
 <div id="ref-ggbranding" class="csl-entry" role="listitem">
 Noblet, Guillaume. 2025. <em><span class="nocase">ggbranding: Add Personal Branding to ’ggplot2’ Charts</span></em>. <a href="https://github.com/gnoblet/ggbranding">https://github.com/gnoblet/ggbranding</a>.
@@ -1114,7 +1115,7 @@ Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href=
 Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
 </div>
 <div id="ref-doctors_data" class="csl-entry" role="listitem">
-Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
+Our World in Data. 2019. <em>Medical Doctors Per 1,000 People</em>. <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
 </div>
 <div id="ref-sf" class="csl-entry" role="listitem">
 Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Standardized Support for Spatial Vector Data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
@@ -1123,10 +1124,10 @@ Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Stand
 Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Accelerating <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggforce">https://CRAN.R-project.org/package=ggforce</a>.
 </div>
 <div id="ref-patchwork" class="csl-entry" role="listitem">
-———. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
+Pedersen, Thomas Lin. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
 </div>
 <div id="ref-Pedersen2025" class="csl-entry" role="listitem">
-———. 2025. <span>“<span class="nocase">Fonts in R</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
+Pedersen, Thomas Lin. 2025. <em><span class="nocase">Fonts in R</span></em>. <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">Https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
 </div>
 <div id="ref-marquee" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
@@ -1144,61 +1145,61 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+Qiu, Yixuan. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
-R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
 </div>
 <div id="ref-tidytuesday" class="csl-entry" role="listitem">
-R4DS Online Learning Community. 2023. <span>“Tidy Tuesday: A Weekly Social Data Project.”</span> <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
+R4DS Online Learning Community. 2023. <em>Tidy Tuesday: A Weekly Social Data Project</em>. <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
 </div>
 <div id="ref-social_icons" class="csl-entry" role="listitem">
-Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span>.”</span> <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
+Rennie, Nicola. 2023a. <em>Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span></em>. <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
 </div>
 <div id="ref-template_files" class="csl-entry" role="listitem">
-———. 2023b. <span>“Creating Template Files with <span>R</span>.”</span> <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
+Rennie, Nicola. 2023b. <em>Creating Template Files with <span>R</span></em>. <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
 </div>
 <div id="ref-streamline" class="csl-entry" role="listitem">
-———. 2023c. <span>“Four Ways to Streamline Your <span>R</span> Workflows.”</span> <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
+Rennie, Nicola. 2023c. <em>Four Ways to Streamline Your <span>R</span> Workflows</em>. <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
 </div>
 <div id="ref-ggtextcircle" class="csl-entry" role="listitem">
-———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
+Rennie, Nicola. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
 </div>
 <div id="ref-nobel" class="csl-entry" role="listitem">
-———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+Rennie, Nicola. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
 </div>
 <div id="ref-pkgs_data" class="csl-entry" role="listitem">
-———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+Rennie, Nicola. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> In <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
 </div>
 <div id="ref-signif2024a" class="csl-entry" role="listitem">
 Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
 </div>
 <div id="ref-Reynolds2025" class="csl-entry" role="listitem">
-Reynolds, Gina. 2025. <span>“<span class="nocase">Everyday ggplot2 extension</span>.”</span> <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
+Reynolds, Gina. 2025. <em><span class="nocase">Everyday ggplot2 extension</span></em>. <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">Https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
 </div>
 <div id="ref-hex_forcats" class="csl-entry" role="listitem">
-RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
+RStudio. 2018a. <em><span class="nocase">forcats</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
 </div>
 <div id="ref-hex_ggplot2" class="csl-entry" role="listitem">
-———. 2018b. <span>“<span class="nocase">ggplot2</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
+RStudio. 2018b. <em><span class="nocase">ggplot2</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
 </div>
 <div id="ref-hex_purrr" class="csl-entry" role="listitem">
-———. 2018c. <span>“<span class="nocase">purrr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
+RStudio. 2018c. <em><span class="nocase">purrr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
 </div>
 <div id="ref-hex_readr" class="csl-entry" role="listitem">
-———. 2018d. <span>“<span class="nocase">readr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
+RStudio. 2018d. <em><span class="nocase">readr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
 </div>
 <div id="ref-hex_tibble" class="csl-entry" role="listitem">
-———. 2018e. <span>“<span class="nocase">tibble</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
+RStudio. 2018e. <em><span class="nocase">tibble</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
 </div>
 <div id="ref-hex_dplyr" class="csl-entry" role="listitem">
-———. 2020a. <span>“<span class="nocase">dplyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
+RStudio. 2020a. <em><span class="nocase">dplyr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
 </div>
 <div id="ref-hex_stringr" class="csl-entry" role="listitem">
-———. 2020b. <span>“<span class="nocase">stringr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
+RStudio. 2020b. <em><span class="nocase">stringr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
 </div>
 <div id="ref-hex_tidyr" class="csl-entry" role="listitem">
-———. 2020c. <span>“<span class="nocase">tidyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
+RStudio. 2020c. <em><span class="nocase">tidyr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
 </div>
 <div id="ref-ggalt" class="csl-entry" role="listitem">
 Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
@@ -1207,7 +1208,7 @@ Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt: Ex
 Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
 </div>
 <div id="ref-lattice" class="csl-entry" role="listitem">
-Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
@@ -1216,7 +1217,7 @@ Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openx
 Scheuch, Christoph. 2025. <em><span class="nocase">owidapi</span>: Access the Our World in Data Chart API</em>. <a href="https://doi.org/10.32614/CRAN.package.owidapi">https://doi.org/10.32614/CRAN.package.owidapi</a>.
 </div>
 <div id="ref-GGally" class="csl-entry" role="listitem">
-Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
+Schloerke, Barret, Di Cook, Joseph Larmarange, et al. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
@@ -1237,16 +1238,16 @@ Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole
 Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principles to Facilitate Missing Data Exploration, Visualization and Assessment of Imputations.”</span> <em>Journal of Statistical Software</em> 105 (7): 1–31. <a href="https://doi.org/10.18637/jss.v105.i07">https://doi.org/10.18637/jss.v105.i07</a>.
 </div>
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
-Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://sronpersonalpages.nl/~pault/" class="uri">https://sronpersonalpages.nl/~pault/</a>.
+Tol, Paul. 2021. <em><span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span></em>. <a href="https://sronpersonalpages.nl/~pault/" class="uri">Https://sronpersonalpages.nl/~pault/</a>.
 </div>
 <div id="ref-UScensuspop" class="csl-entry" role="listitem">
-United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span> <a href="https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html" class="uri">https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html</a>.
+United States Census Bureau. 2021a. <em>Historical Population Change Data (1910-2020)</em>. <a href="https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html" class="uri">Https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html</a>.
 </div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span> <a href="https://www.census.gov/geographies/reference-files/2010/geo/state-area.html" class="uri">https://www.census.gov/geographies/reference-files/2010/geo/state-area.html</a>.
+United States Census Bureau. 2021b. <em>State Area Measurements and Internal Point Coordinates</em>. <a href="https://www.census.gov/geographies/reference-files/2010/geo/state-area.html" class="uri">Https://www.census.gov/geographies/reference-files/2010/geo/state-area.html</a>.
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
-United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
+United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <em>Honey Bee Colonies</em>. <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
 </div>
 <div id="ref-crsuggest" class="csl-entry" role="listitem">
 Walker, Kyle. 2022. <em><span class="nocase">crsuggest: Obtain Suggested Coordinate Reference System Information for Spatial Data</span></em>. <a href="https://CRAN.R-project.org/package=crsuggest">https://CRAN.R-project.org/package=crsuggest</a>.
@@ -1258,13 +1259,13 @@ Wanzer, Dana Linnell, Tarek Azzam, Natalie D. Jones, and Darrel Skousen. 2021. <
 Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
 </div>
 <div id="ref-forcats" class="csl-entry" role="listitem">
-———. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
+Wickham, Hadley. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
 </div>
 <div id="ref-stringr" class="csl-entry" role="listitem">
-———. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+Wickham, Hadley. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
 </div>
 <div id="ref-tidyverse" class="csl-entry" role="listitem">
-Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
 </div>
 <div id="ref-readxl" class="csl-entry" role="listitem">
 Wickham, Hadley, and Jennifer Bryan. 2023. <em><span class="nocase">readxl: Read Excel Files</span></em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.
@@ -1288,7 +1289,7 @@ Wickham, Hadley, Thomas Lin Pedersen, and Dana Seidel. 2023. <em><span class="no
 Wickham, Hadley, Davis Vaughan, and Maximilian Girlich. 2024. <em><span class="nocase">tidyr</span>: Tidy Messy Data</em>. <a href="https://CRAN.R-project.org/package=tidyr">https://CRAN.R-project.org/package=tidyr</a>.
 </div>
 <div id="ref-ggtextures" class="csl-entry" role="listitem">
-Wilke, Claus. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
+Wilke, Claus O. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
 </div>
 <div id="ref-cowplot" class="csl-entry" role="listitem">
 Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot Theme and Plot Annotations for <span class="nocase">’ggplot2’</span></em>. <a href="https://wilkelab.org/cowplot/">https://wilkelab.org/cowplot/</a>.
@@ -1297,7 +1298,7 @@ Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot 
 Wilke, Claus O., and Brenton M. Wiernik. 2022. <em><span class="nocase">ggtext</span>: Improved Text Rendering Support for <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggtext">https://CRAN.R-project.org/package=ggtext</a>.
 </div>
 <div id="ref-nobel_data" class="csl-entry" role="listitem">
-www.nobelprize.org. 2024. <span>“<span>Nobel Prize API Version 2.1</span>.”</span> <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
+<span class="nocase">www.nobelprize.org</span>. 2024. <em><span>Nobel Prize API Version 2.1</span></em>. <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
 </div>
 <div id="ref-owidR" class="csl-entry" role="listitem">
 York, Piers. 2023. <em><span class="nocase">owidR</span>: Import Data from Our World in Data</em>. <a href="https://github.com/piersyork/owidR">https://github.com/piersyork/owidR</a>.

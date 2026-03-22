@@ -2,10 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.9.36">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>5&nbsp; Animal shelter intakes: making gauge charts with ggforce – The Art of Data Visualization with ggplot2</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -56,7 +59,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -85,15 +87,14 @@ div.csl-indent {
 <link href="./bee-colonies.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-0a95de2c3be981c2e03029825b16c585.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e5c7bf9fbb22184c3d5797f9fbacf74.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3c5b6c81ffed3d0a6e9811c7a68a4075.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5c6db23daa683742b7bf794a809ab7ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/line-highlight-1.0.0/line-highlight.css" rel="stylesheet"><script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -126,7 +127,7 @@ window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-1SWN5BH1PZ', { 'anonymize_ip': true});
-</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
 const typesetMath = (el) => {
   if (window.MathJax) {
     // MathJax Typeset
@@ -360,10 +361,10 @@ window.Quarto = {
 <a href="#preparing-a-plot" id="toc-preparing-a-plot" class="nav-link" data-scroll-target="#preparing-a-plot"><span class="header-section-number">5.3</span> Preparing a plot</a>
   <ul class="collapse">
 <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">5.3.1</span> Data wrangling</a></li>
-  <li><a href="#the-ggforce-extension-package" id="toc-the-ggforce-extension-package" class="nav-link" data-scroll-target="#the-ggforce-extension-package"><span class="header-section-number">5.3.2</span> The <strong><code>ggforce</code></strong> extension package</a></li>
+  <li><a href="#ggforce-extension-package" id="toc-ggforce-extension-package" class="nav-link" data-scroll-target="#ggforce-extension-package"><span class="header-section-number">5.3.2</span> <strong><code>ggforce</code></strong> extension package</a></li>
   <li><a href="#gauge-charts-with-ggforce" id="toc-gauge-charts-with-ggforce" class="nav-link" data-scroll-target="#gauge-charts-with-ggforce"><span class="header-section-number">5.3.3</span> Gauge charts with <strong><code>ggforce</code></strong></a></li>
   <li><a href="#computing-aesthetics" id="toc-computing-aesthetics" class="nav-link" data-scroll-target="#computing-aesthetics"><span class="header-section-number">5.3.4</span> Computing aesthetics</a></li>
-  <li><a href="#the-first-plot" id="toc-the-first-plot" class="nav-link" data-scroll-target="#the-first-plot"><span class="header-section-number">5.3.5</span> The first plot</a></li>
+  <li><a href="#first-plot" id="toc-first-plot" class="nav-link" data-scroll-target="#first-plot"><span class="header-section-number">5.3.5</span> First plot</a></li>
   </ul>
 </li>
   <li>
@@ -400,7 +401,7 @@ window.Quarto = {
 <ul>
 <li>Create a gauge chart by programmatically calculating sizes of plot elements to use new <em>geom</em> functions from the <strong><code>ggforce</code></strong> package;</li>
 <li>See how choosing a different aspect ratio or coordinate system can change the look of a chart;</li>
-<li>Analyse your choice of color(s) to check if they are likely to be accessible to people with color vision deficiency.</li>
+<li>Analyze your choice of color(s) to check if they are likely to be accessible to people with color vision deficiency.</li>
 </ul>
 <p>We begin by loading the packages required in this chapter.</p>
 <div class="cell">
@@ -421,7 +422,7 @@ window.Quarto = {
 <li>
 <strong><code>colorblindr</code></strong>: for assessing the accessibility of color palettes and the use of color in charts.</li>
 <li>
-<strong><code>ggforce</code></strong>: a package that extends the behavior of <strong><code>ggplot2</code></strong>, and provides additional <em>geoms</em> and <em>stats</em>.</li>
+<strong><code>ggforce</code></strong>: a package that extends the behavior of <strong><code>ggplot2</code></strong> and provides additional <em>geoms</em> and <em>stats</em>.</li>
 <li>
 <strong><code>lubridate</code></strong>: a package for manipulating and creating date variables. You’ll see more examples of <strong><code>lubridate</code></strong> in <a href="nobel-laureates.html" class="quarto-xref"><span>Chapter 8</span></a> and <a href="r-packages.html" class="quarto-xref"><span>Chapter 10</span></a>.</li>
 <li>
@@ -430,7 +431,7 @@ window.Quarto = {
 <p> </p>
 <section id="data" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="data">
 <span class="header-section-number">5.1</span> Data</h2>
-<p>The Long Beach Animal Shelter dataset <span class="citation" data-cites="longbeach_data">(<a href="references.html#ref-longbeach_data" role="doc-biblioref">Long Beach Animal Shelter 2025</a>)</span> contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2014. Here, the term <em>surrendered</em> refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.</p>
+<p>The Long Beach Animal Shelter dataset <span class="citation" data-cites="longbeach_data">(<a href="references.html#ref-longbeach_data" role="doc-biblioref">Long Beach Animal Shelter 2025</a>)</span> contains information on the intakes and outcomes for over 28,000 animals who were surrendered between 2017 and 2024. Here, the term <em>surrendered</em> refers to all animals who were taken into a shelter, but the dataset also contains information on whether the animals were surrendered by their owner, confiscated, found as a stray, or arrived through other means.</p>
 <p>The animal shelter dataset was used as a TidyTuesday dataset in March 2025 (after being curated by <a href="https://github.com/lgibson7">Lydia Gibson</a>), and the data is also available via the <strong><code>animalshelter</code></strong> package <span class="citation" data-cites="animalshelter">(<a href="references.html#ref-animalshelter" role="doc-biblioref">Hvitfeldt 2025</a>)</span>. Let’s start by reading in the data using the <strong><code>tidytuesdayR</code></strong> R package <span class="citation" data-cites="tidytuesdayR">(<a href="references.html#ref-tidytuesdayR" role="doc-biblioref">Hughes 2022b</a>)</span> and looking at the definitions of the variables: </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tuesdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dslc-io.github.io/tidytuesdayR/reference/tt_load.html">tt_load</a></span><span class="op">(</span><span class="st">"2025-03-04"</span><span class="op">)</span></span>
@@ -458,7 +459,7 @@ window.Quarto = {
 #   outcome_is_dead &lt;lgl&gt;, was_outcome_alive &lt;lgl&gt;, …</code></pre>
 </div>
 </div>
-<p>Each row of the dataset relates to a different intake, with some animals appearing multiple times, as can be identified by the <code>animal_id</code> column. Further information on each individual animal is provided such as their name, the type of animal they are (e.g.&nbsp;cat or dog), what color they are, their sex, and their date of birth. Many of these columns have an excessive number of missing values, mainly due lack of information about animals that arrive as strays. Additional columns provide information about the intake including the date, the type and subtype (e.g.&nbsp;owner surrender or stray), and a free text response giving a reason for the intake. More detailed information is given on the geographic location of the capture or intake, including coordinate date and jurisdiction. Finally, data is also provided on the outcome for each animal, including when their outcome occured, the type and subtype (e.g.&nbsp;adopted or died). Some binary variables for different outcomes are also pre-calculated.</p>
+<p>Each row of the dataset relates to a different intake, with some animals appearing multiple times, as can be identified by the <code>animal_id</code> column. Further information on each individual animal is provided such as their name, the type of animal they are (e.g., cat or dog), what color they are, their sex, and their date of birth. Many of these columns have an excessive number of missing values, mainly due lack of information about animals that arrive as strays. Additional columns provide information about the intake including the date, the type and subtype (e.g., owner surrender or stray), and a free text response giving a reason for the intake. More detailed information is given on the geographic location of the capture or intake, including coordinate date and jurisdiction. Finally, data is also provided on the outcome for each animal, including when their outcome occurred, the type and subtype (e.g., adopted or died). Some binary variables for different outcomes are also pre-calculated.</p>
 </section><section id="exploratory-work" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="exploratory-work">
 <span class="header-section-number">5.2</span> Exploratory work</h2>
 <p>Given the many different aspects of the animals and their intakes and outcomes that have been recorded, there are lots of variables that we could look into further. What might be an interesting aspect of this data to visualize?</p>
@@ -528,10 +529,10 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 </div>
 </div>
 <p>In <a href="#fig-longbeach-heatmap" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>, we’ve used the <code><a href="https://lubridate.tidyverse.org/reference/year.html">year()</a></code> function from <strong><code>lubridate</code></strong> to extract the year from the date variable to aggregate the data to annual values since there are very small numbers of some animal types.</p>
-<p>Let’s think about how we might visually represent this data in a more meaningful, and aesthetic way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we’ll do here, readers might get a <em>Wow, look how much things have changed!</em> message rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend.</p>
+<p>Let’s think about how we might visually represent this data in a more meaningful, and aesthetic, way. Although including all years of data allows us to consider trends in the values, sometimes looking at a only a few snapshots can be more effective. For example, by considering only the years 2017 and 2023 as we’ll do here, readers might say, <em>Wow, look how much things have changed!</em>, rather than the perhaps less impactful visual of a gradual trend. This also allows us to compare numbers pre- and post-pandemic, rather than trying to quantify the pandemic impact at the same time as trying to describe a longer term trend.</p>
 <p>We can again use <code><a href="https://lubridate.tidyverse.org/reference/year.html">year()</a></code> from <strong><code>lubridate</code></strong> to save the extracted years as a new column, use the <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> function from <strong><code>dplyr</code></strong> to filter our <code>longbeach</code> dataset to consider only the rows for the years 2017 and 2023. Since some of the animal types have very small numbers, even when aggregating to annual data, we’ll use <code><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else()</a></code> to include more animal types in the <code>"other"</code> category that already exists. We then use <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> from <strong><code>dplyr</code></strong> to count up how many of each animal type were surrendered in each of the years we’re interested in.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset data for years and combine aninmal types</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># subset data for years and combine animal types</span></span>
 <span><span class="va">intake_data</span> <span class="op">&lt;-</span> <span class="va">longbeach</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
 <span>    year <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html">year</a></span><span class="op">(</span><span class="va">intake_date</span><span class="op">)</span>,</span>
@@ -561,14 +562,14 @@ Figure&nbsp;5.3: Heatmap of number of animals surrendered of each type, each yea
 6  2017 wild          216</code></pre>
 </div>
 </div>
-<p>Our data now shows just the number (<code>n</code>) of animals of each type (<code>animal_type</code>), in each of 2017 and 2023 (<code>year</code>). How might we visualize this data? There are a couple of obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 2017 to 2023? Do we want to look at the relative number of different animal types? Or do we just want to show the range of values in the data? In this data, perhaps the most interesting example is a comparison between 2017 and 2023. Although a slope chart would likely work well for this data, we’re going a little bit more experimental with a gauge chart.</p>
+<p>Our data now shows just the number (<code>n</code>) of animals of each type (<code>animal_type</code>), in each of 2017 and 2023 (<code>year</code>). How might we visualize this data? There are a few obvious options that come to mind: a simple grouped bar chart, a slope chart, or indeed the (not often popular) pie chart. Our choice of data visualization will depend on which aspects of the data we want to show. Do we want to compare 2017 to 2023? Do we want to look at the relative number of different animal types? Or do we just want to show the range of values in the data? In this data, perhaps the most interesting example is a comparison between 2017 and 2023. Although a slope chart would likely work well for this data, we’re going a little bit more experimental with a gauge chart.</p>
 <p>At the time of writing, there isn’t a built-in function in <strong><code>ggplot2</code></strong> to create gauge charts. If you’ve never heard of a gauge chart, the initial sketch in <a href="#fig-longbeach-sketch" class="quarto-xref">Figure&nbsp;<span>5.4</span></a> might give you an idea of what we’re aiming for.</p>
 </section><section id="exploratory-sketches" class="level3" data-number="5.2.2"><h3 data-number="5.2.2" class="anchored" data-anchor-id="exploratory-sketches">
 <span class="header-section-number">5.2.2</span> Exploratory sketches</h3>
-<p>You can think of a gauge chart as being a stacked bar chart which is curved over a half circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
-<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Initial sketches of ideas for visualising data for a single animal type." data-fig-align="center">
+<p>You can think of a gauge chart as a stacked bar chart which is curved over a half-circle. Here, rather than one stacked bar chart, we have two stacked bar charts.</p>
+<div id="fig-longbeach-sketch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center" alt="Initial sketches of ideas for visualizing data for a single animal type.">
 <figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-longbeach-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="images/sketch-longbeach.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketches of ideas for visualising data for a single animal type.">
+<img src="images/sketch-longbeach.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Initial sketches of ideas for visualizing data for a single animal type.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-longbeach-sketch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;5.4: Initial sketches of ideas for visualising data for a single animal type.
@@ -580,8 +581,8 @@ Figure&nbsp;5.4: Initial sketches of ideas for visualising data for a single ani
 <p>Gauge charts are not a built-in feature of <strong><code>ggplot2</code></strong>, so we’re going to have to do a little bit of manual preparation before we start plotting.</p>
 <section id="data-wrangling" class="level3" data-number="5.3.1"><h3 data-number="5.3.1" class="anchored" data-anchor-id="data-wrangling">
 <span class="header-section-number">5.3.1</span> Data wrangling</h3>
-<p>We <em>could</em> use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> to try to make a gauge chart natively in <strong><code>ggplot2</code></strong>. However, the use of polar coordinates in <strong><code>ggplot2</code></strong> often makes it difficult to add elements such as annotations in the position you’d like them to be in. So let’s create a gauge chart a slightly different way! </p>
-<p>A gauge chart is normally used to show progress toward a target or a limit. For example when considering data given as percentages, 100% is a common upper limit. For our data, if we knew the maximum capacity of the shelter, that would be an appropriate choice. However, since we don’t have that information, we don’t really have a <em>natural</em> limit.</p>
+<p>We <em>could</em> use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html">coord_polar()</a></code> to try to make a gauge chart natively in <strong><code>ggplot2</code></strong>. However, the use of polar coordinates in <strong><code>ggplot2</code></strong> often makes it difficult to add elements such as annotations in the position you’d like them to be. So let’s create a gauge chart a slightly different way! </p>
+<p>A gauge chart is normally used to show progress toward a target or a limit. For example, when considering data given as percentages, 100% is a common upper limit. For our data, if we knew the maximum capacity of the shelter, that would be an appropriate choice. However, since we don’t have that information, we don’t really have a <em>natural</em> limit.</p>
 <p>So we need to decide on a reasonable one, such as:</p>
 <ul>
 <li>The maximum number of all animals surrendered across all years</li>
@@ -669,9 +670,9 @@ Tip&nbsp;5.1: Rounding numbers in R
 </div>
 </div>
 <p>You’ll notice that the <code>ymax_*</code> values are always <code>1</code> for the <code>no_value</code> rows - this is because the <code>no_value</code> is the last bar so we will always have plotted 100% of the data by the time we’ve finished that bar. Note that the data is currently still grouped by <code>animal_type</code> - this will be important later!</p>
-</section><section id="the-ggforce-extension-package" class="level3" data-number="5.3.2"><h3 data-number="5.3.2" class="anchored" data-anchor-id="the-ggforce-extension-package">
-<span class="header-section-number">5.3.2</span> The <strong><code>ggforce</code></strong> extension package</h3>
-<p>The <strong><code>ggforce</code></strong> extension package <span class="citation" data-cites="ggforce">(<a href="references.html#ref-ggforce" role="doc-biblioref">Pedersen 2022</a>)</span> contains many useful functions which extend the behavior of <strong><code>ggplot2</code></strong>, many of them aimed at exploratory data visualization. We won’t cover many of it’s functions in this chapter, and instead we’ll focus on how to use it to create gauge charts. <strong><code>ggforce</code></strong> is available on CRAN and can be installed with the usual <code>install.packages("ggforce")</code> command.</p>
+</section><section id="ggforce-extension-package" class="level3" data-number="5.3.2"><h3 data-number="5.3.2" class="anchored" data-anchor-id="ggforce-extension-package">
+<span class="header-section-number">5.3.2</span> <strong><code>ggforce</code></strong> extension package</h3>
+<p>The <strong><code>ggforce</code></strong> extension package <span class="citation" data-cites="ggforce">(<a href="references.html#ref-ggforce" role="doc-biblioref">Pedersen 2022</a>)</span> contains many useful functions which extend the behavior of <strong><code>ggplot2</code></strong>, many of them aimed at exploratory data visualization. We won’t cover many of its functions in this chapter, and instead we’ll focus on how to use it to create gauge charts. <strong><code>ggforce</code></strong> is available on CRAN and can be installed with the usual <code>install.packages("ggforce")</code> command.</p>
 </section><section id="gauge-charts-with-ggforce" class="level3" data-number="5.3.3"><h3 data-number="5.3.3" class="anchored" data-anchor-id="gauge-charts-with-ggforce">
 <span class="header-section-number">5.3.3</span> Gauge charts with <strong><code>ggforce</code></strong>
 </h3>
@@ -693,8 +694,8 @@ Tip&nbsp;5.1: Rounding numbers in R
 <p>The last part of data wrangling we need to do is compute the <code>start</code> and <code>end</code> values.</p>
 </section><section id="computing-aesthetics" class="level3" data-number="5.3.4"><h3 data-number="5.3.4" class="anchored" data-anchor-id="computing-aesthetics">
 <span class="header-section-number">5.3.4</span> Computing aesthetics</h3>
-<p>The end values are easy - these are the <code>ymax_2017</code> and <code>ymax_2023</code> columns that we already have. We need to compute the equivalent <code>ymin_2017</code> and <code>ymin_2023</code> values: what are the minimum values in each stacked bar chart?</p>
-<p>Think again about stacked bar charts instead of gauge charts for a second (since it’s a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero - it’s right at the bottom. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we’ve actually already computed all the values we need and stored them in <code>plot_data</code>. We just need to rearrange them a bit.</p>
+<p>The end values are easy: the <code>ymax_2017</code> and <code>ymax_2023</code> columns that we already have. We need to compute the equivalent <code>ymin_2017</code> and <code>ymin_2023</code> values: what are the minimum values in each stacked bar chart?</p>
+<p>Think again about stacked bar charts instead of gauge charts for a second (since it’s a little bit easier to visualise). The minimum value for the first bar at the bottom of the stack will always be zero. For the rest of the stacked bars, the minimum value will be equal to the maximum value of the bar stacked below it. This means that we’ve actually already computed all the values we need and stored them in <code>plot_data</code>. We just need to rearrange them a bit.</p>
 <div id="tip-longbeach-ymin" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -732,8 +733,8 @@ Tip&nbsp;5.2: Just because you can doesn’t mean you should
 <span>    <span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>All of our variables are currently scaled between 0 and 1 (since they relate to percentages towards a limit). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at <span class="math inline">\(-\pi/2\)</span> (instead of 0) and end at <span class="math inline">\(\pi/2\)</span> (instead of 1). We can use the <code><a href="https://scales.r-lib.org/reference/rescale.html">rescale()</a></code> function from the <strong><code>scales</code></strong> package <span class="citation" data-cites="scales">(<a href="references.html#ref-scales" role="doc-biblioref">Wickham, Pedersen, and Seidel 2023</a>)</span> to define the range we want to scale <code>from</code> and <code>to</code>. </p>
-<p>We want to apply this to every column of <code>ymin_data</code> that starts with a lowercase <code>"y"</code> i.e.&nbsp;all of the <code>ymax_*</code> and <code>ymin_*</code> columns so we use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> from <strong><code>dplyr</code></strong> in conjunction with the <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with()</a></code> column selector function. We need to make sure we set <code>ignore.case = FALSE</code> to prevent <strong><code>dplyr</code></strong> from trying to rescale the <code>YN</code> column as well. </p>
+<p>All of our variables are currently scaled between 0 and 1 (since they relate to percentages towards a limit). To plot this as an arc however, we need to convert this to polar coordinates. We want to start our arc at <span class="math inline">\(-\pi/2\)</span> (instead of 0) and end at <span class="math inline">\(\pi/2\)</span> (instead of 1). We can use the <code><a href="https://scales.r-lib.org/reference/rescale.html">rescale()</a></code> function from the <strong><code>scales</code></strong> package <span class="citation" data-cites="scales">(<a href="references.html#ref-scales" role="doc-biblioref">Wickham, Pedersen, et al. 2023</a>)</span> to define the range we want to scale <code>from</code> and <code>to</code>. </p>
+<p>We want to apply this to every column of <code>ymin_data</code> that starts with a lowercase <code>"y"</code>, i.e., all of the <code>ymax_*</code> and <code>ymin_*</code> columns so we use <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> from <strong><code>dplyr</code></strong> in conjunction with the <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with()</a></code> column selector function. We need to make sure we set <code>ignore.case = FALSE</code> to prevent <strong><code>dplyr</code></strong> from trying to rescale the <code>YN</code> column as well. </p>
 <div id="tip-longbeach-mutate" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -772,11 +773,11 @@ Tip&nbsp;5.3: Older versions of <code><a href="https://dplyr.tidyverse.org/refer
 # ℹ 2 more variables: ymin_2017 &lt;dbl&gt;, ymin_2023 &lt;dbl&gt;</code></pre>
 </div>
 </div>
-</section><section id="the-first-plot" class="level3" data-number="5.3.5"><h3 data-number="5.3.5" class="anchored" data-anchor-id="the-first-plot">
-<span class="header-section-number">5.3.5</span> The first plot</h3>
+</section><section id="first-plot" class="level3" data-number="5.3.5"><h3 data-number="5.3.5" class="anchored" data-anchor-id="first-plot">
+<span class="header-section-number">5.3.5</span> First plot</h3>
 <p>We’re now finished with the data wrangling (finally!) and ready to create our first plot. As always, we start with the <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code> function and pass in <code>gauge_data</code> that will be used for plotting the arcs. The aesthetics for each arc will vary so we’ll hold off on passing them in globally. </p>
 <p>We then add two arcs by using <code><a href="https://ggforce.data-imaginist.com/reference/geom_arc_bar.html">geom_arc_bar()</a></code> twice. We set the <code>x0</code>, <code>y0</code>, <code>r0</code>, and <code>r</code> constants as we described above. Even though we have chosen constant values for the aesthetics, they still need to be inside the <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code> function because they are <em>required</em> aesthetics. We then pass the <code>ymin_*</code> and <code>ymax_*</code> columns in as the <code>start</code> and <code>end</code> aesthetics, and set the <code>fill</code> color based on the <code>YN</code> column. </p>
-<p>We also use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to draw a pair of arcs for each animal type in a separate facet, choosing to use <code>nrow = 2</code> to give us a nice rectangular 3x2 grid of facets for our six countries. </p>
+<p>We also use <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap()</a></code> to draw a pair of arcs for each animal type in a separate facet, choosing to use <code>nrow = 2</code> to give us a nice rectangular 3x2 grid of facets for our six countries as shown in <a href="#fig-longbeach-basic-plot-1" class="quarto-xref">Figure&nbsp;<span>5.5</span></a>. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basic_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gauge_data</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Outer 2023 arc</span></span>
@@ -812,10 +813,10 @@ Figure&nbsp;5.5: Initial plot created using <code><a href="https://ggforce.data-
 </div>
 </section></section><section id="advanced-styling" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="advanced-styling">
 <span class="header-section-number">5.4</span> Advanced styling</h2>
-<p>We now have a double gauge chart - but it could look a lot nicer (and more informative)!</p>
+<p>We now have a double gauge chart, but it could look a lot nicer (and more informative)!</p>
 <section id="colors" class="level3" data-number="5.4.1"><h3 data-number="5.4.1" class="anchored" data-anchor-id="colors">
 <span class="header-section-number">5.4.1</span> Colors</h3>
-<p>Let’s start by defining some variables for our colors. Here, we define a pink <code>highlight_col</code> which we’ll use for the segment showing the percentage towards the target i.e.&nbsp;the number of animals surrendered. This should be a bright, eye-catching color as it’s the main point we’re trying to communicate. The <code>second_col</code> will be used to show the percentage remaining towards to target, so we can choose a color that is a little bit more similar to the background. The background (<code>bg_col</code>) will be a light gray, the <code>second_col</code> will be a medium gray, and the text (<code>text_col</code>) will be black. </p>
+<p>Let’s start by defining some variables for our colors. Here, we define a pink <code>highlight_col</code> which we’ll use for the segment showing the percentage towards the target i.e.&nbsp;the number of animals surrendered. This should be a bright, eye-catching color as it’s the main point we’re trying to communicate. The <code>second_col</code> will be used to show the percentage remaining towards the target, so we can choose a color that is a little bit more similar to the background. The background (<code>bg_col</code>) will be a light gray, the <code>second_col</code> will be a medium gray, and the text (<code>text_col</code>) will be black. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">highlight_col</span> <span class="op">&lt;-</span> <span class="st">"#990C58"</span></span>
 <span><span class="va">second_col</span> <span class="op">&lt;-</span> <span class="st">"#949398"</span></span>
@@ -845,7 +846,7 @@ Figure&nbsp;5.5: Initial plot created using <code><a href="https://ggforce.data-
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">animal_type</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Now we can apply the colors using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> from <strong><code>ggplot2</code></strong>. </p>
+<p>Now we can apply the colors using <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual()</a></code> from <strong><code>ggplot2</code></strong>, as shown in <a href="#fig-longbeach-color-plot" class="quarto-xref">Figure&nbsp;<span>5.6</span></a>. </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">color_plot</span> <span class="op">&lt;-</span> <span class="va">basic_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span></span>
@@ -903,7 +904,7 @@ Figure&nbsp;5.7: A 2x2 grid of charts showing simulations of how the current cha
 <span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2017</span>, <span class="fl">2023</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We can then add this text to the existing plot by adding a layer with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, noting that we need to specify the <code>data</code> argument as using the text <code>data.frame</code> we just created. We also need to specify the typeface and size directly within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function, and can add the title and subtitle text created earlier using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from <strong><code>ggplot2</code></strong>.</p>
+<p>We can then add this text to the existing plot by also adding a layer with <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code>, noting that we need to specify the <code>data</code> argument as using the text <code>data.frame</code> we just created. We also need to specify the typeface and size directly within the <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text()</a></code> function and can add the title and subtitle text created earlier using the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs()</a></code> function from <strong><code>ggplot2</code></strong>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">text_plot</span> <span class="op">&lt;-</span> <span class="va">color_plot</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
@@ -931,7 +932,7 @@ Figure&nbsp;5.8: Previous plot with additional labels indicating the year on eac
 </div>
 </section><section id="adjusting-themes" class="level3" data-number="5.4.3"><h3 data-number="5.4.3" class="anchored" data-anchor-id="adjusting-themes">
 <span class="header-section-number">5.4.3</span> Adjusting themes</h3>
-<p>We’ll start by removing all of the theme elements such as the gray background, grid lines, and axis labels. The easiest way to do this is using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>. We can use the <code>base_family</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to set the typeface that will be used by default for any non-geom text elements that remain.</p>
+<p>We’ll start by removing all of the theme elements such as the gray background, grid lines, and axis labels from <a href="#fig-longbeach-text" class="quarto-xref">Figure&nbsp;<span>5.8</span></a>. The easiest way to do this is using <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code>. We can use the <code>base_family</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void()</a></code> to set the typeface that will be used by default for any non-geom text elements that remain.</p>
 <p>You may have noticed that the current gauge plots look a bit squashed and not exactly semi-circular. We can fix this by adding <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> which forces a 1:1 aspect ratio on the plot panel.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">theme_plot</span> <span class="op">&lt;-</span> <span class="va">text_plot</span> <span class="op">+</span></span>
@@ -949,10 +950,10 @@ Figure&nbsp;5.9: Edited version of previous plot with fixed coordinate system to
 </div>
 </div>
 </div>
-<p>This looks better but it’s still not great. What do we still need to improve with styling?</p>
+<p><a href="#fig-longbeach-style-1" class="quarto-xref">Figure&nbsp;<span>5.9</span></a> looks better, but it’s still not great. What do we still need to improve with styling?</p>
 <ul>
 <li>The title text doesn’t stand out and blends in too easily with the subtitle, similarly for the facet text. Perhaps a <strong>bold</strong> font would help?</li>
-<li>The subtitle text doesn’t fit onto the page but we can fix that with the help of the hopefully now familiar <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> function from <strong><code>ggtext</code></strong>.</li>
+<li>The subtitle text doesn’t fit onto the page, but we can fix that with the help of the hopefully now familiar <code><a href="https://wilkelab.org/ggtext/reference/element_textbox.html">element_textbox_simple()</a></code> function from <strong><code>ggtext</code></strong>.</li>
 <li>Since we’re using <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> to force a specific aspect ratio, there are now some odd spacing issues - there is a large white gap at the top and bottom of the plot, and the year labels are slightly cut off at the bottom.</li>
 <li>The legend takes up a lot of space and isn’t very informative.</li>
 </ul>
@@ -1006,7 +1007,7 @@ Figure&nbsp;5.10: Further styling of gauge chart to change background color, pre
 </div>
 </div>
 </div>
-<p>We’re almost there, but the year label text remains slightly squashed. Part of the problem is how much space the legend takes up - it’s leaving too much empty space in the top and bottom right corners, whilst taking away space from other places where we need more of it. The highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot e.g.&nbsp;when using <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> or spatial co-ordinates as we’ll see in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, since the wrong choice can result in cropped plots or extra white space. </p>
+<p>We’re almost there, but the year label text in <a href="#fig-longbeach-style-2" class="quarto-xref">Figure&nbsp;<span>5.10</span></a> remains slightly squashed. Part of the problem is how much space the legend takes up - it’s leaving too much empty space in the top- and bottom-right corners, while taking away space from other places where we need more of it. This highlights a common problem when developing charts - how big should the visualization be? Choosing the right size of image is especially important when using fixed aspect ratios in your plot, e.g., when using <code><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed()</a></code> or spatial coordinates as we’ll see in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a>, since the wrong choice can result in cropped plots or extra white space. </p>
 <div id="tip-longbeach-aspect" class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1018,7 +1019,7 @@ Tip&nbsp;5.4: Choosing an aspect ratio
 </div>
 <div class="callout-body-container callout-body">
 <p>Rather than thinking about width and height, it can often be more helpful to think about aspect ratio and width (or height). This often makes the process of increasing the image size a little bit easier. </p>
-<p>There are some aspect ratios that are commonly used e.g.&nbsp;4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slide. If you’re creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.</p>
+<p>There are some aspect ratios that are commonly used, e.g., 4x6, 5x7, or 1x1. Choosing a commonly used aspect ratio can make it easier to arrange multiple plots, especially in websites or slides. If you’re creating a plot as part of a publication, some academic journals or magazines may have specific aspect ratio requirements. Otherwise, use your exploratory sketches as a way of determining which aspect ratio might be appropriate.</p>
 </div>
 </div>
 <div id="tip-longbeach-width" class="callout callout-style-default callout-tip callout-titled">
@@ -1031,8 +1032,8 @@ Tip&nbsp;5.5: Choosing a width
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images e.g.&nbsp;low and high resolution.</p>
-<p>Changing the width (or resolution) of a plot, often also means changing other aspects e.g.&nbsp;the font sizes, which don’t necessarily rescale larger. By setting a <code>base_size</code> and using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">rel()</a></code> to edit individual font size elements, you minimize the amount of work. Viewing the plot in at desired size and resolution also makes it easier to set the sizes correctly. See <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a> for more information.</p>
+<p>Often the choice of width can be based on physical constraints. For example, the visualizations in this book are all around 5 inches wide to fit on the page of the print edition. You may also wish to have multiple sizes of images, e.g., low and high resolution.</p>
+<p>Changing the width (or resolution) of a plot, often also means changing other aspects, e.g., the font sizes, which don’t necessarily rescale larger. By setting a <code>base_size</code> and using <code><a href="https://ggplot2.tidyverse.org/reference/element.html">rel()</a></code> to edit individual font size elements, you minimize the amount of work. Viewing the plot in at desired size and resolution also makes it easier to set the sizes correctly. See <a href="other-tricks.html#sec-camcorder" class="quarto-xref"><span>Section 14.1</span></a> for more information.</p>
 </div>
 </div>
 </section><section id="alternatives-to-a-traditional-legend" class="level3" data-number="5.4.4"><h3 data-number="5.4.4" class="anchored" data-anchor-id="alternatives-to-a-traditional-legend">
@@ -1040,8 +1041,8 @@ Tip&nbsp;5.5: Choosing a width
 <p>Although we could simply increase the height of the plot to stop the year labels from becoming squashed, an alternative approach is to address the source of the issue and edit the legend.</p>
 <p>We have a few different options for dealing with the legend. Some options might be:</p>
 <ul>
-<li><p>Leave the legend as it is but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. Repositioning the legend will be discussed in <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>.</p></li>
-<li><p>We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We’ll look at how to design and use a custom in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> and <a href="us-elections.html" class="quarto-xref"><span>Chapter 13</span></a>.</p></li>
+<li><p>Leave the legend as it is, but reposition it to above or below the main chart, rather than to the right, and put it into a single row. Then it would take up less space. Repositioning the legend will be discussed in <a href="doctors.html" class="quarto-xref"><span>Chapter 11</span></a>.</p></li>
+<li><p>We could design a custom legend. This might be a good option as double gauge charts are not so common and readers might be less familiar with them. Adding additional information about how they work might prove helpful. We’ll look at how to design and use a custom legend in <a href="time-zones.html" class="quarto-xref"><span>Chapter 12</span></a> and <a href="us-elections.html" class="quarto-xref"><span>Chapter 13</span></a>.</p></li>
 <li><p>We could instead use colored text in the subtitle to indicate what the categories are. For this visualization, highlighting and explaining the dark pink category would be enough. We’ll look at ways to do this in R in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</p></li>
 </ul>
 <p>Here, there’s an argument to be made that any form of legend is in fact unnecessary. The current choice of colors and title of the chart makes it clear enough that the dark pink color represents the number of animals in the data (percentage towards the target).</p>
@@ -1060,7 +1061,7 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 </div>
 </div>
 </div>
-<p>Then save it with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
+<p>Then save <a href="#fig-longbeach-style-3" class="quarto-xref">Figure&nbsp;<span>5.11</span></a> with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave()</a></code>: </p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36" data-source-line-numbers="nil" data-code-line-numbers="nil"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html">ggsave</a></span><span class="op">(</span></span>
 <span>  filename <span class="op">=</span> <span class="st">"animal-intakes.png"</span>,</span>
@@ -1070,10 +1071,10 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 </div>
 </section></section><section id="reflection" class="level2" data-number="5.5"><h2 data-number="5.5" class="anchored" data-anchor-id="reflection">
 <span class="header-section-number">5.5</span> Reflection</h2>
-<p>Are gauge charts the most effective method of visualising this data? No.&nbsp;Gauge charts have their own problems, some of which you can see here. Since the ring representing 2023 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change in arc length between 2017 and 2023, you’ll get different answers to if you measured the proportional change in area for the two. Here, 2023 values are consistently lower than 2017 values, yet they take up more space. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?</p>
+<p>Are gauge charts the most effective method of visualizing this data? No.&nbsp;Gauge charts have their own problems, some of which you can see here. Since the ring representing 2023 is on the outside, the radius is larger, and therefore the area is as well. If you measure the change in arc length between 2017 and 2023, you’ll get different answers than if you measured the proportional change in area for the two. Here, 2023 values are consistently lower than 2017 values, yet they take up more space. Assuming we stick with the gauge chart idea, what further changes could be made to this plot to improve it?</p>
 <ul>
-<li><p>The facet labels could be formatted a little nicer e.g.&nbsp;using capitalized letters, and perhaps using <em>wild animals</em> instead of just <em>wild</em>. Ordering the facets from overall highest to lowest, would also improve how easy it is to read.</p></li>
-<li><p>Providing the exact counts as labelled text would make it easier to see what the change in surrenders. It’s reasonably clear that there has been an decrease across all six animal types, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What’s the difference between dogs and cats in 2017? It’s too difficult to tell here.</p></li>
+<li><p>The facet labels could be formatted a little nicer, e.g., using capitalized letters, and perhaps using <em>wild animals</em> instead of just <em>wild</em>. Ordering the facets from overall highest to lowest, would also improve how easy it is to read.</p></li>
+<li><p>Providing the exact counts as labeled text would make it easier to see what the change in surrenders is. It’s reasonably clear that there has been an decrease across all six animal types, but the nature of gauge charts (no grid lines) makes it quite difficult to get the exact values. What’s the difference between dogs and cats in 2017? It’s too difficult to tell here.</p></li>
 <li><p>Obtain and use a more intuitive value for the upper limit, as our current choice is rather arbitrary. If none can be found, that’s perhaps more motivation for returning to a simpler chart type such as a slope chart.</p></li>
 <li><p>Although a full, traditional legend may be unnecessary here, the addition of some colored text may add clarification that the pink area is what represents the main data. We’ll look at using colored text instead of a legend in <a href="wind-turbines.html" class="quarto-xref"><span>Chapter 6</span></a> and <a href="cats.html" class="quarto-xref"><span>Chapter 7</span></a>.</p></li>
 </ul></section><section id="exercises" class="level2" data-number="5.6"><h2 data-number="5.6" class="anchored" data-anchor-id="exercises">
@@ -1084,7 +1085,7 @@ Figure&nbsp;5.11: Final styling of gauge chart to remove the legend, providing m
 </ul>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-Anscombe1973" class="csl-entry" role="listitem">
 Anscombe, F. J. 1973. <span>“Graphs in Statistical Analysis.”</span> <em>The American Statistician</em> 27 (1): 17–21. <a href="https://doi.org/10.1080/00031305.1973.10478966">https://doi.org/10.1080/00031305.1973.10478966</a>.
 </div>
@@ -1098,16 +1099,16 @@ Auguie, Baptiste. 2019. <em><span class="nocase">egg: Extensions for ’ggplot2�
 Barthelme, Simon. 2024. <em><span class="nocase">imager: Image Processing Library Based on ’CImg’</span></em>. <a href="https://CRAN.R-project.org/package=imager">https://CRAN.R-project.org/package=imager</a>.
 </div>
 <div id="ref-vandenBrandv4" class="csl-entry" role="listitem">
-Brand, Teun van den. 2025. <span>“<span class="nocase">ggplot2 4.0.0</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/" class="uri">https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/</a>.
+Brand, Teun van den. 2025. <em><span class="nocase">ggplot2 4.0.0</span></em>. <a href="https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/" class="uri">Https://www.tidyverse.org/blog/2025/09/ggplot2-4-0-0/</a>.
 </div>
 <div id="ref-bridson2007" class="csl-entry" role="listitem">
-Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> In <em>ACM SIGGRAPH 2007 Sketches</em>. SIGGRAPH ’07. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
+Bridson, Robert. 2007. <span>“Fast Poisson Disk Sampling in Arbitrary Dimensions.”</span> <em>ACM SIGGRAPH 2007 Sketches</em> (New York, NY, USA), SIGGRAPH ’07. <a href="https://doi.org/10.1145/1278780.1278807">https://doi.org/10.1145/1278780.1278807</a>.
 </div>
 <div id="ref-Brown2009" class="csl-entry" role="listitem">
 Brown, Mark J.F., and Paxton, Robert J. 2009. <span>“The Conservation of Bees: A Global Perspective.”</span> <em>Apidologie</em> 40 (3): 410–16. <a href="https://doi.org/10.1051/apido/2009019">https://doi.org/10.1051/apido/2009019</a>.
 </div>
 <div id="ref-geomtextpath" class="csl-entry" role="listitem">
-Cameron, Allan, and Teun van den Brand. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
+<span class="nocase">Cameron, Allan, and Teun van den Brand</span>. 2024. <em><span class="nocase">geomtextpath: Curved Text in ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=geomtextpath">https://CRAN.R-project.org/package=geomtextpath</a>.
 </div>
 <div id="ref-cartocolors" class="csl-entry" role="listitem">
 CARTO. 2016. <em><span>’CARTOColors’ Palettes</span></em>. <a href="https://carto.com/carto-colors/">https://carto.com/carto-colors/</a>.
@@ -1131,28 +1132,28 @@ Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan, and D
 Domin, Iaroslav. 2024. <em><span class="nocase">ggview: ’ggplot2’ Picture Previewer</span></em>. <a href="https://CRAN.R-project.org/package=ggview">https://CRAN.R-project.org/package=ggview</a>.
 </div>
 <div id="ref-tidyplots" class="csl-entry" role="listitem">
-Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
+Engler, Jan Broder. 2024. <span>“Tidyplots Empowers Life Scientists with Easy Code-Based Data Visualization.”</span> <em>bioRxiv</em>, ahead of print. <a href="https://doi.org/10.1101/2024.11.08.621836">https://doi.org/10.1101/2024.11.08.621836</a>.
 </div>
 <div id="ref-ggpattern" class="csl-entry" role="listitem">
-FC, Mike, Trevor L. Davis, and ggplot2 authors. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
+<span class="nocase">FC, Mike, Trevor L. Davis, and ggplot2 authors</span>. 2024. <em><span class="nocase">ggpattern: ’ggplot2’ Pattern Geoms</span></em>. <a href="https://CRAN.R-project.org/package=ggpattern">https://CRAN.R-project.org/package=ggpattern</a>.
 </div>
 <div id="ref-flaticon" class="csl-entry" role="listitem">
-Flaticon.com. 2024. <span>“<span>Wind Power Flaticon</span>.”</span> <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">https://www.flaticon.com/free-icon/wind-power_5670189</a>.
+Flaticon.com. 2024. <em><span>Wind Power Flaticon</span></em>. <a href="https://www.flaticon.com/free-icon/wind-power_5670189" class="uri">Https://www.flaticon.com/free-icon/wind-power_5670189</a>.
 </div>
 <div id="ref-fontawesome" class="csl-entry" role="listitem">
-Font Awesome. 2024. <span>“<span>Font Awesome 6</span>.”</span> <a href="https://fontawesome.com/" class="uri">https://fontawesome.com/</a>.
+Font Awesome. 2024. <em><span>Font Awesome 6</span></em>. <a href="https://fontawesome.com/" class="uri">Https://fontawesome.com/</a>.
 </div>
 <div id="ref-Hullman2021" class="csl-entry" role="listitem">
 Franconeri, Steven L., Lace M. Padilla, Priti Shah, Jeffrey M. Zacks, and Jessica Hullman. 2021. <span>“The Science of Visual Data Communication: What Works.”</span> <em>Psychological Science in the Public Interest</em> 22 (3): 110–61. <a href="https://doi.org/10.1177/15291006211051956">https://doi.org/10.1177/15291006211051956</a>.
 </div>
 <div id="ref-viridis" class="csl-entry" role="listitem">
-Garnier, Simon, Ross, Noam, Rudis, Robert, Camargo, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
+Garnier, Simon, Ross, et al. 2024. <em><span class="nocase">viridis(Lite)</span> - Colorblind-Friendly Color Maps for <span>R</span></em>. <a href="https://doi.org/10.5281/zenodo.4679423">https://doi.org/10.5281/zenodo.4679423</a>.
 </div>
 <div id="ref-ggiraph" class="csl-entry" role="listitem">
 Gohel, David, and Panagiotis Skintzos. 2024. <em><span class="nocase">ggiraph: Make ’ggplot2’ Graphics Interactive</span></em>. <a href="https://CRAN.R-project.org/package=ggiraph">https://CRAN.R-project.org/package=ggiraph</a>.
 </div>
 <div id="ref-GAcharts" class="csl-entry" role="listitem">
-Government Analysis Function. 2021. <span>“Data Visualisation: Colours.”</span> <a href="https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/" class="uri">https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/</a>.
+Government Analysis Function. 2021. <em>Data Visualisation: Colours</em>. <a href="https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/" class="uri">Https://analysisfunction.civilservice.gov.uk/policy-store/data-visualisation-colours-in-charts/</a>.
 </div>
 <div id="ref-geofacet" class="csl-entry" role="listitem">
 Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase">’ggplot2’</span> Faceting Utilities for Geographical Data</em>. <a href="https://CRAN.R-project.org/package=geofacet">https://CRAN.R-project.org/package=geofacet</a>.
@@ -1161,7 +1162,7 @@ Hafen, Ryan. 2023. <em><span class="nocase">geofacet</span>: <span class="nocase
 Harmon, Jon. 2024. <em><span class="nocase">Web APIs with R</span></em>. <span>CRC Press</span>. <a href="https://wapir.io/">https://wapir.io/</a>.
 </div>
 <div id="ref-lintr" class="csl-entry" role="listitem">
-Hester, Jim, Florent Angly, Russ Hyde, Michael Chirico, Kun Ren, Alexander Rosenstock, and Indrajeet Patil. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
+Hester, Jim, Florent Angly, Russ Hyde, et al. 2024. <em><span class="nocase">lintr</span>: A ’Linter’ for <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=lintr">https://CRAN.R-project.org/package=lintr</a>.
 </div>
 <div id="ref-glue" class="csl-entry" role="listitem">
 Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Interpreted String Literals</em>. <a href="https://glue.tidyverse.org/">https://glue.tidyverse.org/</a>.
@@ -1170,25 +1171,25 @@ Hester, Jim, and Jennifer Bryan. 2024. <em><span class="nocase">glue</span>: Int
 Hughes, Ellis. 2022a. <em><span class="nocase">camcorder</span>: Record Your Plot History</em>. <a href="https://CRAN.R-project.org/package=camcorder">https://CRAN.R-project.org/package=camcorder</a>.
 </div>
 <div id="ref-tidytuesdayR" class="csl-entry" role="listitem">
-———. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
+Hughes, Ellis. 2022b. <em><span class="nocase">tidytuesdayR</span>: Access the Weekly ’TidyTuesday’ Project Dataset</em>. <a href="https://CRAN.R-project.org/package=tidytuesdayR">https://CRAN.R-project.org/package=tidytuesdayR</a>.
 </div>
 <div id="ref-paletteer" class="csl-entry" role="listitem">
 Hvitfeldt, Emil. 2021. <em><span class="nocase">paletteer</span>: Comprehensive Collection of Color Palettes</em>. <a href="https://github.com/EmilHvitfeldt/paletteer">https://github.com/EmilHvitfeldt/paletteer</a>.
 </div>
 <div id="ref-animalshelter" class="csl-entry" role="listitem">
-———. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
+Hvitfeldt, Emil. 2025. <em><span class="nocase">animalshelter</span>: Animal Shelter Data</em>. <a href="https://github.com/EmilHvitfeldt/animalshelter">https://github.com/EmilHvitfeldt/animalshelter</a>.
 </div>
 <div id="ref-fontawesomeR" class="csl-entry" role="listitem">
 Iannone, Richard. 2024. <em><span class="nocase">fontawesome: Easily Work with ’Font Awesome’ Icons</span></em>. <a href="https://CRAN.R-project.org/package=fontawesome">https://CRAN.R-project.org/package=fontawesome</a>.
 </div>
 <div id="ref-zones_data" class="csl-entry" role="listitem">
-Internet Assigned Numbers Authority. 2023. <span>“The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data.”</span> <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
+Internet Assigned Numbers Authority. 2023. <em>The <span class="nocase">tz</span> Database: Time Zone and Daylight Saving Time Data</em>. <span>Internet Assigned Numbers Authority</span>. <a href="https://data.iana.org/time-zones/tz-link.html">https://data.iana.org/time-zones/tz-link.html</a>.
 </div>
 <div id="ref-img_jax" class="csl-entry" role="listitem">
-Jax (@lysrix). 2017. <span>“Lemur.”</span> <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
+Jax (@lysrix). 2017. <em>Lemur</em>. <a href="https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k">https://unsplash.com/photos/red-and-white-rodent-h5xrh3CNT-k</a>.
 </div>
 <div id="ref-kays2020" class="csl-entry" role="listitem">
-Kays, R., R. R. Dunn, A. W. Parsons, B. Mcdonald, T. Perkins, S. A. Powers, L. Shell, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. <a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
+Kays, R., R. R. Dunn, A. W. Parsons, et al. 2020. <span>“The Small Home Ranges and Large Local Ecological Impacts of Pet Cats.”</span> <em>Animal Conservation</em> 23 (5): 516–23. <a href="https://doi.org/10.1111/acv.12563">https://doi.org/10.1111/acv.12563</a>.
 </div>
 <div id="ref-r4rest" class="csl-entry" role="listitem">
 Keyes, David. 2024. <em><span class="nocase">R for the Rest of Us: A Statistics-Free Introduction</span></em>. No Starch Press. <a href="https://book.rfortherestofus.com/">https://book.rfortherestofus.com/</a>.
@@ -1200,31 +1201,31 @@ Long Beach Animal Shelter. 2025. <span>“<span>Animal Shelter Data</span>.”</
 Lucchesi, Lydia, and Petra Kuhnert. 2020. <em><span>Vizumap</span>: Visualizing Uncertainty in Spatial Data</em>. <a href="https://github.com/lydialucchesi/Vizumap">https://github.com/lydialucchesi/Vizumap</a>.
 </div>
 <div id="ref-museums_data" class="csl-entry" role="listitem">
-Mapping Museums. 2021. <span>“Mapping Museums Data.”</span> <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
+Mapping Museums. 2021. <em>Mapping Museums Data</em>. <a href="https://www.mappingmuseums.org">www.mappingmuseums.org</a>.
 </div>
 <div id="ref-rnaturalearth" class="csl-entry" role="listitem">
 Massicotte, Philippe, and Andy South. 2023. <em><span class="nocase">rnaturalearth</span>: World Map Data from Natural Earth</em>. <a href="https://docs.ropensci.org/rnaturalearth/">https://docs.ropensci.org/rnaturalearth/</a>.
 </div>
 <div id="ref-Matejka2017" class="csl-entry" role="listitem">
-Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> In, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
+Matejka, Justin, and George Fitzmaurice. 2017. <span>“Same Stats, Different Graphs: Generating Datasets with Varied Appearance and Identical Statistics Through Simulated Annealing.”</span> May, 1290–94. <a href="https://doi.org/10.1145/3025453.3025912">https://doi.org/10.1145/3025453.3025912</a>.
 </div>
 <div id="ref-cats_data" class="csl-entry" role="listitem">
-McDonald, J. L., and H. Cole. 2020. <span>“Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom].”</span> Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
+McDonald, J. L., and H. Cole. 2020. <em>Data from: The Small Home Ranges and Large Local Ecological Impacts of Pet Cats [United Kingdom]</em>. Movebank data repository. <a href="https://doi.org/doi:10.5441/001/1.pf315732">https://doi.org/doi:10.5441/001/1.pf315732</a>.
 </div>
 <div id="ref-colorblindr" class="csl-entry" role="listitem">
 McWhite, Claire D., and Claus O. Wilke. 2024. <em><span class="nocase">colorblindr: Simulate colorblindness in R figures</span></em>. <a href="https://github.com/clauswilke/colorblindr">https://github.com/clauswilke/colorblindr</a>.
 </div>
 <div id="ref-Apiculture" class="csl-entry" role="listitem">
-Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <span>“Seasonal Cycles of Activities in Colonies.”</span> <a href="https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/" class="uri">https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</a>.
+Mid-Atlantic Apiculture Research and Extension Consortium. 2024. <em>Seasonal Cycles of Activities in Colonies</em>. <a href="https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/" class="uri">Https://canr.udel.edu/maarec/honey-bee-biology/seasonal-cycles-of-activities-in-colonies/</a>.
 </div>
 <div id="ref-poissoned" class="csl-entry" role="listitem">
-mikefc. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
+<span class="nocase">mikefc</span>. 2024. <em><span class="nocase">poissoned: Tileable Poisson Disc Sampling</span></em>. <a href="https://github.com/coolbutuseless/poissoned">https://github.com/coolbutuseless/poissoned</a>.
 </div>
 <div id="ref-MetBrewer" class="csl-entry" role="listitem">
 Mills, Blake Robert. 2022. <em><span>MetBrewer</span>: Color Palettes Inspired by Works at the Metropolitan Museum of Art</em>. <a href="https://CRAN.R-project.org/package=MetBrewer">https://CRAN.R-project.org/package=MetBrewer</a>.
 </div>
 <div id="ref-elections_data" class="csl-entry" role="listitem">
-MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
+MIT Election Data and Science Lab. 2017. <span>“<span>U.S. House 1976–2022</span>.”</span> Version V12. Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/IG0UN2">https://doi.org/10.7910/DVN/IG0UN2</a>.
 </div>
 <div id="ref-styler" class="csl-entry" role="listitem">
 Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</span>: Non-Invasive Pretty Printing of <span>R</span> Code</em>. <a href="https://CRAN.R-project.org/package=styler">https://CRAN.R-project.org/package=styler</a>.
@@ -1233,10 +1234,10 @@ Müller, Kirill, and Lorenz Walthert. 2023. <em><span class="nocase">styler</spa
 Müller, Kirill, and Hadley Wickham. 2023. <em><span class="nocase">tibble</span>: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.
 </div>
 <div id="ref-Muth2018" class="csl-entry" role="listitem">
-Muth, Lisa. 2018. <span>“An Alternative to Pink &amp; Blue: Colors for Gender Data.”</span> <a href="https://blog.datawrapper.de/gendercolor/" class="uri">https://blog.datawrapper.de/gendercolor/</a>.
+Muth, Lisa. 2018. <em>An Alternative to Pink &amp; Blue: Colors for Gender Data</em>. <a href="https://blog.datawrapper.de/gendercolor/" class="uri">Https://blog.datawrapper.de/gendercolor/</a>.
 </div>
 <div id="ref-turbines_data" class="csl-entry" role="listitem">
-Natural Resources Canada. 2021. <span>“Canadian Wind Turbine Database.”</span> Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
+Natural Resources Canada. 2021. <em>Canadian Wind Turbine Database</em>. Natural Resources Canada (Government of Canada). <a href="https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070">https://open.canada.ca/data/en/dataset/79fdad93-9025-49ad-ba16-c26d718cc070</a>.
 </div>
 <div id="ref-ggbranding" class="csl-entry" role="listitem">
 Noblet, Guillaume. 2025. <em><span class="nocase">ggbranding: Add Personal Branding to ’ggplot2’ Charts</span></em>. <a href="https://github.com/gnoblet/ggbranding">https://github.com/gnoblet/ggbranding</a>.
@@ -1248,7 +1249,7 @@ Nowosad, Jakub. 2018. <em><span>’CARTOColors’ Palettes</span></em>. <a href=
 Ooms, Jeroen. 2024. <em><span class="nocase">magick: Advanced Graphics and Image-Processing in R</span></em>. <a href="https://CRAN.R-project.org/package=magick">https://CRAN.R-project.org/package=magick</a>.
 </div>
 <div id="ref-doctors_data" class="csl-entry" role="listitem">
-Our World in Data. 2019. <span>“Medical Doctors Per 1,000 People.”</span> <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
+Our World in Data. 2019. <em>Medical Doctors Per 1,000 People</em>. <a href="https://ourworldindata.org/grapher/physicians-per-1000-people">https://ourworldindata.org/grapher/physicians-per-1000-people</a>.
 </div>
 <div id="ref-sf" class="csl-entry" role="listitem">
 Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Standardized Support for Spatial Vector Data</span>.”</span> <em><span>The R Journal</span></em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.
@@ -1257,10 +1258,10 @@ Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R: Stand
 Pedersen, Thomas Lin. 2022. <em><span class="nocase">ggforce</span>: Accelerating <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggforce">https://CRAN.R-project.org/package=ggforce</a>.
 </div>
 <div id="ref-patchwork" class="csl-entry" role="listitem">
-———. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
+Pedersen, Thomas Lin. 2024. <em><span class="nocase">patchwork</span>: The Composer of Plots</em>. <a href="https://CRAN.R-project.org/package=patchwork">https://CRAN.R-project.org/package=patchwork</a>.
 </div>
 <div id="ref-Pedersen2025" class="csl-entry" role="listitem">
-———. 2025. <span>“<span class="nocase">Fonts in R</span>.”</span> <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
+Pedersen, Thomas Lin. 2025. <em><span class="nocase">Fonts in R</span></em>. <a href="https://www.tidyverse.org/blog/2025/05/fonts-in-r/" class="uri">Https://www.tidyverse.org/blog/2025/05/fonts-in-r/</a>.
 </div>
 <div id="ref-marquee" class="csl-entry" role="listitem">
 Pedersen, Thomas Lin, and Martin Mitáš. 2024. <em><span class="nocase">marquee: Markdown Parser and Renderer for R Graphics</span></em>. <a href="https://CRAN.R-project.org/package=marquee">https://CRAN.R-project.org/package=marquee</a>.
@@ -1278,61 +1279,61 @@ PLDB contributors. 2022. <span>“<span>PLDB</span>: A Programming Language Data
 Qiu, Yixuan. 2022. <em><span class="nocase">sysfonts</span>: Loading Fonts into <span>R</span></em>. <a href="https://CRAN.R-project.org/package=sysfonts">https://CRAN.R-project.org/package=sysfonts</a>.
 </div>
 <div id="ref-showtext" class="csl-entry" role="listitem">
-———. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
+Qiu, Yixuan. 2023. <em><span class="nocase">showtext</span>: Using Fonts More Easily in <span>R</span> Graphs</em>. <a href="https://CRAN.R-project.org/package=showtext">https://CRAN.R-project.org/package=showtext</a>.
 </div>
 <div id="ref-rproj" class="csl-entry" role="listitem">
-R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+R Core Team. 2024. <em><span>R</span>: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
 </div>
 <div id="ref-tidytuesday" class="csl-entry" role="listitem">
-R4DS Online Learning Community. 2023. <span>“Tidy Tuesday: A Weekly Social Data Project.”</span> <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
+R4DS Online Learning Community. 2023. <em>Tidy Tuesday: A Weekly Social Data Project</em>. <a href="https://github.com/rfordatascience/tidytuesday">https://github.com/rfordatascience/tidytuesday</a>.
 </div>
 <div id="ref-social_icons" class="csl-entry" role="listitem">
-Rennie, Nicola. 2023a. <span>“Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span>.”</span> <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
+Rennie, Nicola. 2023a. <em>Adding Social Media Icons to Charts with <span class="nocase">ggplot2</span></em>. <a href="https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/">https://nrennie.rbind.io/blog/adding-social-media-icons-ggplot2/</a>.
 </div>
 <div id="ref-template_files" class="csl-entry" role="listitem">
-———. 2023b. <span>“Creating Template Files with <span>R</span>.”</span> <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
+Rennie, Nicola. 2023b. <em>Creating Template Files with <span>R</span></em>. <a href="https://nrennie.rbind.io/blog/script-templates-r/">https://nrennie.rbind.io/blog/script-templates-r/</a>.
 </div>
 <div id="ref-streamline" class="csl-entry" role="listitem">
-———. 2023c. <span>“Four Ways to Streamline Your <span>R</span> Workflows.”</span> <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
+Rennie, Nicola. 2023c. <em>Four Ways to Streamline Your <span>R</span> Workflows</em>. <a href="https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/">https://nrennie.rbind.io/blog/four-ways-streamline-r-workflows/</a>.
 </div>
 <div id="ref-ggtextcircle" class="csl-entry" role="listitem">
-———. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
+Rennie, Nicola. 2024a. <em><span class="nocase">ggtextcircle: Circular Text in ’ggplot2’</span></em>. <a href="https://github.com/nrennie/ggtextcircle">https://github.com/nrennie/ggtextcircle</a>.
 </div>
 <div id="ref-nobel" class="csl-entry" role="listitem">
-———. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
+Rennie, Nicola. 2024b. <em><span class="nocase">nobel: Access data from the Nobel Prize API via R</span></em>. <a href="https://github.com/nrennie/nobel">https://github.com/nrennie/nobel</a>.
 </div>
 <div id="ref-pkgs_data" class="csl-entry" role="listitem">
-———. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
+Rennie, Nicola. 2024c. <span>“<span class="nocase">tidytuesday</span>.”</span> In <em>GitHub Repository</em>. GitHub. <a href="https://github.com/nrennie/tidytuesday">https://github.com/nrennie/tidytuesday</a>.
 </div>
 <div id="ref-signif2024a" class="csl-entry" role="listitem">
 Rennie, Nicola, and Andreas Krause. 2024. <span>“<span class="nocase">Presenting data the Significance way - Part 1</span>.”</span> <em>Significance</em> 21 (3): 36–39. <a href="https://doi.org/10.1093/jrssig/qmae045">https://doi.org/10.1093/jrssig/qmae045</a>.
 </div>
 <div id="ref-Reynolds2025" class="csl-entry" role="listitem">
-Reynolds, Gina. 2025. <span>“<span class="nocase">Everyday ggplot2 extension</span>.”</span> <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
+Reynolds, Gina. 2025. <em><span class="nocase">Everyday ggplot2 extension</span></em>. <a href="https://evamaerey.github.io/everyday_ggplot2_extension/" class="uri">Https://evamaerey.github.io/everyday_ggplot2_extension/</a>.
 </div>
 <div id="ref-hex_forcats" class="csl-entry" role="listitem">
-RStudio. 2018a. <span>“<span class="nocase">forcats</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
+RStudio. 2018a. <em><span class="nocase">forcats</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/forcats.png</a>.
 </div>
 <div id="ref-hex_ggplot2" class="csl-entry" role="listitem">
-———. 2018b. <span>“<span class="nocase">ggplot2</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
+RStudio. 2018b. <em><span class="nocase">ggplot2</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/ggplot2.png</a>.
 </div>
 <div id="ref-hex_purrr" class="csl-entry" role="listitem">
-———. 2018c. <span>“<span class="nocase">purrr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
+RStudio. 2018c. <em><span class="nocase">purrr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/purrr.png</a>.
 </div>
 <div id="ref-hex_readr" class="csl-entry" role="listitem">
-———. 2018d. <span>“<span class="nocase">readr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
+RStudio. 2018d. <em><span class="nocase">readr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/readr.png</a>.
 </div>
 <div id="ref-hex_tibble" class="csl-entry" role="listitem">
-———. 2018e. <span>“<span class="nocase">tibble</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
+RStudio. 2018e. <em><span class="nocase">tibble</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tibble.png</a>.
 </div>
 <div id="ref-hex_dplyr" class="csl-entry" role="listitem">
-———. 2020a. <span>“<span class="nocase">dplyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
+RStudio. 2020a. <em><span class="nocase">dplyr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/dplyr.png</a>.
 </div>
 <div id="ref-hex_stringr" class="csl-entry" role="listitem">
-———. 2020b. <span>“<span class="nocase">stringr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
+RStudio. 2020b. <em><span class="nocase">stringr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/stringr.png</a>.
 </div>
 <div id="ref-hex_tidyr" class="csl-entry" role="listitem">
-———. 2020c. <span>“<span class="nocase">tidyr</span> Hex Sticker.”</span> <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
+RStudio. 2020c. <em><span class="nocase">tidyr</span> Hex Sticker</em>. <a href="https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png">https://github.com/rstudio/hex-stickers/blob/main/PNG/tidyr.png</a>.
 </div>
 <div id="ref-ggalt" class="csl-entry" role="listitem">
 Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt: Extra Coordinate Systems, ’Geoms’, Statistical Transformations, Scales and Fonts for ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggalt">https://CRAN.R-project.org/package=ggalt</a>.
@@ -1341,7 +1342,7 @@ Rudis, Bob, Ben Bolker, and Jan Schulz. 2017. <em><span class="nocase">ggalt: Ex
 Rudis, Bob, and Dave Gandy. 2023. <em><span class="nocase">waffle</span>: Create Waffle Chart Visualizations</em>. <a href="https://CRAN.R-project.org/package=waffle">https://CRAN.R-project.org/package=waffle</a>.
 </div>
 <div id="ref-lattice" class="csl-entry" role="listitem">
-Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. New York: Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
+Sarkar, Deepayan. 2008. <em>Lattice: Multivariate Data Visualization with r</em>. Springer. <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>.
 </div>
 <div id="ref-openxlsx" class="csl-entry" role="listitem">
 Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openxlsx: Read, Write and Edit xlsx Files</span></em>. <a href="https://CRAN.R-project.org/package=openxlsx">https://CRAN.R-project.org/package=openxlsx</a>.
@@ -1350,7 +1351,7 @@ Schauberger, Philipp, and Alexander Walker. 2023. <em><span class="nocase">openx
 Scheuch, Christoph. 2025. <em><span class="nocase">owidapi</span>: Access the Our World in Data Chart API</em>. <a href="https://doi.org/10.32614/CRAN.package.owidapi">https://doi.org/10.32614/CRAN.package.owidapi</a>.
 </div>
 <div id="ref-GGally" class="csl-entry" role="listitem">
-Schloerke, Barret, Di Cook, Joseph Larmarange, Francois Briatte, Moritz Marbach, Edwin Thoen, Amos Elberg, and Jason Crowley. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
+Schloerke, Barret, Di Cook, Joseph Larmarange, et al. 2024. <em><span class="nocase">GGally: Extension to ’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=GGally">https://CRAN.R-project.org/package=GGally</a>.
 </div>
 <div id="ref-Schloss" class="csl-entry" role="listitem">
 Schloss, Karen B., Connor C. Gramazio, Allison T. Silverman, Madeline L. Parker, and Audrey S. Wang. 2019. <span>“Mapping Color to Meaning in Colormap Data Visualizations.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 25 (1): 810–19. <a href="https://doi.org/10.1109/TVCG.2018.2865147">https://doi.org/10.1109/TVCG.2018.2865147</a>.
@@ -1371,16 +1372,16 @@ Tierney, Nicholas. 2017. <span>“<span class="nocase">visdat: Visualising Whole
 Tierney, Nicholas, and Dianne Cook. 2023. <span>“Expanding Tidy Data Principles to Facilitate Missing Data Exploration, Visualization and Assessment of Imputations.”</span> <em>Journal of Statistical Software</em> 105 (7): 1–31. <a href="https://doi.org/10.18637/jss.v105.i07">https://doi.org/10.18637/jss.v105.i07</a>.
 </div>
 <div id="ref-Tol2021" class="csl-entry" role="listitem">
-Tol, Paul. 2021. <span>“<span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span>.”</span> <a href="https://sronpersonalpages.nl/~pault/" class="uri">https://sronpersonalpages.nl/~pault/</a>.
+Tol, Paul. 2021. <em><span class="nocase">Paul Tol’s Notes: Colour schemes and templates</span></em>. <a href="https://sronpersonalpages.nl/~pault/" class="uri">Https://sronpersonalpages.nl/~pault/</a>.
 </div>
 <div id="ref-UScensuspop" class="csl-entry" role="listitem">
-United States Census Bureau. 2021a. <span>“Historical Population Change Data (1910-2020).”</span> <a href="https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html" class="uri">https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html</a>.
+United States Census Bureau. 2021a. <em>Historical Population Change Data (1910-2020)</em>. <a href="https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html" class="uri">Https://www.census.gov/data/tables/time-series/dec/popchange-data-text.html</a>.
 </div>
 <div id="ref-UScensus" class="csl-entry" role="listitem">
-———. 2021b. <span>“State Area Measurements and Internal Point Coordinates.”</span> <a href="https://www.census.gov/geographies/reference-files/2010/geo/state-area.html" class="uri">https://www.census.gov/geographies/reference-files/2010/geo/state-area.html</a>.
+United States Census Bureau. 2021b. <em>State Area Measurements and Internal Point Coordinates</em>. <a href="https://www.census.gov/geographies/reference-files/2010/geo/state-area.html" class="uri">Https://www.census.gov/geographies/reference-files/2010/geo/state-area.html</a>.
 </div>
 <div id="ref-bees_data" class="csl-entry" role="listitem">
-United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <span>“Honey Bee Colonies.”</span> <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
+United States Department of Agriculture: Economics, Statistics and Market Information System. 2022. <em>Honey Bee Colonies</em>. <span>USDA Economics, Statistics and Market Information System</span>. <a href="https://usda.library.cornell.edu/concern/publications/rn301137d">https://usda.library.cornell.edu/concern/publications/rn301137d</a>.
 </div>
 <div id="ref-crsuggest" class="csl-entry" role="listitem">
 Walker, Kyle. 2022. <em><span class="nocase">crsuggest: Obtain Suggested Coordinate Reference System Information for Spatial Data</span></em>. <a href="https://CRAN.R-project.org/package=crsuggest">https://CRAN.R-project.org/package=crsuggest</a>.
@@ -1392,13 +1393,13 @@ Wanzer, Dana Linnell, Tarek Azzam, Natalie D. Jones, and Darrel Skousen. 2021. <
 Wickham, Hadley. 2016. <em><span class="nocase">ggplot2</span>: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
 </div>
 <div id="ref-forcats" class="csl-entry" role="listitem">
-———. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
+Wickham, Hadley. 2023a. <em><span class="nocase">forcats</span>: Tools for Working with Categorical Variables (Factors)</em>. <a href="https://doi.org/10.32614/CRAN.package.forcats">https://doi.org/10.32614/CRAN.package.forcats</a>.
 </div>
 <div id="ref-stringr" class="csl-entry" role="listitem">
-———. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+Wickham, Hadley. 2023b. <em><span class="nocase">stringr: Simple, Consistent Wrappers for Common String Operations</span></em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
 </div>
 <div id="ref-tidyverse" class="csl-entry" role="listitem">
-Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
 </div>
 <div id="ref-readxl" class="csl-entry" role="listitem">
 Wickham, Hadley, and Jennifer Bryan. 2023. <em><span class="nocase">readxl: Read Excel Files</span></em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.
@@ -1422,7 +1423,7 @@ Wickham, Hadley, Thomas Lin Pedersen, and Dana Seidel. 2023. <em><span class="no
 Wickham, Hadley, Davis Vaughan, and Maximilian Girlich. 2024. <em><span class="nocase">tidyr</span>: Tidy Messy Data</em>. <a href="https://CRAN.R-project.org/package=tidyr">https://CRAN.R-project.org/package=tidyr</a>.
 </div>
 <div id="ref-ggtextures" class="csl-entry" role="listitem">
-Wilke, Claus. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
+Wilke, Claus O. 2022. <em><span class="nocase">ggtextures: Drawing Textured Rectangles and Bars with grid and ggplot2</span></em>. <a href="https://github.com/clauswilke/ggtextures">https://github.com/clauswilke/ggtextures</a>.
 </div>
 <div id="ref-cowplot" class="csl-entry" role="listitem">
 Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot Theme and Plot Annotations for <span class="nocase">’ggplot2’</span></em>. <a href="https://wilkelab.org/cowplot/">https://wilkelab.org/cowplot/</a>.
@@ -1431,7 +1432,7 @@ Wilke, Claus O. 2024. <em><span class="nocase">cowplot</span>: Streamlined Plot 
 Wilke, Claus O., and Brenton M. Wiernik. 2022. <em><span class="nocase">ggtext</span>: Improved Text Rendering Support for <span class="nocase">’ggplot2’</span></em>. <a href="https://CRAN.R-project.org/package=ggtext">https://CRAN.R-project.org/package=ggtext</a>.
 </div>
 <div id="ref-nobel_data" class="csl-entry" role="listitem">
-www.nobelprize.org. 2024. <span>“<span>Nobel Prize API Version 2.1</span>.”</span> <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
+<span class="nocase">www.nobelprize.org</span>. 2024. <em><span>Nobel Prize API Version 2.1</span></em>. <a href="https://api.nobelprize.org/2.1/laureates">https://api.nobelprize.org/2.1/laureates</a>.
 </div>
 <div id="ref-owidR" class="csl-entry" role="listitem">
 York, Piers. 2023. <em><span class="nocase">owidR</span>: Import Data from Our World in Data</em>. <a href="https://github.com/piersyork/owidR">https://github.com/piersyork/owidR</a>.
